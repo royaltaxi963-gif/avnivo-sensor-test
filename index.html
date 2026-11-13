@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v11.0 — Seven Flag Controls</title>
+<title>AVNIVO Translator — UI maket v11.1 — Flag Editor and Copy</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -244,6 +244,9 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 .flag-control-row label{font-size:12px;line-height:1.25;white-space:normal}
 .flag-control-row input{width:100%;min-width:0;accent-color:#f5b94d;touch-action:pan-x}
 .flag-control-row output{text-align:right;font-size:12px;font-variant-numeric:tabular-nums}
+
+.flag-copy-settings{width:100%;padding:11px;border:1px solid #e9bc68;border-radius:10px;background:#79501f;color:#fff4d5;font:700 13px system-ui;cursor:pointer}
+.flag-copy-status{margin:0;font-size:12px;color:#ffdda3;min-height:14px}
 </style>
 </head>
 <body>
@@ -269,8 +272,10 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 <div class="flag-control-row"><label for="flagWidth">Eni</label><input id="flagWidth" type="range" min="50" max="180" step="1" value="110"><output id="flagWidthValue" for="flagWidth">110%</output></div>
 <div class="flag-control-row"><label for="flagHeight">Bo‘yi</label><input id="flagHeight" type="range" min="40" max="160" step="1" value="85"><output id="flagHeightValue" for="flagHeight">85%</output></div>
 <div class="flag-control-row"><label for="flagSymbolSize">Oy-yulduz hajmi</label><input id="flagSymbolSize" type="range" min="50" max="180" step="1" value="100"><output id="flagSymbolSizeValue" for="flagSymbolSize">100%</output></div>
+<div class="flag-control-row"><label for="flagMoonSize">Oy kattaligi</label><input id="flagMoonSize" type="range" min="50" max="180" step="1" value="100"><output id="flagMoonSizeValue" for="flagMoonSize">100%</output></div>
+<div class="flag-control-row"><label for="flagStarSize">Yulduzlar kattaligi</label><input id="flagStarSize" type="range" min="50" max="180" step="1" value="100"><output id="flagStarSizeValue" for="flagStarSize">100%</output></div>
 <div class="flag-control-row"><label for="flagSymbols">Oy-yulduz joyi</label><input id="flagSymbols" type="range" min="-20" max="20" step="1" value="0"><output id="flagSymbolsValue" for="flagSymbols">0%</output></div>
-<div class="flag-control-row"><label for="flagOpacity">Shaffoflik</label><input id="flagOpacity" type="range" min="5" max="100" step="1" value="35"><output id="flagOpacityValue" for="flagOpacity">35%</output></div></div><nav class="nav" aria-label="Asosiy navigatsiya">
+<div class="flag-control-row"><label for="flagOpacity">Shaffoflik</label><input id="flagOpacity" type="range" min="5" max="100" step="1" value="35"><output id="flagOpacityValue" for="flagOpacity">35%</output></div><button id="flagCopySettings" type="button" class="flag-copy-settings">Sozlamalarni nusxalash</button><p id="flagCopyStatus" class="flag-copy-status" role="status" aria-live="polite"></p></div><nav class="nav" aria-label="Asosiy navigatsiya">
 <button class="nav-btn" type="button" aria-label="Tarix (maket)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 11a9 9 0 1 1 2.8 6.5M3 4v7h7"/><path d="M12 7v5l3 2"/></svg><span>Tarix</span></button>
 <button class="mic" type="button" id="mic" aria-label="Demo mikrofon holatini almashtirish" aria-pressed="false"><span class="mic-gyro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg></span></button>
 <button class="nav-btn" type="button" id="settingsBtn" aria-label="Sozlamalar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l-1.8 1.8A1.7 1.7 0 0 0 16 18.4l-1.1.5-.5 2.1h-2.8l-.5-2.1-1.1-.5a1.7 1.7 0 0 0-1.9.3l-1.8-1.8A1.7 1.7 0 0 0 6.6 15l-.5-1.1L4 13.4v-2.8l2.1-.5.5-1.1a1.7 1.7 0 0 0-.3-1.9l1.8-1.8A1.7 1.7 0 0 0 10 5.6l1.1-.5.5-2.1h2.8l.5 2.1 1.1.5a1.7 1.7 0 0 0 1.9-.3l1.8 1.8a1.7 1.7 0 0 0-.3 1.9l.5 1.1 2.1.5v2.8l-2.1.5z"/></svg><span>Sozlamalar</span></button>
@@ -392,7 +397,8 @@ toggle.addEventListener('click',async()=>{
 </script>
 
 <script>
-(()=>{const toggle=document.getElementById('flagSettingsToggle'),box=document.getElementById('flagSettings'),close=document.getElementById('flagSettingsClose'),panel=document.querySelector('.speaker[data-speaker="1"]');if(!toggle||!box||!panel)return;function show(open){box.hidden=!open;toggle.setAttribute('aria-expanded',String(open));}toggle.addEventListener('click',()=>show(box.hidden));close?.addEventListener('click',()=>show(false));for(const id of ['flagX','flagY','flagWidth','flagHeight','flagSymbolSize','flagSymbols','flagOpacity']){const input=document.getElementById(id),out=document.getElementById(id+'Value');if(!input||!out)continue;input.addEventListener('input',()=>{out.textContent=input.value+'%';if(id==='flagOpacity')panel.style.setProperty('--uz-flag-opacity',String(Number(input.value)/100));});}})();
+(()=>{const toggle=document.getElementById('flagSettingsToggle'),box=document.getElementById('flagSettings'),close=document.getElementById('flagSettingsClose'),panel=document.querySelector('.speaker[data-speaker="1"]');if(!toggle||!box||!panel)return;function show(open){box.hidden=!open;toggle.setAttribute('aria-expanded',String(open));}toggle.addEventListener('click',()=>show(box.hidden));close?.addEventListener('click',()=>show(false));for(const id of ['flagX','flagY','flagWidth','flagHeight','flagSymbolSize','flagMoonSize','flagStarSize','flagSymbols','flagOpacity']){const input=document.getElementById(id),out=document.getElementById(id+'Value');if(!input||!out)continue;input.addEventListener('input',()=>{out.textContent=input.value+'%';if(id==='flagOpacity')panel.style.setProperty('--uz-flag-opacity',String(Number(input.value)/100));});}const copy=document.getElementById('flagCopySettings'),status=document.getElementById('flagCopyStatus');copy?.addEventListener('click',async()=>{const ids=['flagX','flagY','flagWidth','flagHeight','flagSymbolSize','flagMoonSize','flagStarSize','flagSymbols','flagOpacity'];const names=['Chap/o‘ng','Yuqori/past','Eni','Bo‘yi','Oy-yulduz umumiy','Oy kattaligi','Yulduzlar kattaligi','Oy-yulduz joyi','Shaffoflik'];const message='AVNIVO bayroq sozlamalari v11.1\\n'+ids.map((id,i)=>names[i]+': '+document.getElementById(id).value+'%').join('\\n');try{await navigator.clipboard.writeText(message);status.textContent='Nusxalandi! Chatga joylang.';}catch(e){const field=document.createElement('textarea');field.value=message;field.style.cssText='position:fixed;top:25%;left:5%;width:90%;height:45%;z-index:9999';document.body.appendChild(field);field.focus();field.select();status.textContent='Matn tanlandi. Nusxalab chatga yuboring.';}});
+})();
 </script>
-<script src="uz-flag-inline.js?v=110" defer></script>
+<script src="uz-flag-inline.js?v=111" defer></script>
 </body></html>
