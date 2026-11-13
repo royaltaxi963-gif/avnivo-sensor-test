@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v11.6 — Three Language Flag Test</title>
+<title>AVNIVO Translator — UI maket v11.7 — Visible Language Selector</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -258,7 +258,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 /* v11.6 isolated language-flag test: preserve bottom Uzbekistan flag */
 .speaker.top{--uz-flag-opacity:.65}
 .speaker.top>.uz-flag-mini[hidden]{display:none!important}
-.flag-test-select{position:absolute;right:10px;bottom:10px;z-index:4;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:9px;background:#171c27e8;color:#fff;font:600 11px system-ui}
+.flag-test-select{position:absolute;left:12px;right:12px;top:52px;bottom:auto;z-index:30;display:flex!important;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border:2px solid #d5b477;border-radius:10px;background:#171c27;color:#fff;font:700 13px system-ui;pointer-events:auto!important;visibility:visible!important}
 .flag-test-select select{max-width:180px;min-width:120px;border:1px solid #bfa57d;border-radius:6px;padding:6px;background:#292f3a;color:white;font:12px system-ui}
 .speaker.top>.header{pointer-events:none}
 </style>
@@ -410,5 +410,5 @@ toggle.addEventListener('click',async()=>{
 <script>
 (()=>{const select=document.getElementById('testLanguage'),wrap=document.getElementById('topFlagWrap'),canvas=document.getElementById('topFlagCanvas'),label=document.getElementById('topLang');if(!select||!wrap||!canvas||!label)return;const names={uz:'O‘zbekcha',ru:'Ruscha',jp:'Yaponcha'};function apply(code){if(!Object.prototype.hasOwnProperty.call(names,code)){wrap.hidden=true;label.textContent='Chet tili · Avto';return;}canvas.dataset.flagType=code;wrap.hidden=false;label.textContent=names[code]+' · Tanlangan';if(window.avnivoSetFlagType)window.avnivoSetFlagType(canvas,code);}select.addEventListener('change',()=>apply(select.value));window.avnivoSelectDetectedLanguage=code=>{if(!Object.prototype.hasOwnProperty.call(names,code))return false;select.value=code;apply(code);return true;};apply(select.value);})();
 </script>
-<script src="uz-flag-inline.js?v=116" defer></script>
+<script src="uz-flag-inline.js?v=117" defer></script>
 </body></html>
