@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v9.1 — Pink Aurora</title>
+<title>AVNIVO Translator — UI maket v9.2 — Soft Pink Aurora</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -165,6 +165,26 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 @keyframes micAuroraBreath{0%,100%{opacity:.83;transform:scale(.97)}50%{opacity:1;transform:scale(1.09)}}
 @keyframes micAuroraOrbit{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){#mic.active,#mic.active:before,#mic.active:after{animation:none!important}}
+
+/* v9.2: modest pink glow and an actual upward layout offset, gold idle untouched. */
+.nav #mic{position:relative;top:-27px}
+#mic.active{
+ box-shadow:0 0 0 2px #ffe2f5,0 0 0 6px #ff8dd755,0 0 16px 5px #ff9cdbbb,0 0 30px 9px #ee55a777,inset 0 2px 8px #fff8;
+ animation:micSoftPinkPulse 2.5s ease-in-out infinite;
+}
+#mic.active:before{
+ box-shadow:0 0 9px 2px #ffb5e4,0 0 16px 4px #ff76c388;
+ opacity:.78;
+}
+#mic.active:after{
+ opacity:.56;
+ filter:drop-shadow(0 0 3px #ffa3dd);
+}
+@keyframes micSoftPinkPulse{
+ 0%,100%{box-shadow:0 0 0 2px #ffe2f5,0 0 0 6px #ff8dd755,0 0 16px 5px #ff9cdbbb,0 0 30px 9px #ee55a777,inset 0 2px 8px #fff8}
+ 50%{box-shadow:0 0 0 3px #fff0fa,0 0 0 8px #ff8dd766,0 0 21px 7px #ff9cdbcc,0 0 38px 11px #ee55a788,inset 0 2px 10px #fff9}
+}
+@media(prefers-reduced-motion:reduce){#mic.active{animation:none!important}}
 </style>
 </head>
 <body>
