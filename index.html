@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v11.2 — Fixed Flag and Settings Opacity</title>
+<title>AVNIVO Translator — UI maket v11.3 — No Flag</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -270,7 +270,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 </span>
 </button>
 <section data-speaker="1" class="speaker middle" aria-label="Pastdagi suhbatdosh">
-<span class="uz-flag-mini" role="img" aria-label="Hilpirayotgan O‘zbekiston bayrog‘i"><canvas id="uzFlagCanvas" aria-hidden="true"></canvas></span><div class="header"><div class="identity"><span id="bottomName" hidden>1-suhbatdosh</span></div><span class="language" id="bottomLang">O‘zbekcha</span></div>
+<div class="header"><div class="identity"><span id="bottomName" hidden>1-suhbatdosh</span></div><span class="language" id="bottomLang">O‘zbekcha</span></div>
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
 <div class="swap-flare" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -282,7 +282,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 <section class="sensor-sheet" id="sensorSheet" role="dialog" aria-modal="true" aria-labelledby="sensorTitle" hidden>
 <div class="sensor-card"><div class="sensor-head"><strong id="sensorTitle">Harakat sensori</strong><button id="sensorClose" type="button" aria-label="Yopish">✕</button></div>
 <p>Telefonni sekin egib ko‘ring. v8.7: sensor yoqilgach, oynani yopib mikrofon tugmasini kuzating.</p>
-<div class="flag-opacity-setting"><label for="settingsFlagOpacity">Bayroq shaffofligi</label><input type="range" id="settingsFlagOpacity" min="5" max="100" step="1" value="19"><output id="settingsFlagOpacityValue" for="settingsFlagOpacity">19%</output></div><button type="button" id="sensorToggle" class="sensor-toggle">Sensorni yoqish</button>
+<button type="button" id="sensorToggle" class="sensor-toggle">Sensorni yoqish</button>
 <div class="sensor-readings" aria-live="off"><span>Chap / o‘ng <b id="sensorX">—</b></span><span>Old / orqa <b id="sensorY">—</b></span></div>
 <div id="sensorStatus" class="sensor-status" role="status">Sensor o‘chirilgan</div>
 </div></section>
@@ -396,8 +396,6 @@ toggle.addEventListener('click',async()=>{
 </script>
 
 
-<script>
-(()=>{const slider=document.getElementById('settingsFlagOpacity'),output=document.getElementById('settingsFlagOpacityValue'),panel=document.querySelector('.speaker[data-speaker="1"]');if(!slider||!output||!panel)return;slider.addEventListener('input',()=>{const n=Number(slider.value);output.textContent=n+'%';panel.style.setProperty('--uz-flag-opacity',String(n/100));try{localStorage.setItem('avnivoFlagOpacity',String(n));}catch(e){}});try{const saved=Number(localStorage.getItem('avnivoFlagOpacity'));if(saved>=5&&saved<=100){slider.value=String(saved);output.textContent=saved+'%';panel.style.setProperty('--uz-flag-opacity',String(saved/100));}}catch(e){}})();
-</script>
-<script src="uz-flag-inline.js?v=112" defer></script>
+
+
 </body></html>
