@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v8.9 — Gravity Stabilizer</title>
+<title>AVNIVO Translator — UI maket v9.0 — Fantasy Microphone</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -108,6 +108,35 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 #mic{transform:rotate(var(--mic-roll,0deg)) perspective(500px) rotateX(var(--mic-pitch,0deg));transform-origin:center center;will-change:transform;transition:transform 85ms linear,background .2s,box-shadow .2s}
 .mic-gyro svg{display:block}
 @media(prefers-reduced-motion:reduce){.mic-gyro{transition:none}}
+
+/* v9.0: fantasy microphone activation. Decorative layers never intercept taps or sensor rotation. */
+#mic.active{
+ background:radial-gradient(circle at 30% 20%,#ffb9df 0%,#ff73b4 33%,#f23d92 68%,#b71870 100%);
+ border:3px solid #ffe2f5;
+ color:#fff;
+ box-shadow:0 0 0 3px #ffacd8,0 0 0 8px #ff60b744,0 0 18px 6px #ff80d9,0 0 38px 12px #f73b9c99,0 0 65px 18px #d828a655,inset 0 3px 9px #fff9;
+ animation:micFantasyGlow 1.8s ease-in-out infinite;
+}
+#mic.active:before{
+ inset:-13px;border:3px solid #ffd7f2;
+ box-shadow:0 0 16px #ff8ddf,0 0 28px #ff50b7,inset 0 0 12px #ff7dd5;
+ animation:micFantasyHalo 1.8s ease-in-out infinite;
+}
+#mic:after{
+ content:"";position:absolute;inset:-24px;border-radius:50%;pointer-events:none;opacity:0;
+ background:conic-gradient(from 0deg,transparent 0deg,#ffb4ed 28deg,transparent 52deg,transparent 110deg,#fff1fa 132deg,transparent 152deg,transparent 230deg,#ff76d4 250deg,transparent 280deg);
+ -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4px));
+ mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4px));
+}
+#mic.active:after{opacity:.9;animation:micFantasyOrbit 4s linear infinite}
+#mic.active .mic-gyro svg{filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 10px #ffdbf7)}
+@keyframes micFantasyGlow{
+ 0%,100%{box-shadow:0 0 0 3px #ffacd8,0 0 0 8px #ff60b744,0 0 18px 6px #ff80d9,0 0 38px 12px #f73b9c99,0 0 65px 18px #d828a655,inset 0 3px 9px #fff9}
+ 50%{box-shadow:0 0 0 4px #fff0fa,0 0 0 12px #ff60b755,0 0 26px 10px #ffa7eb,0 0 52px 18px #ff3fa9bb,0 0 78px 24px #d828a677,inset 0 3px 12px #fff}
+}
+@keyframes micFantasyHalo{0%,100%{opacity:.8;transform:scale(.96)}50%{opacity:1;transform:scale(1.11)}}
+@keyframes micFantasyOrbit{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#mic.active,#mic.active:before,#mic.active:after{animation:none!important}}
 </style>
 </head>
 <body>
