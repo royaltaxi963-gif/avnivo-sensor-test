@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v8.4 — Gravity Stabilizer</title>
+<title>AVNIVO Translator — UI maket v8.5 — Gravity Stabilizer</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -103,7 +103,9 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 .sensor-card{width:100%;max-width:520px;background:linear-gradient(145deg,#332719,#211b16);border:1px solid #cfa65b70;border-radius:26px;padding:20px;color:#fff0d2;box-shadow:0 20px 70px #000b}.sensor-head{display:flex;align-items:center;justify-content:space-between;font-size:19px}.sensor-head button{border:0;background:#ffffff15;color:#ffdf9a;border-radius:50%;width:36px;height:36px;font-size:18px}.sensor-card p{font-size:13px;line-height:1.6;color:#d8c3a0}.sensor-toggle{background:linear-gradient(135deg,#ffdc8a,#db9c38);border:0;border-radius:14px;padding:13px 18px;color:#2b1b08;font-weight:750;width:100%}.sensor-readings{display:flex;gap:10px;margin:16px 0}.sensor-readings span{flex:1;background:#ffffff0c;border:1px solid #ffffff16;border-radius:13px;padding:12px;font-size:12px}.sensor-readings b{display:block;margin-top:8px;font-size:20px;font-variant-numeric:tabular-nums}.sensor-status{font-size:12px;color:#f5cf85;min-height:18px}
 
 /* Gravity stabilizer: keep the button hit target fixed; move only its visual glyph. */
-.mic-gyro{display:grid;place-items:center;transform:rotate(var(--mic-roll,0deg)) rotateX(var(--mic-pitch,0deg));transform-style:preserve-3d;will-change:transform;transition:transform 110ms linear;pointer-events:none}
+.mic-gyro{display:grid;place-items:center;pointer-events:none}
+/* Rotate the visible microphone button itself: reliable on Chrome Android. */
+#mic{transform:rotate(var(--mic-roll,0deg)) perspective(500px) rotateX(var(--mic-pitch,0deg));transform-origin:center center;will-change:transform;transition:transform 85ms linear,background .2s,box-shadow .2s}
 .mic-gyro svg{display:block}
 @media(prefers-reduced-motion:reduce){.mic-gyro{transition:none}}
 </style>
@@ -214,8 +216,8 @@ const onOrientation=e=>{
  if(!enabled || !Number.isFinite(e.gamma) || !Number.isFinite(e.beta))return;
  latest={gamma:e.gamma,beta:e.beta};seen=true;
  // Counter-rotate the glyph, not the tappable button. Gamma is the portrait roll approximation.
- const roll=Math.max(-65,Math.min(65,-e.gamma));
- const pitch=Math.max(-14,Math.min(14,(e.beta-45)*0.18));
+ const roll=Math.max(-80,Math.min(80,-e.gamma));
+ const pitch=Math.max(-10,Math.min(10,(e.beta-45)*0.12));
  document.getElementById('mic').style.setProperty('--mic-roll',roll.toFixed(1)+'deg');
  document.getElementById('mic').style.setProperty('--mic-pitch',pitch.toFixed(1)+'deg');
  if(!raf)raf=requestAnimationFrame(()=>{
