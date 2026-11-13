@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v10.8 — Bottom Panel Flag Two Sliders</title>
+<title>AVNIVO Translator — UI maket v10.9 — Flag Customizer</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -226,6 +226,13 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 .flag-control-row label{font-size:12px;font-weight:700}
 .flag-control-row input{display:block;width:100%;min-width:0;height:24px;accent-color:#f6b84e;touch-action:pan-x}
 .flag-control-row output{font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* v10.9: adjustable flag only in bottom speaker */
+.flag-settings-toggle{position:fixed;z-index:1002;bottom:88px;left:50%;transform:translateX(-50%);border:1px solid #e6b65c99;border-radius:12px;background:#302315;color:#ffe4aa;padding:10px 14px;font:700 12px system-ui;white-space:nowrap;box-shadow:0 5px 18px #0008}
+.flag-opacity-panel[hidden]{display:none!important}
+.flag-opacity-panel{bottom:136px;max-height:min(54vh,430px);overflow-y:auto;display:flex;flex-direction:column;gap:12px;width:min(350px,calc(100vw - 24px))}
+.flag-control-row{grid-template-columns:110px minmax(70px,1fr) 42px}
+.flag-control-row label{font-size:11px}
 </style>
 </head>
 <body>
@@ -246,7 +253,13 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
 <div class="swap-flare" aria-hidden="true"><i></i><i></i><i></i></div>
-<div class="flag-opacity-panel" role="group" aria-label="Bayroq sozlamalari"><div class="flag-control-row"><label for="flagOpacity">Shaffoflik</label><input id="flagOpacity" type="range" min="10" max="100" step="5" value="35"><output id="flagOpacityValue" for="flagOpacity">35%</output></div><div class="flag-control-row"><label for="flagSize">Kattalik</label><input id="flagSize" type="range" min="60" max="150" step="5" value="100"><output id="flagSizeValue" for="flagSize">100%</output></div></div><nav class="nav" aria-label="Asosiy navigatsiya">
+<button id="flagSettingsToggle" class="flag-settings-toggle" type="button" aria-expanded="false" aria-controls="flagSettings">⚙ Bayroq sozlamalari</button><div id="flagSettings" class="flag-opacity-panel" role="group" aria-label="Bayroq sozlamalari" hidden>
+<div class="flag-control-row"><label for="flagWidth">Eni</label><input id="flagWidth" type="range" min="60" max="160" step="5" value="110"><output id="flagWidthValue">110%</output></div>
+<div class="flag-control-row"><label for="flagHeight">Bo‘yi</label><input id="flagHeight" type="range" min="50" max="140" step="5" value="85"><output id="flagHeightValue">85%</output></div>
+<div class="flag-control-row"><label for="flagSize">Umumiy kattalik</label><input id="flagSize" type="range" min="60" max="150" step="5" value="100"><output id="flagSizeValue">100%</output></div>
+<div class="flag-control-row"><label for="flagOpacity">Shaffoflik</label><input id="flagOpacity" type="range" min="10" max="100" step="5" value="35"><output id="flagOpacityValue">35%</output></div>
+<div class="flag-control-row"><label for="flagSymbols">Oy va yulduzlar ↔</label><input id="flagSymbols" type="range" min="-15" max="15" step="1" value="0"><output id="flagSymbolsValue">0%</output></div>
+</div><nav class="nav" aria-label="Asosiy navigatsiya">
 <button class="nav-btn" type="button" aria-label="Tarix (maket)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 11a9 9 0 1 1 2.8 6.5M3 4v7h7"/><path d="M12 7v5l3 2"/></svg><span>Tarix</span></button>
 <button class="mic" type="button" id="mic" aria-label="Demo mikrofon holatini almashtirish" aria-pressed="false"><span class="mic-gyro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg></span></button>
 <button class="nav-btn" type="button" id="settingsBtn" aria-label="Sozlamalar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l-1.8 1.8A1.7 1.7 0 0 0 16 18.4l-1.1.5-.5 2.1h-2.8l-.5-2.1-1.1-.5a1.7 1.7 0 0 0-1.9.3l-1.8-1.8A1.7 1.7 0 0 0 6.6 15l-.5-1.1L4 13.4v-2.8l2.1-.5.5-1.1a1.7 1.7 0 0 0-.3-1.9l1.8-1.8A1.7 1.7 0 0 0 10 5.6l1.1-.5.5-2.1h2.8l.5 2.1 1.1.5a1.7 1.7 0 0 0 1.9-.3l1.8 1.8a1.7 1.7 0 0 0-.3 1.9l.5 1.1 2.1.5v2.8l-2.1.5z"/></svg><span>Sozlamalar</span></button>
@@ -368,7 +381,10 @@ toggle.addEventListener('click',async()=>{
 </script>
 
 <script>
-(()=>{const slider=document.getElementById('flagOpacity'),out=document.getElementById('flagOpacityValue'),panels=document.querySelectorAll('.speaker[data-speaker="1"]');if(!slider||!out||!panels.length)return;slider.addEventListener('input',()=>{const n=Number(slider.value);panels.forEach(panel=>panel.style.setProperty('--uz-flag-opacity',String(n/100)));out.textContent=n+'%';});const size=document.getElementById('flagSize'),sizeOut=document.getElementById('flagSizeValue');if(size&&sizeOut)size.addEventListener('input',()=>{sizeOut.textContent=size.value+'%';});})();
+(()=>{const toggle=document.getElementById('flagSettingsToggle'),box=document.getElementById('flagSettings'),panel=document.querySelector('.speaker[data-speaker="1"]');if(!toggle||!box||!panel)return;
+toggle.addEventListener('click',()=>{box.hidden=!box.hidden;toggle.setAttribute('aria-expanded',String(!box.hidden));});
+for(const id of ['flagWidth','flagHeight','flagSize','flagOpacity','flagSymbols']){const input=document.getElementById(id),out=document.getElementById(id+'Value');if(!input||!out)continue;input.addEventListener('input',()=>{out.textContent=input.value+'%';if(id==='flagOpacity')panel.style.setProperty('--uz-flag-opacity',String(Number(input.value)/100));});}
+})();
 </script>
-<script src="uz-flag-inline.js?v=108" defer></script>
+<script src="uz-flag-inline.js?v=109" defer></script>
 </body></html>
