@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v11.3 — No Flag</title>
+<title>AVNIVO Translator — UI maket v11.4 — Correct Flag Stars</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -270,6 +270,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 </span>
 </button>
 <section data-speaker="1" class="speaker middle" aria-label="Pastdagi suhbatdosh">
+<span class="uz-flag-mini" role="img" aria-label="Hilpirayotgan O‘zbekiston bayrog‘i"><canvas id="uzFlagCanvas" aria-hidden="true"></canvas></span>
 <div class="header"><div class="identity"><span id="bottomName" hidden>1-suhbatdosh</span></div><span class="language" id="bottomLang">O‘zbekcha</span></div>
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
@@ -398,4 +399,5 @@ toggle.addEventListener('click',async()=>{
 
 
 
+<script src="uz-flag-inline.js?v=114" defer></script>
 </body></html>
