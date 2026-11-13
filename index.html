@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v9.0 — Fantasy Microphone</title>
+<title>AVNIVO Translator — UI maket v9.1 — Pink Aurora</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -136,6 +136,34 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 }
 @keyframes micFantasyHalo{0%,100%{opacity:.8;transform:scale(.96)}50%{opacity:1;transform:scale(1.11)}}
 @keyframes micFantasyOrbit{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#mic.active,#mic.active:before,#mic.active:after{animation:none!important}}
+
+/* v9.1: active-only luminous pink aurora; gold idle appearance unchanged. */
+#mic{top:-12px}
+#mic.active{
+ background:radial-gradient(circle at 29% 19%,#fff3fc 0%,#ffb9ec 19%,#ff67c4 49%,#ed269b 76%,#b40b73 100%);
+ border-color:#fff3fd;
+ color:#fff;
+ animation:micAuroraPulse 2.35s ease-in-out infinite;
+}
+#mic.active:before{
+ inset:-11px;border:3px solid #fff0ff;
+ box-shadow:0 0 12px 4px #ffc2f5,0 0 30px 8px #ff56c7,inset 0 0 16px #ff7bda;
+ animation:micAuroraBreath 2.35s ease-in-out infinite;
+}
+#mic.active:after{
+ inset:-22px;
+ background:conic-gradient(from 0deg,transparent 0deg,#ffe9ff 16deg,#ff74d8 28deg,transparent 45deg,transparent 110deg,#fff 122deg,#ff9de5 136deg,transparent 151deg,transparent 230deg,#ffd7f6 242deg,#ff53c5 257deg,transparent 274deg);
+ opacity:1;filter:drop-shadow(0 0 6px #ffadf0) drop-shadow(0 0 12px #ff43bd);
+ animation:micAuroraOrbit 3.2s linear infinite;
+}
+#mic.active .mic-gyro svg{filter:drop-shadow(0 0 7px #fff) drop-shadow(0 0 14px #ffb5ef)}
+@keyframes micAuroraPulse{
+ 0%,100%{box-shadow:0 0 0 3px #fff0fa,0 0 0 8px #ff8dd766,0 0 24px 10px #ff8add,0 0 45px 16px #fa2fa9a8,inset 0 3px 9px #fff9}
+ 50%{box-shadow:0 0 0 4px #fff,0 0 0 12px #ff9ee899,0 0 33px 14px #ffc1f3,0 0 64px 23px #ff3cbec7,inset 0 3px 14px #fffd}
+}
+@keyframes micAuroraBreath{0%,100%{opacity:.83;transform:scale(.97)}50%{opacity:1;transform:scale(1.09)}}
+@keyframes micAuroraOrbit{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){#mic.active,#mic.active:before,#mic.active:after{animation:none!important}}
 </style>
 </head>
