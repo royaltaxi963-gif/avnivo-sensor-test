@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v9.4 — Frameless WebGL Flag</title>
+<title>AVNIVO Translator — UI maket v9.5 — Transparent Inline Flag</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -196,7 +196,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 @keyframes uzBoyBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
 @keyframes uzBoyHello{0%,100%{transform:rotate(-9deg)}45%{transform:rotate(17deg)}75%{transform:rotate(-13deg)}}
 @media(prefers-reduced-motion:reduce){.uz-flag,.uz-boy,.uz-waving-arm{animation:none!important}}
-.uz-flag-mini{display:block;flex:none;width:118px;height:72px;overflow:visible;background:transparent;border:0;box-shadow:none}.uz-flag-mini iframe{display:block;width:100%;height:100%;border:0;background:transparent;pointer-events:none}\n</style>
+.uz-flag-mini{display:block;flex:none;width:118px;height:72px;overflow:visible;background:transparent;border:0;box-shadow:none}.uz-flag-mini iframe{display:block;width:100%;height:100%;border:0;background:transparent;pointer-events:none}\n.uz-flag-mini{width:118px;height:72px;overflow:hidden}.uz-flag-mini canvas{display:block;width:100%;height:100%;background:transparent;border:0}\n</style>
 </head>
 <body>
 <main class="app" id="app" >
@@ -212,7 +212,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 </span>
 </button>
 <section data-speaker="1" class="speaker middle" aria-label="Pastdagi suhbatdosh">
-<div class="header"><div class="identity"><span class="uz-flag-mini" role="img" aria-label="Hilpirayotgan O‘zbekiston bayrog‘i"><iframe src="uz-flag-3d.html?v=94" title="Jonli O‘zbekiston bayrog‘i" loading="eager" tabindex="-1" aria-hidden="true"></iframe></span><span id="bottomName" hidden>1-suhbatdosh</span></div><span class="language" id="bottomLang">O‘zbekcha</span></div>
+<div class="header"><div class="identity"><span class="uz-flag-mini" role="img" aria-label="Hilpirayotgan O‘zbekiston bayrog‘i"><canvas id="uzFlagCanvas" aria-hidden="true"></canvas></span><span id="bottomName" hidden>1-suhbatdosh</span></div><span class="language" id="bottomLang">O‘zbekcha</span></div>
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
 <div class="swap-flare" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -336,4 +336,4 @@ toggle.addEventListener('click',async()=>{
 });
 })();
 </script>
-</body></html>
+<script src="uz-flag-inline.js?v=95" defer></script>\n</body></html>
