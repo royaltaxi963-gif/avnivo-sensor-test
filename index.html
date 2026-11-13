@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v11.5 — Visible Flag</title>
+<title>AVNIVO Translator — UI maket v11.6 — Three Language Flag Test</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -254,12 +254,20 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 .flag-opacity-setting label{font-size:12px;font-weight:700}
 .flag-opacity-setting input{width:100%;min-width:0;accent-color:#f4b64e}
 .flag-opacity-setting output{text-align:right;font-size:12px;font-variant-numeric:tabular-nums}
+
+/* v11.6 isolated language-flag test: preserve bottom Uzbekistan flag */
+.speaker.top{--uz-flag-opacity:.65}
+.speaker.top>.uz-flag-mini[hidden]{display:none!important}
+.flag-test-select{position:absolute;right:10px;bottom:10px;z-index:4;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:9px;background:#171c27e8;color:#fff;font:600 11px system-ui}
+.flag-test-select select{max-width:180px;min-width:120px;border:1px solid #bfa57d;border-radius:6px;padding:6px;background:#292f3a;color:white;font:12px system-ui}
+.speaker.top>.header{pointer-events:none}
 </style>
 </head>
 <body>
 <main class="app" id="app" >
 <section data-speaker="2" class="speaker top" aria-label="Yuqoridagi suhbatdosh">
-<div class="header"><div class="identity"><span class="avatar" aria-label="Chet tili"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-5 5-5 13 0 18M12 3c5 5 5 13 0 18"/></svg></span><span id="topName" hidden>2-suhbatdosh</span></div><span class="language" id="topLang">Chet tili · Avto</span></div>
+<span class="uz-flag-mini" role="img" aria-label="Tanlangan til mamlakati bayrog‘i" id="topFlagWrap" hidden><canvas id="topFlagCanvas" data-flag-type="ru" aria-hidden="true"></canvas></span>
+<div class="header"><div class="identity"><span class="avatar" aria-label="Chet tili"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-5 5-5 13 0 18M12 3c5 5 5 13 0 18"/></svg></span><span id="topName" hidden>2-suhbatdosh</span></div><span class="language" id="topLang">Chet tili · Avto</span></div><div class="flag-test-select"><label for="testLanguage">Sinov tili:</label><select id="testLanguage" aria-label="Ikkinchi suhbat bo‘limi tili"><option value="">Avto (aniqlanmagan)</option><option value="uz">O‘zbekcha — O‘zbekiston</option><option value="ru">Ruscha — Rossiya</option><option value="jp">Yaponcha — Yaponiya</option></select></div>
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
 <button class="swap" id="swap" type="button" aria-label="Suhbatdoshlar joyini almashtirish" title="Suhbatdoshlar joyini almashtirish">
@@ -270,7 +278,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 </span>
 </button>
 <section data-speaker="1" class="speaker middle" aria-label="Pastdagi suhbatdosh">
-<span class="uz-flag-mini" role="img" aria-label="Hilpirayotgan O‘zbekiston bayrog‘i"><canvas id="uzFlagCanvas" aria-hidden="true"></canvas></span>
+<span class="uz-flag-mini" role="img" aria-label="Hilpirayotgan O‘zbekiston bayrog‘i"><canvas id="uzFlagCanvas" data-flag-type="uz" aria-hidden="true"></canvas></span>
 <div class="header"><div class="identity"><span id="bottomName" hidden>1-suhbatdosh</span></div><span class="language" id="bottomLang">O‘zbekcha</span></div>
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
@@ -399,5 +407,8 @@ toggle.addEventListener('click',async()=>{
 
 
 
-<script src="uz-flag-inline.js?v=115" defer></script>
+<script>
+(()=>{const select=document.getElementById('testLanguage'),wrap=document.getElementById('topFlagWrap'),canvas=document.getElementById('topFlagCanvas'),label=document.getElementById('topLang');if(!select||!wrap||!canvas||!label)return;const names={uz:'O‘zbekcha',ru:'Ruscha',jp:'Yaponcha'};function apply(code){if(!Object.prototype.hasOwnProperty.call(names,code)){wrap.hidden=true;label.textContent='Chet tili · Avto';return;}canvas.dataset.flagType=code;wrap.hidden=false;label.textContent=names[code]+' · Tanlangan';if(window.avnivoSetFlagType)window.avnivoSetFlagType(canvas,code);}select.addEventListener('change',()=>apply(select.value));window.avnivoSelectDetectedLanguage=code=>{if(!Object.prototype.hasOwnProperty.call(names,code))return false;select.value=code;apply(code);return true;};apply(select.value);})();
+</script>
+<script src="uz-flag-inline.js?v=116" defer></script>
 </body></html>
