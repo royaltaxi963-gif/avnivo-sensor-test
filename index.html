@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v9.2 — Soft Pink Aurora</title>
+<title>AVNIVO Translator — UI maket v9.3 — Uzbek Animated Avatar</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -185,12 +185,23 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
  50%{box-shadow:0 0 0 3px #fff0fa,0 0 0 8px #ff8dd766,0 0 21px 7px #ff9cdbcc,0 0 38px 11px #ee55a788,inset 0 2px 10px #fff9}
 }
 @media(prefers-reduced-motion:reduce){#mic.active{animation:none!important}}
+
+/* v9.3: character/flag confined to the Uzbek speaker identity; all other UI untouched. */
+.uz-portrait{display:block;width:128px;height:102px;flex:none;border-radius:15px;overflow:hidden;border:2px solid #e9bd70;box-shadow:0 3px 12px #0008,inset 0 0 0 2px #fff5;isolation:isolate;background:#226b8a}
+.uz-portrait svg{display:block;width:100%;height:100%}
+.uz-flag{transform-origin:0 50%;animation:uzFlagWave 3.5s ease-in-out infinite}
+.uz-boy{transform-origin:70px 93px;animation:uzBoyBreathe 3.2s ease-in-out infinite}
+.uz-waving-arm{transform-origin:89px 78px;animation:uzBoyHello 1.8s ease-in-out infinite}
+@keyframes uzFlagWave{0%,100%{transform:skewY(0deg) scaleX(1)}50%{transform:skewY(-2.2deg) scaleX(.98)}}
+@keyframes uzBoyBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+@keyframes uzBoyHello{0%,100%{transform:rotate(-9deg)}45%{transform:rotate(17deg)}75%{transform:rotate(-13deg)}}
+@media(prefers-reduced-motion:reduce){.uz-flag,.uz-boy,.uz-waving-arm{animation:none!important}}
 </style>
 </head>
 <body>
 <main class="app" id="app" >
 <section data-speaker="2" class="speaker top" aria-label="Yuqoridagi suhbatdosh">
-<div class="header"><div class="identity"><span class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.5-4.5 3-6.5 7-6.5s6.5 2 7 6.5"/></svg></span><span id="topName">2-suhbatdosh</span></div><span class="language" id="topLang">Chet tili · Avto</span></div>
+<div class="header"><div class="identity"><span class="avatar" aria-label="Chet tili"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-5 5-5 13 0 18M12 3c5 5 5 13 0 18"/></svg></span><span id="topName" hidden>2-suhbatdosh</span></div><span class="language" id="topLang">Chet tili · Avto</span></div>
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
 <button class="swap" id="swap" type="button" aria-label="Suhbatdoshlar joyini almashtirish" title="Suhbatdoshlar joyini almashtirish">
@@ -201,7 +212,38 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 </span>
 </button>
 <section data-speaker="1" class="speaker middle" aria-label="Pastdagi suhbatdosh">
-<div class="header"><div class="identity"><span class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.5-4.5 3-6.5 7-6.5s6.5 2 7 6.5"/></svg></span><span id="bottomName">1-suhbatdosh</span></div><span class="language" id="bottomLang">O‘zbekcha</span></div>
+<div class="header"><div class="identity"><span class="uz-portrait" role="img" aria-label="O‘zbekiston bayrog‘i oldida salomlashayotgan multfilm bolakay">
+<svg viewBox="0 0 128 102" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<defs>
+<linearGradient id="uzSkin" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#ffe0b0"/><stop offset=".55" stop-color="#f2b87e"/><stop offset="1" stop-color="#c98053"/></linearGradient>
+<linearGradient id="uzShirt" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff0cf"/><stop offset=".55" stop-color="#e4b96c"/><stop offset="1" stop-color="#ab7035"/></linearGradient>
+<radialGradient id="uzBackdrop"><stop stop-color="#7ec6d6"/><stop offset="1" stop-color="#163c58"/></radialGradient>
+<clipPath id="uzFrameClip"><rect width="128" height="102" rx="13"/></clipPath>
+</defs>
+<g clip-path="url(#uzFrameClip)">
+<rect width="128" height="102" fill="url(#uzBackdrop)"/>
+<g class="uz-flag">
+<path d="M-9 0H139V32H-9Z" fill="#19a9dd"/><path d="M-9 32H139V36H-9Z" fill="#df334a"/><path d="M-9 36H139V67H-9Z" fill="#fff"/><path d="M-9 67H139V71H-9Z" fill="#df334a"/><path d="M-9 71H139V105H-9Z" fill="#1caf65"/>
+<path d="M22 6a10 10 0 1 0 9 15 9 9 0 1 1-9-15Z" fill="#fff"/>
+<g fill="#fff"><circle cx="39" cy="9" r="1.6"/><circle cx="46" cy="9" r="1.6"/><circle cx="53" cy="9" r="1.6"/><circle cx="60" cy="9" r="1.6"/><circle cx="35" cy="16" r="1.6"/><circle cx="42" cy="16" r="1.6"/><circle cx="49" cy="16" r="1.6"/><circle cx="56" cy="16" r="1.6"/><circle cx="39" cy="23" r="1.6"/><circle cx="46" cy="23" r="1.6"/><circle cx="53" cy="23" r="1.6"/><circle cx="60" cy="23" r="1.6"/></g>
+<path d="M0 0Q20 12 40 0T80 0T128 0V102Q105 91 82 102T40 102T0 102Z" fill="#fff" opacity=".11"/>
+<path d="M20 0Q8 48 20 102M80 0Q65 48 80 102" stroke="#001c30" opacity=".14" stroke-width="10" fill="none"/>
+</g>
+<ellipse cx="70" cy="103" rx="42" ry="8" fill="#10243b" opacity=".4"/>
+<g class="uz-boy">
+<path d="M44 101Q42 75 51 70Q70 60 88 73L97 101Z" fill="url(#uzShirt)" stroke="#aa713c" stroke-width="1.5"/>
+<path d="M52 78Q40 78 34 94" stroke="#f0b87d" stroke-width="11" fill="none" stroke-linecap="round"/>
+<g class="uz-waving-arm"><path d="M89 78Q105 65 105 48" stroke="#f0b87d" stroke-width="11" fill="none" stroke-linecap="round"/><ellipse cx="105" cy="42" rx="7" ry="11" fill="url(#uzSkin)" transform="rotate(-15 105 42)"/><path d="M100 38v-7M104 37v-9M108 38v-8" stroke="#e7a36d" stroke-width="2" stroke-linecap="round"/></g>
+<rect x="65" y="64" width="12" height="13" rx="5" fill="#e9a776"/>
+<ellipse cx="70" cy="45" rx="25" ry="29" fill="url(#uzSkin)" stroke="#a86b4a" stroke-width="1.3"/>
+<ellipse cx="45" cy="49" rx="5" ry="8" fill="#efb583"/><ellipse cx="95" cy="49" rx="5" ry="8" fill="#df9c69"/>
+<path d="M46 42Q40 14 61 13Q77 3 93 19Q101 30 95 43L90 31Q78 33 68 26Q60 36 47 34Z" fill="#302420"/>
+<path d="M49 23Q62 9 79 18" stroke="#5a4033" stroke-width="4" fill="none" stroke-linecap="round"/>
+<ellipse cx="61" cy="47" rx="3.4" ry="4.4" fill="#292522"/><ellipse cx="80" cy="47" rx="3.4" ry="4.4" fill="#292522"/>
+<circle cx="62" cy="45.5" r="1.2" fill="#fff"/><circle cx="81" cy="45.5" r="1.2" fill="#fff"/>
+<path d="M63 61Q71 69 79 60" stroke="#9d4b47" stroke-width="2.7" fill="none" stroke-linecap="round"/>
+<ellipse cx="53" cy="57" rx="5" ry="2.5" fill="#e77d72" opacity=".45"/><ellipse cx="87" cy="57" rx="5" ry="2.5" fill="#e77d72" opacity=".45"/>
+</g></g></svg></span><span id="bottomName" hidden>1-suhbatdosh</span></div><span class="language" id="bottomLang">O‘zbekcha</span></div>
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
 <div class="swap-flare" aria-hidden="true"><i></i><i></i><i></i></div>
