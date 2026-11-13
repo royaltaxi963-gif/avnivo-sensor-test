@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v8.1</title>
+<title>AVNIVO Translator — UI maket v8.4 — Gravity Stabilizer</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -101,6 +101,11 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 
 .sensor-sheet[hidden]{display:none!important}.sensor-sheet{position:absolute;inset:0;z-index:20;background:#080603b8;display:flex;align-items:end;justify-content:center;padding:14px 12px calc(18px + env(safe-area-inset-bottom))}
 .sensor-card{width:100%;max-width:520px;background:linear-gradient(145deg,#332719,#211b16);border:1px solid #cfa65b70;border-radius:26px;padding:20px;color:#fff0d2;box-shadow:0 20px 70px #000b}.sensor-head{display:flex;align-items:center;justify-content:space-between;font-size:19px}.sensor-head button{border:0;background:#ffffff15;color:#ffdf9a;border-radius:50%;width:36px;height:36px;font-size:18px}.sensor-card p{font-size:13px;line-height:1.6;color:#d8c3a0}.sensor-toggle{background:linear-gradient(135deg,#ffdc8a,#db9c38);border:0;border-radius:14px;padding:13px 18px;color:#2b1b08;font-weight:750;width:100%}.sensor-readings{display:flex;gap:10px;margin:16px 0}.sensor-readings span{flex:1;background:#ffffff0c;border:1px solid #ffffff16;border-radius:13px;padding:12px;font-size:12px}.sensor-readings b{display:block;margin-top:8px;font-size:20px;font-variant-numeric:tabular-nums}.sensor-status{font-size:12px;color:#f5cf85;min-height:18px}
+
+/* Gravity stabilizer: keep the button hit target fixed; move only its visual glyph. */
+.mic-gyro{display:grid;place-items:center;transform:rotate(var(--mic-roll,0deg)) rotateX(var(--mic-pitch,0deg));transform-style:preserve-3d;will-change:transform;transition:transform 110ms linear;pointer-events:none}
+.mic-gyro svg{display:block}
+@media(prefers-reduced-motion:reduce){.mic-gyro{transition:none}}
 </style>
 </head>
 <body>
@@ -123,7 +128,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 <div class="swap-flare" aria-hidden="true"><i></i><i></i><i></i></div>
 <nav class="nav" aria-label="Asosiy navigatsiya">
 <button class="nav-btn" type="button" aria-label="Tarix (maket)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 11a9 9 0 1 1 2.8 6.5M3 4v7h7"/><path d="M12 7v5l3 2"/></svg><span>Tarix</span></button>
-<button class="mic" type="button" id="mic" aria-label="Demo mikrofon holatini almashtirish" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg></button>
+<button class="mic" type="button" id="mic" aria-label="Demo mikrofon holatini almashtirish" aria-pressed="false"><span class="mic-gyro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg></span></button>
 <button class="nav-btn" type="button" id="settingsBtn" aria-label="Sozlamalar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l-1.8 1.8A1.7 1.7 0 0 0 16 18.4l-1.1.5-.5 2.1h-2.8l-.5-2.1-1.1-.5a1.7 1.7 0 0 0-1.9.3l-1.8-1.8A1.7 1.7 0 0 0 6.6 15l-.5-1.1L4 13.4v-2.8l2.1-.5.5-1.1a1.7 1.7 0 0 0-.3-1.9l1.8-1.8A1.7 1.7 0 0 0 10 5.6l1.1-.5.5-2.1h2.8l.5 2.1 1.1.5a1.7 1.7 0 0 0 1.9-.3l1.8 1.8a1.7 1.7 0 0 0-.3 1.9l.5 1.1 2.1.5v2.8l-2.1.5z"/></svg><span>Sozlamalar</span></button>
 </nav>
 <section class="sensor-sheet" id="sensorSheet" role="dialog" aria-modal="true" aria-labelledby="sensorTitle" hidden>
@@ -208,13 +213,18 @@ let enabled=false,seen=false,raf=0,latest=null,startedAt=0;
 const onOrientation=e=>{
  if(!enabled || !Number.isFinite(e.gamma) || !Number.isFinite(e.beta))return;
  latest={gamma:e.gamma,beta:e.beta};seen=true;
+ // Counter-rotate the glyph, not the tappable button. Gamma is the portrait roll approximation.
+ const roll=Math.max(-65,Math.min(65,-e.gamma));
+ const pitch=Math.max(-14,Math.min(14,(e.beta-45)*0.18));
+ document.getElementById('mic').style.setProperty('--mic-roll',roll.toFixed(1)+'deg');
+ document.getElementById('mic').style.setProperty('--mic-pitch',pitch.toFixed(1)+'deg');
  if(!raf)raf=requestAnimationFrame(()=>{
   raf=0;if(!enabled||!latest)return;
   x.textContent=latest.gamma.toFixed(1)+'°';y.textContent=latest.beta.toFixed(1)+'°';
   status.textContent='Sensor ulandi — telefonni egib tekshiring';
  });
 };
-function stop(){enabled=false;window.removeEventListener('deviceorientation',onOrientation);if(raf)cancelAnimationFrame(raf);raf=0;toggle.textContent='Sensorni yoqish';status.textContent='Sensor o‘chirilgan';x.textContent='—';y.textContent='—'}
+function stop(){enabled=false;document.getElementById('mic').style.removeProperty('--mic-roll');document.getElementById('mic').style.removeProperty('--mic-pitch');window.removeEventListener('deviceorientation',onOrientation);if(raf)cancelAnimationFrame(raf);raf=0;toggle.textContent='Sensorni yoqish';status.textContent='Sensor o‘chirilgan';x.textContent='—';y.textContent='—'}
 document.getElementById('settingsBtn').addEventListener('click',()=>{sheet.hidden=false;toggle.focus()});
 document.getElementById('sensorClose').addEventListener('click',()=>{sheet.hidden=true});
 sheet.addEventListener('click',e=>{if(e.target===sheet)sheet.hidden=true});
