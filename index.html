@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v11.4 — Correct Flag Stars</title>
+<title>AVNIVO Translator — UI maket v11.5 — Visible Flag</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -249,7 +249,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 .flag-copy-status{margin:0;font-size:12px;color:#ffdda3;min-height:14px}
 
 /* v11.2 flag opacity is part of existing settings dialog */
-.speaker[data-speaker="1"]{--uz-flag-opacity:.19}
+.speaker[data-speaker="1"]{--uz-flag-opacity:.65}
 .flag-opacity-setting{display:grid;grid-template-columns:1fr 1fr 42px;align-items:center;gap:9px;padding:12px 0;border-top:1px solid #ffffff30;border-bottom:1px solid #ffffff30}
 .flag-opacity-setting label{font-size:12px;font-weight:700}
 .flag-opacity-setting input{width:100%;min-width:0;accent-color:#f4b64e}
@@ -399,5 +399,5 @@ toggle.addEventListener('click',async()=>{
 
 
 
-<script src="uz-flag-inline.js?v=114" defer></script>
+<script src="uz-flag-inline.js?v=115" defer></script>
 </body></html>
