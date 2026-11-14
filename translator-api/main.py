@@ -2,7 +2,7 @@
 import os
 import time
 from collections import defaultdict, deque
-from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 
@@ -21,7 +21,7 @@ async def health():
     return {"status": "ok", "model": MODEL, "configured": bool(os.getenv("GROQ_API_KEY"))}
 
 @app.post("/api/transcribe")
-async def transcribe(request: Request, audio: UploadFile = File(...), language: str | None = None):
+async def transcribe(request: Request, audio: UploadFile = File(...), language: str | None = Form(None)):
     # Origin validation is a browser guard, not user authentication.
     origin = request.headers.get("origin")
     if origin != ORIGIN:
