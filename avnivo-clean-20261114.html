@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v11.10 — Correct Bilingual Language Labels</title>
+<title>AVNIVO Translator — UI maket v11.11 — Animated Language Equivalence</title>
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -250,19 +250,21 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 .flag-opacity-setting output{text-align:right;font-size:12px;font-variant-numeric:tabular-nums}
 
 
-/* v11.9: independent centered language labels; existing cards and animations unchanged */
-.speaker-language-title{position:absolute;top:15px;left:50%;transform:translateX(-50%);z-index:5;display:flex;align-items:center;justify-content:center;gap:6px;max-width:calc(100% - 128px);padding:5px 10px;border:1px solid rgba(248,201,106,.75);border-radius:999px;background:rgba(45,33,22,.96);color:#ffe0a0;font:600 12px/1.3 system-ui,sans-serif;white-space:nowrap;box-shadow:0 2px 12px #0004}
-.speaker-language-title select{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:#ffe0a0;font:inherit;max-width:145px;min-width:0;cursor:pointer;text-align:center;text-align-last:center;outline-offset:3px}
+/* v11.11: larger language labels and subtle animated equivalence sign */
+.speaker-language-title{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:5;display:flex;align-items:center;justify-content:center;gap:9px;max-width:calc(100% - 42px);padding:8px 14px;border:1px solid rgba(248,201,106,.85);border-radius:999px;background:rgba(45,33,22,.96);color:#ffe0a0;font:700 clamp(13px,3.6vw,17px)/1.35 system-ui,sans-serif;white-space:nowrap;box-shadow:0 2px 12px #0004}
+.speaker-language-title select{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:#ffe0a0;font:inherit;max-width:160px;min-width:0;cursor:pointer;text-align:center;text-align-last:center;outline-offset:3px}
 .speaker-language-title select option{background:#30251b;color:#fff}
-.speaker-language-title .language-divider{opacity:.8}
-.speaker-language-title #upperLanguageUz,.speaker-language-title #bottomLanguageTranslation{overflow:hidden;text-overflow:ellipsis}.speaker-language-title .language-divider{font-size:15px;color:#f8c96a}
-@media(max-width:390px){.speaker-language-title{max-width:calc(100% - 110px);font-size:10px;padding:5px 7px;gap:4px}.speaker-language-title select{max-width:90px}}
+.speaker-language-title #upperLanguageUz,.speaker-language-title #bottomLanguageTranslation{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.speaker-language-title .language-divider{display:inline-block;flex:none;font-size:24px;font-weight:800;line-height:1;color:#ffd77b;text-shadow:0 0 7px rgba(255,210,115,.65);animation:avnivoApproxGlow 2.6s ease-in-out infinite}
+@keyframes avnivoApproxGlow{0%,100%{opacity:.75;text-shadow:0 0 4px rgba(255,210,115,.3);transform:scale(1)}50%{opacity:1;text-shadow:0 0 12px rgba(255,210,115,.9);transform:scale(1.12)}}
+@media(max-width:390px){.speaker-language-title{max-width:calc(100% - 28px);font-size:clamp(12px,3.4vw,14px);padding:7px 9px;gap:6px}.speaker-language-title select{max-width:122px}.speaker-language-title .language-divider{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.speaker-language-title .language-divider{animation:none}}
 </style>
 </head>
 <body>
 <main class="app" id="app" >
 <section data-speaker="2" class="speaker top" aria-label="Yuqoridagi suhbatdosh">
-<div class="speaker-language-title" aria-label="Yuqori suhbat tili"><select id="upperLanguageSelect" aria-label="Yuqori bo‘lim tilini tanlash"><option value="ru">Русский язык</option><option value="en">English</option><option value="tr">Türkçe</option><option value="uz">O‘zbek tili</option></select><span class="language-divider" aria-hidden="true">⟷</span><span id="upperLanguageUz">Rus tili</span></div>
+<div class="speaker-language-title" aria-label="Yuqori suhbat tili"><select id="upperLanguageSelect" aria-label="Yuqori bo‘lim tilini tanlash"><option value="ru">Русский язык</option><option value="en">English</option><option value="tr">Türkçe</option><option value="uz">O‘zbek tili</option></select><span class="language-divider" aria-hidden="true">≈</span><span id="upperLanguageUz">Rus tili</span></div>
 <div class="header"><div class="identity"><span class="avatar" aria-label="Chet tili"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-5 5-5 13 0 18M12 3c5 5 5 13 0 18"/></svg></span><span id="topName" hidden>2-suhbatdosh</span></div><span class="language" id="topLang">Chet tili · Avto</span></div>
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
@@ -274,7 +276,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 </span>
 </button>
 <section data-speaker="1" class="speaker middle" aria-label="Pastdagi suhbatdosh">
-<div class="speaker-language-title" aria-label="Pastki suhbat tili"><span>O‘zbek tili</span><span class="language-divider" aria-hidden="true">⟷</span><span id="bottomLanguageTranslation">Узбекский язык</span></div>
+<div class="speaker-language-title" aria-label="Pastki suhbat tili"><span>O‘zbek tili</span><span class="language-divider" aria-hidden="true">≈</span><span id="bottomLanguageTranslation">Узбекский язык</span></div>
 <div class="header"><div class="identity"><span id="bottomName" hidden>1-suhbatdosh</span></div><span class="language" id="bottomLang">O‘zbekcha</span></div>
 <div class="center"><div class="empty-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></div><div class="placeholder">Suhbat shu yerda ko‘rinadi</div><div class="hint">Asl matn va tarjima uchun joy</div></div>
 </section>
