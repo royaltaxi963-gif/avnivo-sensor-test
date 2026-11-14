@@ -1,4 +1,4 @@
-"""AVNIVO Translator — Groq Whisper Large v3 Turbo proxy."""
+"""AVNIVO Translator — Groq Whisper Large v3 proxy."""
 import os
 import time
 from collections import defaultdict, deque
@@ -6,7 +6,7 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 
-MODEL = "whisper-large-v3-turbo"
+MODEL = "whisper-large-v3"
 GROQ_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
 ORIGIN = "https://royaltaxi963-gif.github.io"
 MAX_AUDIO = 10 * 1024 * 1024
