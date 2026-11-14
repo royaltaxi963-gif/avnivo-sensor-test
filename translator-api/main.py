@@ -21,6 +21,7 @@ async def health():
     return {"status": "ok", "model": MODEL, "configured": bool(os.getenv("GROQ_API_KEY"))}
 
 @app.post("/api/transcribe")
+@app.post("/api/transcribe-groq-test")
 async def transcribe(request: Request, audio: UploadFile = File(...), language: str | None = Form(None)):
     # Origin validation is a browser guard, not user authentication.
     origin = request.headers.get("origin")
@@ -42,7 +43,11 @@ async def transcribe(request: Request, audio: UploadFile = File(...), language: 
     data = await audio.read(MAX_AUDIO + 1)
     if not data or len(data) > MAX_AUDIO:
         raise HTTPException(413, "Invalid audio size")
-    fields = {"model": MODEL, "response_format": "json", "temperature": "0"}
+    is_test = request.url.path == "/api/transcribe-groq-test"
+    model = "whisper-large-v3-turbo" if is_test else MODEL
+    fields = {"model": model, "response_format": "json", "temperature": "0"}
+    if is_test and language == "uz":
+        fields["prompt"] = "Salom, yaxshimisiz, qayerdasiz, nima qilyapsiz, tuzukmisiz."
     if language:
         if language not in {"uz", "ru", "en", "tr"}:
             raise HTTPException(400, "Unsupported language")
@@ -60,4 +65,4 @@ async def transcribe(request: Request, audio: UploadFile = File(...), language: 
             raise HTTPException(429, "Speech provider rate limit reached")
         raise HTTPException(502, "Speech provider error")
     result = response.json()
-    return {"text": result.get("text", ""), "model": MODEL}
+    return {"text": result.get("text", ""), "model": model}
