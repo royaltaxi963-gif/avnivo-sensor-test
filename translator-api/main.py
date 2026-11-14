@@ -43,14 +43,6 @@ async def transcribe(request: Request, audio: UploadFile = File(...), language: 
     if not data or len(data) > MAX_AUDIO:
         raise HTTPException(413, "Invalid audio size")
     fields = {"model": MODEL, "response_format": "json", "temperature": "0"}
-    # Whisper prompt supplies vocabulary/context, not an answer to copy.
-    # Apply only for Uzbek so other languages remain unaffected.
-    if language == "uz":
-        fields["prompt"] = (
-            "O‘zbek tilidagi suhbat. Toshkent shevasi va adabiy o‘zbekcha. "
-            "Qayerdasan? Nima qilyapsan? Nima qilyabsan? Qayerga ketyapsan? "
-            "Salom, yaxshimisan? O‘zbekcha so‘zlar va joy nomlari."
-        )
     if language:
         if language not in {"uz", "ru", "en", "tr"}:
             raise HTTPException(400, "Unsupported language")
