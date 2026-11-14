@@ -5,6 +5,7 @@ from collections import defaultdict, deque
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
+from groq import AsyncGroq, RateLimitError, APIError
 
 MODEL = "whisper-large-v3"
 GROQ_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
@@ -21,6 +22,7 @@ async def health():
     return {"status": "ok", "model": MODEL, "configured": bool(os.getenv("GROQ_API_KEY"))}
 
 @app.post("/api/transcribe")
+@app.post("/api/transcribe-groq-sdk-test")
 @app.post("/api/transcribe-groq-test")
 async def transcribe(request: Request, audio: UploadFile = File(...), language: str | None = Form(None)):
     # Origin validation is a browser guard, not user authentication.
@@ -43,6 +45,7 @@ async def transcribe(request: Request, audio: UploadFile = File(...), language: 
     data = await audio.read(MAX_AUDIO + 1)
     if not data or len(data) > MAX_AUDIO:
         raise HTTPException(413, "Invalid audio size")
+    is_sdk_test = request.url.path == "/api/transcribe-groq-sdk-test"
     is_test = request.url.path == "/api/transcribe-groq-test"
     model = "whisper-large-v3-turbo" if is_test else MODEL
     fields = {"model": model, "response_format": "json", "temperature": "0"}
@@ -52,6 +55,27 @@ async def transcribe(request: Request, audio: UploadFile = File(...), language: 
         if language not in {"uz", "ru", "en", "tr"}:
             raise HTTPException(400, "Unsupported language")
         fields["language"] = language
+    if is_sdk_test:
+        # Isolated user-requested SDK experiment; other routes retain httpx.
+        if language not in {"uz", "ru", "en", "tr"}:
+            raise HTTPException(400, "Unsupported language")
+        prompt = "Salom, yaxshimisiz, qayerdasiz, nima qilyapsiz, tuzukmisiz." if language == "uz" else ""
+        try:
+            sdk = AsyncGroq(api_key=key, max_retries=3, timeout=75)
+            result = await sdk.audio.transcriptions.create(
+                file=(audio.filename or "speech.webm", data),
+                model="whisper-large-v3-turbo",
+                language=language,
+                prompt=prompt,
+                response_format="text",
+            )
+            return {"text": result if isinstance(result, str) else str(result), "model": "whisper-large-v3-turbo"}
+        except RateLimitError:
+            raise HTTPException(429, "Speech provider rate limit reached")
+        except APIError:
+            raise HTTPException(502, "Speech provider error")
+        except Exception:
+            raise HTTPException(502, "Speech provider unreachable")
     try:
         async with httpx.AsyncClient(timeout=75) as client:
             response = await client.post(
