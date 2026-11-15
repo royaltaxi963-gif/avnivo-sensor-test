@@ -1040,18 +1040,32 @@ toggle.addEventListener('click',async()=>{
    try{initialMode=localStorage.getItem(modeKey)==='offline'?'offline':'online'}catch(_){}
    applyMode(initialMode);
  }
- const offlineResult=new URLSearchParams(window.location.hash.slice(1)).get('avnivo_offline_text');
- if(offlineResult!==null){
-   const url=new URL(window.location.href);
-   history.replaceState(null,'',url.pathname+url.search);
-   const speaker=document.querySelector('#app .speaker.middle');
-   window.avnivoComposer?.showBottomEditor();
-   const field=speaker?.querySelector('.message-input');
-   if(field){
-     field.value=[field.value.trim(),offlineResult.trim()].filter(Boolean).join(' ');
-     field.dispatchEvent(new Event('input',{bubbles:true}));
+ // Android offline STT callback can arrive on initial load or into an existing tab.
+ // Keep the fragment until the text has actually reached an editable field.
+ function receiveOfflineTranscript(){
+   const text=new URLSearchParams(location.hash.replace(/^#/, '')).get('avnivo_offline_text');
+   if(text===null)return;
+   const field=document.querySelector('#app .speaker.middle .message-input');
+   if(!field){
+     window.setTimeout(receiveOfflineTranscript,250);
+     return;
    }
+   window.avnivoComposer?.showBottomEditor();
+   const recognized=text.trim();
+   if(recognized){
+     field.value=[field.value.trim(),recognized].filter(Boolean).join(' ');
+     field.dispatchEvent(new Event('input',{bubbles:true}));
+     field.scrollIntoView({block:'nearest'});
+     const output=document.getElementById('avnivoSpeechStatus');
+     if(output)output.textContent='Offline matn yozish maydoniga qo‘shildi.';
+   }
+   const url=new URL(location.href);
+   url.hash='';
+   history.replaceState(null,'',url.pathname+url.search);
  }
+ receiveOfflineTranscript();
+ window.addEventListener('hashchange',receiveOfflineTranscript);
+ window.addEventListener('pageshow',receiveOfflineTranscript);
  const engineSelect=enginePanel.querySelector('#avnivoSpeechEngine');
  const speechStatus=enginePanel.querySelector('#avnivoSpeechStatus');
  function status(text){speechStatus.textContent=text||'';}
