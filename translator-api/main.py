@@ -12,13 +12,21 @@ from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.auth.exceptions import DefaultCredentialsError, RefreshError
 from groq import AsyncGroq, RateLimitError, APIError
 
+from chirp2_languages import (
+    CHIRP2_LOCALES,
+    CHIRP2_REGIONS,
+    CHIRP2_SYNC_MAX_BYTES,
+    GOOGLE_MODEL,
+    GOOGLE_REGION,
+    adaptation_phrases,
+    is_supported_locale,
+)
+
 MODEL = "whisper-large-v3"
 GROQ_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
 ALLOWED_ORIGINS = {"https://royaltaxi963-gif.github.io", "http://localhost:3000", "http://localhost:8080", "null"}
 GOOGLE_PROJECT = "project-6bcf7fe6-cb55-49b7-9f4"
-GOOGLE_REGION = "us-central1"
-GOOGLE_MODEL = "chirp_2"
-MAX_AUDIO = 10 * 1024 * 1024
+MAX_AUDIO = CHIRP2_SYNC_MAX_BYTES
 RATE_LIMIT = 12
 WINDOW = 60
 app = FastAPI(title="AVNIVO Translator API", docs_url=None, redoc_url=None)
@@ -100,23 +108,55 @@ async def transcribe(request: Request, audio: UploadFile = File(...), language: 
     return {"text": result.get("text", ""), "model": model}
 
 
-@app.post("/api/transcribe-google")
-async def transcribe_google(request: Request, audio: UploadFile = File(...), language: str = Form("uz-UZ")):
-    """Independent Google Speech-to-Text v2 endpoint; existing Groq routes are unchanged."""
-    origin = request.headers.get("origin")
-    if origin is not None and origin not in ALLOWED_ORIGINS:
-        raise HTTPException(403, "Origin not allowed")
-    # One reusable recognition pipeline for every enabled Chirp 2 locale.
-    # Extend this allowlist only after verifying model+region support and a live sample.
-    enabled_chirp2_locales = frozenset(("uz-UZ", "ru-RU", "en-US", "tr-TR"))
-    if language not in enabled_chirp2_locales:
-        raise HTTPException(400, "Unsupported Chirp 2 language")
-    if audio.content_type not in {"audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/flac", "audio/x-flac"}:
-        raise HTTPException(415, "Unsupported audio format")
-    data = await audio.read(MAX_AUDIO + 1)
-    if not data or len(data) > MAX_AUDIO:
-        raise HTTPException(413, "Invalid audio size")
-    ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown").split(",")[0].strip()
+ALLOWED_AUDIO_TYPES = frozenset((
+    "audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg",
+    "audio/wav", "audio/x-wav", "audio/flac", "audio/x-flac",
+))
+
+
+def _chirp2_config(locale: str) -> dict:
+    """Build the Chirp 2 RecognitionConfig for one registry locale."""
+    config: dict = {
+        "autoDecodingConfig": {},
+        "languageCodes": [locale],
+        "model": GOOGLE_MODEL,
+    }
+    phrases = adaptation_phrases(locale)
+    if phrases:
+        config["adaptation"] = {"phraseSets": [{"inlinePhraseSet": {"phrases": phrases}}]}
+    return config
+
+
+def _join_transcripts(payload: object) -> str:
+    """Flatten a Speech V2 Recognize response into a single transcript string."""
+    if not isinstance(payload, dict):
+        return ""
+    results = payload.get("results")
+    if not isinstance(results, list):
+        return ""
+    parts = []
+    for item in results:
+        if not isinstance(item, dict):
+            continue
+        alternatives = item.get("alternatives")
+        if not isinstance(alternatives, list) or not alternatives:
+            continue
+        first = alternatives[0]
+        if isinstance(first, dict):
+            transcript = first.get("transcript")
+            if isinstance(transcript, str) and transcript.strip():
+                parts.append(transcript.strip())
+    return " ".join(parts).strip()
+
+
+def _google_token() -> str:
+    credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+    if not credentials.valid:
+        credentials.refresh(GoogleAuthRequest())
+    return credentials.token
+
+
+def _rate_limit(ip: str) -> None:
     now = time.monotonic()
     hits = recent[ip]
     while hits and now - hits[0] > WINDOW:
@@ -125,14 +165,42 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
         raise HTTPException(429, "Too many requests")
     hits.append(now)
 
-    def get_token():
-        credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
-        if not credentials.valid:
-            credentials.refresh(GoogleAuthRequest())
-        return credentials.token
 
+@app.get("/api/chirp2-languages")
+async def chirp2_languages():
+    """Expose the registry so the frontend can never drift from the backend."""
+    return {
+        "model": GOOGLE_MODEL,
+        "region": GOOGLE_REGION,
+        "regions": sorted(CHIRP2_REGIONS),
+        "count": len(CHIRP2_LOCALES),
+        "locales": sorted(CHIRP2_LOCALES),
+    }
+
+
+@app.post("/api/transcribe-google")
+async def transcribe_google(request: Request, audio: UploadFile = File(...), language: str | None = Form(None)):
+    """Google Speech-to-Text V2 (Chirp 2) endpoint; existing Groq routes are unchanged.
+
+    One reusable recognition pipeline serves every locale in the centralized
+    registry. An unsupported or missing code is rejected outright; it never
+    silently substitutes another language such as uz-UZ.
+    """
+    origin = request.headers.get("origin")
+    if origin is not None and origin not in ALLOWED_ORIGINS:
+        raise HTTPException(403, "Origin not allowed")
+    # A missing field must not default to a specific language: reject it.
+    if not is_supported_locale(language):
+        raise HTTPException(400, "Unsupported Chirp 2 language")
+    if audio.content_type not in ALLOWED_AUDIO_TYPES:
+        raise HTTPException(415, "Unsupported audio format")
+    data = await audio.read(MAX_AUDIO + 1)
+    if not data or len(data) > MAX_AUDIO:
+        raise HTTPException(413, "Invalid audio size")
+    ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown").split(",")[0].strip()
+    _rate_limit(ip)
     try:
-        token = await asyncio.to_thread(get_token)
+        token = await asyncio.to_thread(_google_token)
     except (DefaultCredentialsError, RefreshError):
         raise HTTPException(503, "Google Cloud credentials are not configured")
     url = (
@@ -140,23 +208,8 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
         f"/locations/{GOOGLE_REGION}/recognizers/_:recognize"
     )
     payload = {
-        "config": {
-            "autoDecodingConfig": {},
-            "languageCodes": [language],
-            "model": GOOGLE_MODEL,
-            **({"adaptation": {
-                "phraseSets": [{
-                    "inlinePhraseSet": {
-                        "phrases": [
-                            {"value": "Avnivo", "boost": 20.0},
-                            {"value": "ovoz tanish", "boost": 15.0},
-                            {"value": "sinovi", "boost": 10.0}
-                        ]
-                    }
-                }]
-            }} if language == "uz-UZ" else {})
-        },
-        "content": base64.b64encode(data).decode("ascii")
+        "config": _chirp2_config(language),
+        "content": base64.b64encode(data).decode("ascii"),
     }
     try:
         async with httpx.AsyncClient(timeout=90) as client:
@@ -173,12 +226,7 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
         raise HTTPException(503, "Google Speech access denied; check IAM and API")
     if response.status_code != 200:
         raise HTTPException(502, "Google Speech transcription failed")
-    results = response.json().get("results", [])
-    text = " ".join(
-        item["alternatives"][0].get("transcript", "").strip()
-        for item in results if item.get("alternatives")
-    ).strip()
-    return {"text": text, "model": GOOGLE_MODEL, "language": language}
+    return {"text": _join_transcripts(response.json()), "model": GOOGLE_MODEL, "language": language}
 
 
 @app.post("/api/translate")
