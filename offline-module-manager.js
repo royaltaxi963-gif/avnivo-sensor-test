@@ -3,9 +3,9 @@
 (function(){
 'use strict';
 const modules=[
- {id:'uzbek-stt',name:'O‘zbekcha ovoz tanish',size:'ZIP ~431,5 MB · ONNX 591,6 MB',sizeBytes:591649160,description:'O‘zbek tilidagi nutqni internetsiz matnga aylantiradi. Telefonda sinovdan o‘tgan model.int8.onnx va tokens.txt fayllari aniqlandi. Yuklash serveri va Android mexanizmi hali ulanmagan.',ready:false},
- {id:'whisper-small',name:'Whisper Small Multilingual',size:'466 MiB',sizeBytes:488636416,description:'Rus, ingliz, hind, bengal va turk tillaridagi ovozni matnga aylantirish uchun ko‘p tilli model. Turkmancha qo‘llab-quvvatlash va sifat alohida tekshiriladi.',ready:true},
- {id:'nllb-int8',name:'NLLB-200 600M INT8',size:'Taxminan 895 MB (tasdiqlanmagan)',sizeBytes:null,description:'O‘zbek, rus, ingliz, hind, bengal, turk va turkman tillari o‘rtasida internetsiz matn tarjimasi uchun. Mos ONNX fayllari va aniq hajmi hali tasdiqlanmagan.',ready:false}
+ {id:'uzbek-stt',name:'O‘zbekcha ovoz tanish',size:'ZIP ~431,5 MB · ONNX 591,6 MB',sizeBytes:591649160,description:'Internetsiz o‘zbekcha nutqni matnga aylantiradi.',ready:false},
+ {id:'whisper-small',name:'Whisper Small Multilingual',size:'466 MiB',sizeBytes:488636416,description:'Internetsiz nutqni matnga aylantiradi.',ready:true},
+ {id:'nllb-int8',name:'NLLB-200 600M INT8',size:'Taxminan 895 MB (tasdiqlanmagan)',sizeBytes:null,description:'Internetsiz matnni boshqa tilga tarjima qiladi.',ready:false}
 ];
 const css=document.createElement('style');
 css.textContent=`
@@ -29,6 +29,9 @@ css.textContent=`
 #avnivoModuleManager .module-icon:disabled{opacity:.45;cursor:not-allowed}
 #avnivoModuleManager .module-progress{width:100%;height:10px;margin-top:8px}
 #avnivoModuleManager .module-progress-text{font-size:12px}
+#avnivoModuleManager .module-active{display:inline-flex;align-items:center;gap:5px;color:#4a9cff;font-size:11px;font-weight:700;margin-top:5px;animation:avnivo-activate .45s ease-out}
+#avnivoModuleManager .module-active::before{content:'';width:6px;height:6px;background:#4a9cff;border-radius:50%;box-shadow:0 0 8px #4a9cff}
+@keyframes avnivo-activate{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
 `;
 document.head.append(css);
 function bridge(){const b=window.AvnivoOfflineModules;return b&&typeof b.status==='function'?b:null}
@@ -51,17 +54,20 @@ function mount(){
   head.append(name,action);
   const size=document.createElement('p');size.className='module-size';size.textContent='Fayl hajmi: '+mod.size;
   const status=document.createElement('div');status.className='module-state';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+  const active=document.createElement('span');active.className='module-active';active.textContent='Faol';active.hidden=true;
   const progress=document.createElement('progress');progress.className='module-progress';progress.max=100;progress.value=0;progress.hidden=true;
   const progressText=document.createElement('div');progressText.className='module-progress-text';progressText.hidden=true;
   const desc=document.createElement('p');desc.className='module-description';desc.textContent=mod.description;
-  card.append(head,size,status,progress,progressText,desc);root.append(card);
+  card.append(head,size,active,status,progress,progressText,desc);root.append(card);
   let installed=false;
   function refresh(){
    const b=bridge(),data=read(mod.id);
    const phase=String(data?.state||'not_installed');
-   installed=!!b&&phase==='installed';
+   installed=!!b&&(phase==='installed'||phase==='active');
    const percent=Number(data?.percent);
-   const loading=!!b&&phase==='downloading';
+   const loading=!!b&&(phase==='downloading'||phase==='activating');
+   const activeNow=installed&&(data?.active===true||data?.isActive===true||phase==='active');
+   active.hidden=!activeNow;
    action.classList.toggle('is-loading',loading);
    const nextIcon=installed?'delete':loading?'loading':'download';
    if(action.dataset.icon!==nextIcon){action.dataset.icon=nextIcon;action.innerHTML=installed
@@ -73,10 +79,10 @@ function mount(){
    action.title=action.getAttribute('aria-label');
    action.disabled=!b||loading||(!installed&&!mod.ready)||(!installed&&typeof b.download!=='function')||(installed&&typeof b.remove!=='function');
    progress.hidden=!loading;progressText.hidden=!loading;
-   if(loading){const p=Number.isFinite(percent)?Math.max(0,Math.min(100,percent)):0;progress.value=p;progressText.textContent=Math.round(p)+'% yuklandi';}
+   if(loading){const p=Number.isFinite(percent)?Math.max(0,Math.min(100,percent)):0;progress.value=p;progressText.textContent=phase==='activating'?'Faollashtirilmoqda…':Math.round(p)+'% yuklandi';}
    if(!b)status.textContent='Hozircha faqat ko‘rish mumkin — APK yuklash xizmati ulanmagan';
-   else if(installed)status.textContent='✓ O‘rnatilgan — telefonda saqlangan';
-   else if(loading)status.textContent='Yuklanmoqda…';
+   else if(installed)status.textContent=activeNow?'':'O‘rnatilgan — faollashtirish kutilmoqda';
+   else if(loading)status.textContent=phase==='activating'?'Faollashtirilmoqda…':'Yuklanmoqda…';
    else if(phase==='error')status.textContent='Xato: '+String(data?.message||'Yuklash bajarilmadi');
    else if(!mod.ready)status.textContent='Model fayllari aniqlanmaguncha yuklab bo‘lmaydi';
    else status.textContent='Yuklab olinmagan';
