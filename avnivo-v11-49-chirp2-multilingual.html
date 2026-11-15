@@ -581,6 +581,125 @@ toggle.addEventListener('click',async()=>{
 
 
 <script>
+window.CHIRP2_MATRIX=[
+  ["af-ZA","Afrikaans (South Africa)"],
+  ["am-ET","Amharic (Ethiopia)"],
+  ["ar-EG","Arabic (Egypt)"],
+  ["as-IN","Assamese (India)"],
+  ["ast-ES","Asturian (Spain)"],
+  ["az-AZ","Azerbaijani (Azerbaijan)"],
+  ["be-BY","Belarusian (Belarus)"],
+  ["bg-BG","Bulgarian (Bulgaria)"],
+  ["bn-BD","Bengali (Bangladesh)"],
+  ["bn-IN","Bengali (India)"],
+  ["bs-BA","Bosnian (Bosnia and Herzegovina)"],
+  ["ca-ES","Catalan (Spain)"],
+  ["ceb-PH","Cebuano (Philippines)"],
+  ["ckb-IQ","Central Kurdish (Iraq)"],
+  ["cmn-Hans-CN","Chinese (Simplified, China)"],
+  ["cmn-Hant-TW","Chinese, Mandarin (Traditional, Taiwan)"],
+  ["cs-CZ","Czech (Czech Republic)"],
+  ["cy-GB","Welsh (United Kingdom)"],
+  ["da-DK","Danish (Denmark)"],
+  ["de-DE","German (Germany)"],
+  ["el-GR","Greek (Greece)"],
+  ["en-AU","English (Australia)"],
+  ["en-GB","English (United Kingdom)"],
+  ["en-IN","English (India)"],
+  ["en-US","English (United States)"],
+  ["es-419","Spanish (Latin American)"],
+  ["es-ES","Spanish (Spain)"],
+  ["es-US","Spanish (United States)"],
+  ["et-EE","Estonian (Estonia)"],
+  ["eu-ES","Basque (Spain)"],
+  ["fa-IR","Persian (Iran)"],
+  ["ff-SN","Fulah (Senegal)"],
+  ["fi-FI","Finnish (Finland)"],
+  ["fil-PH","Filipino (Philippines)"],
+  ["fr-CA","French (Canada)"],
+  ["fr-FR","French (France)"],
+  ["ga-IE","Irish (Ireland)"],
+  ["gl-ES","Galician (Spain)"],
+  ["gu-IN","Gujarati (India)"],
+  ["ha-NG","Hausa (Nigeria)"],
+  ["hi-IN","Hindi (India)"],
+  ["hr-HR","Croatian (Croatia)"],
+  ["hu-HU","Hungarian (Hungary)"],
+  ["hy-AM","Armenian (Armenia)"],
+  ["id-ID","Indonesian (Indonesia)"],
+  ["ig-NG","Igbo (Nigeria)"],
+  ["is-IS","Icelandic (Iceland)"],
+  ["it-IT","Italian (Italy)"],
+  ["iw-IL","Hebrew (Israel)"],
+  ["ja-JP","Japanese (Japan)"],
+  ["jv-ID","Javanese (Indonesia)"],
+  ["ka-GE","Georgian (Georgia)"],
+  ["kam-KE","Kamba (Kenya)"],
+  ["kea-CV","Kabuverdianu (Cape Verde)"],
+  ["kk-KZ","Kazakh (Kazakhstan)"],
+  ["km-KH","Khmer (Cambodia)"],
+  ["kn-IN","Kannada (India)"],
+  ["ko-KR","Korean (South Korea)"],
+  ["ky-KG","Kyrgyz (Cyrillic)"],
+  ["lb-LU","Luxembourgish (Luxembourg)"],
+  ["lg-UG","Ganda (Uganda)"],
+  ["ln-CD","Lingala (Congo-Kinshasa)"],
+  ["lo-LA","Lao (Laos)"],
+  ["lt-LT","Lithuanian (Lithuania)"],
+  ["luo-KE","Luo (Kenya)"],
+  ["lv-LV","Latvian (Latvia)"],
+  ["mi-NZ","Maori (New Zealand)"],
+  ["mk-MK","Macedonian (North Macedonia)"],
+  ["ml-IN","Malayalam (India)"],
+  ["mn-MN","Mongolian (Mongolia)"],
+  ["mr-IN","Marathi (India)"],
+  ["ms-MY","Malay (Malaysia)"],
+  ["mt-MT","Maltese (Malta)"],
+  ["my-MM","Burmese (Myanmar)"],
+  ["ne-NP","Nepali (Nepal)"],
+  ["nl-NL","Dutch (Netherlands)"],
+  ["no-NO","Norwegian Bokmål (Norway)"],
+  ["nso-ZA","Sepedi (South Africa)"],
+  ["ny-MW","Nyanja (Malawi)"],
+  ["oc-FR","Occitan (France)"],
+  ["om-ET","Oromo (Ethiopia)"],
+  ["or-IN","Oriya (India)"],
+  ["pa-Guru-IN","Punjabi (Gurmukhi India)"],
+  ["pl-PL","Polish (Poland)"],
+  ["ps-AF","Pashto"],
+  ["pt-BR","Portuguese (Brazil)"],
+  ["pt-PT","Portuguese (Portugal)"],
+  ["ro-RO","Romanian (Romania)"],
+  ["ru-RU","Russian (Russia)"],
+  ["rup-BG","Aromanian (Bulgaria)"],
+  ["sd-IN","Sindhi (India)"],
+  ["si-LK","Sinhala (Sri Lanka)"],
+  ["sk-SK","Slovak (Slovakia)"],
+  ["sl-SI","Slovenian (Slovenia)"],
+  ["sn-ZW","Shona (Zimbabwe)"],
+  ["so-SO","Somali"],
+  ["sq-AL","Albanian (Albania)"],
+  ["sr-RS","Serbian (Serbia)"],
+  ["su-ID","Sundanese (Indonesia)"],
+  ["sv-SE","Swedish (Sweden)"],
+  ["sw","Swahili"],
+  ["sw-KE","Swahili (Kenya)"],
+  ["ta-IN","Tamil (India)"],
+  ["te-IN","Telugu (India)"],
+  ["tg-TJ","Tajik (Tajikistan)"],
+  ["th-TH","Thai (Thailand)"],
+  ["tr-TR","Turkish (Turkey)"],
+  ["uk-UA","Ukrainian (Ukraine)"],
+  ["umb-AO","Umbundu (Angola)"],
+  ["ur-PK","Urdu (Pakistan)"],
+  ["uz-UZ","Uzbek (Uzbekistan)"],
+  ["vi-VN","Vietnamese (Vietnam)"],
+  ["wo-SN","Wolof (Senegal)"],
+  ["xh-ZA","Xhosa (South Africa)"],
+  ["yo-NG","Yoruba (Nigeria)"],
+  ["yue-Hant-HK","Chinese, Cantonese (Traditional Hong Kong)"],
+  ["zu-ZA","Zulu (South Africa)"]
+];
 /* Make the entire language badge tappable on Android Chrome, including while editing. */
  const languageTapStyle=document.createElement('style');
  languageTapStyle.textContent='.speaker .speaker-language-title{position:relative;z-index:25;pointer-events:auto;cursor:pointer;touch-action:manipulation}.speaker .speaker-language-title select{pointer-events:auto;min-height:36px;cursor:pointer}.app.is-editing .speaker:not(.is-editor) .speaker-language-title,.app.is-editing .speaker:not(.is-editor) .speaker-language-title select{pointer-events:auto}';
@@ -593,6 +712,7 @@ toggle.addEventListener('click',async()=>{
  const lowerTranslated=document.getElementById('bottomLanguageTranslation');
  if(!upper||!lower||!upperTranslated||!lowerTranslated)return;
  const native={uz:'O‘zbek tili',ru:'Русский язык',en:'English',tr:'Türkçe'};
+ for(const [code,label] of (window.CHIRP2_MATRIX||[]))native[code]=label;
  const names={
   uz:{uz:'O‘zbek tili',ru:'Узбекский язык',en:'Uzbek language',tr:'Özbekçe'},
   ru:{uz:'Rus tili',ru:'Русский язык',en:'Russian language',tr:'Rusça'},
@@ -600,6 +720,11 @@ toggle.addEventListener('click',async()=>{
   tr:{uz:'Turk tili',ru:'Турецкий язык',en:'Turkish language',tr:'Türkçe'}
  };
  const supported=Object.keys(native);
+ for(const select of [upper,lower]){
+   for(const [code,label] of (window.CHIRP2_MATRIX||[])){
+     const option=document.createElement('option');option.value=code;option.textContent=label+' — '+code;select.append(option);
+   }
+ }
  try{
   const a=localStorage.getItem('avnivo.online.upper'),b=localStorage.getItem('avnivo.online.lower');
   if(supported.includes(a))upper.value=a;
@@ -1061,125 +1186,7 @@ toggle.addEventListener('click',async()=>{
 /* AVNIVO Chirp 2 locale matrix (117 official BCP-47 codes).
    Mirrors translator-api/chirp2_languages.py. Source: Google Cloud
    Speech-to-Text V2 supported languages (chirp_2), see docs/chirp2-language-support.md. */
-window.CHIRP2_MATRIX=[
-  ["af-ZA","Afrikaans (South Africa)"],
-  ["am-ET","Amharic (Ethiopia)"],
-  ["ar-EG","Arabic (Egypt)"],
-  ["as-IN","Assamese (India)"],
-  ["ast-ES","Asturian (Spain)"],
-  ["az-AZ","Azerbaijani (Azerbaijan)"],
-  ["be-BY","Belarusian (Belarus)"],
-  ["bg-BG","Bulgarian (Bulgaria)"],
-  ["bn-BD","Bengali (Bangladesh)"],
-  ["bn-IN","Bengali (India)"],
-  ["bs-BA","Bosnian (Bosnia and Herzegovina)"],
-  ["ca-ES","Catalan (Spain)"],
-  ["ceb-PH","Cebuano (Philippines)"],
-  ["ckb-IQ","Central Kurdish (Iraq)"],
-  ["cmn-Hans-CN","Chinese (Simplified, China)"],
-  ["cmn-Hant-TW","Chinese, Mandarin (Traditional, Taiwan)"],
-  ["cs-CZ","Czech (Czech Republic)"],
-  ["cy-GB","Welsh (United Kingdom)"],
-  ["da-DK","Danish (Denmark)"],
-  ["de-DE","German (Germany)"],
-  ["el-GR","Greek (Greece)"],
-  ["en-AU","English (Australia)"],
-  ["en-GB","English (United Kingdom)"],
-  ["en-IN","English (India)"],
-  ["en-US","English (United States)"],
-  ["es-419","Spanish (Latin American)"],
-  ["es-ES","Spanish (Spain)"],
-  ["es-US","Spanish (United States)"],
-  ["et-EE","Estonian (Estonia)"],
-  ["eu-ES","Basque (Spain)"],
-  ["fa-IR","Persian (Iran)"],
-  ["ff-SN","Fulah (Senegal)"],
-  ["fi-FI","Finnish (Finland)"],
-  ["fil-PH","Filipino (Philippines)"],
-  ["fr-CA","French (Canada)"],
-  ["fr-FR","French (France)"],
-  ["ga-IE","Irish (Ireland)"],
-  ["gl-ES","Galician (Spain)"],
-  ["gu-IN","Gujarati (India)"],
-  ["ha-NG","Hausa (Nigeria)"],
-  ["hi-IN","Hindi (India)"],
-  ["hr-HR","Croatian (Croatia)"],
-  ["hu-HU","Hungarian (Hungary)"],
-  ["hy-AM","Armenian (Armenia)"],
-  ["id-ID","Indonesian (Indonesia)"],
-  ["ig-NG","Igbo (Nigeria)"],
-  ["is-IS","Icelandic (Iceland)"],
-  ["it-IT","Italian (Italy)"],
-  ["iw-IL","Hebrew (Israel)"],
-  ["ja-JP","Japanese (Japan)"],
-  ["jv-ID","Javanese (Indonesia)"],
-  ["ka-GE","Georgian (Georgia)"],
-  ["kam-KE","Kamba (Kenya)"],
-  ["kea-CV","Kabuverdianu (Cape Verde)"],
-  ["kk-KZ","Kazakh (Kazakhstan)"],
-  ["km-KH","Khmer (Cambodia)"],
-  ["kn-IN","Kannada (India)"],
-  ["ko-KR","Korean (South Korea)"],
-  ["ky-KG","Kyrgyz (Cyrillic)"],
-  ["lb-LU","Luxembourgish (Luxembourg)"],
-  ["lg-UG","Ganda (Uganda)"],
-  ["ln-CD","Lingala (Congo-Kinshasa)"],
-  ["lo-LA","Lao (Laos)"],
-  ["lt-LT","Lithuanian (Lithuania)"],
-  ["luo-KE","Luo (Kenya)"],
-  ["lv-LV","Latvian (Latvia)"],
-  ["mi-NZ","Maori (New Zealand)"],
-  ["mk-MK","Macedonian (North Macedonia)"],
-  ["ml-IN","Malayalam (India)"],
-  ["mn-MN","Mongolian (Mongolia)"],
-  ["mr-IN","Marathi (India)"],
-  ["ms-MY","Malay (Malaysia)"],
-  ["mt-MT","Maltese (Malta)"],
-  ["my-MM","Burmese (Myanmar)"],
-  ["ne-NP","Nepali (Nepal)"],
-  ["nl-NL","Dutch (Netherlands)"],
-  ["no-NO","Norwegian Bokmål (Norway)"],
-  ["nso-ZA","Sepedi (South Africa)"],
-  ["ny-MW","Nyanja (Malawi)"],
-  ["oc-FR","Occitan (France)"],
-  ["om-ET","Oromo (Ethiopia)"],
-  ["or-IN","Oriya (India)"],
-  ["pa-Guru-IN","Punjabi (Gurmukhi India)"],
-  ["pl-PL","Polish (Poland)"],
-  ["ps-AF","Pashto"],
-  ["pt-BR","Portuguese (Brazil)"],
-  ["pt-PT","Portuguese (Portugal)"],
-  ["ro-RO","Romanian (Romania)"],
-  ["ru-RU","Russian (Russia)"],
-  ["rup-BG","Aromanian (Bulgaria)"],
-  ["sd-IN","Sindhi (India)"],
-  ["si-LK","Sinhala (Sri Lanka)"],
-  ["sk-SK","Slovak (Slovakia)"],
-  ["sl-SI","Slovenian (Slovenia)"],
-  ["sn-ZW","Shona (Zimbabwe)"],
-  ["so-SO","Somali"],
-  ["sq-AL","Albanian (Albania)"],
-  ["sr-RS","Serbian (Serbia)"],
-  ["su-ID","Sundanese (Indonesia)"],
-  ["sv-SE","Swedish (Sweden)"],
-  ["sw","Swahili"],
-  ["sw-KE","Swahili (Kenya)"],
-  ["ta-IN","Tamil (India)"],
-  ["te-IN","Telugu (India)"],
-  ["tg-TJ","Tajik (Tajikistan)"],
-  ["th-TH","Thai (Thailand)"],
-  ["tr-TR","Turkish (Turkey)"],
-  ["uk-UA","Ukrainian (Ukraine)"],
-  ["umb-AO","Umbundu (Angola)"],
-  ["ur-PK","Urdu (Pakistan)"],
-  ["uz-UZ","Uzbek (Uzbekistan)"],
-  ["vi-VN","Vietnamese (Vietnam)"],
-  ["wo-SN","Wolof (Senegal)"],
-  ["xh-ZA","Xhosa (South Africa)"],
-  ["yo-NG","Yoruba (Nigeria)"],
-  ["yue-Hant-HK","Chinese, Cantonese (Traditional Hong Kong)"],
-  ["zu-ZA","Zulu (South Africa)"]
-];
+
 </script>
 <script>
 /* AVNIVO Online STT: Google Chirp 2 only; offline bridge retained. */
@@ -1199,44 +1206,6 @@ window.CHIRP2_MATRIX=[
  enginePanel.style.cssText='display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px;border:1px solid #b99360;border-radius:10px;background:#302315;color:#ffe4aa;font:12px system-ui';
  enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="google">Google Chirp 2 (117 til)</option><option value="offline">Offline STT (Android ilova)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
 
- // Independent STT language selector: recognition does not imply translation/TTS support.
- const localeKey='avnivo.chirp2.locale.v1';
- const localeLabel=document.createElement('label');
- localeLabel.htmlFor='avnivoChirp2Locale';
- localeLabel.textContent='Google Chirp 2 — ovoz tanish tili (117 til)';
- const localeSearch=document.createElement('input');
- localeSearch.type='search';
- localeSearch.placeholder='Tilni qidirish / Search language';
- localeSearch.setAttribute('aria-label','Chirp 2 tilini qidirish');
- localeSearch.style.cssText='width:100%;box-sizing:border-box;padding:10px;border-radius:8px;background:white;color:#222';
- const speechLocaleSelect=document.createElement('select');
- speechLocaleSelect.id='avnivoChirp2Locale';
- speechLocaleSelect.setAttribute('aria-label','Chirp 2 ovoz tanish tilini tanlash');
- speechLocaleSelect.style.cssText='width:100%;padding:10px;border-radius:8px;background:white;color:#222';
- const localeHint=document.createElement('small');
- localeHint.textContent='Bu tanlov faqat ovozni matnga aylantiradi. Tarjima va TTS tillari alohida.';
- let selectedLocale='uz-UZ';
- try{const saved=localStorage.getItem(localeKey);if(Object.hasOwn(CHIRP2_LOCALE_NAMES,saved))selectedLocale=saved}catch(_){}
- const sortedLocales=[...CHIRP2_MATRIX].sort((a,b)=>a[1].localeCompare(b[1]));
- function renderSpeechLocales(){
-   const q=localeSearch.value.trim().toLocaleLowerCase();
-   speechLocaleSelect.replaceChildren();
-   for(const [code,name] of sortedLocales){
-     if(q&&!(code+' '+name).toLocaleLowerCase().includes(q))continue;
-     const option=document.createElement('option');
-     option.value=code;option.textContent=name+' — '+code;
-     speechLocaleSelect.append(option);
-   }
-   if([...speechLocaleSelect.options].some(o=>o.value===selectedLocale))speechLocaleSelect.value=selectedLocale;
- }
- renderSpeechLocales();
- localeSearch.addEventListener('input',renderSpeechLocales);
- speechLocaleSelect.addEventListener('change',()=>{
-   if(!speechLocaleSelect.value)return;
-   selectedLocale=speechLocaleSelect.value;
-   try{localStorage.setItem(localeKey,selectedLocale)}catch(_){}
- });
- enginePanel.append(localeLabel,localeSearch,speechLocaleSelect,localeHint);
  const settingsCard=document.querySelector('#sensorSheet .sensor-card');
  if(settingsCard){
    settingsCard.append(enginePanel);
@@ -1411,8 +1380,8 @@ window.CHIRP2_MATRIX=[
      window.location.href='avnivo-offline://recognize';
      return;
    }
-   const locale=selectedLocale;
-   if(!locale){message('Bu til uchun Google Chirp 2 ovoz tanish hali sozlanmagan');return}
+   const locale=CHIRP2_BASE_TO_LOCALE[language]||language;
+   if(!Object.hasOwn(CHIRP2_LOCALE_NAMES,locale)){message('Tanlangan til Chirp 2 tomonidan qo‘llab-quvvatlanmaydi');return}
    if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){message('Brauzer ovoz yozishni qo‘llamaydi');return}
    window.avnivoComposer?.showBottomEditor();
    const base=field.value.trim();
