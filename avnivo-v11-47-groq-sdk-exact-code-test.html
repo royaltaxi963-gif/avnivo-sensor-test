@@ -435,7 +435,7 @@ button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch
 </span>
 </button>
 <section data-speaker="1" class="speaker middle" aria-label="Pastdagi suhbatdosh">
-<div class="speaker-language-title" aria-label="Pastki suhbat tili"><span>O‘zbek tili</span><span class="language-divider" aria-hidden="true">≈</span><span id="bottomLanguageTranslation">Узбекский язык</span></div>
+<div class="speaker-language-title" aria-label="Pastki suhbat tili"><select id="bottomLanguageSelect" aria-label="Pastki bo‘lim tilini tanlash"><option value="uz">O‘zbek tili</option><option value="ru">Русский язык</option><option value="en">English</option><option value="tr">Türkçe</option></select><span class="language-divider" aria-hidden="true">≈</span><span id="bottomLanguageTranslation">Узбекский язык</span></div>
 <div class="header"><div class="identity"><span id="bottomName" hidden>1-suhbatdosh</span></div></div>
 <div class="center"><div class="translation-history" role="log" aria-label="Tarjimalar tarixi" aria-live="polite" aria-relevant="additions"></div><button class="empty-art message-button" type="button" aria-label="Qo‘lda yozishni boshlash" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></button><div class="placeholder">Qo‘lda yozish uchun bosing!</div><div class="message-compose" hidden><label class="message-bubble"><span class="sr-only">Xabar matni</span><textarea class="message-input" rows="1" aria-label="Xabarni qo‘lda yozish" placeholder="" enterkeyhint="enter"></textarea></label></div></div>
 </section>
@@ -581,8 +581,38 @@ toggle.addEventListener('click',async()=>{
 
 
 <script>
-/* Only updates the language label; does not touch the microphone, swap, sensors or card animations. */
-(()=>{const select=document.getElementById('upperLanguageSelect'),topUz=document.getElementById('upperLanguageUz'),bottomTranslated=document.getElementById('bottomLanguageTranslation'),topLang=document.getElementById('topLang');if(!select||!topUz||!bottomTranslated)return;const names={ru:{uz:'Rus tili',nativeUz:'Узбекский язык',short:'Ruscha'},en:{uz:'Ingliz tili',nativeUz:'Uzbek language',short:'Inglizcha'},tr:{uz:'Turk tili',nativeUz:'Özbekçe',short:'Turkcha'},uz:{uz:'O‘zbek tili',nativeUz:'O‘zbek tili',short:'O‘zbekcha'}};function apply(){const value=names[select.value];if(!value)return;topUz.textContent=value.uz;bottomTranslated.textContent=value.nativeUz;if(topLang)topLang.textContent=value.short;}select.addEventListener('change',apply);apply();})();
+/* Online language selection: both panels, reciprocal names, persisted choice. */
+(()=>{
+ const upper=document.getElementById('upperLanguageSelect');
+ const lower=document.getElementById('bottomLanguageSelect');
+ const upperTranslated=document.getElementById('upperLanguageUz');
+ const lowerTranslated=document.getElementById('bottomLanguageTranslation');
+ if(!upper||!lower||!upperTranslated||!lowerTranslated)return;
+ const native={uz:'O‘zbek tili',ru:'Русский язык',en:'English',tr:'Türkçe'};
+ const names={
+  uz:{uz:'O‘zbek tili',ru:'Узбекский язык',en:'Uzbek language',tr:'Özbekçe'},
+  ru:{uz:'Rus tili',ru:'Русский язык',en:'Russian language',tr:'Rusça'},
+  en:{uz:'Ingliz tili',ru:'Английский язык',en:'English',tr:'İngilizce'},
+  tr:{uz:'Turk tili',ru:'Турецкий язык',en:'Turkish language',tr:'Türkçe'}
+ };
+ const supported=Object.keys(native);
+ try{
+  const a=localStorage.getItem('avnivo.online.upper'),b=localStorage.getItem('avnivo.online.lower');
+  if(supported.includes(a))upper.value=a;
+  if(supported.includes(b))lower.value=b;
+ }catch(_){}
+ function apply(){
+  upperTranslated.textContent=names[upper.value]?.[lower.value]||native[upper.value];
+  lowerTranslated.textContent=names[lower.value]?.[upper.value]||native[lower.value];
+  const topLang=document.getElementById('topLang');
+  if(topLang)topLang.textContent=names[upper.value]?.uz||native[upper.value];
+  try{localStorage.setItem('avnivo.online.upper',upper.value);localStorage.setItem('avnivo.online.lower',lower.value)}catch(_){}
+ }
+ upper.addEventListener('change',apply);
+ lower.addEventListener('change',apply);
+ window.avnivoOnlineLanguageForSpeaker=id=>id==='1'?lower.value:upper.value;
+ apply();
+})();
 </script>
 
 <script>
@@ -717,14 +747,14 @@ toggle.addEventListener('click',async()=>{
      history.scrollTop=history.scrollHeight;
      return {history,body};
    }
-   const sourceLabel=nowTop.dataset.speaker==='1'?'UZ:':(shortNames[language]||'РУ:');
+   const sourceLabel=(window.avnivoOnlineLanguageForSpeaker?.(nowTop.dataset.speaker)||'uz').toUpperCase()+':';
    appendMessage(nowTop,'outgoing',sourceLabel,source);
-   const destLabel=nowBottom.dataset.speaker==='1'?'UZ:':(shortNames[language]||'РУ:');
+   const destLabel=(window.avnivoOnlineLanguageForSpeaker?.(nowBottom.dataset.speaker)||'ru').toUpperCase()+':';
    const target=appendMessage(nowBottom,'incoming',destLabel,'');
    // Real Google Translation LLM; no fabricated demo translation or silent fallback.
    const token=++typingToken;
-   const sourceLang=nowTop.dataset.speaker==='1'?'uz':language;
-   const targetLang=nowBottom.dataset.speaker==='1'?'uz':language;
+   const sourceLang=window.avnivoOnlineLanguageForSpeaker?.(nowTop.dataset.speaker)||'uz';
+   const targetLang=window.avnivoOnlineLanguageForSpeaker?.(nowBottom.dataset.speaker)||'ru';
    if(sourceLang===targetLang){
      target.body.textContent=source;
      return;
@@ -808,7 +838,7 @@ toggle.addEventListener('click',async()=>{
  window.avnivoPrepareSpeech=(original,speakerId)=>({
    originalText:original,
    preparedText:original,
-   sourceLanguage:speakerId==='1'?'uz':(document.getElementById('upperLanguageSelect')?.value||'ru')
+   sourceLanguage:window.avnivoOnlineLanguageForSpeaker?.(speakerId)||'uz'
  });
  function inputFor(s){return s.querySelector('.message-input')}
  function render(s,text){const i=inputFor(s);i.value=text;i.dispatchEvent(new Event('input',{bubbles:true}));i.scrollTop=i.scrollHeight}
@@ -857,7 +887,7 @@ toggle.addEventListener('click',async()=>{
    try{
      const recognition=new Recognition();
      rec=recognition;
-     recognition.lang=s.dataset.speaker==='1'?'uz-UZ':({ru:'ru-RU',en:'en-US',tr:'tr-TR',uz:'uz-UZ'}[document.getElementById('upperLanguageSelect')?.value]||'ru-RU');
+     recognition.lang=({ru:'ru-RU',en:'en-US',tr:'tr-TR',uz:'uz-UZ'}[window.avnivoOnlineLanguageForSpeaker?.(s.dataset.speaker)]||'uz-UZ');
      recognition.continuous=true;
      recognition.interimResults=true;
      recognition.onresult=e=>{
@@ -927,7 +957,7 @@ toggle.addEventListener('click',async()=>{
    btn.disabled=true;
    btn.setAttribute('aria-label','Ovoz tayyorlanmoqda');
    const speaker=btn.closest('.speaker');
-   const language=speaker?.dataset.speaker==='1'?'uz':(document.getElementById('upperLanguageSelect')?.value||'ru');
+   const language=window.avnivoOnlineLanguageForSpeaker?.(speaker?.dataset.speaker)||'uz';
    try{
      const response=await fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts',{
        method:'POST',headers:{'Content-Type':'application/json'},
@@ -1110,7 +1140,7 @@ toggle.addEventListener('click',async()=>{
    if(busy)return
    const speaker=app.querySelector('.speaker.middle'),field=speaker?.querySelector('.message-input');
    if(!field){message('Yozish maydoni topilmadi');return}
-   const language=speaker.dataset.speaker==='1'?'uz':(document.getElementById('upperLanguageSelect')?.value||'ru');
+   const language=window.avnivoOnlineLanguageForSpeaker?.(speaker.dataset.speaker)||'uz';
    const engine=engineSelect.value;
    if(engine==='offline'){
      status('Offline STT ilovasi ochilmoqda. Tayyor model bo‘lishi kerak.');
