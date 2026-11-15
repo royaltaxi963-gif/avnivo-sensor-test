@@ -1,0 +1,47 @@
+name: Diagnose offline Cloud Run staging permissions
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Read-only deploy IAM diagnostics
+        shell: bash
+        run: |
+          set -uo pipefail
+          PROJECT=project-6bcf7fe6-cb55-49b7-9f4
+          REGION=europe-west1
+          echo "## Offline Cloud Run deploy IAM diagnostic" >> "$GITHUB_STEP_SUMMARY"
+          echo "Project: $PROJECT; region: $REGION" >> "$GITHUB_STEP_SUMMARY"
+          echo "Active principal:"
+          gcloud auth list --filter=status:ACTIVE --format='value(account)'
+          probe() {
+            local title="$1"; shift
+            echo "::group::$title"
+            echo "### $title" >> "$GITHUB_STEP_SUMMARY"
+            if "$@" > /tmp/avnivo-probe.out 2>&1; then
+              echo "PASS" >> "$GITHUB_STEP_SUMMARY"
+              cat /tmp/avnivo-probe.out
+            else
+              code=$?
+              echo "FAILED (exit $code)" >> "$GITHUB_STEP_SUMMARY"
+              cat /tmp/avnivo-probe.out
+            fi
+            echo "::endgroup::"
+          }
+          probe "Project describe" gcloud projects describe "$PROJECT" --format='value(projectId)'
+          probe "Cloud Run services list" gcloud run services list --project="$PROJECT" --region="$REGION" --format='table(metadata.name)'
+          probe "Staging service describe" gcloud run services describe avnivo-offline-model-api-staging --project="$PROJECT" --region="$REGION" --format='yaml(metadata.name,spec.template.spec.serviceAccountName)'
+          probe "Cloud Build API status" gcloud services list --project="$PROJECT" --enabled --filter='config.name:cloudbuild.googleapis.com' --format='value(config.name)'
+          probe "Artifact Registry repositories list" gcloud artifacts repositories list --project="$PROJECT" --location="$REGION" --format='table(name)'
+          probe "Cloud Build staging buckets list" gcloud storage buckets list --project="$PROJECT" --format='value(name)'
+          echo "NOTE: Read-only probes cannot prove create/deploy or actAs authorization. A failed probe may also mean missing read access. Check IAM Policy Troubleshooter and audit logs for the exact denied permission." >> "$GITHUB_STEP_SUMMARY"
