@@ -1,4 +1,9 @@
-"""AVNIVO Translator — Groq Whisper Large v3 proxy."""
+"""AVNIVO Translator — Google Cloud Speech-to-Text V2 (Chirp 2) proxy.
+
+Online speech recognition runs on Google Chirp 2 (see ``chirp2_languages``).
+The legacy ``/api/transcribe`` routes below remain only for backward
+compatibility and are unused by the AVNIVO Online frontend.
+"""
 import os
 import time
 import base64
@@ -35,7 +40,16 @@ recent = defaultdict(deque)
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "model": MODEL, "configured": bool(os.getenv("GROQ_API_KEY"))}
+    # Application Default Credentials are implicit on Cloud Run (K_SERVICE) and
+    # explicit locally, so this reflects real Chirp 2 recognizer availability.
+    configured = bool(os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or os.getenv("K_SERVICE"))
+    return {
+        "status": "ok",
+        "model": GOOGLE_MODEL,
+        "region": GOOGLE_REGION,
+        "languages": len(CHIRP2_LOCALES),
+        "configured": configured,
+    }
 
 @app.post("/api/transcribe")
 @app.post("/api/transcribe-groq-sdk-test")

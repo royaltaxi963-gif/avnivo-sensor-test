@@ -98,7 +98,16 @@ def test_registry_codes_are_bcp47_shaped():
 
 def test_configured_region_is_a_chirp2_region():
     assert registry.GOOGLE_REGION in registry.CHIRP2_REGIONS
-    assert registry.GOOGLE_MODEL == "chirp_2"
+
+
+def test_health_reports_chirp2_not_a_stale_groq_label():
+    """`/health` must describe the live Chirp 2 engine, never the retired Groq one."""
+    body = client.get("/health").json()
+    assert body["status"] == "ok"
+    assert body["model"] == registry.GOOGLE_MODEL == "chirp_2"
+    assert body["region"] == registry.GOOGLE_REGION
+    assert body["languages"] == len(registry.CHIRP2_LOCALES)
+    assert "whisper" not in json.dumps(body).lower()
 
 
 def test_supported_locale_helper():
