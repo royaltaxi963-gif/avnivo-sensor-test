@@ -882,7 +882,7 @@ toggle.addEventListener('click',async()=>{
  const app=document.getElementById('app');
  const mic=document.getElementById('mic');
  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
- const GROQ_ONLY=true;
+ const RECORDER_ONLY=true;
  const demoText='Assalomu alaykum, bugun biz yangi tarjimon ilovasini sinab ko‘ryapmiz. Men ovozim orqali xabar yozmoqchiman va har bir aytilgan so‘z ekranda ketma-ket paydo bo‘lishini ko‘rmoqchiman. Suhbatimiz davomida barcha xabarlar tartib bilan saqlanadi.';
  const wave='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg>';
  const speakerSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM16 9q4 3 0 6M18 6q7 6 0 12"/></svg>';
@@ -974,7 +974,7 @@ toggle.addEventListener('click',async()=>{
    }catch(e){rec=null;clearVoice();alert('Brauzerda ovoz tanish ishga tushmadi: '+e.message)}
  }
  mic.setAttribute('aria-label','Ovoz orqali yozishni boshlash');
- mic.addEventListener('click',()=>{if(GROQ_ONLY)return;if(isListening)stop();else begin()});
+ mic.addEventListener('click',()=>{if(RECORDER_ONLY)return;if(isListening)stop();else begin()});
  const swap=document.getElementById('swap');
  swap.addEventListener('click',()=>{if(isListening)stop()},{capture:true});
 
@@ -1058,14 +1058,13 @@ toggle.addEventListener('click',async()=>{
 })();
 </script>
 <script>
-/* AVNIVO v11.40: preserve v11.38 voice composer layout with Groq backend. */
+/* AVNIVO Online STT: Google Chirp 2 only; offline bridge retained. */
 (()=>{
  'use strict';
- const GROQ_API='https://avnivo-translator-api.onrender.com/api/transcribe-groq-sdk-test';
  const GOOGLE_API='https://avnivo-sensor-test-792624108019.europe-west1.run.app/api/transcribe-google';
  const enginePanel=document.createElement('div');
  enginePanel.style.cssText='display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px;border:1px solid #b99360;border-radius:10px;background:#302315;color:#ffe4aa;font:12px system-ui';
- enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="groq">Groq Whisper v3</option><option value="google">Google Chirp 2 (o‘zbekcha)</option><option value="offline">Offline STT (Android ilova)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
+ enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="google">Google Chirp 2 (o‘zbekcha)</option><option value="offline">Offline STT (Android ilova)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
  const settingsCard=document.querySelector('#sensorSheet .sensor-card');
  if(settingsCard){
    settingsCard.append(enginePanel);
@@ -1117,7 +1116,7 @@ toggle.addEventListener('click',async()=>{
      heading.textContent=offline?'OFFLINE':'ONLINE';
      heading.style.color=offline?'#76edc4':'#ffd16d';
      if(offline){offlineContent.append(enginePanel);selectedEngine.value='offline';}
-     else{onlineContent.append(enginePanel);if(selectedEngine.value==='offline')selectedEngine.value='groq';}
+     else{onlineContent.append(enginePanel);if(selectedEngine.value==='offline')selectedEngine.value='google';}
      selectedEngine.querySelectorAll('option').forEach(option=>option.hidden=offline?option.value!=='offline':option.value==='offline');
      try{localStorage.setItem(modeKey,mode)}catch(_){}
    };
@@ -1176,16 +1175,16 @@ toggle.addEventListener('click',async()=>{
    const diagnosticStart=performance.now();
    let responseAt=null;
    busy=true;
-   status(engine==='google'?'Google Chirp 2 taniyapti...':'Groq Whisper taniyapti...');
+   status('Google Chirp 2 taniyapti...');
    try{
      const form=new FormData();
      const extension=blob.type.includes('mp4')?'mp4':blob.type.includes('ogg')?'ogg':blob.type.includes('wav')?'wav':blob.type.includes('flac')?'flac':'webm';
      form.append('audio',blob,'speech.'+extension);
-     form.append('language',engine==='google'?'uz-UZ':language);
+     form.append('language','uz-UZ');
      const ctrl=new AbortController();
      const timer=setTimeout(()=>ctrl.abort(),90000);
      let response;
-     try{response=await fetch(engine==='google'?GOOGLE_API:GROQ_API,{method:'POST',body:form,signal:ctrl.signal})}finally{clearTimeout(timer)}
+     try{response=await fetch(GOOGLE_API,{method:'POST',body:form,signal:ctrl.signal})}finally{clearTimeout(timer)}
      responseAt=performance.now();
      if(id!==requestId)return;
      if(!response.ok)throw new Error(response.status===429?'So‘rovlar limiti tugadi':response.status===503?'Ovoz tanish servisi hozir mavjud emas':response.status===403?'Server ruxsat bermadi':'Server xatosi: '+response.status);
@@ -1199,7 +1198,7 @@ toggle.addEventListener('click',async()=>{
      field.dispatchEvent(new Event('input',{bubbles:true}));
      const total=((performance.now()-diagnosticStart)/1000).toFixed(1);
      const network=((responseAt-diagnosticStart)/1000).toFixed(1);
-     status((engine==='google'?'Google Chirp 2':'Groq Whisper')+' — tayyor. Server javobi: '+network+' s; jami: '+total+' s');
+     status('Google Chirp 2 — tayyor. Server javobi: '+network+' s; jami: '+total+' s');
    }catch(err){if(id===requestId){const seconds=((performance.now()-diagnosticStart)/1000).toFixed(1);message('Ovoz tanilmadi ('+seconds+' s): '+(err.name==='AbortError'?'Server javobi kechikdi':err.message))}}
    finally{busy=false}
  }
@@ -1215,7 +1214,7 @@ toggle.addEventListener('click',async()=>{
      return;
    }
    if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){message('Brauzer ovoz yozishni qo‘llamaydi');return}
-   if(engine==='google' && language!=='uz'){message('Google Chirp 2 hozir faqat o‘zbek tilida (uz-UZ) ishlaydi');return}
+   if(language!=='uz'){message('Google Chirp 2 hozir faqat o‘zbek tilida (uz-UZ) ishlaydi');return}
    window.avnivoComposer?.showBottomEditor();
    const base=field.value.trim();
    if(document.activeElement===field)field.blur();
