@@ -1173,6 +1173,8 @@ toggle.addEventListener('click',async()=>{
    return text.replace(/[А-Яа-яЁёЎўҚқҒғҲҳ]/g,char=>map[char]??char);
  }
  async function upload(blob,id,language,field,base,engine){
+   const diagnosticStart=performance.now();
+   let responseAt=null;
    busy=true;
    status(engine==='google'?'Google Chirp 2 taniyapti...':'Groq Whisper taniyapti...');
    try{
@@ -1184,6 +1186,7 @@ toggle.addEventListener('click',async()=>{
      const timer=setTimeout(()=>ctrl.abort(),90000);
      let response;
      try{response=await fetch(engine==='google'?GOOGLE_API:GROQ_API,{method:'POST',body:form,signal:ctrl.signal})}finally{clearTimeout(timer)}
+     responseAt=performance.now();
      if(id!==requestId)return;
      if(!response.ok)throw new Error(response.status===429?'So‘rovlar limiti tugadi':response.status===503?'Ovoz tanish servisi hozir mavjud emas':response.status===403?'Server ruxsat bermadi':'Server xatosi: '+response.status);
      const data=await response.json();
@@ -1194,8 +1197,10 @@ toggle.addEventListener('click',async()=>{
      // The server returns a transcription, not a translation. Keep its original words.
      field.value=[base,text].filter(Boolean).join(' ');
      field.dispatchEvent(new Event('input',{bubbles:true}));
-     status((engine==='google'?'Google Chirp 2':'Groq Whisper')+' — tayyor');
-   }catch(err){if(id===requestId)message('Ovoz tanilmadi: '+(err.name==='AbortError'?'Server javobi kechikdi':err.message))}
+     const total=((performance.now()-diagnosticStart)/1000).toFixed(1);
+     const network=((responseAt-diagnosticStart)/1000).toFixed(1);
+     status((engine==='google'?'Google Chirp 2':'Groq Whisper')+' — tayyor. Server javobi: '+network+' s; jami: '+total+' s');
+   }catch(err){if(id===requestId){const seconds=((performance.now()-diagnosticStart)/1000).toFixed(1);message('Ovoz tanilmadi ('+seconds+' s): '+(err.name==='AbortError'?'Server javobi kechikdi':err.message))}}
    finally{busy=false}
  }
  async function start(){
