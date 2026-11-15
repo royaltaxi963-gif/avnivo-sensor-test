@@ -3,14 +3,22 @@ import os
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from google.cloud import speech_v2
+from google.api_core.client_options import ClientOptions
 from google.api_core.exceptions import GoogleAPICallError, InvalidArgument
 from starlette.concurrency import run_in_threadpool
 
-ORIGIN = "https://royaltaxi963-gif.github.io"
+REGION = "us-central1"
+MODEL = "chirp_2"
 LANGUAGES = {"uz": "uz-UZ", "ru": "ru-RU", "en": "en-US", "tr": "tr-TR"}
 MAX_BYTES = 10 * 1024 * 1024
 app = FastAPI(title="AVNIVO Google Speech API", docs_url=None, redoc_url=None)
-app.add_middleware(CORSMiddleware, allow_origins=[ORIGIN], allow_methods=["POST"], allow_headers=["Content-Type"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health")
 async def health():
@@ -18,7 +26,9 @@ async def health():
 
 def recognize(data: bytes, language: str, encoding: str) -> str:
     project = os.environ["GOOGLE_CLOUD_PROJECT"]
-    client = speech_v2.SpeechClient()
+    client = speech_v2.SpeechClient(
+        client_options=ClientOptions(api_endpoint=f"{REGION}-speech.googleapis.com")
+    )
     config = speech_v2.RecognitionConfig(
         explicit_decoding_config=speech_v2.ExplicitDecodingConfig(
             encoding=getattr(speech_v2.ExplicitDecodingConfig.AudioEncoding, encoding),
@@ -26,10 +36,23 @@ def recognize(data: bytes, language: str, encoding: str) -> str:
             audio_channel_count=1,
         ),
         language_codes=[LANGUAGES[language]],
-        model="long",
+        model=MODEL,
+        adaptation=speech_v2.SpeechAdaptation(
+            phrase_sets=[
+                speech_v2.SpeechAdaptation.AdaptationPhraseSet(
+                    inline_phrase_set=speech_v2.PhraseSet(
+                        phrases=[
+                            speech_v2.PhraseSet.Phrase(value="Avnivo", boost=20.0),
+                            speech_v2.PhraseSet.Phrase(value="ovoz tanish", boost=15.0),
+                            speech_v2.PhraseSet.Phrase(value="sinovi", boost=10.0),
+                        ]
+                    )
+                )
+            ]
+        ),
     )
     result = client.recognize(request=speech_v2.RecognizeRequest(
-        recognizer=f"projects/{project}/locations/global/recognizers/_",
+        recognizer=f"projects/{project}/locations/{REGION}/recognizers/_",
         config=config,
         content=data,
     ), timeout=75)
@@ -37,9 +60,7 @@ def recognize(data: bytes, language: str, encoding: str) -> str:
 
 @app.post("/api/transcribe")
 async def transcribe(request: Request, audio: UploadFile = File(...), language: str = Form("uz")):
-    # CORS/Origin is not authentication. Deploy with upstream abuse protection.
-    if request.headers.get("origin") != ORIGIN:
-        raise HTTPException(403, "Origin not allowed")
+    # CORS is not authentication; restrict public access before production.
     if language not in LANGUAGES:
         raise HTTPException(400, "Unsupported language")
     encoding = {"audio/webm": "WEBM_OPUS", "audio/ogg": "OGG_OPUS"}.get(
@@ -58,4 +79,4 @@ async def transcribe(request: Request, audio: UploadFile = File(...), language: 
         raise HTTPException(422, "Audio could not be recognized")
     except GoogleAPICallError:
         raise HTTPException(502, "Speech provider error")
-    return {"text": text, "model": "google-speech-v2"}
+    return {"text": text, "model": MODEL}
