@@ -882,29 +882,11 @@ toggle.addEventListener('click',async()=>{
  const swap=document.getElementById('swap');
  swap.addEventListener('click',()=>{if(isListening)stop()},{capture:true});
  // AVNIVO cloud TTS: preserve translation and recognition; show errors rather than silent fallback.
- let activeAudio=null, activeUrl=null, playbackId=0, activeUtterance=null;
+ let activeAudio=null, activeUrl=null, playbackId=0;
  function stopAudio(){
    playbackId++;
    if(activeAudio){activeAudio.pause();activeAudio.removeAttribute('src');activeAudio.load();activeAudio=null;}
    if(activeUrl){URL.revokeObjectURL(activeUrl);activeUrl=null;}
-   if('speechSynthesis' in window)window.speechSynthesis.cancel();
-   activeUtterance=null;
- }
- function browserVoice(text,language){
-   if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return false;
-   const utterance=new SpeechSynthesisUtterance(text);
-   utterance.lang=({uz:'uz-UZ',ru:'ru-RU',en:'en-US',tr:'tr-TR'}[language]||language||'uz-UZ');
-   utterance.rate=0.94;
-   utterance.pitch=1;
-   const voices=window.speechSynthesis.getVoices();
-   const voice=voices.find(v=>v.lang.toLowerCase()===utterance.lang.toLowerCase())||
-     voices.find(v=>v.lang.toLowerCase().startsWith(utterance.lang.slice(0,2).toLowerCase()));
-   if(voice)utterance.voice=voice;
-   activeUtterance=utterance;
-   utterance.onend=()=>{if(activeUtterance===utterance)activeUtterance=null;};
-   utterance.onerror=()=>{if(activeUtterance===utterance)activeUtterance=null;};
-   window.speechSynthesis.speak(utterance);
-   return true;
  }
  app.addEventListener('click',async e=>{
    const btn=e.target.closest('.read-message');
@@ -913,7 +895,7 @@ toggle.addEventListener('click',async()=>{
    const line=btn.closest('.translation-line');
    const message=line?.querySelector('.translation-body')?.textContent?.trim();
    if(!message)return;
-   if((activeAudio&&!activeAudio.paused)||activeUtterance){stopAudio();return;}
+   if(activeAudio&&!activeAudio.paused){stopAudio();return;}
    stopAudio();
    const id=playbackId;
    const previousLabel=btn.getAttribute('aria-label');
@@ -934,13 +916,12 @@ toggle.addEventListener('click',async()=>{
      activeAudio=new Audio(activeUrl);
      const audio=activeAudio;
      audio.onended=()=>{if(activeAudio===audio)stopAudio();};
-     audio.onerror=()=>{if(activeAudio===audio){stopAudio();browserVoice(message,language);}};
+     audio.onerror=()=>{if(activeAudio===audio){stopAudio();alert('AI ovozini ijro etib bo‘lmadi');}};
      await audio.play();
    }catch(err){
      if(id===playbackId){
        stopAudio();
-       if(!browserVoice(message,language))alert('Ovoz ishlamadi: '+err.message);
-       else console.warn('AVNIVO cloud TTS unavailable; device voice used:',err.message);
+       alert('AI ovozi ishlamadi: '+err.message);
      }
    }finally{
      btn.disabled=false;
