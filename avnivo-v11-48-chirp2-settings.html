@@ -717,16 +717,31 @@ toggle.addEventListener('click',async()=>{
    appendMessage(nowTop,'outgoing',sourceLabel,source);
    const destLabel=nowBottom.dataset.speaker==='1'?'UZ:':(shortNames[language]||'РУ:');
    const target=appendMessage(nowBottom,'incoming',destLabel,'');
-   const demo='Salom! Bu sinov tarjimasi.';
    const token=++typingToken;
    nowBottom.classList.add('is-translating');
-   for(const letter of demo){
-     if(token!==typingToken)break;
-     target.body.textContent+=letter;
+   target.body.textContent='Tarjima qilinmoqda...';
+   try{
+     const from=nowTop.dataset.speaker==='1'?'uz':language;
+     const to=nowBottom.dataset.speaker==='1'?'uz':language;
+     const controller=new AbortController();
+     const timeout=setTimeout(()=>controller.abort(),35000);
+     let response;
+     try{
+       response=await fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate',{
+         method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({text:source,source:from,target:to}),signal:controller.signal
+       });
+     }finally{clearTimeout(timeout)}
+     if(!response.ok)throw new Error('HTTP '+response.status);
+     const result=await response.json();
+     if(typeof result.text!=='string'||!result.text.trim())throw new Error('Bo‘sh tarjima');
+     if(token===typingToken)target.body.textContent=result.text;
+   }catch(error){
+     if(token===typingToken)target.body.textContent='Tarjima bajarilmadi. '+(error.name==='AbortError'?'Server javobi kechikdi':error.message);
+   }finally{
+     nowBottom.classList.remove('is-translating');
      target.history.scrollTop=target.history.scrollHeight;
-     await new Promise(resolve=>setTimeout(resolve,85));
    }
-   nowBottom.classList.remove('is-translating');
  }
  // Enforce the edit permission on every swap, including the previously edited panel.
  function enforcePermissions(){
