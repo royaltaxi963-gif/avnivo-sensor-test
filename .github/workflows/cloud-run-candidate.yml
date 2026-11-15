@@ -16,6 +16,11 @@ on:
         description: 'Unique image tag (e.g. the commit SHA)'
         required: true
         type: string
+  # Push-triggered path so the candidate can be built from a feature branch
+  # before anything lands on main. Only fires when the request marker changes.
+  push:
+    branches: [feature/chirp2-multilingual-stt]
+    paths: ['.github/candidate-deploy-request']
 
 permissions:
   contents: read
@@ -39,7 +44,7 @@ jobs:
       - name: Checkout selected source
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.source_ref }}
+          ref: ${{ inputs.source_ref || github.sha }}
           persist-credentials: false
 
       - name: Authenticate with Google Cloud (keyless)
@@ -65,7 +70,7 @@ jobs:
 
       - name: Build image
         run: |
-          IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO/app:${{ inputs.image_tag }}"
+          IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO/app:${{ inputs.image_tag || github.sha }}"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
           docker build --tag "$IMAGE" ./translator-api
 
