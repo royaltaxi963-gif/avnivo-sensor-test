@@ -644,7 +644,8 @@ toggle.addEventListener('click',async()=>{
    button.addEventListener('click',()=>{
      // Only the panel currently at the bottom may accept manual text.
      if(!speaker.classList.contains('middle'))return;
-     if(active&&active!==speaker)return;
+     // A stale editor lock must never block the currently visible lower panel.
+     if(active&&active!==speaker){active=null;app.classList.remove('is-editing');speakers.forEach(p=>p.classList.remove('is-editor'));}
      button.classList.remove('is-shaking');void button.offsetWidth;button.classList.add('is-shaking');
      setTimeout(()=>button.classList.remove('is-shaking'),400);
      // Only the tapped speaker opens; the other icon stays exactly in place.
@@ -659,6 +660,9 @@ toggle.addEventListener('click',async()=>{
    const bubble=speaker.querySelector('.message-bubble');
    bubble.addEventListener('click',()=>{
      if(!speaker.classList.contains('middle'))return;
+     if(active&&active!==speaker){active=null;app.classList.remove('is-editing');speakers.forEach(p=>p.classList.remove('is-editor'));}
+     open(speaker,false);
+     lock(speaker);
      if(input.readOnly)input.readOnly=false;
      input.focus({preventScroll:true});
    });
