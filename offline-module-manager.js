@@ -19,6 +19,13 @@ css.textContent=`
 #avnivoModuleManager .module-description{font-size:12px;line-height:1.55;margin:9px 0 0}
 #avnivoModuleManager .module-state{font-size:12px;margin-top:6px}
 #avnivoModuleManager .module-icon{display:inline-flex;align-items:center;justify-content:center;width:42px;min-width:42px;height:42px;border:1px solid #b58e53;border-radius:10px;background:#e7b75b;color:#21180c;cursor:pointer;font-size:20px}
+#avnivoModuleManager .module-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease}
+#avnivoModuleManager .module-icon:not(:disabled):active svg{transform:scale(.85)}
+#avnivoModuleManager .module-icon:not(:disabled):hover svg{transform:translateY(2px)}
+#avnivoModuleManager .module-icon.is-loading{background:transparent;color:#e7b75b;border-color:#e7b75b}
+#avnivoModuleManager .module-icon.is-loading svg{animation:avnivo-rotate 1s linear infinite}
+@keyframes avnivo-rotate{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#avnivoModuleManager .module-icon svg{transition:none}#avnivoModuleManager .module-icon.is-loading svg{animation:none}}
 #avnivoModuleManager .module-icon:disabled{opacity:.45;cursor:not-allowed}
 #avnivoModuleManager .module-progress{width:100%;height:10px;margin-top:8px}
 #avnivoModuleManager .module-progress-text{font-size:12px}
@@ -55,7 +62,12 @@ function mount(){
    installed=!!b&&phase==='installed';
    const percent=Number(data?.percent);
    const loading=!!b&&phase==='downloading';
-   action.textContent=installed?'🗑':loading?'…':'↓';
+   action.classList.toggle('is-loading',loading);
+   action.innerHTML=installed
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 4h4M7 7l1 13h8l1-13M10 11v6M14 11v6"/></svg>'
+    : loading
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg>';
    action.setAttribute('aria-label',installed?mod.name+' modulini o‘chirish':mod.name+' modulini yuklab olish');
    action.title=action.getAttribute('aria-label');
    action.disabled=!b||loading||(!installed&&!mod.ready)||(!installed&&typeof b.download!=='function')||(installed&&typeof b.remove!=='function');
