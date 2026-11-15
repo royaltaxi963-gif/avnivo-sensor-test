@@ -1062,6 +1062,8 @@ toggle.addEventListener('click',async()=>{
 (()=>{
  'use strict';
  const GOOGLE_API='https://avnivo-sensor-test-792624108019.europe-west1.run.app/api/transcribe-google';
+ // Shared recognition workflow: only the language code changes per verified locale.
+ const CHIRP2_LOCALES=Object.freeze({uz:'uz-UZ',ru:'ru-RU',en:'en-US',tr:'tr-TR'});
  const enginePanel=document.createElement('div');
  enginePanel.style.cssText='display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px;border:1px solid #b99360;border-radius:10px;background:#302315;color:#ffe4aa;font:12px system-ui';
  enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="google">Google Chirp 2 (UZ / RU / EN / TR)</option><option value="offline">Offline STT (Android ilova)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
@@ -1180,7 +1182,7 @@ toggle.addEventListener('click',async()=>{
      const form=new FormData();
      const extension=blob.type.includes('mp4')?'mp4':blob.type.includes('ogg')?'ogg':blob.type.includes('wav')?'wav':blob.type.includes('flac')?'flac':'webm';
      form.append('audio',blob,'speech.'+extension);
-     form.append('language',({uz:'uz-UZ',ru:'ru-RU',en:'en-US',tr:'tr-TR'}[language]||'uz-UZ'));
+     form.append('language',CHIRP2_LOCALES[language]);
      const ctrl=new AbortController();
      const timer=setTimeout(()=>ctrl.abort(),90000);
      let response;
@@ -1214,7 +1216,7 @@ toggle.addEventListener('click',async()=>{
      return;
    }
    if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){message('Brauzer ovoz yozishni qo‘llamaydi');return}
-   if(!['uz','ru','en','tr'].includes(language)){message('Bu til uchun Chirp 2 ovoz tanish hali sozlanmagan');return}
+   if(!Object.hasOwn(CHIRP2_LOCALES,language)){message('Bu til uchun Chirp 2 ovoz tanish hali sozlanmagan');return}
    window.avnivoComposer?.showBottomEditor();
    const base=field.value.trim();
    if(document.activeElement===field)field.blur();
