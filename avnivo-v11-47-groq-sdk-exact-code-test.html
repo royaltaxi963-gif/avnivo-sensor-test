@@ -981,6 +981,65 @@ toggle.addEventListener('click',async()=>{
  }else{
    console.error('AVNIVO: settings container missing');
  }
+ // Online/offline settings tabs; existing controls are preserved and reparented.
+ const modeStyles=document.createElement('style');
+ modeStyles.textContent=`
+ .avnivo-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+ .avnivo-mode-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:83px;border:1px solid #67533b;border-radius:13px;background:#32271e;color:#9e8a73;cursor:pointer;font:600 14px system-ui}
+ .avnivo-mode-tab svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+ .avnivo-mode-tab[aria-selected=true][data-mode=online]{background:#49371e;border:2px solid #f3ba52;color:#ffd16d}
+ .avnivo-mode-tab[aria-selected=true][data-mode=offline]{background:#1d4238;border:2px solid #55d6ab;color:#76edc4}
+ .avnivo-mode-title{text-align:center;font:700 17px system-ui;margin:4px 0 12px}
+ .avnivo-mode-content[hidden]{display:none!important}
+ `;
+ document.head.append(modeStyles);
+ if(settingsCard){
+   const header=settingsCard.querySelector('.sensor-head');
+   const tabs=document.createElement('div');
+   tabs.className='avnivo-mode-tabs';
+   tabs.setAttribute('role','tablist');
+   tabs.setAttribute('aria-label','AVNIVO ish rejimi');
+   tabs.innerHTML=`<button type="button" class="avnivo-mode-tab" data-mode="online" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.8a16 16 0 0 1 20 0M5 12.5a11 11 0 0 1 14 0M8.5 16.2a6 6 0 0 1 7 0"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg><span>Online</span></button><button type="button" class="avnivo-mode-tab" data-mode="offline" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.8a16 16 0 0 1 20 0M5 12.5a11 11 0 0 1 14 0M8.5 16.2a6 6 0 0 1 7 0M3 3l18 18"/></svg><span>Offline</span></button>`;
+   const heading=document.createElement('div');
+   heading.className='avnivo-mode-title';
+   heading.setAttribute('aria-live','polite');
+   const onlineContent=document.createElement('div');
+   onlineContent.className='avnivo-mode-content';
+   const offlineContent=document.createElement('div');
+   offlineContent.className='avnivo-mode-content';
+   offlineContent.hidden=true;
+   const existing=Array.from(settingsCard.children).filter(el=>el!==header&&el!==enginePanel);
+   existing.forEach(el=>onlineContent.append(el));
+   const offlineHelp=document.createElement('p');
+   offlineHelp.textContent='O‘zbekcha ovoz tanish: sherpa-onnx. Android modulining o‘rnatilgan va modeli tayyor bo‘lishi kerak. Veb-sahifa o‘zi ONNX modelini ishga tushirmaydi.';
+   offlineContent.append(offlineHelp);
+   header.after(tabs,heading,onlineContent,offlineContent);
+   onlineContent.append(enginePanel);
+   const modeKey='avnivo-speech-mode';
+   const selectedEngine=enginePanel.querySelector('#avnivoSpeechEngine');
+   const applyMode=(mode)=>{
+     const offline=mode==='offline';
+     tabs.querySelectorAll('button').forEach(btn=>btn.setAttribute('aria-selected',String(btn.dataset.mode===mode)));
+     onlineContent.hidden=offline;
+     offlineContent.hidden=!offline;
+     heading.textContent=offline?'OFFLINE':'ONLINE';
+     heading.style.color=offline?'#76edc4':'#ffd16d';
+     if(offline){offlineContent.append(enginePanel);selectedEngine.value='offline';}
+     else{onlineContent.append(enginePanel);if(selectedEngine.value==='offline')selectedEngine.value='groq';}
+     selectedEngine.querySelectorAll('option').forEach(option=>option.hidden=offline?option.value!=='offline':option.value==='offline');
+     try{localStorage.setItem(modeKey,mode)}catch(_){}
+   };
+   tabs.addEventListener('click',event=>{
+     const btn=event.target.closest('button[data-mode]');
+     if(btn)applyMode(btn.dataset.mode);
+   });
+   selectedEngine.addEventListener('change',()=>{
+     if(selectedEngine.value==='offline')applyMode('offline');
+   });
+   let initialMode='online';
+   try{initialMode=localStorage.getItem(modeKey)==='offline'?'offline':'online'}catch(_){}
+   applyMode(initialMode);
+ }
  const offlineResult=new URLSearchParams(window.location.hash.slice(1)).get('avnivo_offline_text');
  if(offlineResult!==null){
    const url=new URL(window.location.href);
