@@ -1198,6 +1198,45 @@ window.CHIRP2_MATRIX=[
  const enginePanel=document.createElement('div');
  enginePanel.style.cssText='display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px;border:1px solid #b99360;border-radius:10px;background:#302315;color:#ffe4aa;font:12px system-ui';
  enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="google">Google Chirp 2 (117 til)</option><option value="offline">Offline STT (Android ilova)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
+
+ // Independent STT language selector: recognition does not imply translation/TTS support.
+ const localeKey='avnivo.chirp2.locale.v1';
+ const localeLabel=document.createElement('label');
+ localeLabel.htmlFor='avnivoChirp2Locale';
+ localeLabel.textContent='Google Chirp 2 — ovoz tanish tili (117 til)';
+ const localeSearch=document.createElement('input');
+ localeSearch.type='search';
+ localeSearch.placeholder='Tilni qidirish / Search language';
+ localeSearch.setAttribute('aria-label','Chirp 2 tilini qidirish');
+ localeSearch.style.cssText='width:100%;box-sizing:border-box;padding:10px;border-radius:8px;background:white;color:#222';
+ const speechLocaleSelect=document.createElement('select');
+ speechLocaleSelect.id='avnivoChirp2Locale';
+ speechLocaleSelect.setAttribute('aria-label','Chirp 2 ovoz tanish tilini tanlash');
+ speechLocaleSelect.style.cssText='width:100%;padding:10px;border-radius:8px;background:white;color:#222';
+ const localeHint=document.createElement('small');
+ localeHint.textContent='Bu tanlov faqat ovozni matnga aylantiradi. Tarjima va TTS tillari alohida.';
+ let selectedLocale='uz-UZ';
+ try{const saved=localStorage.getItem(localeKey);if(Object.hasOwn(CHIRP2_LOCALE_NAMES,saved))selectedLocale=saved}catch(_){}
+ const sortedLocales=[...CHIRP2_MATRIX].sort((a,b)=>a[1].localeCompare(b[1]));
+ function renderSpeechLocales(){
+   const q=localeSearch.value.trim().toLocaleLowerCase();
+   speechLocaleSelect.replaceChildren();
+   for(const [code,name] of sortedLocales){
+     if(q&&!(code+' '+name).toLocaleLowerCase().includes(q))continue;
+     const option=document.createElement('option');
+     option.value=code;option.textContent=name+' — '+code;
+     speechLocaleSelect.append(option);
+   }
+   if([...speechLocaleSelect.options].some(o=>o.value===selectedLocale))speechLocaleSelect.value=selectedLocale;
+ }
+ renderSpeechLocales();
+ localeSearch.addEventListener('input',renderSpeechLocales);
+ speechLocaleSelect.addEventListener('change',()=>{
+   if(!speechLocaleSelect.value)return;
+   selectedLocale=speechLocaleSelect.value;
+   try{localStorage.setItem(localeKey,selectedLocale)}catch(_){}
+ });
+ enginePanel.append(localeLabel,localeSearch,speechLocaleSelect,localeHint);
  const settingsCard=document.querySelector('#sensorSheet .sensor-card');
  if(settingsCard){
    settingsCard.append(enginePanel);
@@ -1372,7 +1411,7 @@ window.CHIRP2_MATRIX=[
      window.location.href='avnivo-offline://recognize';
      return;
    }
-   const locale=chirp2LocaleFor(language);
+   const locale=selectedLocale;
    if(!locale){message('Bu til uchun Google Chirp 2 ovoz tanish hali sozlanmagan');return}
    if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){message('Brauzer ovoz yozishni qo‘llamaydi');return}
    window.avnivoComposer?.showBottomEditor();
