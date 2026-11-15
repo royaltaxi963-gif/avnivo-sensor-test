@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "purpose": "offline-speech-to-text",
+  "engine": "whisper.cpp",
+  "model_family": "Whisper Small Multilingual",
+  "selected_variant": "small",
+  "models": [
+    {
+      "id": "small",
+      "file": "ggml-small.bin",
+      "size_mib_approx": 466,
+      "source_url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin",
+      "sha1": "55356645c2b361a969dfd0ef2c5a50d530afd8d5",
+      "quality": "baseline-original"
+    },
+    {
+      "id": "small-q8_0",
+      "file": "ggml-small-q8_0.bin",
+      "size_mib_approx": 252,
+      "source_url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q8_0.bin",
+      "sha1": "bcad8a2083f4e53d648d586b7dbc0cd673d8afad",
+      "quality": "quantized-test-only"
+    },
+    {
+      "id": "small-q5_1",
+      "file": "ggml-small-q5_1.bin",
+      "size_mib_approx": 181,
+      "source_url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q5_1.bin",
+      "sha1": "6fe57ddcfdd1c6b07cdcc73aaf620810ce5fc771",
+      "quality": "quantized-test-only"
+    }
+  ],
+  "target_languages": [
+    {
+      "name": "Russian",
+      "code": "ru"
+    },
+    {
+      "name": "English",
+      "code": "en"
+    },
+    {
+      "name": "Hindi",
+      "code": "hi"
+    },
+    {
+      "name": "Bengali",
+      "code": "bn"
+    },
+    {
+      "name": "Turkish",
+      "code": "tr"
+    },
+    {
+      "name": "Turkmen",
+      "code": "tk",
+      "note": "Check language support and accuracy in runtime before enabling"
+    }
+  ],
+  "installation": {
+    "target": "Android app-private storage",
+    "download": "on-demand",
+    "resume": true,
+    "verify": "SHA1 from upstream; prefer SHA256 when pinned",
+    "unpack": false,
+    "offline_runtime": "whisper.cpp native Android integration required"
+  },
+  "status": "manifest-only; not downloaded or installed"
+}
