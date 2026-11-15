@@ -364,6 +364,13 @@ async def synthesize_emotional_speech(request: Request):
     if not isinstance(spoken, str) or not spoken.strip() or len(spoken) > 350:
         raise HTTPException(400, "Text must contain 1-350 characters")
     spoken = spoken.strip()
+    allowed_voices = {
+        "Kore", "Aoede", "Leda", "Zephyr", "Achernar",
+        "Puck", "Charon", "Orus", "Achird", "Iapetus",
+    }
+    voice = body.get("voice", "Kore")
+    if not isinstance(voice, str) or voice not in allowed_voices:
+        raise HTTPException(400, "Unsupported TTS voice")
     ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown").split(",")[0].strip()
     now = time.monotonic()
     hits = recent[ip]
@@ -398,7 +405,7 @@ async def synthesize_emotional_speech(request: Request):
         }]}],
         "generationConfig": {
             "responseModalities": ["AUDIO"],
-            "speechConfig": {"voiceConfig": {"voice": "Kore"}},
+            "speechConfig": {"voiceConfig": {"voice": voice}},
         },
     }
     try:
