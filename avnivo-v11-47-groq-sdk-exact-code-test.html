@@ -895,9 +895,15 @@ toggle.addEventListener('click',async()=>{
  const GROQ_API='https://avnivo-translator-api.onrender.com/api/transcribe-groq-sdk-test';
  const GOOGLE_API='https://avnivo-sensor-test-792624108019.europe-west1.run.app/api/transcribe-google';
  const enginePanel=document.createElement('div');
- enginePanel.style.cssText='position:fixed;z-index:1100;right:12px;bottom:84px;background:#302315;color:#ffe4aa;padding:8px 10px;border:1px solid #b99360;border-radius:10px;font:12px system-ui;max-width:calc(100vw - 24px)';
+ enginePanel.style.cssText='display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px;border:1px solid #b99360;border-radius:10px;background:#302315;color:#ffe4aa;font:12px system-ui';
  enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="groq">Groq Whisper v3</option><option value="google">Google Chirp 2 (o‘zbekcha)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
- document.body.append(enginePanel);
+ const settingsCard=document.querySelector('#sensorSheet .sensor-card');
+ if(settingsCard){
+   settingsCard.append(enginePanel);
+   document.querySelector('#sensorTitle').textContent='Sozlamalar';
+ }else{
+   console.error('AVNIVO: settings container missing');
+ }
  const engineSelect=enginePanel.querySelector('#avnivoSpeechEngine');
  const speechStatus=enginePanel.querySelector('#avnivoSpeechStatus');
  function status(text){speechStatus.textContent=text||'';}
