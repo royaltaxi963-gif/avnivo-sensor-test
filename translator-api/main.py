@@ -375,9 +375,8 @@ async def synthesize_emotional_speech(request: Request):
 
     style = _detect_tts_style(spoken)
     project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
-    # The global Vertex AI endpoint avoids regional model availability mismatches.
-    location = "global"
-    url = f"https://aiplatform.googleapis.com/v1/projects/{project}/locations/{location}/publishers/google/models/gemini-3.8-flash-tts:generateContent"
+    # Use the enabled Cloud Text-to-Speech API with a higher-quality Gemini voice.
+    # Keep translation, ASR and the public /api/tts contract unchanged.
     def get_tts_token():
         credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
         if not credentials.valid:
@@ -389,37 +388,41 @@ async def synthesize_emotional_speech(request: Request):
         import logging
         logging.getLogger("avnivo.tts").exception("TTS credentials unavailable (%s)", type(exc).__name__)
         raise HTTPException(503, "TTS credentials unavailable")
-    payload = {
-        "contents": [{"role": "user", "parts": [{"text": spoken, "speechMetadata": {"style": _TTS_STYLES[style]}}]}],
-        "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": {"voiceConfig": {"voice": "Kore"}}},
+
+    # Detect Russian Cyrillic; otherwise use Uzbek. Never silently translate spoken text.
+    language = "ru-RU" if any("\\u0400" <= c <= "\\u04ff" for c in spoken) else "uz-UZ"
+    tts_payload = {
+        "input": {"text": spoken, "prompt": _TTS_STYLES[style] + " Read the supplied text exactly, in its original language, with human pacing and expressive intonation."},
+        "voice": {"languageCode": language, "modelName": "gemini-2.5-pro-tts", "name": "Kore"},
+        "audioConfig": {"audioEncoding": "LINEAR16", "sampleRateHertz": 24000},
     }
     try:
         async with httpx.AsyncClient(timeout=75) as client:
-            response = await client.post(url, headers={"Authorization": f"Bearer {token}"}, json=payload)
+            response = await client.post(
+                "https://texttospeech.googleapis.com/v1/text:synthesize",
+                headers={"Authorization": f"Bearer {token}", "x-goog-user-project": project},
+                json=tts_payload,
+            )
     except httpx.RequestError:
         raise HTTPException(502, "TTS provider unreachable")
     if response.status_code == 429:
         raise HTTPException(429, "TTS quota exceeded")
     if response.status_code in (401, 403):
         import logging
-        logging.getLogger("avnivo.tts").error(
-            "Vertex TTS access denied: upstream HTTP %s, project=%s, location=%s, response=%s",
-            response.status_code, project, location, response.text[:1200]
-        )
+        logging.getLogger("avnivo.tts").error("Cloud TTS access denied: HTTP %s, response=%s", response.status_code, response.text[:1200])
         raise HTTPException(503, "TTS access denied; check service account permissions")
     if response.status_code != 200:
-        # Log a bounded provider error for Cloud Run diagnostics, without credentials.
         import logging
-        logging.getLogger("avnivo.tts").error("Vertex TTS failed: HTTP %s, body=%s", response.status_code, response.text[:1200])
+        logging.getLogger("avnivo.tts").error("Cloud TTS failed: HTTP %s, response=%s", response.status_code, response.text[:1200])
         raise HTTPException(502, f"TTS provider HTTP {response.status_code}; see Cloud Run logs")
     try:
-        encoded = response.json()["candidates"][0]["content"]["parts"][0]["inlineData"]["data"]
+        encoded = response.json()["audioContent"]
         audio = base64.b64decode(encoded, validate=True)
         if not audio or len(audio) > 8 * 1024 * 1024:
             raise ValueError("Invalid audio size")
     except (KeyError, IndexError, TypeError, ValueError):
         raise HTTPException(502, "Invalid TTS audio response")
-    # Gemini 3.8 unary returns WAV; preserve it. Older variants may return raw PCM.
+    # Cloud Text-to-Speech LINEAR16 normally returns WAV; wrap raw PCM only if needed.
     if not audio.startswith(b"RIFF"):
         import io
         import wave
