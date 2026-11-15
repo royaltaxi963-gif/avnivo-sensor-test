@@ -717,16 +717,37 @@ toggle.addEventListener('click',async()=>{
    appendMessage(nowTop,'outgoing',sourceLabel,source);
    const destLabel=nowBottom.dataset.speaker==='1'?'UZ:':(shortNames[language]||'РУ:');
    const target=appendMessage(nowBottom,'incoming',destLabel,'');
-   const demo='Salom! Bu sinov tarjimasi.';
+   // Real Google Translation LLM; no fabricated demo translation or silent fallback.
    const token=++typingToken;
-   nowBottom.classList.add('is-translating');
-   for(const letter of demo){
-     if(token!==typingToken)break;
-     target.body.textContent+=letter;
-     target.history.scrollTop=target.history.scrollHeight;
-     await new Promise(resolve=>setTimeout(resolve,85));
+   const sourceLang=nowTop.dataset.speaker==='1'?'uz':language;
+   const targetLang=nowBottom.dataset.speaker==='1'?'uz':language;
+   if(sourceLang===targetLang){
+     target.body.textContent=source;
+     return;
    }
-   nowBottom.classList.remove('is-translating');
+   nowBottom.classList.add('is-translating');
+   target.body.textContent='Tarjima qilinmoqda…';
+   const controller=new AbortController();
+   const timeout=setTimeout(()=>controller.abort(),30000);
+   try{
+     const response=await fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate',{
+       method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({text:source,source:sourceLang,target:targetLang}),
+       signal:controller.signal
+     });
+     const data=await response.json().catch(()=>({}));
+     if(token!==typingToken)return;
+     if(!response.ok||typeof data.text!=='string'||!data.text.trim()){
+       throw new Error(response.status===429?'So‘rovlar chegarasi oshdi':response.status===503?'Tarjima xizmati sozlanmagan':('HTTP '+response.status));
+     }
+     target.body.textContent=data.text;
+   }catch(error){
+     if(token===typingToken)target.body.textContent='Tarjima amalga oshmadi: '+(error.name==='AbortError'?'vaqt tugadi':error.message||'tarmoq xatosi');
+   }finally{
+     clearTimeout(timeout);
+     nowBottom.classList.remove('is-translating');
+     target.history.scrollTop=target.history.scrollHeight;
+   }
  }
  // Enforce the edit permission on every swap, including the previously edited panel.
  function enforcePermissions(){
