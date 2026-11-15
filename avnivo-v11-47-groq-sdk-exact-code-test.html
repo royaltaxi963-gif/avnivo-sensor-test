@@ -981,11 +981,10 @@ toggle.addEventListener('click',async()=>{
  }else{
    console.error('AVNIVO: settings container missing');
  }
- const offlineResult=new URL(window.location.href).searchParams.get('avnivo_offline_text');
+ const offlineResult=new URLSearchParams(window.location.hash.slice(1)).get('avnivo_offline_text');
  if(offlineResult!==null){
    const url=new URL(window.location.href);
-   url.searchParams.delete('avnivo_offline_text');
-   history.replaceState(null,'',url.pathname+url.search+url.hash);
+   history.replaceState(null,'',url.pathname+url.search);
    const speaker=document.querySelector('#app .speaker.middle');
    window.avnivoComposer?.showBottomEditor();
    const field=speaker?.querySelector('.message-input');
@@ -1036,7 +1035,6 @@ toggle.addEventListener('click',async()=>{
  }
  async function start(){
    if(busy)return
-   if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){message('Brauzer ovoz yozishni qo‘llamaydi');return}
    const speaker=app.querySelector('.speaker.middle'),field=speaker?.querySelector('.message-input');
    if(!field){message('Yozish maydoni topilmadi');return}
    const language=speaker.dataset.speaker==='1'?'uz':(document.getElementById('upperLanguageSelect')?.value||'ru');
@@ -1046,6 +1044,7 @@ toggle.addEventListener('click',async()=>{
      window.location.href='avnivo-offline://recognize';
      return;
    }
+   if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){message('Brauzer ovoz yozishni qo‘llamaydi');return}
    if(engine==='google' && language!=='uz'){message('Google Chirp 2 hozir faqat o‘zbek tilida (uz-UZ) ishlaydi');return}
    window.avnivoComposer?.showBottomEditor();
    const base=field.value.trim();
