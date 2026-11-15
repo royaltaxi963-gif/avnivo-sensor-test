@@ -20,6 +20,20 @@ Usage::
     AVNIVO_CHIRP2_SAMPLE=/path/to/speech.wav \\
     AVNIVO_CHIRP2_LIVE_LOCALES=uz-UZ,ru-RU,en-US,tr-TR \\
     python -m pytest -q translator-api/test_chirp2_live.py -s
+
+Two modes are supported:
+
+* **Local** (default): calls ``main.app`` through FastAPI's ``TestClient`` using
+  Application Default Credentials.
+* **Remote**: set ``AVNIVO_CHIRP2_BASE_URL`` to a deployed base URL (for example
+  a zero-traffic Cloud Run candidate tag) and the harness POSTs to
+  ``<base>/api/transcribe-google`` instead. No local credentials are needed
+  because the deployed service holds them.
+
+A single sample may be reused for every locale via ``AVNIVO_CHIRP2_SAMPLE``, or
+one sample per locale may be supplied in a directory via
+``AVNIVO_CHIRP2_SAMPLE_DIR`` (files named ``<locale>.<ext>``, e.g.
+``uz-UZ.webm``).
 """
 import json
 import os
@@ -81,34 +95,68 @@ def _locales() -> list[str]:
     return codes or list(DEFAULT_LOCALES)
 
 
-def test_real_chirp2_recognition_per_locale():
-    if not _credentials_available():
-        pytest.skip("No Google Application Default Credentials")
+def _sample_for(locale: str, sample_dir: str | None):
+    """Resolve the speech sample for one locale (per-locale dir or single file)."""
+    if sample_dir:
+        directory = Path(sample_dir)
+        for extension in ("webm", "wav", "ogg", "mp4", "flac"):
+            candidate = directory / f"{locale}.{extension}"
+            if candidate.is_file():
+                return candidate
+        return None
     sample = os.getenv("AVNIVO_CHIRP2_SAMPLE")
-    assert sample, "AVNIVO_CHIRP2_SAMPLE must point at a real speech sample"
-    sample_path = Path(sample)
-    assert sample_path.is_file(), f"sample not found: {sample_path}"
+    return Path(sample) if sample else None
+
+
+def test_real_chirp2_recognition_per_locale():
+    base_url = os.getenv("AVNIVO_CHIRP2_BASE_URL", "").rstrip("/")
+    sample_dir = os.getenv("AVNIVO_CHIRP2_SAMPLE_DIR")
+    if not base_url and not _credentials_available():
+        pytest.skip("No Google Application Default Credentials")
+    if not base_url:
+        assert os.getenv("AVNIVO_CHIRP2_SAMPLE"), "AVNIVO_CHIRP2_SAMPLE must point at a real speech sample"
+
+    import hashlib
 
     import chirp2_languages as registry
-    from fastapi.testclient import TestClient
 
-    import main
+    if base_url:
+        import httpx
 
-    client = TestClient(main.app)
-    audio_bytes = sample_path.read_bytes()
-    content_type = "audio/wav" if sample_path.suffix.lower() == ".wav" else "audio/webm"
+        def call(locale: str, sample_path: Path, content_type: str, index: int):
+            with httpx.Client(timeout=120) as client:
+                return client.post(
+                    f"{base_url}/api/transcribe-google",
+                    files={"audio": (sample_path.name, sample_path.read_bytes(), content_type)},
+                    data={"language": locale},
+                    headers={"x-forwarded-for": f"198.18.0.{index}"},
+                )
+    else:
+        from fastapi.testclient import TestClient
+
+        import main
+
+        client = TestClient(main.app)
+
+        def call(locale: str, sample_path: Path, content_type: str, index: int):
+            return client.post(
+                "/api/transcribe-google",
+                files={"audio": (sample_path.name, sample_path.read_bytes(), content_type)},
+                data={"language": locale},
+                headers={"x-forwarded-for": f"198.18.0.{index}"},
+            )
+
     rows = _read_report()
     failures = []
 
     for index, locale in enumerate(_locales()):
         assert registry.is_supported_locale(locale), f"{locale} is not a Chirp 2 locale"
+        sample_path = _sample_for(locale, sample_dir)
+        assert sample_path and sample_path.is_file(), f"no sample for {locale}"
+        audio_bytes = sample_path.read_bytes()
+        content_type = "audio/wav" if sample_path.suffix.lower() == ".wav" else "audio/webm"
         started = time.perf_counter()
-        response = client.post(
-            "/api/transcribe-google",
-            files={"audio": (sample_path.name, audio_bytes, content_type)},
-            data={"language": locale},
-            headers={"x-forwarded-for": f"198.18.0.{index}"},
-        )
+        response = call(locale, sample_path, content_type, index)
         elapsed = round(time.perf_counter() - started, 3)
         transcript = ""
         if response.status_code == 200:
@@ -116,10 +164,11 @@ def test_real_chirp2_recognition_per_locale():
         row = {
             "locale": locale,
             "sample": sample_path.name,
-            "sample_sha256": __import__("hashlib").sha256(audio_bytes).hexdigest(),
+            "sample_sha256": hashlib.sha256(audio_bytes).hexdigest(),
             "model": registry.GOOGLE_MODEL,
             "method": "Speech.Recognize (sync)",
             "region": registry.GOOGLE_REGION,
+            "base_url": base_url or "local TestClient",
             "http_status": response.status_code,
             "transcript": transcript,
             "latency_seconds": elapsed,

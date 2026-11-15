@@ -1240,6 +1240,7 @@ window.CHIRP2_MATRIX=[
    header.after(tabs,heading,onlineContent,offlineContent);
    onlineContent.append(enginePanel);
    const modeKey='avnivo-speech-mode';
+   const engineKey='avnivo-speech-engine';
    const selectedEngine=enginePanel.querySelector('#avnivoSpeechEngine');
    const applyMode=(mode)=>{
      const offline=mode==='offline';
@@ -1251,28 +1252,25 @@ window.CHIRP2_MATRIX=[
      if(offline){offlineContent.append(enginePanel);selectedEngine.value='offline';}
      else{onlineContent.append(enginePanel);if(selectedEngine.value==='offline')selectedEngine.value='google';}
      selectedEngine.querySelectorAll('option').forEach(option=>option.hidden=offline?option.value!=='offline':option.value==='offline');
-     try{localStorage.setItem(modeKey,mode)}catch(_){}
+     try{localStorage.setItem(modeKey,mode);localStorage.setItem(engineKey,selectedEngine.value)}catch(_){}
    };
    tabs.addEventListener('click',event=>{
      const btn=event.target.closest('button[data-mode]');
      if(btn)applyMode(btn.dataset.mode);
    });
-   const engineKey='avnivo-speech-engine';
    selectedEngine.addEventListener('change',()=>{
      try{localStorage.setItem(engineKey,selectedEngine.value)}catch(_){}
      if(selectedEngine.value==='offline')applyMode('offline');
    });
-   let initialMode='online';
-   try{initialMode=localStorage.getItem(modeKey)==='offline'?'offline':'online'}catch(_){}
-   applyMode(initialMode);
-   // Restore the saved engine selection (Settings-only control).
+   let initialMode='online',savedEngine=null;
    try{
-     const savedEngine=localStorage.getItem(engineKey);
-     if(savedEngine&&selectedEngine.querySelector('option[value="'+savedEngine+'"]')){
-       selectedEngine.value=savedEngine;
-       if(savedEngine==='offline')applyMode('offline');
-     }
+     initialMode=localStorage.getItem(modeKey)==='offline'?'offline':'online';
+     savedEngine=localStorage.getItem(engineKey);
    }catch(_){}
+   applyMode(initialMode);
+   // Restore the saved engine selection (Settings-only control). The value is
+   // read before applyMode runs, because applyMode persists the engine too.
+   if(savedEngine==='offline')applyMode('offline');
  }
  // Android offline STT callback can arrive on initial load or into an existing tab.
  // Keep the fragment until the text has actually reached an editable field.

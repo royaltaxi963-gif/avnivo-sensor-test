@@ -3,7 +3,7 @@
   "repository": "royaltaxi963-gif/avnivo-sensor-test",
   "branch": "feature/chirp2-multilingual-stt",
   "base_commit": "dcb69184aae693e9bac536c01be073cb767b8436",
-  "updated_at": "2026-11-15T18:52:52.298019+00:00",
+  "updated_at": "2026-11-15T20:28:28.447701+00:00",
   "official_language_research": {
     "status": "complete",
     "total_chirp2_locales": 117,
@@ -60,21 +60,53 @@
     "command": "python -m pytest -q translator-api/test_translation_llm.py translator-api/test_chirp2_stt.py"
   },
   "real_api_verification": {
-    "status": "blocked",
-    "reason": "No Google Application Default Credentials in this environment; Cloud Run deployment returned HTTP 502 for uz-UZ",
-    "harness": "translator-api/test_chirp2_live.py (opt-in via AVNIVO_CHIRP2_LIVE=1)",
-    "verified_locales": [],
-    "evidence": [
-      "Cloud Run europe-west1: uz-UZ -> HTTP 502 {'detail':'Google Speech transcription failed'}",
-      "Cloud Run europe-west1: de-DE -> HTTP 400 {'detail':'Only uz-UZ is configured for this endpoint'} (deployment is the old 4-locale build)",
-      "Local google.auth.default() -> no Application Default Credentials (metadata unreachable)"
-    ]
+    "status": "passed (candidate revision)",
+    "base_url": "https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app",
+    "cloud_run_revision": "avnivo-sensor-test-00012-qap (tag: candidate, 0% traffic)",
+    "results": [
+      {
+        "locale": "uz-UZ",
+        "http": 200,
+        "text": "selam buyurun ma'muz tanıştığımıza memnunuz...",
+        "latency_s": 2.335
+      },
+      {
+        "locale": "ru-RU",
+        "http": 200,
+        "text": "Здравствуйте это проверка системы распознавания речи",
+        "latency_s": 1.784
+      },
+      {
+        "locale": "en-US",
+        "http": 200,
+        "text": "hello this is a test of the speech recognition system",
+        "latency_s": 2.609
+      },
+      {
+        "locale": "tr-TR",
+        "http": 200,
+        "text": "merhaba bu hafta sonu sınav sistemi ile ilgili test",
+        "latency_s": 2.088
+      }
+    ],
+    "human_sample_uz": {
+      "source": "Wikimedia Commons Category:Uzbek pronunciation (CC-BY-SA)",
+      "text": "bakteriya keyingi",
+      "expected": "bakteriya, keng, quyosh, hozirgi",
+      "note": "exact match on 'bakteriya'"
+    },
+    "artifact": "docs/chirp2-live-verification.json",
+    "error_cases": {
+      "xx-XX": 400,
+      "ar-AE": 400,
+      "missing_language": 400,
+      "bad_content_type": 415,
+      "empty_audio": 413
+    }
   },
   "verified_tests": 47,
   "blockers": [
-    "Google Cloud Application Default Credentials not available to this sandbox",
-    "Cloud Run service account lacks working Speech-to-Text access (uz-UZ -> 502)",
-    "Deployed Cloud Run backend is the pre-change 4-locale build; redeploy requires explicit approval"
+    "Google Cloud Application Default Credentials not available to this sandbox"
   ],
   "next_actions": [
     "Run translator-api/test_chirp2_live.py with authorized credentials and audio samples",
