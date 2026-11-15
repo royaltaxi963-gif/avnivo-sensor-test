@@ -881,21 +881,49 @@ toggle.addEventListener('click',async()=>{
  mic.addEventListener('click',()=>{if(GROQ_ONLY)return;if(isListening)stop();else begin()});
  const swap=document.getElementById('swap');
  swap.addEventListener('click',()=>{if(isListening)stop()},{capture:true});
- // Read aloud any saved chat message, including future messages.
- app.addEventListener('click',e=>{
+ // AVNIVO cloud TTS: preserve translation and recognition; show errors rather than silent fallback.
+ let activeAudio=null, activeUrl=null, playbackId=0;
+ function stopAudio(){
+   playbackId++;
+   if(activeAudio){activeAudio.pause();activeAudio.removeAttribute('src');activeAudio.load();activeAudio=null;}
+   if(activeUrl){URL.revokeObjectURL(activeUrl);activeUrl=null;}
+ }
+ app.addEventListener('click',async e=>{
    const btn=e.target.closest('.read-message');
    if(!btn)return;
    e.preventDefault();
-   if(!('speechSynthesis' in window)){alert('Bu brauzer matnni ovoz chiqarib o‘qishni qo‘llamaydi.');return}
    const line=btn.closest('.translation-line');
    const message=line?.querySelector('.translation-body')?.textContent?.trim();
    if(!message)return;
-   window.speechSynthesis.cancel();
-   const utter=new SpeechSynthesisUtterance(message);
-   const speaker=btn.closest('.speaker');
-   utter.lang=speaker?.dataset.speaker==='1'?'uz-UZ':({ru:'ru-RU',en:'en-US',tr:'tr-TR',uz:'uz-UZ'}[document.getElementById('upperLanguageSelect')?.value]||'ru-RU');
-   utter.rate=.94;
-   window.speechSynthesis.speak(utter);
+   if(activeAudio && !activeAudio.paused){stopAudio();return;}
+   stopAudio();
+   const id=playbackId;
+   const previousLabel=btn.getAttribute('aria-label');
+   btn.disabled=true;
+   btn.setAttribute('aria-label','Ovoz tayyorlanmoqda');
+   try{
+     const speaker=btn.closest('.speaker');
+     const language=speaker?.dataset.speaker==='1'?'uz':(document.getElementById('upperLanguageSelect')?.value||'ru');
+     const response=await fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts',{
+       method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({text:message.slice(0,350),language})
+     });
+     if(!response.ok)throw new Error('TTS HTTP '+response.status);
+     const blob=await response.blob();
+     if(!blob.size||!blob.type.startsWith('audio/'))throw new Error('Audio javobi noto‘g‘ri');
+     if(id!==playbackId)return;
+     activeUrl=URL.createObjectURL(blob);
+     activeAudio=new Audio(activeUrl);
+     const audio=activeAudio;
+     audio.onended=()=>{if(activeAudio===audio)stopAudio();};
+     audio.onerror=()=>{if(activeAudio===audio){stopAudio();alert('Audio ijro etilmadi');}};
+     await audio.play();
+   }catch(err){
+     if(id===playbackId){stopAudio();alert('Jonli ovoz ishlamadi: '+err.message);}
+   }finally{
+     btn.disabled=false;
+     if(previousLabel===null)btn.removeAttribute('aria-label');else btn.setAttribute('aria-label',previousLabel);
+   }
  });
  const observer=new MutationObserver(records=>{
    for(const record of records)for(const node of record.addedNodes){
