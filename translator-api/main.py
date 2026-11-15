@@ -375,6 +375,7 @@ async def synthesize_emotional_speech(request: Request):
 
     style = _detect_tts_style(spoken)
     project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
+    project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
     # Use the enabled Cloud Text-to-Speech API with a higher-quality Gemini voice.
     # Keep translation, ASR and the public /api/tts contract unchanged.
     def get_tts_token():
