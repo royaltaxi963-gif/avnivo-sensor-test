@@ -389,18 +389,23 @@ async def synthesize_emotional_speech(request: Request):
         logging.getLogger("avnivo.tts").exception("TTS credentials unavailable (%s)", type(exc).__name__)
         raise HTTPException(503, "TTS credentials unavailable")
 
-    # Detect Russian Cyrillic; otherwise use Uzbek. Never silently translate spoken text.
-    language = "ru-RU" if any(0x0400 <= ord(c) <= 0x04FF for c in spoken) else "uz-UZ"
+    # Gemini 3.8 TTS detects Uzbek, Russian and other supported languages.
+    # Unlike Cloud Text-to-Speech v1, this endpoint accepts turn-level speechMetadata.
     tts_payload = {
-        "input": {"text": spoken, "prompt": _TTS_STYLES[style] + " Read the supplied text exactly, in its original language, with human pacing and expressive intonation."},
-        "voice": {"languageCode": language, "modelName": "gemini-2.5-pro-tts", "name": "Kore"},
-        "audioConfig": {"audioEncoding": "LINEAR16", "sampleRateHertz": 24000},
+        "contents": [{"role": "user", "parts": [{
+            "text": spoken,
+            "speechMetadata": {"style": _TTS_STYLES[style]},
+        }]}],
+        "generationConfig": {
+            "responseModalities": ["AUDIO"],
+            "speechConfig": {"voiceConfig": {"voice": "Kore"}},
+        },
     }
     try:
         async with httpx.AsyncClient(timeout=75) as client:
             response = await client.post(
-                "https://texttospeech.googleapis.com/v1/text:synthesize",
-                headers={"Authorization": f"Bearer {token}", "x-goog-user-project": project},
+                f"https://aiplatform.googleapis.com/v1/projects/{project}/locations/global/publishers/google/models/gemini-3.8-flash-tts:generateContent",
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
                 json=tts_payload,
             )
     except httpx.RequestError:
@@ -416,13 +421,15 @@ async def synthesize_emotional_speech(request: Request):
         logging.getLogger("avnivo.tts").error("Cloud TTS failed: HTTP %s, response=%s", response.status_code, response.text[:1200])
         raise HTTPException(502, f"TTS provider HTTP {response.status_code}; see Cloud Run logs")
     try:
-        encoded = response.json()["audioContent"]
+        payload = response.json()
+        parts = payload["candidates"][0]["content"]["parts"]
+        encoded = next(part["inlineData"]["data"] for part in parts if part.get("inlineData", {}).get("data"))
         audio = base64.b64decode(encoded, validate=True)
         if not audio or len(audio) > 8 * 1024 * 1024:
             raise ValueError("Invalid audio size")
-    except (KeyError, IndexError, TypeError, ValueError):
+    except (KeyError, IndexError, TypeError, ValueError, StopIteration):
         raise HTTPException(502, "Invalid TTS audio response")
-    # Cloud Text-to-Speech LINEAR16 normally returns WAV; wrap raw PCM only if needed.
+    # Gemini 3.8 unary output is WAV; wrap raw PCM only if needed.
     if not audio.startswith(b"RIFF"):
         import io
         import wave
