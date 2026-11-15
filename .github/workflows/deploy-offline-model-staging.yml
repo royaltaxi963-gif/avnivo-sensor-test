@@ -1,0 +1,44 @@
+name: Deploy offline model API to isolated Cloud Run staging
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test before deploy
+        run: |
+          python -m pip install -r translator-api/requirements.txt pytest
+          python -m pytest translator-api/test_offline_models.py -q
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy isolated service (never replace production)
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=project-6bcf7fe6-cb55-49b7-9f4
+          SERVICE=avnivo-offline-model-api-staging
+          REGION=europe-west1
+          gcloud run deploy "$SERVICE" \
+            --source=translator-api \
+            --project="$PROJECT" \
+            --region="$REGION" \
+            --no-allow-unauthenticated \
+            --set-env-vars=AVNIVO_MODEL_BUCKET=avnivo-offline-models-792624108019 \
+            --quiet
+          URL="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
+          test -n "$URL"
+          echo "Staging deployed: $SERVICE"
+          echo "URL=$URL" >> "$GITHUB_STEP_SUMMARY"
+          TOKEN="$(gcloud auth print-identity-token --audiences="$URL")"
+          HTTP="$(curl -sS -o /tmp/health.json -w '%{http_code}' -H "Authorization: Bearer $TOKEN" "$URL/health")"
+          test "$HTTP" = 200
+          cat /tmp/health.json
+          echo "Authenticated staging health: 200" >> "$GITHUB_STEP_SUMMARY"
