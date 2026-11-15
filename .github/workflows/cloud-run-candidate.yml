@@ -1,0 +1,61 @@
+name: Cloud Run safe candidate (manual, zero traffic)
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 'Reviewed branch or commit SHA to build (e.g. feature/chirp2-multilingual-stt)'
+        required: true
+        type: string
+jobs:
+  deploy_candidate:
+    runs-on: ubuntu-latest
+    environment: cloud-run-candidate
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: avnivo-cloud-run-candidate
+      cancel-in-progress: false
+    steps:
+      - name: Checkout selected source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+          persist-credentials: false
+      - name: Validate required configuration
+        env:
+          PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          REGION: ${{ vars.GCP_REGION }}
+          SERVICE: ${{ vars.GCP_CLOUD_RUN_SERVICE }}
+          WIF: ${{ secrets.GCP_WIF_PROVIDER }}
+          SA: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
+        run: |
+          for key in PROJECT_ID REGION SERVICE WIF SA; do
+            if [ -z "${!key}" ]; then echo "::error::Missing $key"; exit 1; fi
+          done
+      - name: Authenticate with Google Cloud (keyless)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy candidate revision without traffic
+        env:
+          PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          REGION: ${{ vars.GCP_REGION }}
+          SERVICE: ${{ vars.GCP_CLOUD_RUN_SERVICE }}
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --source=translator-api \
+            --no-traffic \
+            --quiet
+      - name: Print revision status
+        env:
+          PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          REGION: ${{ vars.GCP_REGION }}
+          SERVICE: ${{ vars.GCP_CLOUD_RUN_SERVICE }}
+        run: |
+          gcloud run revisions list --service="$SERVICE" --project="$PROJECT_ID" --region="$REGION" --limit=5
