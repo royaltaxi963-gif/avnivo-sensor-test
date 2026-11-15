@@ -1257,12 +1257,22 @@ window.CHIRP2_MATRIX=[
      const btn=event.target.closest('button[data-mode]');
      if(btn)applyMode(btn.dataset.mode);
    });
+   const engineKey='avnivo-speech-engine';
    selectedEngine.addEventListener('change',()=>{
+     try{localStorage.setItem(engineKey,selectedEngine.value)}catch(_){}
      if(selectedEngine.value==='offline')applyMode('offline');
    });
    let initialMode='online';
    try{initialMode=localStorage.getItem(modeKey)==='offline'?'offline':'online'}catch(_){}
    applyMode(initialMode);
+   // Restore the saved engine selection (Settings-only control).
+   try{
+     const savedEngine=localStorage.getItem(engineKey);
+     if(savedEngine&&selectedEngine.querySelector('option[value="'+savedEngine+'"]')){
+       selectedEngine.value=savedEngine;
+       if(savedEngine==='offline')applyMode('offline');
+     }
+   }catch(_){}
  }
  // Android offline STT callback can arrive on initial load or into an existing tab.
  // Keep the fragment until the text has actually reached an editable field.
