@@ -232,6 +232,11 @@ configured for that language. There is no silent fallback to Uzbek.
 - Research: complete (117 locales, three regions, methods, limits, encodings).
 - Implementation: the backend registry and endpoint accept all 117 locales; the
   frontend resolver covers the four currently selectable languages.
+- **Matrix cross-check (independent):** the 117 codes and English names in
+  `translator-api/chirp2_languages.py` were parsed out of the official supported-
+  languages page (rows whose model column is `chirp` or `chirp_2`) and compared:
+  **exact set match, 0 name mismatches**. Script: `translator-api/test_chirp2_stt.py`
+  asserts the same invariants against the embedded frontend matrix.
 - Real Google recognition: blocked in this environment — no Application Default
   Credentials are present, so only the four-language Cloud Run deployment could
   be probed, and even it returned HTTP 502 for `uz-UZ` because its service

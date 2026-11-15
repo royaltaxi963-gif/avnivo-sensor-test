@@ -3,7 +3,7 @@
   "repository": "royaltaxi963-gif/avnivo-sensor-test",
   "branch": "feature/chirp2-multilingual-stt",
   "base_commit": "dcb69184aae693e9bac536c01be073cb767b8436",
-  "updated_at": "2026-11-15T18:51:50.417452+00:00",
+  "updated_at": "2026-11-15T18:52:52.298019+00:00",
   "official_language_research": {
     "status": "complete",
     "total_chirp2_locales": 117,
@@ -18,7 +18,12 @@
       "https://cloud.google.com/speech-to-text/v2/docs/speech-to-text-supported-languages",
       "https://cloud.google.com/speech-to-text/v2/docs/quotas",
       "https://cloud.google.com/speech-to-text/v2/docs/encoding"
-    ]
+    ],
+    "cross_check": {
+      "method": "Parsed <tr> rows from the official supported-languages page where the model column is chirp or chirp_2",
+      "result": "exact set match: 117 codes, 0 English-name mismatches",
+      "date": "2026-11-15"
+    }
   },
   "implementation": {
     "status": "complete",
