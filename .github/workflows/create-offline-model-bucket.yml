@@ -1,0 +1,43 @@
+name: Create secure AVNIVO offline model bucket
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  create-bucket:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate with Google Cloud using WIF
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - name: Install Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Verify identity and project
+        run: |
+          gcloud config set project project-6bcf7fe6-cb55-49b7-9f4
+          gcloud projects describe project-6bcf7fe6-cb55-49b7-9f4 --format="value(projectId)"
+      - name: Create private model bucket if absent
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUCKET="avnivo-offline-models-792624108019"
+          if gcloud storage buckets describe "gs://${BUCKET}" --format="value(name)" >/dev/null 2>&1; then
+            echo "Bucket exists and is accessible"
+          else
+            gcloud storage buckets create "gs://${BUCKET}" \
+              --project="project-6bcf7fe6-cb55-49b7-9f4" \
+              --location="europe-west1" \
+              --uniform-bucket-level-access \
+              --public-access-prevention
+          fi
+          gcloud storage buckets update "gs://${BUCKET}" \
+            --uniform-bucket-level-access \
+            --public-access-prevention
+          gcloud storage buckets describe "gs://${BUCKET}" \
+            --format="yaml(name,location,iamConfiguration)"
