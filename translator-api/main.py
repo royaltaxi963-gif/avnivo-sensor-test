@@ -375,11 +375,9 @@ async def synthesize_emotional_speech(request: Request):
 
     style = _detect_tts_style(spoken)
     project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
-    location = os.getenv("AVNIVO_TTS_LOCATION", "eu")
-    if location not in {"eu", "us", "global"}:
-        raise HTTPException(503, "Invalid TTS location")
-    host = {"eu": "aiplatform.eu.rep.googleapis.com", "us": "aiplatform.us.rep.googleapis.com", "global": "aiplatform.googleapis.com"}[location]
-    url = f"https://{host}/v1/projects/{project}/locations/{location}/publishers/google/models/gemini-3.8-flash-tts:generateContent"
+    # The global Vertex AI endpoint avoids regional model availability mismatches.
+    location = "global"
+    url = f"https://aiplatform.googleapis.com/v1/projects/{project}/locations/{location}/publishers/google/models/gemini-3.8-flash-tts:generateContent"
     def get_tts_token():
         credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
         if not credentials.valid:
@@ -403,7 +401,10 @@ async def synthesize_emotional_speech(request: Request):
     if response.status_code in (401, 403):
         raise HTTPException(503, "TTS access denied; check service account permissions")
     if response.status_code != 200:
-        raise HTTPException(502, "TTS generation failed")
+        # Log a bounded provider error for Cloud Run diagnostics, without credentials.
+        import logging
+        logging.getLogger("avnivo.tts").error("Vertex TTS failed: HTTP %s, body=%s", response.status_code, response.text[:1200])
+        raise HTTPException(502, f"TTS provider HTTP {response.status_code}; see Cloud Run logs")
     try:
         encoded = response.json()["candidates"][0]["content"]["parts"][0]["inlineData"]["data"]
         audio = base64.b64decode(encoded, validate=True)
@@ -411,5 +412,16 @@ async def synthesize_emotional_speech(request: Request):
             raise ValueError("Invalid audio size")
     except (KeyError, IndexError, TypeError, ValueError):
         raise HTTPException(502, "Invalid TTS audio response")
+    # Gemini 3.8 unary returns WAV; preserve it. Older variants may return raw PCM.
+    if not audio.startswith(b"RIFF"):
+        import io
+        import wave
+        output = io.BytesIO()
+        with wave.open(output, "wb") as wav:
+            wav.setnchannels(1)
+            wav.setsampwidth(2)
+            wav.setframerate(24000)
+            wav.writeframes(audio)
+        audio = output.getvalue()
     from fastapi.responses import Response
     return Response(content=audio, media_type="audio/wav", headers={"Cache-Control": "no-store", "X-AVNIVO-TTS-Style": style})
