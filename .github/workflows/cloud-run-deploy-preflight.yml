@@ -1,0 +1,41 @@
+name: Cloud Run deployment preflight (no changes)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Docker image builds locally (no push)
+        run: docker build --tag avnivo-translator-preflight:local ./translator-api
+      - name: Authenticate with Google Cloud (short-lived credentials)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Verify project identity
+        run: |
+          gcloud config set project project-6bcf7fe6-cb55-49b7-9f4
+          gcloud auth list --filter='status:ACTIVE' --format='value(account)' | grep -q .
+          echo 'Google Cloud authentication and Docker build succeeded.'
+      - name: Check Cloud Run read access (no deploy)
+        run: |
+          gcloud run services describe avnivo-sensor-test \
+            --region=europe-west1 \
+            --project=project-6bcf7fe6-cb55-49b7-9f4 \
+            --format='value(metadata.name,status.url)'
+      - name: Check Artifact Registry read access (no upload)
+        run: |
+          gcloud artifacts repositories list \
+            --location=europe-west1 \
+            --project=project-6bcf7fe6-cb55-49b7-9f4 \
+            --format='table(name,format)' 
