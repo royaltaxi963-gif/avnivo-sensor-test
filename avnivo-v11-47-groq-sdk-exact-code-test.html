@@ -981,6 +981,19 @@ toggle.addEventListener('click',async()=>{
  }else{
    console.error('AVNIVO: settings container missing');
  }
+ const offlineResult=new URL(window.location.href).searchParams.get('avnivo_offline_text');
+ if(offlineResult!==null){
+   const url=new URL(window.location.href);
+   url.searchParams.delete('avnivo_offline_text');
+   history.replaceState(null,'',url.pathname+url.search+url.hash);
+   const speaker=document.querySelector('#app .speaker.middle');
+   window.avnivoComposer?.showBottomEditor();
+   const field=speaker?.querySelector('.message-input');
+   if(field){
+     field.value=[field.value.trim(),offlineResult.trim()].filter(Boolean).join(' ');
+     field.dispatchEvent(new Event('input',{bubbles:true}));
+   }
+ }
  const engineSelect=enginePanel.querySelector('#avnivoSpeechEngine');
  const speechStatus=enginePanel.querySelector('#avnivoSpeechStatus');
  function status(text){speechStatus.textContent=text||'';}
@@ -1029,9 +1042,8 @@ toggle.addEventListener('click',async()=>{
    const language=speaker.dataset.speaker==='1'?'uz':(document.getElementById('upperLanguageSelect')?.value||'ru');
    const engine=engineSelect.value;
    if(engine==='offline'){
-     window.avnivoComposer?.showBottomEditor();
-     status('Offline STT Android ilovasida ovozni matnga aylantiring, matnni nusxalab shu yerga joylang. Brauzer boshqa ilovaning mikrofoniga bevosita ulana olmaydi.');
-     field.focus();
+     status('Offline STT ilovasi ochilmoqda. Tayyor model bo‘lishi kerak.');
+     window.location.href='avnivo-offline://recognize';
      return;
    }
    if(engine==='google' && language!=='uz'){message('Google Chirp 2 hozir faqat o‘zbek tilida (uz-UZ) ishlaydi');return}
