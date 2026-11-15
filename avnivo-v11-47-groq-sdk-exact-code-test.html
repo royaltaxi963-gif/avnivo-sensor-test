@@ -892,30 +892,40 @@ toggle.addEventListener('click',async()=>{
 /* AVNIVO v11.40: preserve v11.38 voice composer layout with Groq backend. */
 (()=>{
  'use strict';
- const API='https://avnivo-translator-api.onrender.com/api/transcribe-groq-sdk-test';
+ const GROQ_API='https://avnivo-translator-api.onrender.com/api/transcribe-groq-sdk-test';
+ const GOOGLE_API='https://avnivo-sensor-test-792624108019.europe-west1.run.app/api/transcribe-google';
+ const enginePanel=document.createElement('div');
+ enginePanel.style.cssText='position:fixed;z-index:1100;right:12px;bottom:84px;background:#302315;color:#ffe4aa;padding:8px 10px;border:1px solid #b99360;border-radius:10px;font:12px system-ui;max-width:calc(100vw - 24px)';
+ enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="groq">Groq Whisper v3</option><option value="google">Google Chirp 2 (o‘zbekcha)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
+ document.body.append(enginePanel);
+ const engineSelect=enginePanel.querySelector('#avnivoSpeechEngine');
+ const speechStatus=enginePanel.querySelector('#avnivoSpeechStatus');
+ function status(text){speechStatus.textContent=text||'';}
  const mic=document.getElementById('mic');
  const swap=document.getElementById('swap');
  const app=document.getElementById('app');
  if(!mic||!swap||!app)return;
  let recorder=null,stream=null,chunks=[],busy=false,recording=false,requestId=0,startedAt=0;
- function message(t){if(t)console.warn('AVNIVO voice:',t)}
+ function message(t){if(t){console.warn('AVNIVO voice:',t);status(t)}}
  function clean(){recording=false;mic.classList.remove('active');mic.setAttribute('aria-pressed','false');stream?.getTracks().forEach(t=>t.stop());stream=null;recorder=null;app.querySelectorAll('.speaker').forEach(s=>s.classList.remove('voice-listening'))}
  function cyrillicToLatin(text){
    const map={'А':'A','а':'a','Б':'B','б':'b','В':'V','в':'v','Г':'G','г':'g','Д':'D','д':'d','Е':'E','е':'e','Ё':'Yo','ё':'yo','Ж':'J','ж':'j','З':'Z','з':'z','И':'I','и':'i','Й':'Y','й':'y','К':'K','к':'k','Л':'L','л':'l','М':'M','м':'m','Н':'N','н':'n','О':'O','о':'o','П':'P','п':'p','Р':'R','р':'r','С':'S','с':'s','Т':'T','т':'t','У':'U','у':'u','Ф':'F','ф':'f','Х':'X','х':'x','Ц':'Ts','ц':'ts','Ч':'Ch','ч':'ch','Ш':'Sh','ш':'sh','Ъ':"'",'ъ':"'",'Ь':'','ь':'','Э':'E','э':'e','Ю':'Yu','ю':'yu','Я':'Ya','я':'ya','Ў':"O'",'ў':"o'",'Қ':'Q','қ':'q','Ғ':"G'",'ғ':"g'",'Ҳ':'H','ҳ':'h'};
    return text.replace(/[А-Яа-яЁёЎўҚқҒғҲҳ]/g,char=>map[char]??char);
  }
- async function upload(blob,id,language,field,base){
+ async function upload(blob,id,language,field,base,engine){
    busy=true;
+   status(engine==='google'?'Google Chirp 2 taniyapti...':'Groq Whisper taniyapti...');
    try{
      const form=new FormData();
-     form.append('audio',blob,'speech.'+(blob.type.includes('mp4')?'mp4':'webm'));
-     form.append('language',language);
+     const extension=blob.type.includes('mp4')?'mp4':blob.type.includes('ogg')?'ogg':blob.type.includes('wav')?'wav':blob.type.includes('flac')?'flac':'webm';
+     form.append('audio',blob,'speech.'+extension);
+     form.append('language',engine==='google'?'uz-UZ':language);
      const ctrl=new AbortController();
      const timer=setTimeout(()=>ctrl.abort(),90000);
      let response;
-     try{response=await fetch(API,{method:'POST',body:form,signal:ctrl.signal})}finally{clearTimeout(timer)}
+     try{response=await fetch(engine==='google'?GOOGLE_API:GROQ_API,{method:'POST',body:form,signal:ctrl.signal})}finally{clearTimeout(timer)}
      if(id!==requestId)return;
-     if(!response.ok)throw new Error(response.status===429?'Bepul API limiti yoki so‘rovlar chegarasi tugadi':response.status===503?'Groq API kaliti serverda sozlanmagan':'Server xatosi: '+response.status);
+     if(!response.ok)throw new Error(response.status===429?'So‘rovlar limiti tugadi':response.status===503?'Ovoz tanish servisi hozir mavjud emas':response.status===403?'Server ruxsat bermadi':'Server xatosi: '+response.status);
      const data=await response.json();
      if(id!==requestId)return;
      let text=String(data.text||'').trim();
@@ -924,8 +934,8 @@ toggle.addEventListener('click',async()=>{
      // The server returns a transcription, not a translation. Keep its original words.
      field.value=[base,text].filter(Boolean).join(' ');
      field.dispatchEvent(new Event('input',{bubbles:true}));
-
-   }catch(err){if(id===requestId)message('Ovoz tanilmadi: '+err.message)}
+     status((engine==='google'?'Google Chirp 2':'Groq Whisper')+' — tayyor');
+   }catch(err){if(id===requestId)message('Ovoz tanilmadi: '+(err.name==='AbortError'?'Server javobi kechikdi':err.message))}
    finally{busy=false}
  }
  async function start(){
@@ -934,6 +944,8 @@ toggle.addEventListener('click',async()=>{
    const speaker=app.querySelector('.speaker.middle'),field=speaker?.querySelector('.message-input');
    if(!field){message('Yozish maydoni topilmadi');return}
    const language=speaker.dataset.speaker==='1'?'uz':(document.getElementById('upperLanguageSelect')?.value||'ru');
+   const engine=engineSelect.value;
+   if(engine==='google' && language!=='uz'){message('Google Chirp 2 hozir faqat o‘zbek tilida (uz-UZ) ishlaydi');return}
    window.avnivoComposer?.showBottomEditor();
    const base=field.value.trim();
    if(document.activeElement===field)field.blur();
@@ -954,10 +966,11 @@ toggle.addEventListener('click',async()=>{
        if(id!==requestId)return;
        if(blob.size<1000){message('Ovoz juda qisqa, qayta urinib ko‘ring');return}
        if(blob.size>10*1024*1024){message('Audio hajmi 10 MB dan oshdi');return}
-       upload(blob,id,language,field,base);
+       upload(blob,id,language,field,base,engine);
      };
      recorder.start();
      startedAt=Date.now();recording=true;
+     status('Ovoz yozilmoqda...');
      mic.classList.add('active');mic.setAttribute('aria-pressed','true');
 
    }catch(err){clean();message('Mikrofon ishga tushmadi: '+err.message)}
