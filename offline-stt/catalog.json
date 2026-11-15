@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "catalog_version": "0.1.0",
+  "description": "AVNIVO offline STT candidate registry. No downloadable model has passed Android acceptance.",
+  "languages": [
+    {
+      "id": "stt-uz",
+      "language_tag": "uz-UZ",
+      "display_name": "O‘zbek",
+      "status": "unavailable",
+      "artifacts": [],
+      "reason": "Model package, redistribution license and Android-device accuracy not yet verified."
+    },
+    {
+      "id": "stt-ru",
+      "language_tag": "ru-RU",
+      "display_name": "Русский",
+      "status": "unavailable",
+      "artifacts": [],
+      "reason": "Model package, redistribution license and Android-device accuracy not yet verified."
+    },
+    {
+      "id": "stt-en",
+      "language_tag": "en-US",
+      "display_name": "English",
+      "status": "unavailable",
+      "artifacts": [],
+      "reason": "Model package, redistribution license and Android-device accuracy not yet verified."
+    },
+    {
+      "id": "stt-hi",
+      "language_tag": "hi-IN",
+      "display_name": "हिन्दी",
+      "status": "unavailable",
+      "artifacts": [],
+      "reason": "Model package, redistribution license and Android-device accuracy not yet verified."
+    },
+    {
+      "id": "stt-bn",
+      "language_tag": "bn-BD",
+      "display_name": "বাংলা (বাংলাদেশ)",
+      "status": "unavailable",
+      "artifacts": [],
+      "reason": "Model package, redistribution license and Android-device accuracy not yet verified."
+    },
+    {
+      "id": "stt-tr",
+      "language_tag": "tr-TR",
+      "display_name": "Türkçe",
+      "status": "unavailable",
+      "artifacts": [],
+      "reason": "Model package, redistribution license and Android-device accuracy not yet verified."
+    },
+    {
+      "id": "stt-tk",
+      "language_tag": "tk-TM",
+      "display_name": "Türkmençe",
+      "status": "unavailable",
+      "artifacts": [],
+      "reason": "Model package, redistribution license and Android-device accuracy not yet verified."
+    }
+  ]
+}
