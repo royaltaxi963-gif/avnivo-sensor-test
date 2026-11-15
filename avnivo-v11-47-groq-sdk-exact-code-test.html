@@ -885,6 +885,27 @@ toggle.addEventListener('click',async()=>{
  mic.addEventListener('click',()=>{if(GROQ_ONLY)return;if(isListening)stop();else begin()});
  const swap=document.getElementById('swap');
  swap.addEventListener('click',()=>{if(isListening)stop()},{capture:true});
+
+ // Voice selection is independent of sensor and recognition settings.
+ const avnivoVoices=[
+  ['Kore','Ayol — qat’iy'],['Aoede','Ayol — yengil'],['Leda','Ayol — yosh'],
+  ['Zephyr','Ayol — yorqin'],['Achernar','Ayol — muloyim'],
+  ['Puck','Erkak — quvnoq'],['Charon','Erkak — ravon'],['Orus','Erkak — jiddiy'],
+  ['Achird','Erkak — samimiy'],['Iapetus','Erkak — tiniq']
+ ];
+ const voicePanel=document.createElement('section');
+ voicePanel.style.cssText='display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px;border:1px solid #b99360;border-radius:10px;color:#ffe4aa;background:#302315;font:13px system-ui';
+ const voiceTitle=document.createElement('strong');voiceTitle.textContent='AI ovozi';
+ const voiceLabel=document.createElement('label');voiceLabel.textContent='Ovoz turini tanlang';voiceLabel.htmlFor='avnivoTtsVoice';
+ const voiceSelect=document.createElement('select');voiceSelect.id='avnivoTtsVoice';
+ voiceSelect.style.cssText='width:100%;padding:10px;background:#21170f;color:#ffe4aa;border:1px solid #b99360;border-radius:8px';
+ for(const [name,description] of avnivoVoices){const option=document.createElement('option');option.value=name;option.textContent=name+' — '+description;voiceSelect.append(option);}
+ let savedVoice='Kore';try{savedVoice=localStorage.getItem('avnivoTtsVoice')||'Kore';}catch(_){}
+ if(avnivoVoices.some(([name])=>name===savedVoice))voiceSelect.value=savedVoice;
+ voiceSelect.addEventListener('change',()=>{try{localStorage.setItem('avnivoTtsVoice',voiceSelect.value)}catch(_){}});
+ const voiceHint=document.createElement('small');voiceHint.textContent='10 ta ovoz. Tanlov saqlanadi. Ovozlarni sinash uchun matn yonidagi 🔊 tugmasini bosing.';
+ voicePanel.append(voiceTitle,voiceLabel,voiceSelect,voiceHint);
+ document.querySelector('#sensorSheet .sensor-card')?.append(voicePanel);
  // AVNIVO cloud TTS: preserve translation and recognition; show errors rather than silent fallback.
  let activeAudio=null, activeUrl=null, playbackId=0;
  function stopAudio(){
@@ -910,7 +931,7 @@ toggle.addEventListener('click',async()=>{
    try{
      const response=await fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts',{
        method:'POST',headers:{'Content-Type':'application/json'},
-       body:JSON.stringify({text:message.slice(0,350),language})
+       body:JSON.stringify({text:message.slice(0,350),language,voice:voiceSelect.value})
      });
      if(!response.ok)throw new Error('TTS HTTP '+response.status);
      const blob=await response.blob();
