@@ -3,7 +3,7 @@
   "repository": "royaltaxi963-gif/avnivo-sensor-test",
   "branch": "feature/chirp2-multilingual-stt",
   "base_commit": "dcb69184aae693e9bac536c01be073cb767b8436",
-  "updated_at": "2026-11-15T18:48:46.159441+00:00",
+  "updated_at": "2026-11-15T18:51:50.417452+00:00",
   "official_language_research": {
     "status": "complete",
     "total_chirp2_locales": 117,
@@ -58,17 +58,28 @@
     "status": "blocked",
     "reason": "No Google Application Default Credentials in this environment; Cloud Run deployment returned HTTP 502 for uz-UZ",
     "harness": "translator-api/test_chirp2_live.py (opt-in via AVNIVO_CHIRP2_LIVE=1)",
-    "verified_locales": []
+    "verified_locales": [],
+    "evidence": [
+      "Cloud Run europe-west1: uz-UZ -> HTTP 502 {'detail':'Google Speech transcription failed'}",
+      "Cloud Run europe-west1: de-DE -> HTTP 400 {'detail':'Only uz-UZ is configured for this endpoint'} (deployment is the old 4-locale build)",
+      "Local google.auth.default() -> no Application Default Credentials (metadata unreachable)"
+    ]
   },
   "verified_tests": 47,
   "blockers": [
     "Google Cloud Application Default Credentials not available to this sandbox",
-    "Cloud Run service account lacks working Speech-to-Text access (uz-UZ -> 502)"
+    "Cloud Run service account lacks working Speech-to-Text access (uz-UZ -> 502)",
+    "Deployed Cloud Run backend is the pre-change 4-locale build; redeploy requires explicit approval"
   ],
   "next_actions": [
     "Run translator-api/test_chirp2_live.py with authorized credentials and audio samples",
     "Review and merge consolidated PR for branch feature/chirp2-multilingual-stt"
   ],
   "branch_head": "origin/feature/chirp2-multilingual-stt",
-  "commit_note": "base commit is base_commit; the feature branch head is whatever this file is committed on"
+  "commit_note": "base commit is base_commit; the feature branch head is whatever this file is committed on",
+  "pull_request": {
+    "url": "https://github.com/royaltaxi963-gif/avnivo-sensor-test/pull/2",
+    "status": "open",
+    "ci": "Translator API offline tests: success (47 passed)"
+  }
 }
