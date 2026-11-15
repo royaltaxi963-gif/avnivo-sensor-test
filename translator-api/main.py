@@ -48,7 +48,7 @@ async def transcribe(request: Request, audio: UploadFile = File(...), language: 
     if len(hits) >= RATE_LIMIT:
         raise HTTPException(429, "Too many requests")
     hits.append(now)
-    if audio.content_type not in {"audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/wav", "audio/x-wav"}:
+    if audio.content_type not in {"audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/flac", "audio/x-flac"}:
         raise HTTPException(415, "Unsupported audio format")
     data = await audio.read(MAX_AUDIO + 1)
     if not data or len(data) > MAX_AUDIO:
@@ -108,7 +108,7 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
         raise HTTPException(403, "Origin not allowed")
     if language != "uz-UZ":
         raise HTTPException(400, "Only uz-UZ is configured for this endpoint")
-    if audio.content_type not in {"audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/wav", "audio/x-wav"}:
+    if audio.content_type not in {"audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/flac", "audio/x-flac"}:
         raise HTTPException(415, "Unsupported audio format")
     data = await audio.read(MAX_AUDIO + 1)
     if not data or len(data) > MAX_AUDIO:
