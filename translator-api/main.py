@@ -375,7 +375,6 @@ async def synthesize_emotional_speech(request: Request):
 
     style = _detect_tts_style(spoken)
     project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
-    project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
     # Use the enabled Cloud Text-to-Speech API with a higher-quality Gemini voice.
     # Keep translation, ASR and the public /api/tts contract unchanged.
     def get_tts_token():
@@ -391,7 +390,7 @@ async def synthesize_emotional_speech(request: Request):
         raise HTTPException(503, "TTS credentials unavailable")
 
     # Detect Russian Cyrillic; otherwise use Uzbek. Never silently translate spoken text.
-    language = "ru-RU" if any("\\u0400" <= c <= "\\u04ff" for c in spoken) else "uz-UZ"
+    language = "ru-RU" if any(0x0400 <= ord(c) <= 0x04FF for c in spoken) else "uz-UZ"
     tts_payload = {
         "input": {"text": spoken, "prompt": _TTS_STYLES[style] + " Read the supplied text exactly, in its original language, with human pacing and expressive intonation."},
         "voice": {"languageCode": language, "modelName": "gemini-2.5-pro-tts", "name": "Kore"},
