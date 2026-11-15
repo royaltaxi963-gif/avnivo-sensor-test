@@ -973,7 +973,7 @@ toggle.addEventListener('click',async()=>{
  const GOOGLE_API='https://avnivo-sensor-test-792624108019.europe-west1.run.app/api/transcribe-google';
  const enginePanel=document.createElement('div');
  enginePanel.style.cssText='display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px;border:1px solid #b99360;border-radius:10px;background:#302315;color:#ffe4aa;font:12px system-ui';
- enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="groq">Groq Whisper v3</option><option value="google">Google Chirp 2 (o‘zbekcha)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
+ enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="groq">Groq Whisper v3</option><option value="google">Google Chirp 2 (o‘zbekcha)</option><option value="offline">Offline STT (Android ilova)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
  const settingsCard=document.querySelector('#sensorSheet .sensor-card');
  if(settingsCard){
    settingsCard.append(enginePanel);
@@ -1028,6 +1028,12 @@ toggle.addEventListener('click',async()=>{
    if(!field){message('Yozish maydoni topilmadi');return}
    const language=speaker.dataset.speaker==='1'?'uz':(document.getElementById('upperLanguageSelect')?.value||'ru');
    const engine=engineSelect.value;
+   if(engine==='offline'){
+     window.avnivoComposer?.showBottomEditor();
+     status('Offline STT Android ilovasida ovozni matnga aylantiring, matnni nusxalab shu yerga joylang. Brauzer boshqa ilovaning mikrofoniga bevosita ulana olmaydi.');
+     field.focus();
+     return;
+   }
    if(engine==='google' && language!=='uz'){message('Google Chirp 2 hozir faqat o‘zbek tilida (uz-UZ) ishlaydi');return}
    window.avnivoComposer?.showBottomEditor();
    const base=field.value.trim();
