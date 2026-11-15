@@ -1,0 +1,30 @@
+name: Verify uploaded Uzbek offline STT model
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Verify exact objects and SHA-256 before publishing any download manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUCKET=avnivo-offline-models-792624108019
+          mkdir -p "$RUNNER_TEMP/avnivo-stt"
+          cd "$RUNNER_TEMP/avnivo-stt"
+          gcloud storage cp "gs://$BUCKET/stt-uzbek/model.int8.onnx" model.int8.onnx
+          gcloud storage cp "gs://$BUCKET/stt-uzbek/tokens.txt" tokens.txt
+          printf '%s  %s\n' \
+            '8bff17ef8d7da04369a559b99b71c1155a90fc604d35d84c6d4e44159c1b0873' 'model.int8.onnx' \
+            '2022129a0c61784d4a1838da59e5875f9b29d2c6ad12413cbedc98632f98710f' 'tokens.txt' | sha256sum --check --strict
+          test "$(wc -c < model.int8.onnx)" -eq 591649160
+          test "$(wc -c < tokens.txt)" -eq 411
+          echo 'VERIFIED: both private bucket objects match the previously recorded local model hashes and sizes'
