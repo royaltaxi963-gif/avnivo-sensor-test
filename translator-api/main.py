@@ -385,7 +385,9 @@ async def synthesize_emotional_speech(request: Request):
         return credentials.token
     try:
         token = await asyncio.to_thread(get_tts_token)
-    except (DefaultCredentialsError, RefreshError):
+    except (DefaultCredentialsError, RefreshError) as exc:
+        import logging
+        logging.getLogger("avnivo.tts").exception("TTS credentials unavailable (%s)", type(exc).__name__)
         raise HTTPException(503, "TTS credentials unavailable")
     payload = {
         "contents": [{"role": "user", "parts": [{"text": spoken, "speechMetadata": {"style": _TTS_STYLES[style]}}]}],
@@ -399,6 +401,11 @@ async def synthesize_emotional_speech(request: Request):
     if response.status_code == 429:
         raise HTTPException(429, "TTS quota exceeded")
     if response.status_code in (401, 403):
+        import logging
+        logging.getLogger("avnivo.tts").error(
+            "Vertex TTS access denied: upstream HTTP %s, project=%s, location=%s, response=%s",
+            response.status_code, project, location, response.text[:1200]
+        )
         raise HTTPException(503, "TTS access denied; check service account permissions")
     if response.status_code != 200:
         # Log a bounded provider error for Cloud Run diagnostics, without credentials.
