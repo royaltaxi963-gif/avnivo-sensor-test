@@ -320,3 +320,96 @@ async def translate_llm_test(request: Request):
     except (KeyError, IndexError, TypeError, ValueError):
         raise HTTPException(502, "Unexpected translation response")
     return {"text": translated, "model": "general/translation-llm", "source": source, "target": target}
+
+
+# Emotion-aware TTS is isolated from translation and speech recognition.
+_TTS_STYLES = {
+    "concerned": "Speak in a slightly stern, concerned tone with restrained frustration; remain natural, never shout.",
+    "happy": "Speak with warm happiness and a lively, smiling intonation.",
+    "sad": "Speak softly and compassionately, with subdued sadness.",
+    "excited": "Speak with enthusiastic, animated energy and natural emphasis.",
+    "calm": "Speak clearly, naturally and conversationally with a calm neutral tone.",
+}
+
+def _detect_tts_style(text: str) -> str:
+    lowered = text.casefold()
+    if any(x in lowered for x in ("qayerda yurd", "izlayapman", "izlayabman", "nega kelmad", "где ты был", "я тебя ищу", "where have you been")):
+        return "concerned"
+    if any(x in lowered for x in ("tabrik", "zo'r yangilik", "ура", "поздравля", "congratulations", "wonderful news")):
+        return "excited"
+    if any(x in lowered for x in ("xursand", "rahmat", "спасибо", "радост", "thank you", "so happy")):
+        return "happy"
+    if any(x in lowered for x in ("afsus", "hamdard", "сожалею", "груст", "sorry for your loss")):
+        return "sad"
+    return "calm"
+
+
+@app.post("/api/tts")
+async def synthesize_emotional_speech(request: Request):
+    """Return Gemini-generated WAV audio; auto-select a conservative emotional style."""
+    origin = request.headers.get("origin")
+    if origin is not None and origin not in ALLOWED_ORIGINS:
+        raise HTTPException(403, "Origin not allowed")
+    raw = await request.body()
+    if len(raw) > 2048:
+        raise HTTPException(413, "Request too large")
+    try:
+        import json
+        body = json.loads(raw)
+    except (ValueError, UnicodeDecodeError):
+        raise HTTPException(400, "Invalid JSON")
+    if not isinstance(body, dict):
+        raise HTTPException(400, "Invalid request")
+    spoken = body.get("text")
+    if not isinstance(spoken, str) or not spoken.strip() or len(spoken) > 350:
+        raise HTTPException(400, "Text must contain 1-350 characters")
+    spoken = spoken.strip()
+    ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown").split(",")[0].strip()
+    now = time.monotonic()
+    hits = recent[ip]
+    while hits and now - hits[0] > WINDOW:
+        hits.popleft()
+    if len(hits) >= RATE_LIMIT:
+        raise HTTPException(429, "Too many requests")
+    hits.append(now)
+
+    style = _detect_tts_style(spoken)
+    project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
+    location = os.getenv("AVNIVO_TTS_LOCATION", "eu")
+    if location not in {"eu", "us", "global"}:
+        raise HTTPException(503, "Invalid TTS location")
+    host = {"eu": "aiplatform.eu.rep.googleapis.com", "us": "aiplatform.us.rep.googleapis.com", "global": "aiplatform.googleapis.com"}[location]
+    url = f"https://{host}/v1/projects/{project}/locations/{location}/publishers/google/models/gemini-3.8-flash-tts:generateContent"
+    def get_tts_token():
+        credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        if not credentials.valid:
+            credentials.refresh(GoogleAuthRequest())
+        return credentials.token
+    try:
+        token = await asyncio.to_thread(get_tts_token)
+    except (DefaultCredentialsError, RefreshError):
+        raise HTTPException(503, "TTS credentials unavailable")
+    payload = {
+        "contents": [{"role": "user", "parts": [{"text": spoken, "speechMetadata": {"style": _TTS_STYLES[style]}}]}],
+        "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": {"voiceConfig": {"voice": "Kore"}}},
+    }
+    try:
+        async with httpx.AsyncClient(timeout=75) as client:
+            response = await client.post(url, headers={"Authorization": f"Bearer {token}"}, json=payload)
+    except httpx.RequestError:
+        raise HTTPException(502, "TTS provider unreachable")
+    if response.status_code == 429:
+        raise HTTPException(429, "TTS quota exceeded")
+    if response.status_code in (401, 403):
+        raise HTTPException(503, "TTS access denied; check service account permissions")
+    if response.status_code != 200:
+        raise HTTPException(502, "TTS generation failed")
+    try:
+        encoded = response.json()["candidates"][0]["content"]["parts"][0]["inlineData"]["data"]
+        audio = base64.b64decode(encoded, validate=True)
+        if not audio or len(audio) > 8 * 1024 * 1024:
+            raise ValueError("Invalid audio size")
+    except (KeyError, IndexError, TypeError, ValueError):
+        raise HTTPException(502, "Invalid TTS audio response")
+    from fastapi.responses import Response
+    return Response(content=audio, media_type="audio/wav", headers={"Cache-Control": "no-store", "X-AVNIVO-TTS-Style": style})
