@@ -202,11 +202,11 @@ translation without Chirp 2 recognition; this document covers recognition only.
 
 ## 8. Excluded languages
 
-53 language codes exist for other Speech-to-Text V2 models but are **not**
-offered by `chirp_2` (for example: Albanian `sq-AL` is present, but many
-telephony-only and Chirp 3 additions are not). They are excluded because Google
-does not list them for the `chirp_2` model. Chirp 3 support never implies Chirp 2
-support, so nothing was inferred from the Chirp 3 list.
+53 language codes appear in the Speech-to-Text V2 matrix for other models but
+are **not** offered by `chirp_2` (for example `ar-AE`, `ar-DZ`, `ar-IL` and the
+telephony-only `telephony`/`telephony_short` codes). They are excluded because
+Google does not list them for the `chirp_2` model. Chirp 3 support never implies
+Chirp 2 support, so nothing was inferred from the Chirp 3 list.
 
 Locales that AVNIVO supports for **text translation** but that are outside the
 Chirp 2 matrix (if added to the translation selector later) must be reported as
