@@ -106,8 +106,9 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
     origin = request.headers.get("origin")
     if origin is not None and origin not in ALLOWED_ORIGINS:
         raise HTTPException(403, "Origin not allowed")
-    if language != "uz-UZ":
-        raise HTTPException(400, "Only uz-UZ is configured for this endpoint")
+    # Explicit allowlist for Chirp 2 short-audio recognition; preserve uz-UZ behavior.
+    if language not in {"uz-UZ", "ru-RU", "en-US", "tr-TR"}:
+        raise HTTPException(400, "Unsupported Chirp 2 language")
     if audio.content_type not in {"audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/flac", "audio/x-flac"}:
         raise HTTPException(415, "Unsupported audio format")
     data = await audio.read(MAX_AUDIO + 1)
@@ -141,7 +142,7 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
             "autoDecodingConfig": {},
             "languageCodes": [language],
             "model": GOOGLE_MODEL,
-            "adaptation": {
+            **({"adaptation": {
                 "phraseSets": [{
                     "inlinePhraseSet": {
                         "phrases": [
@@ -151,7 +152,7 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
                         ]
                     }
                 }]
-            }
+            }} if language == "uz-UZ" else {})
         },
         "content": base64.b64encode(data).decode("ascii")
     }
