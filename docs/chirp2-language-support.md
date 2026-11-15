@@ -237,7 +237,29 @@ configured for that language. There is no silent fallback to Uzbek.
   languages page (rows whose model column is `chirp` or `chirp_2`) and compared:
   **exact set match, 0 name mismatches**. Script: `translator-api/test_chirp2_stt.py`
   asserts the same invariants against the embedded frontend matrix.
-- Real Google recognition: blocked in this environment — no Application Default
-  Credentials are present, so only the four-language Cloud Run deployment could
-  be probed, and even it returned HTTP 502 for `uz-UZ` because its service
-  account lacked working Speech access. See the engineering report for details.
+- **Real Google recognition (verified):** four locales were transcribed by the
+  deployed Chirp 2 service on Cloud Run revision `avnivo-sensor-test-00012-qap`
+  (candidate tag, 0% production traffic), region `us-central1`, model `chirp_2`:
+
+  | Locale | Sample | HTTP | Transcript | Latency |
+  |---|---|---|---|---|
+  | `uz-UZ` | Wikimedia Commons Uzbek pronunciation (CC-BY-SA) | 200 | `bakteriya keyingi` | 2.28 s |
+  | `ru-RU` | espeak-ng synthetic Russian | 200 | `Здравствуйте это проверка системы распознавания речи` | 2.07 s |
+  | `en-US` | espeak-ng synthetic English | 200 | `hello this is a test of the speech recognition system` | 1.47 s |
+  | `tr-TR` | espeak-ng synthetic Turkish | 200 | `merhaba bu hafta sonu sınav sistemi ile ilgili test` | 1.52 s |
+
+  Recorded evidence: `docs/chirp2-live-verification.json`. Harness:
+  `translator-api/test_chirp2_live.py` (skipped unless explicitly enabled).
+
+- **Error handling (verified against the deployment):** unsupported codes
+  (`xx-XX`, `ar-AE`) → HTTP 400; missing `language` → HTTP 400 (no Uzbek
+  fallback); unsupported content type → HTTP 415; empty audio → HTTP 413.
+
+- **Not yet real-verified:** the remaining 113 registered locales. Their codes
+  are registered and validated, and request construction is covered by offline
+  tests, but they have not been exercised against the live API (no speech
+  samples and no explicit spend authorization). They must not be reported as
+  verified until tested.
+- **Production deployment:** the live production revision still runs the older
+  pre-registry build (`/api/chirp2-languages` → 404). Promoting the candidate
+  revision to 100% traffic is a deliberate, separate step requiring approval.

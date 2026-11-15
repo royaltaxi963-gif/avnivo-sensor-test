@@ -3,7 +3,7 @@
   "repository": "royaltaxi963-gif/avnivo-sensor-test",
   "branch": "feature/chirp2-multilingual-stt",
   "base_commit": "dcb69184aae693e9bac536c01be073cb767b8436",
-  "updated_at": "2026-11-15T20:28:28.447701+00:00",
+  "updated_at": "2026-11-15T20:34:58.579261+00:00",
   "official_language_research": {
     "status": "complete",
     "total_chirp2_locales": 117,
@@ -54,10 +54,9 @@
     }
   ],
   "tests": {
-    "offline_suite": "translator-api/test_chirp2_stt.py",
-    "count": 47,
-    "status": "pass",
-    "command": "python -m pytest -q translator-api/test_translation_llm.py translator-api/test_chirp2_stt.py"
+    "offline": "48 passed, 1 skipped",
+    "live_remote": "1 passed (4 locales)",
+    "ci": "Translator API offline tests"
   },
   "real_api_verification": {
     "status": "passed (candidate revision)",
@@ -109,8 +108,9 @@
     "Google Cloud Application Default Credentials not available to this sandbox"
   ],
   "next_actions": [
-    "Run translator-api/test_chirp2_live.py with authorized credentials and audio samples",
-    "Review and merge consolidated PR for branch feature/chirp2-multilingual-stt"
+    "Obtain explicit approval + spending limit to promote candidate revision to 100% traffic",
+    "Authorize real-sample verification for the remaining 113 locales (samples + spend)",
+    "Optionally run Android Chrome manual smoke on the deployed candidate"
   ],
   "branch_head": "origin/feature/chirp2-multilingual-stt",
   "commit_note": "base commit is base_commit; the feature branch head is whatever this file is committed on",
@@ -118,5 +118,19 @@
     "url": "https://github.com/royaltaxi963-gif/avnivo-sensor-test/pull/2",
     "status": "open",
     "ci": "Translator API offline tests: success (47 passed)"
+  },
+  "commit_sha": "215a11d2ad90a49a4f8586b8e3636a589596e8b0",
+  "pr": {
+    "number": 2,
+    "state": "OPEN",
+    "url": "https://github.com/royaltaxi963-gif/avnivo-sensor-test/pull/2"
+  },
+  "cloud_run": {
+    "service": "avnivo-sensor-test",
+    "region": "europe-west1",
+    "candidate_revision": "avnivo-sensor-test-00012-qap",
+    "candidate_tag_url": "https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app",
+    "production_traffic_revision": "avnivo-sensor-test-00011-xl4",
+    "promotion": "NOT DONE (requires approval)"
   }
 }

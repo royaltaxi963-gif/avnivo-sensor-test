@@ -2,14 +2,14 @@
   {
     "locale": "uz-UZ",
     "sample": "uz-UZ.webm",
-    "sample_sha256": "14b33d6dd655e18ba5b23f62c245fed9dd7c40626f4e9dd1eea2320abbbf4149",
+    "sample_sha256": "9251b91155c0c8610ede525e209bfe449142d9b12eee8a28c44837cfd482cd3c",
     "model": "chirp_2",
     "method": "Speech.Recognize (sync)",
     "region": "us-central1",
     "base_url": "https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app",
     "http_status": 200,
-    "transcript": "selam buyurun ma'muz tanıştığımıza memnunuz o güzel gülü de götürebilir miyim",
-    "latency_seconds": 2.335,
+    "transcript": "bakteriya keyingi",
+    "latency_seconds": 2.278,
     "pass": true,
     "error": null
   },
@@ -23,7 +23,7 @@
     "base_url": "https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app",
     "http_status": 200,
     "transcript": "Здравствуйте это проверка системы распознавания речи",
-    "latency_seconds": 1.784,
+    "latency_seconds": 2.072,
     "pass": true,
     "error": null
   },
@@ -37,7 +37,7 @@
     "base_url": "https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app",
     "http_status": 200,
     "transcript": "hello this is a test of the speech recognition system",
-    "latency_seconds": 2.609,
+    "latency_seconds": 1.468,
     "pass": true,
     "error": null
   },
@@ -51,7 +51,7 @@
     "base_url": "https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app",
     "http_status": 200,
     "transcript": "merhaba bu hafta sonu sınav sistemi ile ilgili test",
-    "latency_seconds": 2.088,
+    "latency_seconds": 1.521,
     "pass": true,
     "error": null
   }
