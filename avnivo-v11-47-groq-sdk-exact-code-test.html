@@ -581,7 +581,11 @@ toggle.addEventListener('click',async()=>{
 
 
 <script>
-/* Online language selection: both panels, reciprocal names, persisted choice. */
+/* Make the entire language badge tappable on Android Chrome, including while editing. */
+ const languageTapStyle=document.createElement('style');
+ languageTapStyle.textContent='.speaker .speaker-language-title{position:relative;z-index:25;pointer-events:auto;cursor:pointer;touch-action:manipulation}.speaker .speaker-language-title select{pointer-events:auto;min-height:36px;cursor:pointer}.app.is-editing .speaker:not(.is-editor) .speaker-language-title,.app.is-editing .speaker:not(.is-editor) .speaker-language-title select{pointer-events:auto}';
+ document.head.appendChild(languageTapStyle);
+ /* Online language selection: both panels, reciprocal names, persisted choice. */
 (()=>{
  const upper=document.getElementById('upperLanguageSelect');
  const lower=document.getElementById('bottomLanguageSelect');
@@ -608,7 +612,15 @@ toggle.addEventListener('click',async()=>{
   if(topLang)topLang.textContent=names[upper.value]?.uz||native[upper.value];
   try{localStorage.setItem('avnivo.online.upper',upper.value);localStorage.setItem('avnivo.online.lower',lower.value)}catch(_){}
  }
- upper.addEventListener('change',apply);
+ // Tapping the translated half or ≈ also opens the native language picker.
+ for(const select of [upper,lower]){
+   const badge=select.closest('.speaker-language-title');
+   badge?.addEventListener('click',event=>{
+     if(event.target===select)return;
+     try{select.showPicker()}catch(_){select.focus();select.click()}
+   });
+ }
+  upper.addEventListener('change',apply);
  lower.addEventListener('change',apply);
  window.avnivoOnlineLanguageForSpeaker=id=>id==='1'?lower.value:upper.value;
  apply();
