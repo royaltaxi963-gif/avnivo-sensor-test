@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "uzbek-stt",
+  "display_name": "O‘zbekcha ovoz tanish",
+  "source": "User-supplied tested-on-phone ONNX model archive",
+  "archive": {
+    "filename": "model.int8..zip",
+    "bytes": 431526970,
+    "sha256": "a1d6a6bd4da7e0c0849801ad916f56bf464416adb0fd3adb8a3b3508e5b06250",
+    "download_url": null
+  },
+  "files": [
+    {
+      "path": "model.int8/model.int8.onnx",
+      "bytes": 591649160,
+      "sha256": "8bff17ef8d7da04369a559b99b71c1155a90fc604d35d84c6d4e44159c1b0873"
+    },
+    {
+      "path": "model.int8/tokens.txt",
+      "bytes": 411,
+      "sha256": "2022129a0c61784d4a1838da59e5875f9b29d2c6ad12413cbedc98632f98710f"
+    }
+  ],
+  "installation": {
+    "storage": "Android app-private storage",
+    "require_integrity_check": true,
+    "download_status": "blocked_pending_verified_host_url",
+    "runtime_status": "not_integrated",
+    "delete_after_install": "user_controlled"
+  },
+  "note": "No public hosting URL yet. No verified APK integration or inference test."
+}
