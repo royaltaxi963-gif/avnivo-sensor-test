@@ -176,3 +176,76 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
         for item in results if item.get("alternatives")
     ).strip()
     return {"text": text, "model": GOOGLE_MODEL, "language": language}
+
+
+@app.post("/api/translate-llm-test")
+async def translate_llm_test(request: Request):
+    """Opt-in, authenticated test route. Never silently falls back to another model."""
+    import secrets
+    if os.getenv("AVNIVO_TRANSLATION_TEST_ENABLED") != "true":
+        raise HTTPException(503, "Translation test is disabled")
+    expected = os.getenv("AVNIVO_TRANSLATION_TEST_TOKEN", "")
+    supplied = request.headers.get("x-avnivo-test-token", "")
+    if not expected or not secrets.compare_digest(supplied, expected):
+        raise HTTPException(401, "Unauthorized")
+    origin = request.headers.get("origin")
+    if origin is not None and origin not in ALLOWED_ORIGINS:
+        raise HTTPException(403, "Origin not allowed")
+    if int(request.headers.get("content-length", "0") or "0") > 4096:
+        raise HTTPException(413, "Request too large")
+    try:
+        body = await request.json()
+    except ValueError:
+        raise HTTPException(400, "Invalid JSON")
+    if not isinstance(body, dict):
+        raise HTTPException(400, "Invalid request")
+    text = body.get("text")
+    source = body.get("source", "uz")
+    target = body.get("target", "ru")
+    if not isinstance(text, str) or not text.strip() or len(text) > 500:
+        raise HTTPException(400, "Text must contain 1-500 characters")
+    if source not in {"uz", "ru", "en"} or target not in {"uz", "ru", "en"} or source == target:
+        raise HTTPException(400, "Unsupported language pair")
+    project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
+    region = os.getenv("AVNIVO_TRANSLATION_REGION", "us-central1")
+    if region not in {"us-central1", "global"}:
+        raise HTTPException(503, "Invalid translation region")
+
+    def get_translation_token():
+        credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        if not credentials.valid:
+            credentials.refresh(GoogleAuthRequest())
+        return credentials.token
+
+    try:
+        token = await asyncio.to_thread(get_translation_token)
+    except (DefaultCredentialsError, RefreshError):
+        raise HTTPException(503, "Translation credentials unavailable")
+    model = f"projects/{project}/locations/{region}/models/general/translation-llm"
+    url = f"https://translation.googleapis.com/v3/projects/{project}/locations/{region}:translateText"
+    payload = {
+        "contents": [text],
+        "mimeType": "text/plain",
+        "sourceLanguageCode": source,
+        "targetLanguageCode": target,
+        "model": model,
+    }
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.post(url, headers={"Authorization": f"Bearer {token}"}, json=payload)
+    except httpx.RequestError:
+        raise HTTPException(502, "Translation provider unreachable")
+    if response.status_code == 429:
+        raise HTTPException(429, "Translation quota exceeded")
+    if response.status_code in (401, 403):
+        raise HTTPException(503, "Translation access denied")
+    if response.status_code != 200:
+        raise HTTPException(502, "Translation provider error")
+    try:
+        translations = response.json()["translations"]
+        translated = translations[0]["translatedText"]
+        if not isinstance(translated, str):
+            raise ValueError("Invalid translated text")
+    except (KeyError, IndexError, TypeError, ValueError):
+        raise HTTPException(502, "Unexpected translation response")
+    return {"text": translated, "model": "general/translation-llm", "source": source, "target": target}
