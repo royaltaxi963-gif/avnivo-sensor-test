@@ -11,6 +11,7 @@ import google.auth
 from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.auth.exceptions import DefaultCredentialsError, RefreshError
 from groq import AsyncGroq, RateLimitError, APIError
+from offline_models import router as offline_models_router
 
 MODEL = "whisper-large-v3"
 GROQ_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
@@ -23,6 +24,7 @@ RATE_LIMIT = 12
 WINDOW = 60
 app = FastAPI(title="AVNIVO Translator API", docs_url=None, redoc_url=None)
 app.add_middleware(CORSMiddleware, allow_origins=sorted(ALLOWED_ORIGINS), allow_methods=["POST"], allow_headers=["Content-Type"], allow_credentials=False)
+app.include_router(offline_models_router)
 recent = defaultdict(deque)
 
 @app.get("/health")
