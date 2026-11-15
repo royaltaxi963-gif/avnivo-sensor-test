@@ -191,7 +191,15 @@ async def translate_llm_test(request: Request):
     origin = request.headers.get("origin")
     if origin is not None and origin not in ALLOWED_ORIGINS:
         raise HTTPException(403, "Origin not allowed")
-    if int(request.headers.get("content-length", "0") or "0") > 4096:
+    raw_length = request.headers.get("content-length", "0")
+    try:
+        content_length = int(raw_length)
+    except ValueError:
+        raise HTTPException(400, "Invalid Content-Length")
+    if content_length > 4096:
+        raise HTTPException(413, "Request too large")
+    raw_body = await request.body()
+    if len(raw_body) > 4096:
         raise HTTPException(413, "Request too large")
     try:
         body = await request.json()
