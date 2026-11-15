@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 const modules=[
- {id:'uzbek-stt',name:'O‘zbekcha ovoz tanish',size:'Hajmi aniqlanmoqda',sizeBytes:null,description:'O‘zbek tilidagi nutqni internetsiz matnga aylantiradi. Avval telefonda sinovdan o‘tgan sherpa-onnx modelining aynan o‘sha fayllari kerak.',ready:false},
+ {id:'uzbek-stt',name:'O‘zbekcha ovoz tanish',size:'ZIP ~431,5 MB · ONNX 591,6 MB',sizeBytes:591649160,description:'O‘zbek tilidagi nutqni internetsiz matnga aylantiradi. Telefonda sinovdan o‘tgan model.int8.onnx va tokens.txt fayllari aniqlandi. Yuklash serveri va Android mexanizmi hali ulanmagan.',ready:false},
  {id:'whisper-small',name:'Whisper Small Multilingual',size:'466 MiB',sizeBytes:488636416,description:'Rus, ingliz, hind, bengal va turk tillaridagi ovozni matnga aylantirish uchun ko‘p tilli model. Turkmancha qo‘llab-quvvatlash va sifat alohida tekshiriladi.',ready:true},
  {id:'nllb-int8',name:'NLLB-200 600M INT8',size:'Taxminan 895 MB (tasdiqlanmagan)',sizeBytes:null,description:'O‘zbek, rus, ingliz, hind, bengal, turk va turkman tillari o‘rtasida internetsiz matn tarjimasi uchun. Mos ONNX fayllari va aniq hajmi hali tasdiqlanmagan.',ready:false}
 ];
