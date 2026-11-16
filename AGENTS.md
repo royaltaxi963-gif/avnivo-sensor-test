@@ -63,13 +63,21 @@ Cost: Speech-to-Text V2 Standard is $0.016/min (first 500k min/month). A full
   *and* client-side audio faults. Fixed: Google 400 now returns 400, and every
   non-200 upstream status is logged with its body. Watch for the same collapse
   if the mapping is edited.
+- Transient upstream failures (429/5xx and dropped connections) are retried up
+  to `RETRY_ATTEMPTS` with backoff; client faults (400/401/403/404) are not
+  retried. The final status keeps the normal mapping, so a provider that stays
+  down still fails fast.
 - Chirp 2 auto-decode accepts containerised 16-bit PCM (WAV), webm/ogg, and mp3.
   It **rejects 32-bit float WAV and headerless PCM** with 400 INVALID_ARGUMENT.
   FLEURS source clips are 32-bit float, so anything that posts them raw (instead
   of converting via ffmpeg to `pcm_s16le` first) will see failures that look
   like outages.
-- `uz-UZ` carries a phrase boost (`"Avnivo"` @ 20.0). It amplifies hallucinated
-  "avnivo" output on near-silent audio; consider an audio-energy gate.
+- `uz-UZ` carries a phrase boost (`"Avnivo"` @ 20.0). Verified live: it makes
+  Chirp 2 return `"avnivo"` for digital silence and low-energy tones, not an
+  empty transcript. `main.py` now gates near-silent 16-bit PCM WAV locally
+  (`_is_near_silent`, RMS < 1e-3) and returns an empty transcript before the
+  paid call. webm/opus (browser audio) is not inspected (no ffmpeg in the
+  image) and is still sent to Google.
 - Tests that assert specific DOM selectors rot silently when the picker UI is
   redesigned and may drop out of CI — keep them tied to the live contract
   (`CHIRP2_MATRIX`, `chirp2LocaleFor`, etc.).

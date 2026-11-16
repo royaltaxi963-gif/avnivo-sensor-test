@@ -113,12 +113,16 @@ between the three sources.
 | Oversized audio (> 10 MB) | 413 | correct rejection |
 | Disallowed CORS origin | 403 | correct rejection |
 | Allowed CORS origin, valid WAV | 200 | correct — transcribed `uz-UZ` |
-| Silent 16-bit WAV (2 s) | 200 | correct — empty transcript, no hallucination |
-| Random bytes as `audio/wav` | 502 | upstream 400 mis-mapped (fixed → 400) |
+| Silent 16-bit WAV (2 s) | 200 | correct — empty transcript (local near-silence gate) |
+| Low-energy tone | 200 | correct — empty transcript (local near-silence gate) |
+| Random bytes as `audio/wav` | 400 | upstream 400 now surfaced as 400 |
+| Repeated recognition (same clip ×3) | 200 | correct — stable transcript |
+| Rate-limit burst (14 valid requests) | 429 after 12 | correct — window enforced |
 | Unreachable host | 0 | correct client-side network error |
 
 The two 502 rows above were re-measured after the error-mapping fix: garbage
-audio now returns 400, and the silent-audio probe returns a clean empty 200.
+audio now returns 400, and the silent-audio probe returns a clean empty 200
+(from the local near-silence gate, not from Google).
 
 ## 5. Defects and findings
 
@@ -176,13 +180,27 @@ Fixes applied:
 
 ### 5.2 Silent / garbage audio behaviour
 
-With a valid 16-bit WAV, silent audio returns 200 with an **empty** transcript
-(no hallucination) — see `reliability.json`. Garbage bytes are rejected by
-Google with 400 INVALID_ARGUMENT (now surfaced as 400). The `uz-UZ` phrase boost
-(`CHIRP2_ADAPTATION` in `translator-api/chirp2_languages.py`, `"Avnivo"` at
-boost 20.0) remains a residual risk: it can amplify a spurious `"avnivo"`
-output if Google ever returns 200 for near-silent audio. Consider gating
-adaptation on a minimum audio-energy check.
+With a valid 16-bit WAV, silent audio now returns 200 with an **empty**
+transcript — see `reliability.json`. This is the result of a fix, not of
+Google: an earlier revision of this document claimed Google returned an empty
+transcript for silence, but fresh evidence against the zero-traffic candidate
+revision (`candidate---avnivo-sensor-test-...`) **falsified** that claim.
+Chirp 2 returned `"avnivo"` for both 2 s of digital silence and a low-energy
+220 Hz tone on `uz-UZ`.
+
+Root cause: the `uz-UZ` phrase boost (`CHIRP2_ADAPTATION` in
+`translator-api/chirp2_languages.py`, `"Avnivo"` at boost 20.0) amplifies the
+model's output on near-silent input, so the boosted phrase is emitted where
+there is no speech.
+
+Fix: `main.py` now measures the RMS of any 16-bit PCM WAV with the standard
+library (`_pcm_rms` / `_is_near_silent`) and answers sub-threshold input with an
+empty transcript locally, before the paid Google call. The threshold (1e-3,
+≈ −63 dBFS) gates only inaudible input; the loudest real campaign samples are
+orders of magnitude above it. Compressed containers (webm/opus, what the
+browser records) cannot be inspected without ffmpeg and are forwarded
+unchanged, so the gate is a safety net for the WAV path the API and campaign
+use, not a replacement for the boost.
 
 ### 5.3 Test rot fixed
 
