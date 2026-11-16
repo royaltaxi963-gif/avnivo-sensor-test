@@ -377,23 +377,96 @@ function messageData(entry,firstLanguage){
  if(entry&&typeof entry==='object'&&!Array.isArray(entry))return {text:String(entry.text||''),language:entry.language==='right'?'right':'left'};
  return {text:String(entry),language:firstLanguage||'left'};
 }
-let speakingButton=null;
+// Existing Gemini Cloud TTS is used only in Online mode. Offline keeps device speech.
+const AVNIVO_TTS_URL='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts';
+const AVNIVO_TTS_VOICES=['Kore','Aoede','Leda','Zephyr','Achernar','Puck','Charon','Orus','Achird','Iapetus'];
+const ttsVoiceSelect=document.createElement('select');
+ttsVoiceSelect.setAttribute('aria-label','AI ovoz turini tanlash');
+ttsVoiceSelect.style.cssText='width:100%;max-width:280px;margin:10px 0;padding:10px;border-radius:10px;background:#241b15;color:#ffe7b9;border:1px solid #b58a52;font:15px system-ui';
+for(const voice of AVNIVO_TTS_VOICES){const option=document.createElement('option');option.value=voice;option.textContent=voice;ttsVoiceSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsVoice');if(AVNIVO_TTS_VOICES.includes(saved))ttsVoiceSelect.value=saved}catch(e){}
+ttsVoiceSelect.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsVoice',ttsVoiceSelect.value)}catch(e){}});
+const ttsVoiceLabel=document.createElement('label');
+ttsVoiceLabel.textContent='AI ovozi (Online)';
+ttsVoiceLabel.style.cssText='display:block;margin:14px 0 0;color:#ffe7b9;font:14px system-ui';
+ttsVoiceLabel.append(ttsVoiceSelect);
+document.querySelector('.settings-drawer')?.append(ttsVoiceLabel);
+let speakingButton=null,ttsAudio=null,ttsAudioUrl=null,ttsAbort=null,ttsGeneration=0;
 function stopSpeaking(){
+ ttsGeneration++;
+ if(ttsAbort){ttsAbort.abort();ttsAbort=null}
+ if(ttsAudio){ttsAudio.pause();ttsAudio.removeAttribute('src');ttsAudio.load();ttsAudio=null}
+ if(ttsAudioUrl){URL.revokeObjectURL(ttsAudioUrl);ttsAudioUrl=null}
  if(window.speechSynthesis)window.speechSynthesis.cancel();
- if(speakingButton){speakingButton.classList.remove('is-speaking');speakingButton.setAttribute('aria-pressed','false');speakingButton=null}
+ if(speakingButton){speakingButton.classList.remove('is-speaking');speakingButton.removeAttribute('data-loading');speakingButton.setAttribute('aria-pressed','false');speakingButton=null}
 }
-function playMessage(button,bubble,language){
+function ttsChunks(text){
+ // Preserve the complete text. Prefer sentence/word boundaries within the API's 350-character limit.
+ const result=[];let rest=text.trim();
+ while(rest){
+  if(rest.length<=350){result.push(rest);break}
+  let cut=350;
+  const section=rest.slice(0,351);
+  const sentence=[section.lastIndexOf('. '),section.lastIndexOf('! '),section.lastIndexOf('? '),section.lastIndexOf('。'),section.lastIndexOf('؟')].reduce((a,b)=>Math.max(a,b),-1);
+  if(sentence>=130)cut=sentence+1;
+  else {const space=section.lastIndexOf(' ',350);if(space>=130)cut=space}
+  // Do not split a UTF-16 surrogate pair.
+  if(cut<rest.length&&cut>0&&/[\\uD800-\\uDBFF]/.test(rest[cut-1])&&/[\\uDC00-\\uDFFF]/.test(rest[cut]))cut--;
+  result.push(rest.slice(0,cut).trim());rest=rest.slice(cut).trim();
+ }
+ return result.filter(Boolean);
+}
+async function playMessage(button,bubble,language){
  if(speakingButton===button){stopSpeaking();return}
  stopSpeaking();
  const text=bubble.textContent.trim();
- if(!text||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
- const utterance=new SpeechSynthesisUtterance(text);
- utterance.lang=document.documentElement.dataset.avnivoMode==='online'?onlineChoice[language]:language==='right'?'ru-RU':'uz-UZ';
- utterance.rate=.95;
- const finish=()=>{if(speakingButton===button){button.classList.remove('is-speaking');button.setAttribute('aria-pressed','false');speakingButton=null}};
- utterance.onend=finish;utterance.onerror=finish;
+ if(!text)return;
+ const generation=ttsGeneration;
  speakingButton=button;button.classList.add('is-speaking');button.setAttribute('aria-pressed','true');
- try{speechSynthesis.speak(utterance)}catch(e){finish()}
+ const finish=()=>{if(generation===ttsGeneration)stopSpeaking()};
+ if(document.documentElement.dataset.avnivoMode!=='online'){
+  if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){finish();return}
+  const utterance=new SpeechSynthesisUtterance(text);
+  utterance.lang=language==='right'?'ru-RU':'uz-UZ';utterance.rate=.95;
+  utterance.onend=finish;utterance.onerror=finish;
+  try{speechSynthesis.speak(utterance)}catch(e){finish()}
+  return;
+ }
+ const voice=ttsVoiceSelect.value;
+ const locale=onlineChoice[language];
+ if(!onlineLanguagesByCode.has(locale)){button.title='TTS: til tanlanmagan';finish();return}
+ const chunks=ttsChunks(text);
+ try{
+  for(const chunk of chunks){
+   if(generation!==ttsGeneration)return;
+   const controller=new AbortController();ttsAbort=controller;
+   button.dataset.loading='true';button.setAttribute('aria-label','AI ovozi tayyorlanmoqda');
+   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,language:locale,voice}),signal:controller.signal});
+   if(!response.ok)throw Error('TTS HTTP '+response.status);
+   const blob=await response.blob();
+   if(generation!==ttsGeneration)return;
+   if(!blob.size||!blob.type.startsWith('audio/'))throw Error('Audio javobi noto‘g‘ri');
+   ttsAudioUrl=URL.createObjectURL(blob);
+   ttsAudio=new Audio(ttsAudioUrl);
+   button.removeAttribute('data-loading');button.setAttribute('aria-label','Ovozli o‘qishni to‘xtatish');
+   const audio=ttsAudio;
+   await new Promise((resolve,reject)=>{
+    audio.onended=resolve;audio.onerror=()=>reject(Error('Audio ijro xatosi'));
+    audio.play().catch(reject);
+   });
+   if(generation!==ttsGeneration)return;
+   audio.pause();audio.removeAttribute('src');audio.load();ttsAudio=null;
+   URL.revokeObjectURL(ttsAudioUrl);ttsAudioUrl=null;
+  }
+ }catch(e){
+  if(generation===ttsGeneration&&e.name!=='AbortError'){
+   console.warn('AVNIVO TTS:',e);
+   button.title='AI ovozi ishlamadi: '+e.message;
+   button.setAttribute('aria-label','AI ovozi ishlamadi: '+e.message);
+  }
+ }finally{
+  if(generation===ttsGeneration){ttsAbort=null;finish()}
+ }
 }
 function attachSpeaker(bubble,language){
  const isLeft=bubble.classList.contains('message-left');
