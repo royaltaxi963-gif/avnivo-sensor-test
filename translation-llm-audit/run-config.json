@@ -1,4 +1,5 @@
 {
+  "run": false,
   "phase": "full",
   "only": "",
   "deep": "si-LK,xh-ZA,yo-NG",

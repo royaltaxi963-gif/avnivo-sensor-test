@@ -303,12 +303,30 @@ def run(phase: str, only: list[str] | None, max_requests: int, deep: set[str] | 
     state["ledger"] = {"in_chars": ledger.in_chars, "out_chars": ledger.out_chars,
                        "requests": ledger.requests, "errors": ledger.errors}
     save_checkpoint(state)
-    EVIDENCE.write_text(json.dumps({"records": list(done.values()),
-                                    "ledger": ledger.to_dict()},
-                                   ensure_ascii=False, indent=1))
+    write_evidence(done, ledger)
     print(f"[harness] done new={executed} total_requests={ledger.requests} "
           f"cost=${ledger.cost:.4f} errors={ledger.errors}", flush=True)
     return {"records": list(done.values()), "ledger": ledger.to_dict()}
+
+
+def write_evidence(done: dict, ledger: "Ledger") -> None:
+    """Write the evidence file, preserving tagged retest records.
+
+    The checkpoint only tracks the main matrix. diagnose.py appends retest
+    records (carrying a ``tag``) straight to the evidence file, so a later
+    harness run must not drop them when it rewrites the file.
+    """
+    existing: list[dict] = []
+    if EVIDENCE.exists():
+        existing = json.loads(EVIDENCE.read_text()).get("records", [])
+    merged = dict(done)
+    for r in existing:
+        if r.get("tag") or r.get("category") in ("diagnosis", "disputed_retest",
+                                                 "experimental_retest", "regression"):
+            merged.setdefault(f"{r['chirp']}|{r['direction']}@{r.get('tag')}|{r['item']}", r)
+    EVIDENCE.write_text(json.dumps({"records": list(merged.values()),
+                                    "ledger": ledger.to_dict()},
+                                   ensure_ascii=False, indent=1))
 
 
 def main() -> None:

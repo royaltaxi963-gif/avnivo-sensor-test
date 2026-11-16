@@ -68,10 +68,11 @@ jobs:
           print("deep=" + str(c.get("deep", "")))
           print("mode=" + str(c.get("mode", "")))
           print("max_requests=" + str(c.get("max_requests", 120)))
+          print("run=" + str(c.get("run", False)).lower())
           PY
 
       - name: Run audit against the real Translation LLM API
-        if: steps.cfg.outputs.mode == ''
+        if: steps.cfg.outputs.run == 'true' && steps.cfg.outputs.mode == ''
         env:
           AVNIVO_TRANSLATION_PROJECT: project-6bcf7fe6-cb55-49b7-9f4
           AVNIVO_TRANSLATION_REGION: us-central1
@@ -83,7 +84,7 @@ jobs:
             --max-requests "${{ steps.cfg.outputs.max_requests }}"
 
       - name: Run targeted diagnosis / retest against the real Translation LLM API
-        if: steps.cfg.outputs.mode != ''
+        if: steps.cfg.outputs.run == 'true' && steps.cfg.outputs.mode != ''
         env:
           AVNIVO_TRANSLATION_PROJECT: project-6bcf7fe6-cb55-49b7-9f4
           AVNIVO_TRANSLATION_REGION: us-central1
