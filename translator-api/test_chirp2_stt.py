@@ -338,13 +338,33 @@ def test_response_parsing_handles_empty_and_malformed(monkeypatch):
 
 @pytest.mark.parametrize(
     "google_status,expected",
-    [(429, 429), (401, 503), (403, 503), (500, 502), (400, 502)],
+    [(429, 429), (401, 503), (403, 503), (500, 502), (400, 400), (404, 502)],
 )
 def test_google_errors_are_mapped(monkeypatch, google_status, expected):
     _fake_credentials(monkeypatch)
     _stub_httpx(monkeypatch, _capture_handler(status=google_status, body={"error": "x"}))
     response = client.post("/api/transcribe-google", files=_audio(), data={"language": "uz-UZ"})
     assert response.status_code == expected
+
+
+def test_undecodable_audio_is_400_not_502(monkeypatch):
+    """A Google INVALID_ARGUMENT (400) is a client payload fault, not an outage.
+
+    Regression: every non-200 upstream status used to collapse to 502, which made
+    an undecodable-audio request look like a Google Speech outage.
+    """
+    _fake_credentials(monkeypatch)
+    body = {
+        "error": {
+            "code": 400,
+            "status": "INVALID_ARGUMENT",
+            "message": "Audio data does not appear to be in a supported encoding.",
+        }
+    }
+    _stub_httpx(monkeypatch, _capture_handler(status=400, body=body))
+    response = client.post("/api/transcribe-google", files=_audio(), data={"language": "uz-UZ"})
+    assert response.status_code == 400
+    assert "audio" in response.json()["detail"].lower()
 
 
 def test_transport_error_is_mapped_to_502(monkeypatch):

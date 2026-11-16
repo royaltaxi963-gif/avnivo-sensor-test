@@ -2653,7 +2653,7 @@
    "observed": {
     "http_status": 400,
     "body": "{\"detail\":\"Unsupported Chirp 2 language\"}",
-    "latency_seconds": 0.665
+    "latency_seconds": 0.694
    }
   },
   {
@@ -2665,7 +2665,7 @@
    "observed": {
     "http_status": 400,
     "body": "{\"detail\":\"Unsupported Chirp 2 language\"}",
-    "latency_seconds": 0.631
+    "latency_seconds": 0.648
    }
   },
   {
@@ -2677,7 +2677,7 @@
    "observed": {
     "http_status": 400,
     "body": "{\"detail\":\"Unsupported Chirp 2 language\"}",
-    "latency_seconds": 0.645
+    "latency_seconds": 0.64
    }
   },
   {
@@ -2689,7 +2689,7 @@
    "observed": {
     "http_status": 400,
     "body": "{\"detail\":\"Unsupported Chirp 2 language\"}",
-    "latency_seconds": 0.634
+    "latency_seconds": 0.678
    }
   },
   {
@@ -2702,7 +2702,7 @@
    "observed": {
     "http_status": 415,
     "body": "{\"detail\":\"Unsupported audio format\"}",
-    "latency_seconds": 0.637
+    "latency_seconds": 0.238
    }
   },
   {
@@ -2714,7 +2714,7 @@
    "observed": {
     "http_status": 413,
     "body": "{\"detail\":\"Invalid audio size\"}",
-    "latency_seconds": 0.635
+    "latency_seconds": 0.638
    }
   },
   {
@@ -2726,7 +2726,7 @@
    "observed": {
     "http_status": 413,
     "body": "{\"detail\":\"Invalid audio size\"}",
-    "latency_seconds": 1.8
+    "latency_seconds": 1.81
    }
   },
   {
@@ -2738,20 +2738,20 @@
    "observed": {
     "http_status": 403,
     "body": "{\"detail\":\"Origin not allowed\"}",
-    "latency_seconds": 0.647
+    "latency_seconds": 0.657
    }
   },
   {
    "probe": "cors_allowed_origin",
    "request": {
     "origin": "https://royaltaxi963-gif.github.io",
-    "blob": "<64000 bytes>",
+    "blob": "<64044 bytes>",
     "ip": "198.19.0.8"
    },
    "observed": {
-    "http_status": 502,
-    "body": "{\"detail\":\"Google Speech transcription failed\"}",
-    "latency_seconds": 1.957
+    "http_status": 200,
+    "body": "{\"text\":\"avnivo\",\"model\":\"chirp_2\",\"language\":\"uz-UZ\"}",
+    "latency_seconds": 2.534
    }
   },
   {
@@ -2764,19 +2764,19 @@
    "observed": {
     "http_status": 502,
     "body": "{\"detail\":\"Google Speech transcription failed\"}",
-    "latency_seconds": 1.482
+    "latency_seconds": 1.436
    }
   },
   {
    "probe": "silent_audio_empty_result",
    "request": {
-    "blob": "<64000 bytes>",
+    "blob": "<64044 bytes>",
     "ip": "198.19.0.10"
    },
    "observed": {
-    "http_status": 502,
-    "body": "{\"detail\":\"Google Speech transcription failed\"}",
-    "latency_seconds": 1.842
+    "http_status": 200,
+    "body": "{\"text\":\"avnivo\",\"model\":\"chirp_2\",\"language\":\"uz-UZ\"}",
+    "latency_seconds": 2.25
    }
   },
   {
@@ -2788,7 +2788,7 @@
    "observed": {
     "http_status": 0,
     "body": "{\"error\": \"URLError: <urlopen error [Errno -2] Name or service not known>\"}",
-    "latency_seconds": 0.017
+    "latency_seconds": 0.021
    }
   }
  ]

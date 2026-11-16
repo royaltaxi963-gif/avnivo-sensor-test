@@ -63,7 +63,22 @@ def _call(path="/api/transcribe-google", locale="uz-UZ", blob=b"\x00" * 4096,
 
 
 def _silence(seconds=2.0):
-    return b"\x00" * int(16000 * 2 * seconds)
+    """A valid 16-bit PCM mono WAV of silence.
+
+    Chirp 2 auto-decodes only containerised 16-bit PCM (or webm/ogg/mp3). A bare
+    ``b"\\x00" * n`` blob is headerless and Google rejects it with 400, so the
+    silent-audio probe must send a real WAV header to reach recognition.
+    """
+    frames = int(16000 * 2 * seconds)
+    header = (
+        b"RIFF" + (36 + frames).to_bytes(4, "little") + b"WAVE"
+        + b"fmt " + (16).to_bytes(4, "little") + (1).to_bytes(2, "little")
+        + (1).to_bytes(2, "little") + (16000).to_bytes(4, "little")
+        + (32000).to_bytes(4, "little") + (2).to_bytes(2, "little")
+        + (16).to_bytes(2, "little")
+        + b"data" + frames.to_bytes(4, "little")
+    )
+    return header + b"\x00" * frames
 
 
 def run():

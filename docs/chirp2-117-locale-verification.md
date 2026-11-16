@@ -112,38 +112,76 @@ between the three sources.
 | Empty audio | 413 | correct rejection |
 | Oversized audio (> 10 MB) | 413 | correct rejection |
 | Disallowed CORS origin | 403 | correct rejection |
+| Allowed CORS origin, valid WAV | 200 | correct — transcribed `uz-UZ` |
+| Silent 16-bit WAV (2 s) | 200 | correct — empty transcript, no hallucination |
+| Random bytes as `audio/wav` | 502 | upstream 400 mis-mapped (fixed → 400) |
 | Unreachable host | 0 | correct client-side network error |
+
+The two 502 rows above were re-measured after the error-mapping fix: garbage
+audio now returns 400, and the silent-audio probe returns a clean empty 200.
 
 ## 5. Defects and findings
 
-### 5.1 Live regression: STT route returns 502 for valid audio
+### 5.1 "502 regression" was a harness artifact, not a service outage
 
-After the campaign finished (last success 06:35), **every** call to
-`/api/transcribe-google` began returning HTTP 502
-`{"detail":"Google Speech transcription failed"}` — including a known-good
-`en-US` sample that had just returned 200. `/health` and
-`/api/chirp2-languages` kept returning 200, so the service is up; only the
-Google Speech call inside the endpoint fails. `main.py:242` maps any non-200
-from Google to this generic 502, which hides the upstream cause (quota,
-billing, or a Google-side error). Observed continuously for > 15 minutes and
-tracked by `verification/chirp2_campaign/watch_recovery.py`.
+After the campaign finished (last success 06:35), `watch_recovery.py` began
+recording HTTP 502 `{"detail":"Google Speech transcription failed"}` for a
+sample that had just returned 200. That was reported as a live regression and
+briefly investigated as an IAM/quota outage. The diagnosis was wrong, and the
+evidence now shows why.
 
-Recommended fixes:
-- Surface the upstream Google status/error in the 502 response or in logs, so
-  quota vs. IAM vs. transient errors are distinguishable.
-- Confirm the Speech-to-Text V2 quota and billing state on
-  `project-6bcf7fe6-cb55-49b7-9f4`.
-- Add a retry with backoff for transient Google 5xx.
+`watch_recovery.py` read the **raw** FLEURS clip
+(`/tmp/chirp2_samples/en-US/<id>.wav`) and posted it unmodified. FLEURS clips
+are 32-bit float PCM (`pcm_f32le`), and the endpoint sends
+`autoDecodingConfig`. Google Chirp 2 cannot auto-decode 32-bit float WAV or
+headerless PCM, so it returns **400 INVALID_ARGUMENT** — *"Audio data does not
+appear to be in a supported encoding."* The old error mapping collapsed every
+non-200/401/403/429 upstream status to 502, so a client payload fault looked
+exactly like a provider outage. `reliability.py` had the same defect: its
+`_silence()` helper sent a headerless `b"\x00" * n` blob, which Google also
+rejects.
 
-### 5.2 Silent / garbage audio behaviour changed
+Confirmed against the live endpoint (`chirp2-test` revision):
 
-Earlier reconnaissance observed Chirp 2 returning hallucinated text for silent
-audio (e.g. `uz-UZ → "avnivo"`). In the final probes, silent and garbage audio
-returned **502** (Google rejected the request) rather than a hallucinated 200,
-so no hallucination was observed this time. The `uz-UZ` phrase boost
+| Audio sent | Google result | Old app status |
+|---|---|---|
+| 16-bit PCM WAV (as the campaign sends) | 200 | 200 |
+| webm/opus, ogg/opus, mp3 | 200 | 200 |
+| 32-bit float WAV (raw FLEURS) | 400 INVALID_ARGUMENT | **502 (misleading)** |
+| headerless PCM (`b"\x00"*n`) | 400 INVALID_ARGUMENT | **502 (misleading)** |
+| random bytes as `audio/wav` | 400 INVALID_ARGUMENT | 502 (misleading) |
+
+The speech logs confirm it: 26 `code 3` (INVALID_ARGUMENT) entries in the
+watch window, and the code-3 messages are all the encoding error above. The
+`code 7` (PERMISSION_DENIED) entries in the same window came from a separate,
+deliberately unauthenticated CI probe — not from the service, which had already
+recognised the campaign audio 351/351.
+
+The campaign results are therefore valid: `run_campaign.py` converts every
+sample to 16 kHz mono 16-bit PCM via ffmpeg before sending
+(`samples.py`), which is exactly the encoding Chirp 2 auto-decodes.
+
+Fixes applied:
+
+- `translator-api/main.py`: Google 400 now maps to **400** (client payload
+  fault) instead of 502; 404 still maps to 502; and every non-200 upstream
+  status is now logged with its body, so IAM vs. quota vs. transient errors are
+  distinguishable from Cloud Run logs.
+- `verification/chirp2_campaign/watch_recovery.py`: converts the clip to 16-bit
+  PCM before polling.
+- `verification/chirp2_campaign/reliability.py`: `_silence()` now emits a real
+  RIFF/WAVE header so the silent-audio probe reaches recognition.
+- `translator-api/test_chirp2_stt.py`: the mapping table expects 400→400 and
+  404→502, plus a regression test for the undecodable-audio case.
+
+### 5.2 Silent / garbage audio behaviour
+
+With a valid 16-bit WAV, silent audio returns 200 with an **empty** transcript
+(no hallucination) — see `reliability.json`. Garbage bytes are rejected by
+Google with 400 INVALID_ARGUMENT (now surfaced as 400). The `uz-UZ` phrase boost
 (`CHIRP2_ADAPTATION` in `translator-api/chirp2_languages.py`, `"Avnivo"` at
-boost 20.0) remains a risk: if Google ever returns 200 for near-silent audio,
-that boost makes a spurious `"avnivo"` output more likely. Consider gating
+boost 20.0) remains a residual risk: it can amplify a spurious `"avnivo"`
+output if Google ever returns 200 for near-silent audio. Consider gating
 adaptation on a minimum audio-energy check.
 
 ### 5.3 Test rot fixed

@@ -58,9 +58,16 @@ Cost: Speech-to-Text V2 Standard is $0.016/min (first 500k min/month). A full
 
 ## Gotchas
 
-- The deployed endpoint maps any non-200 from Google to a generic HTTP 502
-  ("Google Speech transcription failed"), which hides quota/IAM/transient
-  causes — check Cloud Run logs and the Speech-to-Text quota directly.
+- The endpoint used to map any non-200 from Google to a generic HTTP 502
+  ("Google Speech transcription failed"), which hid quota/IAM/transient causes
+  *and* client-side audio faults. Fixed: Google 400 now returns 400, and every
+  non-200 upstream status is logged with its body. Watch for the same collapse
+  if the mapping is edited.
+- Chirp 2 auto-decode accepts containerised 16-bit PCM (WAV), webm/ogg, and mp3.
+  It **rejects 32-bit float WAV and headerless PCM** with 400 INVALID_ARGUMENT.
+  FLEURS source clips are 32-bit float, so anything that posts them raw (instead
+  of converting via ffmpeg to `pcm_s16le` first) will see failures that look
+  like outages.
 - `uz-UZ` carries a phrase boost (`"Avnivo"` @ 20.0). It amplifies hallucinated
   "avnivo" output on near-silent audio; consider an audio-energy gate.
 - Tests that assert specific DOM selectors rot silently when the picker UI is

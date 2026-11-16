@@ -1,18 +1,34 @@
 """Poll the STT route until it recovers (or the window expires), logging each try."""
 import glob
 import json
+import subprocess
+import tempfile
 import time
 import urllib.error
 import urllib.request
 from pathlib import Path
 
 BASE = "https://chirp2-test---avnivo-sensor-test-5xwrf7netq-ew.a.run.app"
-WAV = sorted(glob.glob("/tmp/chirp2_samples/en-US/*.wav"))[0]
+RAW_WAV = sorted(glob.glob("/tmp/chirp2_samples/en-US/*.wav"))[0]
 OUT = Path(__file__).resolve().parent / "recovery_watch.jsonl"
 
 
+def _decodable_wav() -> bytes:
+    """FLEURS clips are 32-bit float; Chirp 2 only auto-decodes 16-bit PCM."""
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as handle:
+        pcm = handle.name
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-y", "-i", RAW_WAV, "-ar", "16000",
+         "-ac", "1", "-c:a", "pcm_s16le", pcm],
+        check=True,
+    )
+    data = Path(pcm).read_bytes()
+    Path(pcm).unlink()
+    return data
+
+
 def call():
-    blob = Path(WAV).read_bytes()
+    blob = _decodable_wav()
     b = "----w"
     head = (
         f'--{b}\r\nContent-Disposition: form-data; name="language"\r\n\r\nen-US\r\n'

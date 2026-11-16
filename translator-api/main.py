@@ -237,8 +237,18 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
     if response.status_code == 429:
         raise HTTPException(429, "Google Speech quota exceeded")
     if response.status_code in (401, 403):
+        # The upstream body names the exact permission, which is the only way to
+        # tell an IAM regression from a disabled API in Cloud Run logs.
+        print(f"chirp2 upstream {response.status_code}: {response.text[:300]}", flush=True)
         raise HTTPException(503, "Google Speech access denied; check IAM and API")
+    if response.status_code == 400:
+        # Chirp 2 rejects audio it cannot auto-decode (e.g. 32-bit float WAV or
+        # headerless PCM) with INVALID_ARGUMENT. That is a client payload fault,
+        # so it must not be reported as a 5xx provider outage.
+        print(f"chirp2 upstream 400: {response.text[:300]}", flush=True)
+        raise HTTPException(400, "Google Speech rejected the audio; use 16-bit PCM WAV or a webm/ogg/mp3 container")
     if response.status_code != 200:
+        print(f"chirp2 upstream {response.status_code}: {response.text[:300]}", flush=True)
         raise HTTPException(502, "Google Speech transcription failed")
     return {"text": _join_transcripts(response.json()), "model": GOOGLE_MODEL, "language": language}
 
