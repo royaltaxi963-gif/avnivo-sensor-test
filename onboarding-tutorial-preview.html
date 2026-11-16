@@ -288,7 +288,7 @@ function applyMode(mode){
 }
 modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online');updateOnlineLanguageLabels()});
 modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){requestToken++;cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
-try{applyMode(localStorage.getItem('avnivo.ui.mode.v1'))}catch(e){applyMode('online')}
+try{applyMode(localStorage.getItem('avnivo-first-launch-v1-complete')==='yes'?localStorage.getItem('avnivo.ui.mode.v1'):'online')}catch(e){applyMode('online')}
 const mic=shell.querySelector('.mic-icon');
 const trace=shell.querySelector('.voice-trace-glow');
 const languageRow=document.querySelector('.language-row');
@@ -1205,34 +1205,37 @@ let wordOrder=shuffledIndices(names.length),languageOrder=shuffledIndices(langua
 let wi=0,wp=0,we=false,li=0,lp=0,le=false,selected=false,menuOpen=false;
 function typeWord(){if(selected)return;const chars=segment(names[wordOrder[wi]]);if(!we){wp=Math.min(chars.length,wp+1);word.textContent=chars.slice(0,wp).join('');if(wp===chars.length){we=true;setTimeout(typeWord,800)}else setTimeout(typeWord,95)}else{wp=Math.max(0,wp-1);word.textContent=chars.slice(0,wp).join('');if(!wp){we=false;wi++;if(wi>=wordOrder.length){const last=wordOrder[wordOrder.length-1];wordOrder=shuffledIndices(names.length);if(wordOrder.length>1&&wordOrder[0]===last){[wordOrder[0],wordOrder[1]]=[wordOrder[1],wordOrder[0]]}wi=0}setTimeout(typeWord,180)}else setTimeout(typeWord,45)}}
 function typeLanguage(){if(selected)return;const chars=segment(languageNames[languageOrder[li]]);if(!le){lp=Math.min(chars.length,lp+1);lang.textContent=chars.slice(0,lp).join('');if(lp===chars.length){le=true;setTimeout(typeLanguage,1200)}else setTimeout(typeLanguage,95)}else{lp=Math.max(0,lp-1);lang.textContent=chars.slice(0,lp).join('');if(!lp){le=false;li++;if(li>=languageOrder.length){const last=languageOrder[languageOrder.length-1];languageOrder=shuffledIndices(languageNames.length);if(languageOrder.length>1&&languageOrder[0]===last){[languageOrder[0],languageOrder[1]]=[languageOrder[1],languageOrder[0]]}li=0}setTimeout(typeLanguage,250)}else setTimeout(typeLanguage,55)}}
-function choose(){if(selected||!menuOpen)return;selected=true;menuOpen=false;document.getElementById('avnivo-language-menu').classList.remove('open');pill.setAttribute('aria-expanded','false');lang.textContent='O‘zbek tili';localStorage.setItem('avnivo-onboarding-language','uz');pill.classList.add('selected');
-setTimeout(()=>root.classList.add('departing'),300);
-setTimeout(()=>{
-  // The language pill has finished leaving the bottom of the screen.
-  // Only now may the brand return to the exact chat center.
-  const chatBrand=document.querySelector('.center-brand');
-  const introBrand=root.querySelector('.intro-brand');
-  if(chatBrand&&introBrand){
-    const target=chatBrand.getBoundingClientRect();
-    const current=introBrand.getBoundingClientRect();
-    const centerY=target.top+target.height/2;
-    introBrand.style.top=centerY+'px';
-    const chatName=chatBrand.querySelector('.brand-name');
-    const introName=introBrand.querySelector('.intro-brand-name');
-    if(chatName&&introName){introName.style.fontSize=getComputedStyle(chatName).fontSize}
-    // Brand typography and scale transition into the app's brand position.
-  }
-  root.classList.add('brand-to-chat');
-  setTimeout(()=>{
-    // Fade from black into the actual application after the brand settles.
-    root.classList.add('finished');
-    setTimeout(()=>{
-      root.remove();
-      // Leave the real chat completely visible before fading to the tutorial dim.
-      setTimeout(startTutorial,750);
-    },1200);
-  },1250);
-},2200)}
+function choose(){
+ if(selected||!menuOpen)return;
+ selected=true;menuOpen=false;
+ document.getElementById('avnivo-language-menu').classList.remove('open');
+ pill.setAttribute('aria-expanded','false');
+ lang.textContent='O‘zbek tili';
+ localStorage.setItem('avnivo-onboarding-language','uz');
+ // The first-launch walkthrough always opens the actual Online chat.
+ try{localStorage.setItem('avnivo.ui.mode.v1','online')}catch(e){}
+ document.documentElement.dataset.avnivoMode='online';
+ document.getElementById('mode-online').setAttribute('aria-pressed','true');
+ document.getElementById('mode-offline').setAttribute('aria-pressed','false');
+ pill.classList.add('selected');
+ // Start the brand's descent at the same instant as the pill's departure.
+ const chatBrand=document.querySelector('.center-brand');
+ const introBrand=root.querySelector('.intro-brand');
+ if(chatBrand&&introBrand){
+   const target=chatBrand.getBoundingClientRect();
+   introBrand.style.top=(target.top+target.height/2)+'px';
+ }
+ root.classList.add('brand-to-chat');
+ setTimeout(()=>root.classList.add('departing'),300);
+ // Wait for both motions to finish before revealing the app.
+ setTimeout(()=>{
+   root.classList.add('finished');
+   setTimeout(()=>{
+     root.remove();
+     setTimeout(startTutorial,750);
+   },1200);
+ },2200);
+}
 const dim=document.getElementById('avnivo-tutorial-dim'),spot=document.getElementById('avnivo-tutorial-spot'),label=document.getElementById('avnivo-tutorial-label'),next=document.getElementById('avnivo-tutorial-next'),heading=document.getElementById('avnivo-tutorial-heading'),description=document.getElementById('avnivo-tutorial-description');
 let tutorialStage=-1;
 function spotlight(selector){const source=document.querySelector(selector);if(!source)return;const rect=source.getBoundingClientRect();spot.style.left=rect.left+'px';spot.style.top=rect.top+'px';spot.style.width=rect.width+'px';spot.style.height=rect.height+'px';spot.style.background=getComputedStyle(source).background;spot.style.color=getComputedStyle(source).color;spot.style.border=getComputedStyle(source).border;spot.innerHTML=source.querySelector('svg')?.outerHTML||'';spot.classList.add('active')}
