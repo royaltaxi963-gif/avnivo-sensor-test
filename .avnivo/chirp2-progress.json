@@ -1,0 +1,136 @@
+{
+  "task": "Google Chirp 2 multilingual STT",
+  "repository": "royaltaxi963-gif/avnivo-sensor-test",
+  "branch": "feature/chirp2-multilingual-stt",
+  "base_commit": "dcb69184aae693e9bac536c01be073cb767b8436",
+  "updated_at": "2026-11-15T20:34:58.579261+00:00",
+  "official_language_research": {
+    "status": "complete",
+    "total_chirp2_locales": 117,
+    "regions": [
+      "us-central1",
+      "europe-west4",
+      "asia-southeast1"
+    ],
+    "document": "docs/chirp2-language-support.md",
+    "sources": [
+      "https://cloud.google.com/speech-to-text/v2/docs/chirp_2-model",
+      "https://cloud.google.com/speech-to-text/v2/docs/speech-to-text-supported-languages",
+      "https://cloud.google.com/speech-to-text/v2/docs/quotas",
+      "https://cloud.google.com/speech-to-text/v2/docs/encoding"
+    ],
+    "cross_check": {
+      "method": "Parsed <tr> rows from the official supported-languages page where the model column is chirp or chirp_2",
+      "result": "exact set match: 117 codes, 0 English-name mismatches",
+      "date": "2026-11-15"
+    }
+  },
+  "implementation": {
+    "status": "complete",
+    "backend_registry": "translator-api/chirp2_languages.py",
+    "backend_endpoint": "/api/transcribe-google (registry-driven)",
+    "registry_endpoint": "GET /api/chirp2-languages",
+    "frontend": "avnivo-v11-49-chirp2-multilingual.html",
+    "frontend_selectable_locales": [
+      "uz-UZ",
+      "ru-RU",
+      "en-US",
+      "tr-TR"
+    ],
+    "note": "Adding a language is a registry data change, not a new recognition engine."
+  },
+  "defects_fixed": [
+    {
+      "id": "D1",
+      "summary": "Empty/omitted language form field defaulted to uz-UZ (silent Uzbek substitution)",
+      "fix": "language is now str|None with Form(None) and rejected as 400",
+      "regression_test": "test_missing_language_is_rejected_not_defaulted"
+    },
+    {
+      "id": "D2",
+      "summary": "Backend allowlist hard-coded to four locales",
+      "fix": "centralized 117-locale registry",
+      "regression_test": "test_registry_has_all_official_locales"
+    }
+  ],
+  "tests": {
+    "offline": "48 passed, 1 skipped",
+    "live_remote": "1 passed (4 locales)",
+    "ci": "Translator API offline tests"
+  },
+  "real_api_verification": {
+    "status": "passed (candidate revision)",
+    "base_url": "https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app",
+    "cloud_run_revision": "avnivo-sensor-test-00012-qap (tag: candidate, 0% traffic)",
+    "results": [
+      {
+        "locale": "uz-UZ",
+        "http": 200,
+        "text": "selam buyurun ma'muz tanıştığımıza memnunuz...",
+        "latency_s": 2.335
+      },
+      {
+        "locale": "ru-RU",
+        "http": 200,
+        "text": "Здравствуйте это проверка системы распознавания речи",
+        "latency_s": 1.784
+      },
+      {
+        "locale": "en-US",
+        "http": 200,
+        "text": "hello this is a test of the speech recognition system",
+        "latency_s": 2.609
+      },
+      {
+        "locale": "tr-TR",
+        "http": 200,
+        "text": "merhaba bu hafta sonu sınav sistemi ile ilgili test",
+        "latency_s": 2.088
+      }
+    ],
+    "human_sample_uz": {
+      "source": "Wikimedia Commons Category:Uzbek pronunciation (CC-BY-SA)",
+      "text": "bakteriya keyingi",
+      "expected": "bakteriya, keng, quyosh, hozirgi",
+      "note": "exact match on 'bakteriya'"
+    },
+    "artifact": "docs/chirp2-live-verification.json",
+    "error_cases": {
+      "xx-XX": 400,
+      "ar-AE": 400,
+      "missing_language": 400,
+      "bad_content_type": 415,
+      "empty_audio": 413
+    }
+  },
+  "verified_tests": 47,
+  "blockers": [
+    "Google Cloud Application Default Credentials not available to this sandbox"
+  ],
+  "next_actions": [
+    "Obtain explicit approval + spending limit to promote candidate revision to 100% traffic",
+    "Authorize real-sample verification for the remaining 113 locales (samples + spend)",
+    "Optionally run Android Chrome manual smoke on the deployed candidate"
+  ],
+  "branch_head": "origin/feature/chirp2-multilingual-stt",
+  "commit_note": "base commit is base_commit; the feature branch head is whatever this file is committed on",
+  "pull_request": {
+    "url": "https://github.com/royaltaxi963-gif/avnivo-sensor-test/pull/2",
+    "status": "open",
+    "ci": "Translator API offline tests: success (47 passed)"
+  },
+  "commit_sha": "215a11d2ad90a49a4f8586b8e3636a589596e8b0",
+  "pr": {
+    "number": 2,
+    "state": "OPEN",
+    "url": "https://github.com/royaltaxi963-gif/avnivo-sensor-test/pull/2"
+  },
+  "cloud_run": {
+    "service": "avnivo-sensor-test",
+    "region": "europe-west1",
+    "candidate_revision": "avnivo-sensor-test-00012-qap",
+    "candidate_tag_url": "https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app",
+    "production_traffic_revision": "avnivo-sensor-test-00011-xl4",
+    "promotion": "NOT DONE (requires approval)"
+  }
+}

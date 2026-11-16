@@ -31,4 +31,4 @@ jobs:
       - name: Compile Python
         run: python -m compileall -q translator-api
       - name: Run offline tests (no paid API calls)
-        run: python -m pytest -q translator-api/test_translation_llm.py
+        run: python -m pytest -q translator-api/test_translation_llm.py translator-api/test_chirp2_stt.py
