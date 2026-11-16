@@ -1,0 +1,456 @@
+nohup: ignoring input
+existing evidence: 9 samples, $0.0234 spent
+[af-ZA]
+  PASS http=200 wer=0.1333 lat=3.182s $0.0253
+  PASS http=200 wer=0.1111 lat=2.849s $0.0267
+  PASS http=200 wer=0.0476 lat=3.932s $0.0293
+[am-ET]
+  PASS http=200 wer=0.0833 lat=4.027s $0.0316
+  PASS http=200 wer=0.0769 lat=4.004s $0.0344
+  PASS http=200 wer=0.0833 lat=7.017s $0.0386
+[ar-EG]
+  PASS http=200 wer=0.1111 lat=5.735s $0.0427
+  PASS http=200 wer=0.0625 lat=3.964s $0.0456
+  PASS http=200 wer=0.0 lat=6.256s $0.0486
+[as-IN]
+  PASS http=200 wer=0.0741 lat=5.062s $0.0526
+  PASS http=200 wer=0.2727 lat=4.245s $0.0559
+  PASS http=200 wer=0.5556 lat=4.607s $0.0591
+[ast-ES]
+  PASS http=200 wer=0.1818 lat=3.361s $0.0612
+  PASS http=200 wer=0.0455 lat=4.016s $0.0634
+  PASS http=200 wer=0.0909 lat=3.135s $0.0652
+[az-AZ]
+  PASS http=200 wer=0.0 lat=4.218s $0.0685
+  PASS http=200 wer=0.1579 lat=5.121s $0.0721
+  PASS http=200 wer=0.0294 lat=6.187s $0.0784
+[be-BY]
+  PASS http=200 wer=0.0 lat=4.939s $0.0828
+  PASS http=200 wer=0.0 lat=5.138s $0.0867
+  PASS http=200 wer=0.1212 lat=6.854s $0.0935
+[bg-BG]
+  PASS http=200 wer=0.1333 lat=3.558s $0.0959
+  PASS http=200 wer=0.15 lat=3.763s $0.0984
+  PASS http=200 wer=0.0526 lat=4.165s $0.1013
+[bn-BD]
+  PASS http=200 wer=1.3333 lat=2.225s $0.1018
+[bn-IN]
+  PASS http=200 wer=0.2778 lat=4.421s $0.1053
+  PASS http=200 wer=0.1481 lat=5.375s $0.1099
+  PASS http=200 wer=0.1071 lat=6.007s $0.1153
+[bs-BA]
+  PASS http=200 wer=0.2308 lat=3.975s $0.1183
+  PASS http=200 wer=0.1538 lat=4.189s $0.1214
+  PASS http=200 wer=0.1111 lat=4.083s $0.1241
+[ca-ES]
+  PASS http=200 wer=0.0556 lat=3.123s $0.1258
+  PASS http=200 wer=0.0 lat=3.039s $0.1281
+  PASS http=200 wer=0.1111 lat=3.312s $0.1301
+[ceb-PH]
+  PASS http=200 wer=0.0455 lat=3.643s $0.1326
+  PASS http=200 wer=0.0909 lat=3.424s $0.1350
+  PASS http=200 wer=0.4146 lat=7.084s $0.1434
+[ckb-IQ]
+  PASS http=200 wer=0.1429 lat=3.73s $0.1457
+  PASS http=200 wer=0.0741 lat=4.983s $0.1499
+  PASS http=200 wer=0.2353 lat=4.194s $0.1525
+[cmn-Hans-CN]
+  PASS http=200 wer=0.4255 lat=3.889s $0.1565
+  PASS http=200 wer=0.1053 lat=4.47s $0.1607
+  PASS http=200 wer=0.0 lat=3.869s $0.1638
+[cmn-Hant-TW]
+  PASS http=200 wer=1.0 lat=2.237s $0.1641
+  PASS http=200 wer=1.0 lat=1.942s $0.1643
+  PASS http=200 wer=1.0 lat=1.982s $0.1646
+[cs-CZ]
+  PASS http=200 wer=0.0 lat=4.584s $0.1686
+  PASS http=200 wer=0.0 lat=4.442s $0.1720
+  PASS http=200 wer=0.0435 lat=3.969s $0.1746
+[cy-GB]
+  PASS http=200 wer=0.4 lat=4.979s $0.1795
+  PASS http=200 wer=0.25 lat=5.571s $0.1839
+  PASS http=200 wer=0.2143 lat=5.197s $0.1888
+[da-DK]
+  PASS http=200 wer=0.0 lat=3.005s $0.1902
+  PASS http=200 wer=0.0833 lat=2.829s $0.1916
+  PASS http=200 wer=0.08 lat=4.702s $0.1957
+[de-DE]
+  PASS http=200 wer=0.0 lat=4.175s $0.1987
+  PASS http=200 wer=0.0 lat=5.533s $0.2049
+  PASS http=200 wer=0.08 lat=6.087s $0.2110
+[el-GR]
+  PASS http=200 wer=0.0 lat=4.465s $0.2144
+  PASS http=200 wer=0.05 lat=2.939s $0.2163
+  PASS http=200 wer=0.05 lat=3.564s $0.2185
+[en-AU]
+  PASS http=200 wer=0.0 lat=2.445s $0.2191
+  PASS http=200 wer=0.0 lat=2.268s $0.2197
+  PASS http=200 wer=0.0 lat=2.204s $0.2201
+[en-GB]
+  PASS http=200 wer=0.0 lat=2.144s $0.2207
+  PASS http=200 wer=0.0 lat=2.28s $0.2213
+  PASS http=200 wer=0.0 lat=2.224s $0.2217
+[en-IN]
+  PASS http=200 wer=0.0 lat=2.07s $0.2223
+  PASS http=200 wer=0.0 lat=2.329s $0.2229
+  PASS http=200 wer=0.0 lat=2.113s $0.2233
+[en-US]
+  = cached
+  = cached
+  = cached
+[es-419]
+  PASS http=200 wer=0.0 lat=3.304s $0.2256
+  PASS http=200 wer=0.0 lat=3.108s $0.2274
+  PASS http=200 wer=0.0 lat=5.19s $0.2325
+[es-ES]
+  PASS http=200 wer=0.0 lat=2.042s $0.2329
+  PASS http=200 wer=1.0 lat=2.04s $0.2331
+  PASS http=200 wer=0.0 lat=1.491s $0.2335
+[es-US]
+  PASS http=200 wer=0.0 lat=2.113s $0.2338
+  PASS http=200 wer=1.0 lat=1.914s $0.2341
+  PASS http=200 wer=0.0 lat=2.092s $0.2345
+[et-EE]
+  PASS http=200 wer=0.1111 lat=3.474s $0.2369
+  PASS http=200 wer=0.1304 lat=4.523s $0.2409
+  PASS http=200 wer=0.0667 lat=4.154s $0.2444
+[eu-ES]
+  PASS http=200 wer=1.0 lat=3.21s $0.2455
+[fa-IR]
+  PASS http=200 wer=0.0 lat=5.541s $0.2513
+  PASS http=200 wer=0.3667 lat=4.084s $0.2545
+  PASS http=200 wer=0.0417 lat=5.069s $0.2595
+[ff-SN]
+  PASS http=200 wer=0.65 lat=3.804s $0.2625
+  PASS http=200 wer=0.84 lat=4.308s $0.2663
+  PASS http=200 wer=0.7368 lat=3.46s $0.2687
+[fi-FI]
+  PASS http=200 wer=0.0 lat=4.159s $0.2721
+  PASS http=200 wer=0.0 lat=4.823s $0.2767
+  PASS http=200 wer=0.0 lat=3.854s $0.2792
+[fil-PH]
+  PASS http=200 wer=0.1923 lat=4.736s $0.2834
+  PASS http=200 wer=0.0333 lat=6.087s $0.2902
+  PASS http=200 wer=0.0323 lat=6.462s $0.2959
+[fr-CA]
+  PASS http=200 wer=1.0 lat=1.493s $0.2963
+  PASS http=200 wer=1.0 lat=2.113s $0.2967
+  PASS http=200 wer=0.0 lat=1.981s $0.2971
+[fr-FR]
+  PASS http=200 wer=0.0 lat=2.47s $0.2986
+  PASS http=200 wer=0.1053 lat=3.81s $0.3015
+  PASS http=200 wer=0.0 lat=3.362s $0.3039
+[ga-IE]
+  PASS http=200 wer=0.5185 lat=4.801s $0.3082
+  PASS http=200 wer=0.4348 lat=6.624s $0.3153
+  PASS http=200 wer=0.9333 lat=5.07s $0.3195
+[gl-ES]
+  PASS http=200 wer=0.0 lat=3.629s $0.3221
+  PASS http=200 wer=0.1034 lat=4.27s $0.3257
+  PASS http=200 wer=0.1579 lat=3.423s $0.3281
+[gu-IN]
+  PASS http=200 wer=0.1538 lat=4.421s $0.3313
+  PASS http=200 wer=0.0 lat=4.46s $0.3343
+  PASS http=200 wer=0.2143 lat=3.369s $0.3361
+[ha-NG]
+  PASS http=200 wer=0.2083 lat=4.065s $0.3390
+  PASS http=200 wer=0.2308 lat=3.707s $0.3416
+  PASS http=200 wer=0.0833 lat=6.293s $0.3484
+[hi-IN]
+  PASS http=200 wer=0.087 lat=3.804s $0.3512
+  PASS http=200 wer=0.0 lat=4.032s $0.3539
+  PASS http=200 wer=0.0 lat=3.461s $0.3563
+[hr-HR]
+  PASS http=200 wer=0.0 lat=3.061s $0.3579
+  PASS http=200 wer=0.1667 lat=3.266s $0.3601
+  PASS http=200 wer=0.0 lat=4.45s $0.3637
+[hu-HU]
+  PASS http=200 wer=0.0 lat=4.052s $0.3669
+  PASS http=200 wer=0.0909 lat=4.226s $0.3699
+  PASS http=200 wer=0.1333 lat=3.495s $0.3723
+[hy-AM]
+  PASS http=200 wer=0.1053 lat=4.468s $0.3759
+  PASS http=200 wer=0.0 lat=3.115s $0.3776
+  PASS http=200 wer=0.1 lat=5.616s $0.3809
+[id-ID]
+  PASS http=200 wer=0.0 lat=3.571s $0.3836
+  PASS http=200 wer=0.0 lat=3.339s $0.3854
+  PASS http=200 wer=0.0 lat=2.602s $0.3872
+[ig-NG]
+  PASS http=200 wer=0.5556 lat=3.606s $0.3896
+  PASS http=200 wer=0.7692 lat=4.359s $0.3932
+  PASS http=200 wer=0.9167 lat=7.192s $0.4014
+[is-IS]
+  PASS http=200 wer=0.0526 lat=4.136s $0.4044
+  PASS http=200 wer=0.3125 lat=4.276s $0.4078
+  PASS http=200 wer=0.0667 lat=4.124s $0.4110
+[it-IT]
+  PASS http=200 wer=0.0 lat=3.174s $0.4129
+  PASS http=200 wer=0.0 lat=5.136s $0.4178
+  PASS http=200 wer=0.0 lat=4.277s $0.4210
+[iw-IL]
+  PASS http=200 wer=0.1667 lat=4.852s $0.4251
+  PASS http=200 wer=0.0 lat=3.494s $0.4269
+  PASS http=200 wer=0.0833 lat=3.193s $0.4282
+[ja-JP]
+  PASS http=200 wer=0.0303 lat=4.424s $0.4319
+  PASS http=200 wer=0.0732 lat=4.008s $0.4349
+  PASS http=200 wer=0.1863 lat=6.618s $0.4414
+[jv-ID]
+  PASS http=200 wer=0.2308 lat=3.928s $0.4447
+  PASS http=200 wer=0.1176 lat=3.632s $0.4473
+  PASS http=200 wer=0.2 lat=3.775s $0.4498
+[ka-GE]
+  PASS http=200 wer=0.0625 lat=4.317s $0.4528
+  PASS http=200 wer=0.2632 lat=5.35s $0.4565
+  PASS http=200 wer=0.4167 lat=4.371s $0.4598
+[kam-KE]
+  PASS http=200 wer=0.0455 lat=4.038s $0.4630
+  PASS http=200 wer=0.3158 lat=4.058s $0.4663
+  PASS http=200 wer=0.4211 lat=4.378s $0.4702
+[kea-CV]
+  PASS http=200 wer=0.093 lat=6.431s $0.4770
+  PASS http=200 wer=0.0 lat=3.186s $0.4789
+  PASS http=200 wer=0.1053 lat=4.049s $0.4820
+[kk-KZ]
+  PASS http=200 wer=0.0 lat=4.787s $0.4860
+  PASS http=200 wer=0.0833 lat=3.937s $0.4889
+  PASS http=200 wer=0.1538 lat=4.068s $0.4931
+[km-KH]
+  PASS http=200 wer=0.0 lat=4.273s $0.4957
+  PASS http=200 wer=0.0451 lat=6.705s $0.5003
+  PASS http=200 wer=0.024 lat=5.46s $0.5045
+[kn-IN]
+  PASS http=200 wer=0.0 lat=4.317s $0.5076
+  PASS http=200 wer=0.0556 lat=5.016s $0.5105
+  PASS http=200 wer=0.15 lat=4.424s $0.5143
+[ko-KR]
+  PASS http=200 wer=0.1875 lat=4.441s $0.5182
+  PASS http=200 wer=0.1875 lat=4.343s $0.5225
+  PASS http=200 wer=0.0476 lat=5.139s $0.5276
+[ky-KG]
+  PASS http=200 wer=0.125 lat=4.616s $0.5318
+  PASS http=200 wer=0.1176 lat=6.221s $0.5376
+  PASS http=200 wer=0.1333 lat=3.655s $0.5399
+[lb-LU]
+  PASS http=200 wer=0.2 lat=3.704s $0.5425
+  PASS http=200 wer=0.3846 lat=2.678s $0.5443
+  PASS http=200 wer=0.1852 lat=6.195s $0.5504
+[lg-UG]
+  PASS http=200 wer=0.4545 lat=4.171s $0.5538
+  PASS http=200 wer=0.6923 lat=4.23s $0.5572
+  PASS http=200 wer=0.4375 lat=4.297s $0.5607
+[ln-CD]
+  PASS http=200 wer=0.0 lat=4.058s $0.5641
+  PASS http=200 wer=0.1143 lat=6.83s $0.5719
+  PASS http=200 wer=0.1724 lat=5.393s $0.5774
+[lo-LA]
+  PASS http=200 wer=0.1263 lat=5.943s $0.5817
+  PASS http=200 wer=0.4054 lat=3.793s $0.5837
+  PASS http=200 wer=0.0541 lat=3.948s $0.5863
+[lt-LT]
+  PASS http=200 wer=0.1 lat=3.627s $0.5889
+  PASS http=200 wer=0.0 lat=4.208s $0.5923
+  PASS http=200 wer=0.1071 lat=4.49s $0.5961
+[luo-KE]
+  PASS http=200 wer=0.4839 lat=5.033s $0.6009
+  PASS http=200 wer=0.3 lat=2.876s $0.6023
+  PASS http=200 wer=0.1471 lat=4.782s $0.6072
+[lv-LV]
+  PASS http=200 wer=0.0 lat=3.311s $0.6091
+  PASS http=200 wer=0.0 lat=3.467s $0.6122
+  PASS http=200 wer=0.1765 lat=3.928s $0.6149
+[mi-NZ]
+  PASS http=200 wer=0.2581 lat=5.829s $0.6208
+  PASS http=200 wer=0.2381 lat=3.964s $0.6239
+  PASS http=200 wer=0.0278 lat=5.414s $0.6285
+[mk-MK]
+  PASS http=200 wer=0.0 lat=3.335s $0.6306
+  PASS http=200 wer=0.0 lat=3.957s $0.6336
+  PASS http=200 wer=0.0 lat=4.099s $0.6366
+[ml-IN]
+  PASS http=200 wer=0.0909 lat=4.986s $0.6412
+  PASS http=200 wer=0.0476 lat=5.689s $0.6467
+  PASS http=200 wer=0.2941 lat=4.951s $0.6506
+[mn-MN]
+  PASS http=200 wer=0.1 lat=3.269s $0.6526
+  PASS http=200 wer=0.2857 lat=4.683s $0.6554
+  PASS http=200 wer=0.0 lat=3.194s $0.6570
+[mr-IN]
+  PASS http=200 wer=0.3333 lat=4.843s $0.6606
+  PASS http=200 wer=0.0 lat=4.284s $0.6636
+  PASS http=200 wer=0.1 lat=4.28s $0.6667
+[ms-MY]
+  PASS http=200 wer=0.0357 lat=4.421s $0.6705
+  PASS http=200 wer=0.0 lat=3.76s $0.6730
+  PASS http=200 wer=0.0 lat=3.861s $0.6759
+[mt-MT]
+  PASS http=200 wer=0.0 lat=3.954s $0.6787
+  PASS http=200 wer=0.0556 lat=5.067s $0.6831
+  PASS http=200 wer=0.2895 lat=7.616s $0.6922
+[my-MM]
+  PASS http=200 wer=0.0241 lat=4.27s $0.6952
+  PASS http=200 wer=0.2828 lat=3.922s $0.6976
+  PASS http=200 wer=0.1086 lat=5.424s $0.7012
+[ne-NP]
+  PASS http=200 wer=0.0 lat=3.48s $0.7033
+  PASS http=200 wer=0.4211 lat=4.314s $0.7068
+  PASS http=200 wer=0.28 lat=4.768s $0.7112
+[nl-NL]
+  PASS http=200 wer=0.0 lat=3.273s $0.7131
+  PASS http=200 wer=0.0588 lat=2.844s $0.7151
+  PASS http=200 wer=0.0588 lat=3.13s $0.7169
+[no-NO]
+[nso-ZA]
+  PASS http=200 wer=0.0 lat=3.817s $0.7198
+  PASS http=200 wer=0.25 lat=4.933s $0.7241
+  PASS http=200 wer=0.3433 lat=10.646s $0.7367
+[ny-MW]
+  PASS http=200 wer=0.1111 lat=4.843s $0.7413
+  PASS http=200 wer=0.1111 lat=4.07s $0.7443
+  PASS http=200 wer=0.2667 lat=4.201s $0.7470
+[oc-FR]
+  PASS http=200 wer=0.3871 lat=4.997s $0.7517
+  PASS http=200 wer=0.2083 lat=4.865s $0.7559
+  PASS http=200 wer=0.9167 lat=2.868s $0.7581
+[om-ET]
+  PASS http=200 wer=0.5714 lat=3.286s $0.7598
+  PASS http=200 wer=0.7143 lat=2.693s $0.7610
+  PASS http=200 wer=0.4167 lat=5.214s $0.7649
+[or-IN]
+  PASS http=200 wer=0.0909 lat=3.928s $0.7672
+  PASS http=200 wer=0.3636 lat=3.832s $0.7693
+  PASS http=200 wer=0.0476 lat=5.513s $0.7734
+[pa-Guru-IN]
+  PASS http=200 wer=0.1111 lat=3.245s $0.7757
+  PASS http=200 wer=0.037 lat=4.101s $0.7794
+  PASS http=200 wer=0.0588 lat=5.983s $0.7847
+[pl-PL]
+  PASS http=200 wer=0.1875 lat=3.311s $0.7867
+  PASS http=200 wer=0.1364 lat=4.785s $0.7907
+  PASS http=200 wer=0.1739 lat=4.027s $0.7936
+[ps-AF]
+  PASS http=200 wer=0.4516 lat=4.89s $0.7976
+  PASS http=200 wer=0.2353 lat=3.559s $0.7999
+  PASS http=200 wer=0.625 lat=3.991s $0.8024
+[pt-BR]
+  PASS http=200 wer=0.0286 lat=5.816s $0.8078
+  PASS http=200 wer=0.0 lat=4.257s $0.8112
+  PASS http=200 wer=0.0645 lat=4.374s $0.8156
+[pt-PT]
+  PASS http=200 wer=0.0 lat=2.002s $0.8159
+  PASS http=200 wer=0.0 lat=2.117s $0.8163
+  PASS http=200 wer=1.0 lat=2.04s $0.8166
+[ro-RO]
+  PASS http=200 wer=0.1 lat=2.836s $0.8179
+  PASS http=200 wer=0.0 lat=5.172s $0.8226
+  PASS http=200 wer=0.0435 lat=4.019s $0.8265
+[ru-RU]
+  = cached
+  = cached
+  = cached
+[rup-BG]
+  PASS http=200 wer=1.0 lat=2.086s $0.8268
+  PASS http=200 wer=2.0 lat=2.149s $0.8272
+  PASS http=200 wer=1.0 lat=2.264s $0.8276
+[sd-IN]
+  PASS http=200 wer=0.2609 lat=3.486s $0.8298
+  PASS http=200 wer=1.0 lat=2.728s $0.8309
+  PASS http=200 wer=0.1053 lat=4.936s $0.8352
+[si-LK]
+  PASS http=200 wer=1.2 lat=2.938s $0.8363
+[sk-SK]
+  PASS http=200 wer=0.0 lat=3.536s $0.8388
+  PASS http=200 wer=0.0909 lat=4.354s $0.8425
+  PASS http=200 wer=0.0 lat=3.687s $0.8450
+[sl-SI]
+  PASS http=200 wer=0.0 lat=3.137s $0.8470
+  PASS http=200 wer=0.1538 lat=2.914s $0.8492
+  PASS http=200 wer=0.1538 lat=2.695s $0.8512
+[sn-ZW]
+  PASS http=200 wer=0.2143 lat=3.683s $0.8535
+  PASS http=200 wer=0.3 lat=2.893s $0.8557
+  PASS http=200 wer=0.0769 lat=4.133s $0.8589
+[so-SO]
+  PASS http=200 wer=0.2632 lat=5.687s $0.8642
+  PASS http=200 wer=0.4 lat=4.442s $0.8679
+  PASS http=200 wer=0.3077 lat=3.315s $0.8701
+[sq-AL]
+  PASS http=200 wer=0.4545 lat=2.579s $0.8712
+[sr-RS]
+  PASS http=200 wer=0.0 lat=3.925s $0.8742
+  PASS http=200 wer=0.0 lat=3.877s $0.8768
+  PASS http=200 wer=0.0385 lat=4.676s $0.8809
+[su-ID]
+  PASS http=200 wer=1.1667 lat=2.511s $0.8818
+[sv-SE]
+  PASS http=200 wer=0.2 lat=3.583s $0.8840
+  PASS http=200 wer=0.0465 lat=5.864s $0.8895
+  PASS http=200 wer=0.0952 lat=3.658s $0.8917
+[sw]
+  PASS http=200 wer=0.25 lat=2.611s $0.8927
+[sw-KE]
+  PASS http=200 wer=0.3529 lat=3.773s $0.8963
+  PASS http=200 wer=0.0 lat=4.276s $0.9004
+  PASS http=200 wer=0.05 lat=4.256s $0.9037
+[ta-IN]
+  PASS http=200 wer=0.1154 lat=4.547s $0.9078
+  PASS http=200 wer=0.0455 lat=5.053s $0.9123
+  PASS http=200 wer=0.1429 lat=6.875s $0.9195
+[te-IN]
+  PASS http=200 wer=0.1905 lat=9.032s $0.9255
+  PASS http=200 wer=0.1818 lat=4.676s $0.9282
+  PASS http=200 wer=0.0 lat=3.428s $0.9309
+[tg-TJ]
+  PASS http=200 wer=0.0 lat=4.747s $0.9350
+  PASS http=200 wer=0.0909 lat=4.451s $0.9383
+  PASS http=200 wer=0.1364 lat=4.292s $0.9417
+[th-TH]
+  PASS http=200 wer=0.0072 lat=3.528s $0.9446
+  PASS http=200 wer=0.1216 lat=6.603s $0.9518
+  PASS http=200 wer=0.0833 lat=4.003s $0.9546
+[tr-TR]
+  PASS http=200 wer=0.0 lat=3.572s $0.9568
+  PASS http=200 wer=0.0 lat=4.527s $0.9601
+  PASS http=200 wer=0.0714 lat=2.949s $0.9623
+[uk-UA]
+  PASS http=200 wer=0.0 lat=2.956s $0.9642
+  PASS http=200 wer=0.0 lat=2.909s $0.9657
+  PASS http=200 wer=0.0 lat=3.648s $0.9683
+[umb-AO]
+  PASS http=200 wer=0.5 lat=4.955s $0.9733
+  PASS http=200 wer=0.5 lat=4.247s $0.9766
+  PASS http=200 wer=0.25 lat=8.588s $0.9877
+[ur-PK]
+  PASS http=200 wer=0.1379 lat=3.784s $0.9903
+  PASS http=200 wer=0.1212 lat=4.306s $0.9940
+  PASS http=200 wer=0.0488 lat=4.306s $0.9977
+[uz-UZ]
+  = cached
+  = cached
+  = cached
+[vi-VN]
+  PASS http=200 wer=0.0 lat=3.657s $1.0004
+  PASS http=200 wer=0.0 lat=3.294s $1.0026
+  PASS http=200 wer=0.0 lat=4.584s $1.0067
+[wo-SN]
+  PASS http=200 wer=0.5 lat=4.971s $1.0118
+  PASS http=200 wer=0.6111 lat=5.365s $1.0173
+  PASS http=200 wer=0.25 lat=4.759s $1.0217
+[xh-ZA]
+  PASS http=200 wer=0.2857 lat=5.033s $1.0270
+  PASS http=200 wer=0.3333 lat=5.486s $1.0320
+  PASS http=200 wer=0.3333 lat=5.11s $1.0357
+[yo-NG]
+  PASS http=200 wer=0.4211 lat=5.221s $1.0403
+  PASS http=200 wer=1.0 lat=5.034s $1.0460
+  PASS http=200 wer=0.4074 lat=4.855s $1.0494
+[yue-Hant-HK]
+  PASS http=200 wer=0.06 lat=3.959s $1.0535
+  PASS http=200 wer=0.7059 lat=4.07s $1.0565
+  PASS http=200 wer=0.0784 lat=4.426s $1.0600
+[zu-ZA]
+  PASS http=200 wer=0.5455 lat=4.014s $1.0627
+  PASS http=200 wer=0.2727 lat=6.077s $1.0675
+  PASS http=200 wer=0.375 lat=3.11s $1.0695
+TOTAL spend $1.0695 of $30.00

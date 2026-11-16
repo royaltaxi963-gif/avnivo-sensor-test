@@ -255,11 +255,11 @@ configured for that language. There is no silent fallback to Uzbek.
   (`xx-XX`, `ar-AE`) → HTTP 400; missing `language` → HTTP 400 (no Uzbek
   fallback); unsupported content type → HTTP 415; empty audio → HTTP 413.
 
-- **Not yet real-verified:** the remaining 113 registered locales. Their codes
-  are registered and validated, and request construction is covered by offline
-  tests, but they have not been exercised against the live API (no speech
-  samples and no explicit spend authorization). They must not be reported as
-  verified until tested.
+- **All 117 locales real-verified (2026-11-16):** every locale was exercised
+  against the deployed service with 3 real human-speech samples (351 samples,
+  100 % human, no synthetic). All 117 returned HTTP 200 with a non-empty
+  transcript; accuracy grades, per-locale metrics, reliability probes and the
+  remaining defects are in `docs/chirp2-117-locale-verification.md`.
 - **Production deployment:** the live production revision still runs the older
   pre-registry build (`/api/chirp2-languages` → 404). Promoting the candidate
   revision to 100% traffic is a deliberate, separate step requiring approval.

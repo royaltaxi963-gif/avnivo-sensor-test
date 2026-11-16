@@ -1,4 +1,12 @@
-"""Static UI/registry contract checks; no paid API calls."""
+"""Static UI/registry contract checks; no paid API calls.
+
+These assert the *current* speech-picker implementation. The earlier tests
+pinned selectors (``id='avnivoChirp2Locale'``, ``renderSpeechLocales``,
+``localeKey``) that the modal picker replaced, so they failed on every run and
+were silently excluded from CI — which is exactly how a contract test stops
+protecting anything. Each assertion below names a string that exists in the
+shipped file and that would only disappear if the contract it guards broke.
+"""
 from pathlib import Path
 import re
 
@@ -18,16 +26,24 @@ def test_all_chirp2_locales_are_present_in_ui_matrix():
 
 
 def test_speech_picker_uses_selected_locale_without_uzbek_fallback():
+    """The picker must send the selected BCP-47 locale, never a fixed fallback."""
     source = HTML.read_text(encoding="utf-8")
-    assert "id='avnivoChirp2Locale'" in source
-    assert "localeSearch.addEventListener('input',renderSpeechLocales)" in source
-    assert "const locale=selectedLocale;" in source
+    # The searchable modal picker that replaced the native <select> UI.
+    assert "avnivo-language-options" in source
+    assert "avnivo-language-search" in source
+    # The chosen option drives the request language field directly.
     assert "form.append('language',locale)" in source
-    assert "localStorage.setItem(localeKey,selectedLocale)" in source
+    # The resolver returns the selected locale and rejects anything unsupported.
+    assert "function chirp2LocaleFor(baseCode)" in source
+    assert "const locale=chirp2LocaleFor(language);" in source
+    # No silent Uzbek substitution: an unsupported language reports instead.
+    assert "Bu til uchun Google Chirp 2 ovoz tanish hali sozlanmagan" in source
 
 
 def test_translation_selector_remains_independent():
+    """The translation panels keep their own four base codes and stay separate."""
     source = HTML.read_text(encoding="utf-8")
     assert "const supported=Object.keys(native);" in source
     assert "window.avnivoOnlineLanguageForSpeaker" in source
-    assert "Bu tanlov faqat ovozni matnga aylantiradi" in source
+    # The four translation base codes map onto verified Chirp 2 locales.
+    assert "CHIRP2_BASE_TO_LOCALE=Object.freeze({uz:'uz-UZ',ru:'ru-RU',en:'en-US',tr:'tr-TR'})" in source

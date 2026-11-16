@@ -1,0 +1,149 @@
+[
+ {
+  "probe": "unsupported_locale_xx",
+  "request": {
+   "locale": "xx-XX",
+   "ip": "198.19.0.0"
+  },
+  "observed": {
+   "http_status": 400,
+   "body": "{\"detail\":\"Unsupported Chirp 2 language\"}",
+   "latency_seconds": 0.142
+  }
+ },
+ {
+  "probe": "unsupported_locale_ar-AE",
+  "request": {
+   "locale": "ar-AE",
+   "ip": "198.19.0.1"
+  },
+  "observed": {
+   "http_status": 400,
+   "body": "{\"detail\":\"Unsupported Chirp 2 language\"}",
+   "latency_seconds": 0.636
+  }
+ },
+ {
+  "probe": "base_code_not_locale",
+  "request": {
+   "locale": "uz",
+   "ip": "198.19.0.2"
+  },
+  "observed": {
+   "http_status": 400,
+   "body": "{\"detail\":\"Unsupported Chirp 2 language\"}",
+   "latency_seconds": 0.649
+  }
+ },
+ {
+  "probe": "missing_language_field",
+  "request": {
+   "locale": null,
+   "ip": "198.19.0.3"
+  },
+  "observed": {
+   "http_status": 400,
+   "body": "{\"detail\":\"Unsupported Chirp 2 language\"}",
+   "latency_seconds": 0.662
+  }
+ },
+ {
+  "probe": "wrong_content_type",
+  "request": {
+   "content_type": "text/plain",
+   "filename": "s.txt",
+   "ip": "198.19.0.4"
+  },
+  "observed": {
+   "http_status": 415,
+   "body": "{\"detail\":\"Unsupported audio format\"}",
+   "latency_seconds": 0.128
+  }
+ },
+ {
+  "probe": "empty_audio",
+  "request": {
+   "blob": "<0 bytes>",
+   "ip": "198.19.0.5"
+  },
+  "observed": {
+   "http_status": 413,
+   "body": "{\"detail\":\"Invalid audio size\"}",
+   "latency_seconds": 0.676
+  }
+ },
+ {
+  "probe": "oversized_audio",
+  "request": {
+   "blob": "<10485761 bytes>",
+   "ip": "198.19.0.6"
+  },
+  "observed": {
+   "http_status": 413,
+   "body": "{\"detail\":\"Invalid audio size\"}",
+   "latency_seconds": 1.813
+  }
+ },
+ {
+  "probe": "cors_disallowed_origin",
+  "request": {
+   "origin": "https://evil.example",
+   "ip": "198.19.0.7"
+  },
+  "observed": {
+   "http_status": 403,
+   "body": "{\"detail\":\"Origin not allowed\"}",
+   "latency_seconds": 0.637
+  }
+ },
+ {
+  "probe": "cors_allowed_origin",
+  "request": {
+   "origin": "https://royaltaxi963-gif.github.io",
+   "blob": "<64000 bytes>",
+   "ip": "198.19.0.8"
+  },
+  "observed": {
+   "http_status": 502,
+   "body": "{\"detail\":\"Google Speech transcription failed\"}",
+   "latency_seconds": 1.96
+  }
+ },
+ {
+  "probe": "garbage_bytes_as_wav",
+  "request": {
+   "blob": "<8192 bytes>",
+   "content_type": "audio/wav",
+   "ip": "198.19.0.9"
+  },
+  "observed": {
+   "http_status": 502,
+   "body": "{\"detail\":\"Google Speech transcription failed\"}",
+   "latency_seconds": 1.483
+  }
+ },
+ {
+  "probe": "silent_audio_empty_result",
+  "request": {
+   "blob": "<64000 bytes>",
+   "ip": "198.19.0.10"
+  },
+  "observed": {
+   "http_status": 502,
+   "body": "{\"detail\":\"Google Speech transcription failed\"}",
+   "latency_seconds": 1.828
+  }
+ },
+ {
+  "probe": "unreachable_host",
+  "request": {
+   "base": "https://avnivo-does-not-exist.invalid",
+   "ip": "198.19.0.11"
+  },
+  "observed": {
+   "http_status": 0,
+   "body": "{\"error\": \"URLError: <urlopen error [Errno -2] Name or service not known>\"}",
+   "latency_seconds": 0.15
+  }
+ }
+]

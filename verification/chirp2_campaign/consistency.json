@@ -1,0 +1,18 @@
+{
+ "ui_count": 117,
+ "ui_unique": 117,
+ "registry_count": 117,
+ "registry_unique": 117,
+ "live_count": 117,
+ "live_unique": 117,
+ "ui_equals_registry": true,
+ "ui_equals_live": true,
+ "registry_equals_live": true,
+ "ui_minus_registry": [],
+ "registry_minus_ui": [],
+ "live_minus_ui": [],
+ "ui_minus_live": [],
+ "live_model": "chirp_2",
+ "live_region": "us-central1",
+ "live_configured": null
+}
