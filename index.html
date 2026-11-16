@@ -365,7 +365,7 @@ settingsOverlay.addEventListener('click',()=>setSettingsOpen(false));
 
 /* Offline module UI: only installer-verified states may show success. */
 const offlineModuleCatalog=[
- {id:'uz-stt',name:'O‘zbekcha ovoz tanish',desc:'O‘zbekcha nutqni tushunib, aytilgan so‘zlarni matnga aylantiradi.',icon:'mic',bytes:591649160,sizeNote:'Model fayli: 591,6 MB · qo‘shimcha fayllar alohida'},
+ {id:'uz-stt',serverModelId:'uzbek-stt',name:'O‘zbekcha ovoz tanish',desc:'O‘zbekcha nutqni tushunib, aytilgan so‘zlarni matnga aylantiradi.',icon:'mic',bytes:591649160,sizeNote:'Model fayli: 591,6 MB · qo‘shimcha fayllar alohida'},
  {id:'multilingual-stt',name:'Ko‘p tilli ovoz tanish',desc:'Turli tillardagi nutqni matnga aylantiradi. 99 til sifati hali tasdiqlanmagan.',icon:'languages',bytes:251875316,sizeNote:'Model: 251,9 MB · qo‘shimcha runtime alohida'},
  {id:'offline-translate',name:'Internetsiz tarjima',desc:'Matnlarni internetga ulanmasdan boshqa tilga tarjima qilishga yordam beradi.',icon:'translate',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'},
  {id:'offline-tts',name:'Matnni ovozli o‘qish',desc:'Yozilgan matn va tarjimalarni internetsiz ovoz chiqarib o‘qiydi.',icon:'speaker',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'}
@@ -425,6 +425,15 @@ for(const module of offlineModuleCatalog){
  btn.addEventListener('click',()=>{
   if(document.documentElement.dataset.avnivoMode!=='offline'||offlineState.get(module.id)==='ready')return;
   btn.classList.remove('is-tapped');void btn.offsetWidth;btn.classList.add('is-tapped');
+  if(module.serverModelId){
+   offlineNotice.textContent='Model uchun xavfsiz yuklash ruxsati tekshirilmoqda…';
+   btn.disabled=true;
+   fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/offline-models/'+encodeURIComponent(module.serverModelId)+'/download-ticket',{cache:'no-store'})
+    .then(async response=>{if(!response.ok)throw Error('Server '+response.status);const ticket=await response.json();if(ticket.model_id!==module.serverModelId||!Array.isArray(ticket.files)||ticket.files.length!==2||ticket.files.some(file=>!/^https:\/\//.test(file.url)||!Number.isSafeInteger(file.bytes)||file.bytes<=0||!(/^[a-f0-9]{64}$/.test(file.sha256))))throw Error('Model manifesti noto‘g‘ri');offlineNotice.textContent='Xavfsiz yuklash ruxsati olindi. Qurilmaga saqlash va SHA-256 tekshiruvi ulanmaguncha yuklash boshlanmaydi.';})
+    .catch(err=>{offlineNotice.textContent='Yuklash ruxsati olinmadi: '+err.message+'. Model yuklanmadi.';})
+    .finally(()=>{btn.disabled=false});
+   return;
+  }
   offlineNotice.textContent=module.name+': yuklash manbasi hali ulanmagan. Yuklash boshlanmadi.';
  });
  btn.addEventListener('animationend',()=>btn.classList.remove('is-tapped'));
