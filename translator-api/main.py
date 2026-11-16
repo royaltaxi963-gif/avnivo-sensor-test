@@ -29,7 +29,7 @@ from chirp2_languages import (
 
 MODEL = "whisper-large-v3"
 GROQ_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
-ALLOWED_ORIGINS = {"https://royaltaxi963-gif.github.io", "http://localhost:3000", "http://localhost:8080", "null"}
+ALLOWED_ORIGINS = {"https://royaltaxi963-gif.github.io", "https://raw.githack.com", "https://rawcdn.githack.com", "http://localhost:3000", "http://localhost:8080", "null"}
 GOOGLE_PROJECT = "project-6bcf7fe6-cb55-49b7-9f4"
 MAX_AUDIO = CHIRP2_SYNC_MAX_BYTES
 RATE_LIMIT = 12
