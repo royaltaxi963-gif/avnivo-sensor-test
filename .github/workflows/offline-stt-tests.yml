@@ -26,4 +26,4 @@ jobs:
       # dependency install is needed. The suite covers sha256, the model spec,
       # registry consistency, microphone routing and the model manager.
       - name: Run offline STT unit tests
-        run: node --test offline-stt/tests/
+        run: node --test offline-stt/tests/offline-stt.test.mjs
