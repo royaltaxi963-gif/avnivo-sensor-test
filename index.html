@@ -263,7 +263,8 @@ function renderOnlineLanguages(){
   item.append(title,note);item.setAttribute('aria-selected',String(onlineChoice[longPressSide]===locale));
   item.addEventListener('click',()=>{
    if(!onlineLanguagesByCode.has(locale))return;
-   onlineChoice[longPressSide]=locale;
+   if(onlineChoice[longPressSide]!==locale){cancelOnlineRecording();if(active)stopVoice()}
+    onlineChoice[longPressSide]=locale;
    updateOnlineLanguageLabels();closeOnlineLanguages();
   });
   languageResults.append(item);
@@ -632,14 +633,16 @@ function beginOnlineRecording(stream){
   const recorder=new MediaRecorder(stream,{mimeType:mime,audioBitsPerSecond:48000});
   const session=++onlineSession,locale=onlineLocale();
   onlineChunks=[];onlineRecorder=recorder;
+   const maxRecording=setTimeout(()=>{if(session===onlineSession&&recorder.state==='recording')stopVoice()},30000);
   recorder.ondataavailable=e=>{if(e.data.size)onlineChunks.push(e.data)};
-  recorder.onerror=()=>{if(session===onlineSession)onlineState('error')};
+  recorder.onerror=()=>{clearTimeout(maxRecording);if(session===onlineSession)onlineState('error')};
   recorder.onstop=()=>{
-   const parts=onlineChunks.splice(0);
+   clearTimeout(maxRecording);
+    const parts=onlineChunks.splice(0);
    if(onlineRecorder===recorder)onlineRecorder=null;
    if(session!==onlineSession)return;
    const blob=new Blob(parts,{type:recorder.mimeType.split(';')[0]});
-   if(blob.size<500){onlineState('error');return}
+   if(blob.size<500||blob.size>10*1024*1024){onlineState('error');return}
    sendOnlineAudio(blob,locale,session);
   };
   recorder.start();
@@ -651,7 +654,9 @@ async function sendOnlineAudio(blob,locale,session){
  if(document.documentElement.dataset.avnivoMode!=='online')return;
  if(onlineAbort)onlineAbort.abort();
  const ctrl=new AbortController();onlineAbort=ctrl;
- const form=new FormData();form.append('audio',blob,'speech.webm');form.append('language',locale);
+ if(!onlineLanguagesByCode.has(locale)){onlineState('error');return}
+  const extension=blob.type==='audio/ogg'?'ogg':'webm';
+  const form=new FormData();form.append('audio',blob,'speech.'+extension);form.append('language',locale);
  onlineState('loading');
  const timer=setTimeout(()=>ctrl.abort(),45000);
  try{
