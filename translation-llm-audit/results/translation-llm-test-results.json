@@ -31437,29 +31437,6 @@
    "class": "A",
    "item": "c01",
    "category": "greeting",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "Hello, how are you?",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c01",
-   "category": "greeting",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -31474,25 +31451,6 @@
     "length_ratio": 0.895
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c01",
-   "category": "greeting",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -31521,29 +31479,6 @@
    "class": "A",
    "item": "c02",
    "category": "daily_conversation",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "The weather is very hot today.",
-   "translated": "",
-   "latency_s": 0.046,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c02",
-   "category": "daily_conversation",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -31558,25 +31493,6 @@
     "length_ratio": 0.81
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c02",
-   "category": "daily_conversation",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -31605,29 +31521,6 @@
    "class": "A",
    "item": "c03",
    "category": "question_answer",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "Where do you live?",
-   "translated": "",
-   "latency_s": 0.055,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c03",
-   "category": "question_answer",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -31642,25 +31535,6 @@
     "length_ratio": 1.0
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c03",
-   "category": "question_answer",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -31689,29 +31563,6 @@
    "class": "A",
    "item": "c04",
    "category": "workplace",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "The meeting starts at ten o'clock.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c04",
-   "category": "workplace",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -31726,25 +31577,6 @@
     "length_ratio": 0.941
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c04",
-   "category": "workplace",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -31773,29 +31605,6 @@
    "class": "A",
    "item": "c05",
    "category": "travel_transport",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "The train departs at eight in the morning.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c05",
-   "category": "travel_transport",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -31810,25 +31619,6 @@
     "length_ratio": 0.927
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c05",
-   "category": "travel_transport",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -31857,29 +31647,6 @@
    "class": "A",
    "item": "c06",
    "category": "shopping",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "This shirt is very expensive.",
-   "translated": "",
-   "latency_s": 0.046,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c06",
-   "category": "shopping",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -31894,25 +31661,6 @@
     "length_ratio": 0.793
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c06",
-   "category": "shopping",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -31941,29 +31689,6 @@
    "class": "A",
    "item": "c07",
    "category": "numbers_money",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "I have one hundred and fifty thousand soum.",
-   "translated": "",
-   "latency_s": 0.045,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c07",
-   "category": "numbers_money",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -31978,25 +31703,6 @@
     "length_ratio": 1.095
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c07",
-   "category": "numbers_money",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32025,29 +31731,6 @@
    "class": "A",
    "item": "c08",
    "category": "date_time",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "The appointment is on March 5, 2026.",
-   "translated": "",
-   "latency_s": 0.045,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c08",
-   "category": "date_time",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32062,25 +31745,6 @@
     "length_ratio": 1.312
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c08",
-   "category": "date_time",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32109,29 +31773,6 @@
    "class": "A",
    "item": "c09",
    "category": "negation",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "I do not know this place.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c09",
-   "category": "negation",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32146,25 +31787,6 @@
     "length_ratio": 0.958
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c09",
-   "category": "negation",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32193,29 +31815,6 @@
    "class": "A",
    "item": "c10",
    "category": "commands_requests",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "Please close the door.",
-   "translated": "",
-   "latency_s": 0.044,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c10",
-   "category": "commands_requests",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32230,25 +31829,6 @@
     "length_ratio": 1.091
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c10",
-   "category": "commands_requests",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32277,29 +31857,6 @@
    "class": "A",
    "item": "c11",
    "category": "complex_grammar",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "If I have time, I will call you.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c11",
-   "category": "complex_grammar",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32314,25 +31871,6 @@
     "length_ratio": 1.406
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c11",
-   "category": "complex_grammar",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32361,29 +31899,6 @@
    "class": "A",
    "item": "c12",
    "category": "ambiguous_words",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "This is a very interesting book.",
-   "translated": "",
-   "latency_s": 0.045,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c12",
-   "category": "ambiguous_words",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32398,25 +31913,6 @@
     "length_ratio": 0.75
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c12",
-   "category": "ambiguous_words",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32445,29 +31941,6 @@
    "class": "A",
    "item": "c13",
    "category": "context_idioms",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "Do not take it to heart.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c13",
-   "category": "context_idioms",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32482,25 +31955,6 @@
     "length_ratio": 1.348
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c13",
-   "category": "context_idioms",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32529,29 +31983,6 @@
    "class": "A",
    "item": "c14",
    "category": "long_text",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "Tomorrow we will start a new project and in the evening we will discuss the results.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c14",
-   "category": "long_text",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32566,25 +31997,6 @@
     "length_ratio": 1.039
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c14",
-   "category": "long_text",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32613,29 +32025,6 @@
    "class": "A",
    "item": "c15",
    "category": "names_places",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "Alisher Navoi lived in Bukhara.",
-   "translated": "",
-   "latency_s": 0.041,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c15",
-   "category": "names_places",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32650,25 +32039,6 @@
     "length_ratio": 1.065
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c15",
-   "category": "names_places",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32697,29 +32067,6 @@
    "class": "A",
    "item": "c16",
    "category": "formal_informal",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "Dear Mr. Director, thank you for the letter.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c16",
-   "category": "formal_informal",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32734,25 +32081,6 @@
     "length_ratio": 1.114
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c16",
-   "category": "formal_informal",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32781,29 +32109,6 @@
    "class": "A",
    "item": "c17",
    "category": "spelling_punctuation",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "Why did you not come?",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c17",
-   "category": "spelling_punctuation",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32818,25 +32123,6 @@
     "length_ratio": 0.85
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c17",
-   "category": "spelling_punctuation",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32865,29 +32151,6 @@
    "class": "A",
    "item": "c18",
    "category": "writing_systems",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "I speak the Uzbek language.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c18",
-   "category": "writing_systems",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32902,25 +32165,6 @@
     "length_ratio": 2.143
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c18",
-   "category": "writing_systems",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -32949,29 +32193,6 @@
    "class": "A",
    "item": "c19",
    "category": "special_unicode",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "This price increased by 25%.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c19",
-   "category": "special_unicode",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -32986,25 +32207,6 @@
     "length_ratio": 0.857
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c19",
-   "category": "special_unicode",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -33033,29 +32235,6 @@
    "class": "A",
    "item": "c20",
    "category": "stability_repeat",
-   "direction": "en2X",
-   "source": "en",
-   "target": "en",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: en\"\n          },\n          {\n            \"field",
-   "source_text": "Thank you, I wish you a good day.",
-   "translated": "",
-   "latency_s": 0.044,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c20",
-   "category": "stability_repeat",
    "direction": "X2uz",
    "source": "en",
    "target": "uz",
@@ -33070,25 +32249,6 @@
     "length_ratio": 1.03
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "en-IN",
-   "llm": "en",
-   "class": "A",
-   "item": "c20",
-   "category": "stability_repeat",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "en-IN",
@@ -67580,29 +66740,6 @@
    "class": "A",
    "item": "c10",
    "category": "commands_requests",
-   "direction": "en2X",
-   "source": "en",
-   "target": "ja",
-   "http": 429,
-   "error": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota Error: RESOURCE_EXHAUSTED Quota exceeded for quota metric 'Translation LLM requests' and limit 'Translation LLM requests per minute' of service 'translate.googleapis.com' for consumer 'project_number:792624108019'.\",\n    \"status\": \"RESOURCE_EXHAUSTED\"\n  }\n}\n",
-   "source_text": "Please close the door.",
-   "translated": "",
-   "latency_s": 0.044,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "ja-JP",
-   "llm": "ja",
-   "class": "A",
-   "item": "c10",
-   "category": "commands_requests",
    "direction": "X2uz",
    "source": "ja",
    "target": "uz",
@@ -67617,25 +66754,6 @@
     "length_ratio": 1.364
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "ja-JP",
-   "llm": "ja",
-   "class": "A",
-   "item": "c10",
-   "category": "commands_requests",
-   "direction": "X2en",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "ja-JP",
@@ -105835,29 +104953,6 @@
    "class": "A",
    "item": "c03",
    "category": "question_answer",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "ro",
-   "http": 429,
-   "error": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota Error: RESOURCE_EXHAUSTED Quota exceeded for quota metric 'Translation LLM requests' and limit 'Translation LLM requests per minute' of service 'translate.googleapis.com' for consumer 'project_number:792624108019'.\",\n    \"status\": \"RESOURCE_EXHAUSTED\"\n  }\n}\n",
-   "source_text": "Siz qayerda yashaysiz?",
-   "translated": "",
-   "latency_s": 0.048,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "ro-RO",
-   "llm": "ro",
-   "class": "A",
-   "item": "c03",
-   "category": "question_answer",
    "direction": "en2X",
    "source": "en",
    "target": "ro",
@@ -105872,25 +104967,6 @@
     "length_ratio": 0.833
    },
    "model": "general/translation-llm"
-  },
-  {
-   "chirp": "ro-RO",
-   "llm": "ro",
-   "class": "A",
-   "item": "c03",
-   "category": "question_answer",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
   },
   {
    "chirp": "ro-RO",
@@ -125146,29 +124222,6 @@
    "class": "A",
    "item": "c20",
    "category": "stability_repeat",
-   "direction": "X2uz",
-   "source": "th",
-   "target": "uz",
-   "http": 429,
-   "error": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota Error: RESOURCE_EXHAUSTED Quota exceeded for quota metric 'Translation LLM requests' and limit 'Translation LLM requests per minute' of service 'translate.googleapis.com' for consumer 'project_number:792624108019'.\",\n    \"status\": \"RESOURCE_EXHAUSTED\"\n  }\n}\n",
-   "source_text": "ขอบคุณค่ะ ขอให้เป็นวันที่ดีนะคะ",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "th-TH",
-   "llm": "th",
-   "class": "A",
-   "item": "c20",
-   "category": "stability_repeat",
    "direction": "X2en",
    "source": "th",
    "target": "en",
@@ -130421,29 +129474,6 @@
    "class": "A",
    "item": "c01",
    "category": "greeting",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Salom, yaxshimisiz?",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c01",
-   "category": "greeting",
    "direction": "en2X",
    "source": "en",
    "target": "uz",
@@ -130465,25 +129495,6 @@
    "class": "A",
    "item": "c01",
    "category": "greeting",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c01",
-   "category": "greeting",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -130496,29 +129507,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.118
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c02",
-   "category": "daily_conversation",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Bugun havo juda issiq.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -130549,25 +129537,6 @@
    "class": "A",
    "item": "c02",
    "category": "daily_conversation",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c02",
-   "category": "daily_conversation",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -130580,29 +129549,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 0.955
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c03",
-   "category": "question_answer",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Siz qayerda yashaysiz?",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -130633,25 +129579,6 @@
    "class": "A",
    "item": "c03",
    "category": "question_answer",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c03",
-   "category": "question_answer",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -130664,29 +129591,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c04",
-   "category": "workplace",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Yig'ilish soat o'nda boshlanadi.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -130717,25 +129621,6 @@
    "class": "A",
    "item": "c04",
    "category": "workplace",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c04",
-   "category": "workplace",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -130748,29 +129633,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.062
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c05",
-   "category": "travel_transport",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Poyezd ertalab sakkizda jo'naydi.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -130801,25 +129663,6 @@
    "class": "A",
    "item": "c05",
    "category": "travel_transport",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c05",
-   "category": "travel_transport",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -130832,29 +129675,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.316
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c06",
-   "category": "shopping",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Bu ko'ylak juda qimmat.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -130885,25 +129705,6 @@
    "class": "A",
    "item": "c06",
    "category": "shopping",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c06",
-   "category": "shopping",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -130916,29 +129717,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.261
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c07",
-   "category": "numbers_money",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Menda yuz ellik ming so'm bor.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -130969,25 +129747,6 @@
    "class": "A",
    "item": "c07",
    "category": "numbers_money",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c07",
-   "category": "numbers_money",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131000,29 +129759,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.294
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c08",
-   "category": "date_time",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Uchrashuv 2026 yil 5 mart kuni.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131053,25 +129789,6 @@
    "class": "A",
    "item": "c08",
    "category": "date_time",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c08",
-   "category": "date_time",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131084,29 +129801,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.075
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c09",
-   "category": "negation",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Men bu joyni bilmayman.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131137,25 +129831,6 @@
    "class": "A",
    "item": "c09",
    "category": "negation",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c09",
-   "category": "negation",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131168,29 +129843,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.043
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c10",
-   "category": "commands_requests",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Iltimos, eshikni yoping.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131221,25 +129873,6 @@
    "class": "A",
    "item": "c10",
    "category": "commands_requests",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c10",
-   "category": "commands_requests",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131252,29 +129885,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 0.917
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c11",
-   "category": "complex_grammar",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Agar vaqtim bo'lsa, sizga qo'ng'iroq qilaman.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131305,25 +129915,6 @@
    "class": "A",
    "item": "c11",
    "category": "complex_grammar",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c11",
-   "category": "complex_grammar",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131336,29 +129927,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 0.711
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c12",
-   "category": "ambiguous_words",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Bu juda qiziq kitob.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131389,25 +129957,6 @@
    "class": "A",
    "item": "c12",
    "category": "ambiguous_words",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c12",
-   "category": "ambiguous_words",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131420,29 +129969,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.333
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c13",
-   "category": "context_idioms",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Ko'nglingizga og'ir olmang.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131473,25 +129999,6 @@
    "class": "A",
    "item": "c13",
    "category": "context_idioms",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c13",
-   "category": "context_idioms",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131504,29 +130011,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 0.806
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c14",
-   "category": "long_text",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Ertaga biz yangi loyihani boshlaymiz va kechqurun natijalarni muhokama qilamiz.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131557,25 +130041,6 @@
    "class": "A",
    "item": "c14",
    "category": "long_text",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c14",
-   "category": "long_text",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131588,29 +130053,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 0.962
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c15",
-   "category": "names_places",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Alisher Navoiy Buxoroda yashagan.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131641,25 +130083,6 @@
    "class": "A",
    "item": "c15",
    "category": "names_places",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c15",
-   "category": "names_places",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131672,29 +130095,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 0.939
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c16",
-   "category": "formal_informal",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Hurmatli janob direktor, xat uchun rahmat.",
-   "translated": "",
-   "latency_s": 0.042,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131725,25 +130125,6 @@
    "class": "A",
    "item": "c16",
    "category": "formal_informal",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c16",
-   "category": "formal_informal",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131756,29 +130137,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 0.816
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c17",
-   "category": "spelling_punctuation",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Nima uchun kelmadingiz?",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131809,25 +130167,6 @@
    "class": "A",
    "item": "c17",
    "category": "spelling_punctuation",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c17",
-   "category": "spelling_punctuation",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131840,29 +130179,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.176
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c18",
-   "category": "writing_systems",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Men o'zbek tilida gaplashaman.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131893,25 +130209,6 @@
    "class": "A",
    "item": "c18",
    "category": "writing_systems",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c18",
-   "category": "writing_systems",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -131924,29 +130221,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 0.467
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c19",
-   "category": "special_unicode",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Bu narx 25% ga oshdi.",
-   "translated": "",
-   "latency_s": 0.044,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -131977,25 +130251,6 @@
    "class": "A",
    "item": "c19",
    "category": "special_unicode",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c19",
-   "category": "special_unicode",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -132008,29 +130263,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 1.458
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c20",
-   "category": "stability_repeat",
-   "direction": "uz2X",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Rahmat, sizga yaxshi kun tilayman.",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
@@ -132061,25 +130293,6 @@
    "class": "A",
    "item": "c20",
    "category": "stability_repeat",
-   "direction": "X2uz",
-   "http": null,
-   "error": "prerequisite_missing",
-   "source_text": "",
-   "translated": "",
-   "latency_s": 0,
-   "quality": {
-    "flags": [
-     "prerequisite_missing"
-    ],
-    "length_ratio": 0
-   }
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c20",
-   "category": "stability_repeat",
    "direction": "X2en",
    "source": "uz",
    "target": "en",
@@ -132092,52 +130305,6 @@
    "quality": {
     "flags": [],
     "length_ratio": 0.971
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c01",
-   "category": "stability_repeat",
-   "direction": "uz2X_rep2",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Salom, yaxshimisiz?",
-   "translated": "",
-   "latency_s": 0.043,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
-   },
-   "model": "general/translation-llm"
-  },
-  {
-   "chirp": "uz-UZ",
-   "llm": "uz",
-   "class": "A",
-   "item": "c01",
-   "category": "stability_repeat",
-   "direction": "uz2X_rep3",
-   "source": "uz",
-   "target": "uz",
-   "http": 400,
-   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language can't be equal to source language.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"source_language_code\",\n            \"description\": \"Source language: uz\"\n          },\n          {\n            \"field",
-   "source_text": "Salom, yaxshimisiz?",
-   "translated": "",
-   "latency_s": 0.041,
-   "detected": null,
-   "quality": {
-    "flags": [
-     "empty_output"
-    ],
-    "length_ratio": 0.0
    },
    "model": "general/translation-llm"
   },
