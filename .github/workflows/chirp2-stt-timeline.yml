@@ -26,25 +26,18 @@ jobs:
       - name: Speech recognition outcome timeline (last 10h)
         shell: bash
         run: |
-          echo "### Counts by Google STT status code (last 10h)"
+          echo "### Non-zero status: timestamp, code, message"
           gcloud logging read 'logName:"speech.googleapis.com%2Fcloud_speech_recognition_stream"' \
             --project="$PROJECT_ID" --limit=1000 --freshness=10h --format=json \
-            | jq -r '.[].jsonPayload.recognize.recognizeResponse.status.code // 0' | sort | uniq -c || true
-          echo
-          echo "### All NON-ZERO status entries (errors) with timestamp + code"
-          gcloud logging read 'logName:"speech.googleapis.com%2Fcloud_speech_recognition_stream"' \
-            --project="$PROJECT_ID" --limit=1000 --freshness=10h --format=json \
-            | jq -r '.[] | select((.jsonPayload.recognize.recognizeResponse.status.code // 0) != 0) | [.timestamp, (.jsonPayload.recognize.recognizeResponse.status.code)] | @tsv' \
+            | jq -r '.[] | select((.jsonPayload.recognize.recognizeResponse.status.code // 0) != 0) | [.timestamp, (.jsonPayload.recognize.recognizeResponse.status.code), (.jsonPayload.recognize.recognizeResponse.status.message // "")] | @tsv' \
             | sort || true
           echo
-          echo "### OK (code 0) count per 2-minute bucket"
+          echo "### Code 3 request config sample (first + last)"
           gcloud logging read 'logName:"speech.googleapis.com%2Fcloud_speech_recognition_stream"' \
             --project="$PROJECT_ID" --limit=1000 --freshness=10h --format=json \
-            | jq -r '.[] | select((.jsonPayload.recognize.recognizeResponse.status.code // 0) == 0) | .timestamp' \
-            | cut -c1-15 | sort | uniq -c || true
+            | jq -c '[.[] | select((.jsonPayload.recognize.recognizeResponse.status.code // 0) == 3)] | sort_by(.timestamp) | (.[0], .[-1]) | {ts:.timestamp, msg:.jsonPayload.recognize.recognizeResponse.status.message, reqConfig:.jsonPayload.recognize.recognizeRequest.config}' 2>/dev/null || true
           echo
-          echo "### First and last OK entries"
+          echo "### Code 0 request config sample (last OK)"
           gcloud logging read 'logName:"speech.googleapis.com%2Fcloud_speech_recognition_stream"' \
             --project="$PROJECT_ID" --limit=1000 --freshness=10h --format=json \
-            | jq -r '.[] | select((.jsonPayload.recognize.recognizeResponse.status.code // 0) == 0) | .timestamp' \
-            | sort | sed -n '1p;$p' || true
+            | jq -c '[.[] | select((.jsonPayload.recognize.recognizeResponse.status.code // 0) == 0)] | sort_by(.timestamp) | .[-1] | {ts:.timestamp, reqConfig:.jsonPayload.recognize.recognizeRequest.config}' 2>/dev/null || true
