@@ -118,7 +118,7 @@ html[data-avnivo-mode=offline] .avnivo-online-tts-settings{display:none}
 html[data-avnivo-mode=online] .offline-modules{display:none}
 
 /* First-launch guided preview, isolated from normal application */
-#avnivo-first-launch{position:fixed;z-index:1000;inset:0;background:#000;overflow:hidden;transition:opacity 1.15s ease,visibility 1.15s}
+#avnivo-first-launch{position:fixed;z-index:1000;inset:0;background:#000;overflow:hidden;transition:opacity 2.25s ease,visibility 2.25s}
 #avnivo-first-launch.finished{opacity:0;visibility:hidden;pointer-events:none}
 #avnivo-first-launch .intro-colors{position:absolute;inset:-20%;opacity:0;background:radial-gradient(ellipse 60% 50% at 18% 78%,#0079c76b,transparent 72%),radial-gradient(ellipse 55% 55% at 83% 19%,#d39a3670,transparent 75%),radial-gradient(ellipse 55% 48% at 80% 86%,#035a9e54,transparent 75%),#06070b;transition:opacity 1.6s;animation:avnivo-aurora 11s ease-in-out infinite alternate}
 @keyframes avnivo-aurora{0%{transform:translate(-3%,1%) scale(1)}100%{transform:translate(2%,-3%) scale(1.07)}}
@@ -142,9 +142,9 @@ html[data-avnivo-mode=online] .offline-modules{display:none}
 #avnivo-first-launch.departing #avnivo-language-menu{display:none}
 #avnivo-first-launch.departing{transition:none}
 /* After the selected language pill has fully left, return the brand to the chat center. */
-#avnivo-first-launch.brand-to-chat .intro-brand{top:var(--brand-center,50%);transform:translate(-50%,-50%) scale(.92);transition:top 1.2s cubic-bezier(.22,.72,.16,1),transform 1.2s cubic-bezier(.22,.72,.16,1)}
+#avnivo-first-launch.brand-to-chat .intro-brand{top:var(--brand-center,50%);transform:translate(-50%,-50%) scale(var(--target-scale,1));transition:top 1.95s cubic-bezier(.22,.72,.16,1),transform 1.95s cubic-bezier(.22,.72,.16,1)}
 #avnivo-first-launch.brand-to-chat .intro-brand-name{font-size:clamp(39px,11vw,64px)}
-#avnivo-first-launch.brand-to-chat .intro-colors{opacity:0}
+#avnivo-first-launch.brand-to-chat .intro-colors{opacity:0}#avnivo-first-launch .intro-brand{z-index:4}#avnivo-first-launch .lang-pill{z-index:3}
 
 #avnivo-tutorial-dim{position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:2000;visibility:hidden;opacity:0;pointer-events:none;transition:opacity 1.15s ease,visibility 1.15s}
 #avnivo-tutorial-dim.active{visibility:visible;opacity:1;pointer-events:auto}
@@ -1212,29 +1212,53 @@ function choose(){
  pill.setAttribute('aria-expanded','false');
  lang.textContent='O‘zbek tili';
  localStorage.setItem('avnivo-onboarding-language','uz');
- // The first-launch walkthrough always opens the actual Online chat.
  try{localStorage.setItem('avnivo.ui.mode.v1','online')}catch(e){}
  document.documentElement.dataset.avnivoMode='online';
  document.getElementById('mode-online').setAttribute('aria-pressed','true');
  document.getElementById('mode-offline').setAttribute('aria-pressed','false');
- pill.classList.add('selected');
- // Start the brand's descent at the same instant as the pill's departure.
  const chatBrand=document.querySelector('.center-brand');
  const introBrand=root.querySelector('.intro-brand');
- if(chatBrand&&introBrand){
+ const introName=introBrand?.querySelector('.intro-brand-name');
+ const chatName=chatBrand?.querySelector('.brand-name');
+ if(chatBrand&&introBrand&&introName&&chatName){
    const target=chatBrand.getBoundingClientRect();
-   introBrand.style.top=(target.top+target.height/2)+'px';
+   const targetName=chatName.getBoundingClientRect();
+   const introNameBox=introName.getBoundingClientRect();
+   const scale=targetName.width/Math.max(introNameBox.width,1);
+   introBrand.style.setProperty('--brand-center',(target.top+target.height/2)+'px');
+   introBrand.style.setProperty('--target-scale',String(scale));
+   // Keep the original chat brand invisible until the tutorial dim is opaque.
+   chatBrand.style.opacity='0';
+   chatBrand.dataset.onboardingHidden='true';
  }
- root.classList.add('brand-to-chat');
- setTimeout(()=>root.classList.add('departing'),300);
- // Wait for both motions to finish before revealing the app.
+ pill.classList.add('selected');
+ setTimeout(()=>{
+   root.classList.add('departing');
+   root.classList.add('brand-to-chat');
+ },300);
+ // The pill exits first; the screen stays black throughout both movements.
  setTimeout(()=>{
    root.classList.add('finished');
+   // Slowly reveal the actual Online chat.
    setTimeout(()=>{
+     const clone=introBrand.cloneNode(true);
+     clone.id='avnivo-transition-brand';
+     clone.style.position='fixed';
+     clone.style.zIndex='1500';
+     clone.style.pointerEvents='none';
+     clone.style.opacity='1';
+     clone.style.transition='opacity .4s ease';
+     const rect=introBrand.getBoundingClientRect();
+     clone.style.top=(rect.top+rect.height/2)+'px';
+     clone.style.left=(rect.left+rect.width/2)+'px';
+     clone.style.transform='translate(-50%,-50%) scale(1)';
+     clone.style.width=rect.width+'px';
+     clone.style.margin='0';
+     document.body.appendChild(clone);
      root.remove();
-     setTimeout(startTutorial,750);
-   },1200);
- },2200);
+     setTimeout(startTutorial,850);
+   },2300);
+ },2550);
 }
 const dim=document.getElementById('avnivo-tutorial-dim'),spot=document.getElementById('avnivo-tutorial-spot'),label=document.getElementById('avnivo-tutorial-label'),next=document.getElementById('avnivo-tutorial-next'),heading=document.getElementById('avnivo-tutorial-heading'),description=document.getElementById('avnivo-tutorial-description');
 let tutorialStage=-1;
@@ -1257,7 +1281,7 @@ function startTutorial(){
  document.body.classList.add('avnivo-tutorial');
  dim.classList.add('active');
  // Wait for the screen to finish darkening before highlighting the history icon.
- setTimeout(()=>showTutorialStage(0),1250);
+ setTimeout(()=>{const original=document.querySelector('.center-brand');const transition=document.getElementById('avnivo-transition-brand');if(original&&original.dataset.onboardingHidden){original.style.opacity='';delete original.dataset.onboardingHidden}if(transition)transition.remove();showTutorialStage(0)},1250);
 }
 next.addEventListener('click',()=>{
  if(tutorialTransitioning||tutorialStage!==0)return;
