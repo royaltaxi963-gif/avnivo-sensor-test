@@ -1,0 +1,90 @@
+name: AVNIVO Android APK build
+
+on:
+  push:
+    branches: [main, 'feat/android-*', 'feat/openhands-android-build-release']
+    paths:
+      - 'android/**'
+      - 'index.html'
+      - 'offline-uzbek-download.js'
+      - 'i18n/**'
+      - '.github/workflows/avnivo-android.yml'
+  pull_request:
+    paths:
+      - 'android/**'
+      - 'index.html'
+      - 'offline-uzbek-download.js'
+      - 'i18n/**'
+      - '.github/workflows/avnivo-android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Install Android platform 35 and build-tools
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
+      - name: Run JVM unit tests (WebView origin policy)
+        working-directory: android
+        run: gradle :app:testDebugUnitTest --no-daemon --console=plain
+
+      - name: Build debug APK
+        working-directory: android
+        run: gradle :app:assembleDebug --no-daemon --console=plain
+
+      - name: Verify APK identity, permissions and bundled assets
+        working-directory: android
+        run: |
+          set -euo pipefail
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -f "$APK"
+          BT=$(ls -d "$ANDROID_SDK_ROOT"/build-tools/35.0.0)
+          BADGING=$("$BT/aapt2" dump badging "$APK")
+          echo "$BADGING" | grep -F "package: name='com.avnivo.translator'"
+          echo "$BADGING" | grep -F "uses-permission: name='android.permission.RECORD_AUDIO'"
+          echo "$BADGING" | grep -F "launchable-activity: name='com.avnivo.translator.MainActivity'"
+          # 100 locale packages plus the engine, registry and web app must be bundled.
+          COUNT=$(unzip -l "$APK" | grep -c "assets/i18n/locales/.*\.json")
+          test "$COUNT" -eq 100 || { echo "expected 100 locales, got $COUNT"; exit 1; }
+          unzip -l "$APK" | grep -q "assets/index.html"
+          unzip -l "$APK" | grep -q "assets/i18n/avnivo-i18n.js"
+          unzip -l "$APK" | grep -q "assets/i18n/languages.json"
+          echo "APK verification passed."
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-translator-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-android-test-results
+          path: android/app/build/test-results/testDebugUnitTest/*.xml
+          if-no-files-found: ignore
