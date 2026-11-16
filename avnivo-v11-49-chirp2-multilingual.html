@@ -754,7 +754,7 @@ window.CHIRP2_MATRIX=[
  modal.setAttribute('role','dialog');
  modal.setAttribute('aria-modal','true');
  modal.setAttribute('aria-label','Online tarjima tilini tanlash');
- modal.innerHTML='<div class="avnivo-language-card"><div class="avnivo-language-head"><strong>Ovoz tanish tili · 117 til</strong><button type="button" data-close aria-label="Yopish">✕</button></div><input type="search" class="avnivo-language-search" placeholder="Til nomi yoki kodi bo‘yicha qidirish" aria-label="Til qidirish" autocomplete="off"><div class="avnivo-language-options"></div></div>';
+ modal.innerHTML='<div class="avnivo-language-card"><div class="avnivo-language-head"><strong>Ovoz tanish tili · 117 til</strong><button type="button" data-close aria-label="Yopish">✕</button></div><div class="avnivo-language-search-toolbar"><button type="button" class="avnivo-language-search-toggle" aria-label="Til qidirishni ochish" aria-expanded="false" title="Til qidirish"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button></div><input type="search" class="avnivo-language-search" placeholder="Til nomi yoki kodi bo‘yicha qidirish" aria-label="Til qidirish" autocomplete="off" hidden><div class="avnivo-language-options"></div></div>';
  const css=document.createElement('style');
  css.textContent=`
  #avnivoOnlineLanguageDialog[hidden]{display:none!important}
@@ -762,7 +762,7 @@ window.CHIRP2_MATRIX=[
  #avnivoOnlineLanguageDialog .avnivo-language-card{width:min(420px,100%);max-height:80dvh;overflow:auto;border:1px solid #c79b58;border-radius:20px;background:#30251b;color:#ffe4aa;padding:18px;box-sizing:border-box}
  .avnivo-language-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
  .avnivo-language-head button{background:transparent;border:0;color:inherit;font-size:24px;padding:8px}
- .avnivo-language-search{display:block;width:100%;padding:12px;margin-bottom:12px;border:1px solid #a47a46;border-radius:12px;background:#211910;color:#fff4dc;font:15px system-ui;box-sizing:border-box}\n .avnivo-language-options{display:grid;gap:8px;max-height:58dvh;overflow-y:auto}
+ .avnivo-language-search[hidden]{display:none!important}\n .avnivo-language-search-toolbar{display:flex;justify-content:center;margin:0 0 12px}\n .avnivo-language-search-toggle{display:grid;place-items:center;width:52px;height:52px;border:1px solid #d8aa62;border-radius:50%;background:#604329;color:#ffdf9c;cursor:pointer;animation:avnivo-loupe-float 2.8s ease-in-out infinite,avnivo-loupe-nudge 9s ease-in-out infinite;transform-origin:center}\n .avnivo-language-search-toggle:focus-visible{outline:2px solid #ffe4aa;outline-offset:3px}\n @keyframes avnivo-loupe-float{0%,100%{translate:0 0}50%{translate:0 -5px}}\n @keyframes avnivo-loupe-nudge{0%,82%,92%,100%{rotate:0deg}84%,88%{rotate:-11deg}86%,90%{rotate:11deg}}\n @media(prefers-reduced-motion:reduce){.avnivo-language-search-toggle{animation:none}}\n .avnivo-language-search{display:block;width:100%;padding:12px;margin-bottom:12px;border:1px solid #a47a46;border-radius:12px;background:#211910;color:#fff4dc;font:15px system-ui;box-sizing:border-box}\n .avnivo-language-options{display:grid;gap:8px;max-height:58dvh;overflow-y:auto}
  .avnivo-language-options button{display:block;width:100%;padding:14px;text-align:left;font:600 17px system-ui;color:#ffe4aa;background:#473426;border:1px solid #a47a46;border-radius:12px}
  .avnivo-language-options button[aria-pressed=true]{border-color:#ffdc84;background:#684b27}
  .speaker .speaker-language-title select{pointer-events:none!important}
@@ -774,7 +774,9 @@ window.CHIRP2_MATRIX=[
  const closePicker=()=>{modal.hidden=true;editingSelect=null};
  function openPicker(select){
    editingSelect=select;
-   modal.querySelector('.avnivo-language-search').value='';
+   const search=modal.querySelector('.avnivo-language-search');
+   search.value='';search.hidden=true;
+   modal.querySelector('.avnivo-language-search-toggle').setAttribute('aria-expanded','false');
    const options=modal.querySelector('.avnivo-language-options');
    options.replaceChildren();
    const query=modal.querySelector('.avnivo-language-search').value.trim().toLocaleLowerCase();
@@ -793,9 +795,9 @@ window.CHIRP2_MATRIX=[
      options.append(button);
    }
    modal.hidden=false;
-   modal.querySelector('.avnivo-language-search').focus();
  }
  modal.querySelector('.avnivo-language-search').addEventListener('input',()=>{if(editingSelect)openPickerResults(editingSelect)});
+ modal.querySelector('.avnivo-language-search-toggle').addEventListener('click',()=>{const search=modal.querySelector('.avnivo-language-search');search.hidden=false;modal.querySelector('.avnivo-language-search-toggle').setAttribute('aria-expanded','true');search.focus();});
  function openPickerResults(select){const options=modal.querySelector('.avnivo-language-options');options.replaceChildren();const query=modal.querySelector('.avnivo-language-search').value.trim().toLocaleLowerCase();for(const code of supported){if(query&&!(native[code]+' '+code).toLocaleLowerCase().includes(query))continue;const button=document.createElement('button');button.type='button';button.textContent=native[code]+' · '+code;button.setAttribute('aria-pressed',String(select.value===code));button.addEventListener('click',()=>{select.value=code;select.dispatchEvent(new Event('change',{bubbles:true}));closePicker()});options.append(button)}}
  modal.addEventListener('click',e=>{if(e.target===modal||e.target.closest('[data-close]'))closePicker()});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closePicker()});
