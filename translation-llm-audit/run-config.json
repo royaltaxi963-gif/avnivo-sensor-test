@@ -1,4 +1,4 @@
 {
-  "mode": "disputed",
-  "max_requests": 120
+  "mode": "experimental",
+  "max_requests": 200
 }
