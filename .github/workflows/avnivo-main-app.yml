@@ -50,7 +50,7 @@ jobs:
 
           # Online Chirp 2 must accept exactly the 93 audited picker locales.
           import re
-          locales = re.findall(r'\\["([A-Za-z0-9-]+)","[^"]+","(?:official|experimental|retest)"\\]', html)
+          locales = re.findall(r'\["([A-Za-z0-9-]+)","[^"]+","(?:official|experimental|retest)"\]', html)
           assert len(locales) == len(set(locales)) == 93, f"Expected 93 distinct Online locales, got {len(locales)}"
           assert {"uz-UZ", "ru-RU", "en-US", "cmn-Hans-CN", "cmn-Hant-TW"} <= set(locales)
           for contract in ("onlineLanguagesByCode.has(locale)", "cancelOnlineRecording()", "maxRecording",
