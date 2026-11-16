@@ -384,7 +384,7 @@ function playMessage(button,bubble,language){
  const text=bubble.textContent.trim();
  if(!text||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
  const utterance=new SpeechSynthesisUtterance(text);
- utterance.lang=language==='right'?'ru-RU':'uz-UZ';
+ utterance.lang=document.documentElement.dataset.avnivoMode==='online'?onlineChoice[language]:language==='right'?'ru-RU':'uz-UZ';
  utterance.rate=.95;
  const finish=()=>{if(speakingButton===button){button.classList.remove('is-speaking');button.setAttribute('aria-pressed','false');speakingButton=null}};
  utterance.onend=finish;utterance.onerror=finish;
@@ -488,6 +488,33 @@ function syncComposerMode(){
  updateBrandVisibility();
  label.hidden=typing||messages.children.length>0||active||shell.classList.contains('hold-voice');
 }
+const ONLINE_TRANSLATION_ENDPOINT='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate';
+async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry){
+ const source=onlineLanguagesByCode.get(sourceLocale),target=onlineLanguagesByCode.get(targetLocale);
+ if(!source||!target||source[1]===target[1]){
+  bubble.textContent='Tarjima uchun boshqa tilni tanlang';return;
+ }
+ const controller=new AbortController(),timeoutId=setTimeout(()=>controller.abort(),30000);
+ try{
+  const response=await fetch(ONLINE_TRANSLATION_ENDPOINT,{
+   method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({text,source:sourceLocale,target:targetLocale}),signal:controller.signal
+  });
+  if(!response.ok){
+   const msg=response.status===400?'Til juftligi serverda hali qo‘llab-quvvatlanmaydi':response.status===429?'Tarjima limiti tugadi':'Tarjima serveri xatosi ('+response.status+')';
+   throw Error(msg);
+  }
+  const data=await response.json();
+  if(data.model!=='general/translation-llm'||data.source!==source[1]||data.target!==target[1]||typeof data.text!=='string')throw Error('Tarjima javobida til kodlari mos kelmadi');
+  if(!bubble.isConnected)return;
+  typeTranslation(bubble,data.text);
+  if(entry){entry.translation=data.text;persistHistory()}
+ }catch(error){
+  if(!bubble.isConnected)return;
+  bubble.textContent=error.name==='AbortError'?'Tarjima vaqti tugadi':error instanceof TypeError?'Tarjima serveriga ulanib bo‘lmadi':error.message;
+  bubble.classList.remove('typing');
+ }finally{clearTimeout(timeoutId)}
+}
 function sendMessage(){
  const message=input.value.trim();
  if(!message)return;
@@ -496,11 +523,20 @@ function sendMessage(){
  const firstLanguage=session?.firstLanguage||language;
  const sourceBubble=renderChatBubble({text:message,language},firstLanguage);
  messages.appendChild(attachSpeaker(sourceBubble,language));
- saveChatMessage(message,language,PREVIEW_TRANSLATION);
+ const online=document.documentElement.dataset.avnivoMode==='online';
+ const sourceLocale=online?onlineChoice[language]:null;
+ const targetLocale=online?onlineChoice[oppositeLanguage(language)]:null;
+ saveChatMessage(message,language,online?'':PREVIEW_TRANSLATION);
+ const savedSession=historySessions.find(x=>x.id===currentHistoryId);
+ const entry=savedSession?.messages[savedSession.messages.length-1];
+ if(online&&entry){entry.sourceLocale=sourceLocale;entry.targetLocale=targetLocale;persistHistory()}
  const translationBubble=renderChatBubble({text:'',language:oppositeLanguage(language)},firstLanguage);
  translationBubble.classList.add('translation-preview');
  messages.appendChild(attachSpeaker(translationBubble,oppositeLanguage(language)));
- typeTranslation(translationBubble,PREVIEW_TRANSLATION);
+ if(online){
+  translationBubble.textContent='Tarjima qilinmoqda…';
+  translateOnlineText(message,sourceLocale,targetLocale,translationBubble,entry);
+ }else typeTranslation(translationBubble,PREVIEW_TRANSLATION);
  while(messages.children.length>60)messages.firstElementChild.remove();
  scrollChatToLatest();
  input.value='';persistDraft();clearTimeout(timeout);timeout=0;resize();syncComposerMode();delay(300);
