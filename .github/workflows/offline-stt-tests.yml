@@ -1,0 +1,29 @@
+name: Offline STT tests
+on:
+  push:
+    paths:
+      - 'offline-stt/**'
+      - '.github/workflows/offline-stt-tests.yml'
+  pull_request:
+    paths:
+      - 'offline-stt/**'
+      - '.github/workflows/offline-stt-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # The offline STT modules and their tests use only Node built-ins, so no
+      # dependency install is needed. The suite covers sha256, the model spec,
+      # registry consistency, microphone routing and the model manager.
+      - name: Run offline STT unit tests
+        run: node --test offline-stt/tests/
