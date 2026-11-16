@@ -1348,7 +1348,7 @@ window.CHIRP2_MATRIX=[
  const app=document.getElementById('app');
  if(!mic||!swap||!app)return;
  mic.style.position='relative';
- mic.style.top='-13px';
+ mic.style.top='-45px';
  let recorder=null,stream=null,chunks=[],busy=false,recording=false,requestId=0,startedAt=0;
  function message(t){if(t){console.warn('AVNIVO voice:',t);status(t,'error')}}
  function clean(){recording=false;mic.classList.remove('active');mic.setAttribute('aria-pressed','false');stream?.getTracks().forEach(t=>t.stop());stream=null;recorder=null;app.querySelectorAll('.speaker').forEach(s=>s.classList.remove('voice-listening'))}
