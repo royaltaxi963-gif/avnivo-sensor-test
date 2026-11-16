@@ -25,7 +25,10 @@ from quality import score
 
 RESULTS = harness.RESULTS
 EVIDENCE = RESULTS / "translation-llm-test-results.json"
-DIAG = RESULTS / "translation-llm-failed-diagnosis.json"
+
+
+def diag_path(mode: str) -> Path:
+    return RESULTS / f"translation-llm-diagnosis-{mode}.json"
 
 # Independent sentences (not reused from the main corpus), so a retest cannot
 # merely reproduce the earlier answer.
@@ -203,8 +206,9 @@ def main() -> None:
                                   "language_name": row["language_name"], "results": per})
 
     # Persist diagnosis and refreshed evidence/ledger.
-    DIAG.write_text(json.dumps({"mode": args.mode, "diagnosis": diagnosis},
-                               ensure_ascii=False, indent=1))
+    diag_path(args.mode).write_text(
+        json.dumps({"mode": args.mode, "diagnosis": diagnosis},
+                   ensure_ascii=False, indent=1))
     merged_ledger = _merge_ledger(ledger)
     EVIDENCE.write_text(json.dumps({"records": list(done.values()), "ledger": merged_ledger},
                                    ensure_ascii=False, indent=1))
