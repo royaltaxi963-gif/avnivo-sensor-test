@@ -712,7 +712,14 @@ window.CHIRP2_MATRIX=[
  const lowerTranslated=document.getElementById('bottomLanguageTranslation');
  if(!upper||!lower||!upperTranslated||!lowerTranslated)return;
  const native={uz:'O‘zbek tili',ru:'Русский язык',en:'English',tr:'Türkçe'};
- for(const [code,label] of (window.CHIRP2_MATRIX||[]))native[code]=label;
+ // The original four language choices use short codes. Keep those exact
+ // values so existing translation, TTS and saved selections continue to work.
+ // Suppress their full BCP-47 aliases in the visible picker only; the STT
+ // resolver maps the short codes to the correct Chirp 2 locale.
+ const aliases=new Set(['uz-UZ','ru-RU','en-US','tr-TR']);
+ for(const [code,label] of (window.CHIRP2_MATRIX||[])){
+   if(!aliases.has(code))native[code]=label;
+ }
  const names={
   uz:{uz:'O‘zbek tili',ru:'Узбекский язык',en:'Uzbek language',tr:'Özbekçe'},
   ru:{uz:'Rus tili',ru:'Русский язык',en:'Russian language',tr:'Rusça'},
@@ -722,6 +729,7 @@ window.CHIRP2_MATRIX=[
  const supported=Object.keys(native);
  for(const select of [upper,lower]){
    for(const [code,label] of (window.CHIRP2_MATRIX||[])){
+     if(aliases.has(code))continue;
      const option=document.createElement('option');option.value=code;option.textContent=label+' — '+code;select.append(option);
    }
  }
