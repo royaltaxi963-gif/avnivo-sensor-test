@@ -13,11 +13,11 @@ body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
 .app{height:100dvh;min-height:320px;max-width:540px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 11px calc(10px + env(safe-area-inset-bottom));background:radial-gradient(ellipse at 12% 10%,#51391c 0%,transparent 48%),radial-gradient(ellipse at 95% 78%,#3c2b1d 0%,transparent 48%),#17120d}
 .background{height:100%;width:100%;position:relative;border-radius:26px;border:1px solid rgba(255,255,255,.11);background:linear-gradient(145deg,#4a3422,#34271e 65%,#2c251e);box-shadow:0 12px 30px #0005,inset 0 1px #ffffff12}
 .writing-shell{position:fixed;bottom:var(--input-bottom,18px);left:var(--input-left,28px);width:var(--input-width,calc(100% - 56px));border-radius:24px;z-index:10;border:1px solid rgba(255,224,168,.35);background:#2c221a;box-shadow:inset 0 1px 4px #0003;min-height:60px;max-height:var(--input-max,300px);overflow:hidden;display:flex;align-items:flex-end}.writing-shell:focus-within{border-color:#e9c483}.writing-area{display:block;position:relative;z-index:1;box-sizing:border-box;width:100%;height:60px;min-height:60px;max-height:var(--input-max,300px);overflow-y:auto;resize:none;border:0;border-radius:24px;background:transparent;color:#fff8e9;font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:17px 12px 17px 18px;outline:none;overflow-wrap:anywhere;flex:1;min-width:0}.mic-icon{width:48px;height:58px;flex:0 0 48px;display:grid;place-items:center;color:#f6c977;pointer-events:none;align-self:flex-end}.mic-icon svg{width:25px;height:25px;display:block}.animated-greeting{position:absolute;z-index:0;top:17px;left:18px;right:62px;color:#b6a48c;font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:clip}.animated-greeting[hidden]{display:none}.animated-greeting:after{content:"";display:inline-block;vertical-align:-2px;height:1em;border-right:1.5px solid currentColor;margin-inline-start:2px;animation:blink .85s step-end infinite}@keyframes blink{50%{opacity:0}}@media(prefers-reduced-motion:reduce){.animated-greeting:after{animation:none}}@media(min-width:650px){.app{box-shadow:0 0 50px #0007}}
-</style>
+.mic-icon{position:relative;z-index:5;width:48px;height:58px;flex:0 0 48px;display:grid;place-items:center;color:#f6c977;pointer-events:auto;align-self:flex-end;cursor:pointer;background:transparent;border:0;padding:0;isolation:isolate;outline-offset:-5px}.mic-icon svg{grid-area:1/1;transition:transform .6s cubic-bezier(.22,.8,.2,1),opacity .4s ease,filter .5s ease}.mic-symbol{opacity:1;transform:rotate(0) scale(1);animation:micBreathe 2.2s ease-in-out infinite}.close-symbol{opacity:0;transform:rotate(-130deg) scale(.25)}.writing-shell.voice-active .mic-symbol{opacity:0;transform:rotate(135deg) scale(.25);animation:none}.writing-shell.voice-active .close-symbol{opacity:1;transform:rotate(0) scale(1);filter:drop-shadow(0 0 6px #40baff)}.writing-shell.voice-active .mic-icon{color:#63cfff}.mic-icon:focus-visible{outline:2px solid #74dfff;border-radius:14px}.voice-trace{position:absolute;left:18px;right:55px;top:50%;height:32px;transform:translateY(-50%);pointer-events:none;opacity:0;z-index:2;overflow:visible}.voice-trace-fill{position:absolute;inset:0;transform:scaleX(0);transform-origin:right center;transition:transform .9s cubic-bezier(.16,.85,.23,1);background:linear-gradient(90deg,transparent,#22a7ff 25%,#82ecff 75%,#55c9ff);height:2px;top:15px;box-shadow:0 0 7px #00aaff,0 0 16px #008bff}.voice-trace-glow{position:absolute;left:0;right:0;top:0;height:32px;opacity:0;transition:opacity .5s;filter:drop-shadow(0 0 5px #25baff);background:transparent}.writing-shell.voice-active .voice-trace{opacity:1}.writing-shell.voice-active .voice-trace-fill{transform:scaleX(1)}.writing-shell.voice-active .voice-trace-glow{opacity:1}.writing-shell.voice-active .animated-greeting{display:none!important}@keyframes micBreathe{0%,100%{filter:drop-shadow(0 0 1px #eebd6e);transform:scale(1)}50%{filter:drop-shadow(0 0 9px #ffc974);transform:scale(1.09)}}@media(prefers-reduced-motion:reduce){.mic-symbol{animation:none}}</style>
 </head>
 <body>
 <main class="app" aria-label="AVNIVO fon">
-<div class="background"><div class="writing-shell"><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><span class="mic-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span></div></div>
+<div class="background"><div class="writing-shell"><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg></button></div></div>
 </main>
 <script>
 (()=>{'use strict';
@@ -43,7 +43,7 @@ function shuffleRound(){
 let order=shuffleRound();
 const delay=ms=>{clearTimeout(timeout);timeout=setTimeout(tick,ms)};
 function tick(){
- if(input.value.length){label.hidden=true;return}
+ if(input.value.length||shell.classList.contains("voice-active")){label.hidden=true;return}
  label.hidden=false;
  const [lang,word]=greetings[order[index]];const letters=segment(word);
  label.lang=lang;label.dir=/^(ar|fa|ur|ps|ug|sd|dv|ku|yi|he)$/.test(lang)?'rtl':'auto';
@@ -75,8 +75,8 @@ function resize(){
  input.style.height='auto';
  input.style.height=Math.min(Math.max(60,input.scrollHeight),max)+'px';
  input.style.overflowY=input.scrollHeight>max?'auto':'hidden';
- label.hidden=Boolean(input.value);
- if(!input.value&&!timeout)delay(180);
+ label.hidden=Boolean(input.value)||shell.classList.contains("voice-active");
+ if(!input.value&&!timeout&&!shell.classList.contains("voice-active"))delay(180);
 }
 input.addEventListener('input',()=>{clearTimeout(timeout);timeout=0;resize()});
 window.addEventListener('resize',resize,{passive:true});
@@ -85,6 +85,66 @@ if(window.visualViewport){
  window.visualViewport.addEventListener('scroll',layout,{passive:true});
 }
 resize();delay(350);
+const mic=shell.querySelector('.mic-icon');
+const trace=shell.querySelector('.voice-trace-glow');
+let mediaStream=null,audioContext=null,analyser=null,samples=null,frame=0,active=false,requestToken=0,level=0;
+const idleWave=()=>{trace.style.background='transparent';trace.style.filter='drop-shadow(0 0 5px #25baff)';};
+function draw(){
+ if(!active||!analyser)return;
+ analyser.getByteTimeDomainData(samples);
+ let sum=0;
+ for(let i=0;i<samples.length;i++){const v=(samples[i]-128)/128;sum+=v*v}
+ const rms=Math.sqrt(sum/samples.length);
+ level=level*.7+Math.min(1,rms*9)*.3;
+ const amplitude=Math.max(1.2,Math.min(13,level*16));
+ const points=[];
+ const n=60;
+ for(let i=0;i<=n;i++){
+  const x=i/n*100;
+  const envelope=Math.pow(Math.sin(Math.PI*i/n),.7);
+  const y=16+Math.sin(i*.83+performance.now()*.014)*amplitude*envelope+Math.sin(i*.29+performance.now()*.02)*amplitude*.27*envelope;
+  points.push(x.toFixed(2)+'% '+y.toFixed(2)+'px');
+ }
+ const wave='polygon(0 50%, '+points.join(', ')+', 100% 50%)';
+ trace.style.clipPath='none';
+ const path='M '+Array.from({length:n+1},(_,i)=>{const x=i/n*100,y=16+Math.sin(i*.83+performance.now()*.014)*amplitude*Math.sin(Math.PI*i/n);return x.toFixed(2)+','+y.toFixed(2)}).join(' L ');
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 32" preserveAspectRatio="none"><path d="'+path+'" fill="none" stroke="#65d9ff" stroke-width="1.7" vector-effect="non-scaling-stroke" stroke-linecap="round"/></svg>';
+ trace.style.backgroundImage='url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
+ trace.style.backgroundSize='100% 100%';
+ trace.style.filter='drop-shadow(0 0 '+(4+level*14).toFixed(1)+'px #00aeff)';
+ frame=requestAnimationFrame(draw);
+}
+async function stopVoice(){
+ requestToken++;active=false;cancelAnimationFrame(frame);
+ shell.classList.remove('voice-active');mic.setAttribute('aria-pressed','false');mic.setAttribute('aria-label','Mikrofonni yoqish');
+ if(mediaStream){mediaStream.getTracks().forEach(track=>track.stop());mediaStream=null}
+ if(audioContext){const context=audioContext;audioContext=null;await context.close().catch(()=>{})}
+ analyser=null;samples=null;level=0;idleWave();
+ if(!input.value){clearTimeout(timeout);timeout=0;delay(300)}
+}
+async function startVoice(){
+ if(!navigator.mediaDevices?.getUserMedia){return}
+ const token=++requestToken;
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  if(token!==requestToken){stream.getTracks().forEach(track=>track.stop());return}
+  const Context=window.AudioContext||window.webkitAudioContext;
+  if(!Context){stream.getTracks().forEach(track=>track.stop());return}
+  const ctx=new Context();await ctx.resume();
+  if(token!==requestToken){stream.getTracks().forEach(track=>track.stop());await ctx.close();return}
+  const source=ctx.createMediaStreamSource(stream),a=ctx.createAnalyser();
+  a.fftSize=1024;a.smoothingTimeConstant=.22;source.connect(a);
+  mediaStream=stream;audioContext=ctx;analyser=a;samples=new Uint8Array(a.fftSize);active=true;
+  clearTimeout(timeout);timeout=0;label.hidden=true;
+  mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label','Mikrofonni o‘chirish');
+  shell.classList.add('voice-active');
+  frame=requestAnimationFrame(draw);
+  stream.getAudioTracks()[0]?.addEventListener('ended',()=>{if(active)stopVoice()},{once:true});
+ }catch(error){if(token===requestToken){mic.setAttribute('aria-label','Mikrofonga ruxsat berilmadi');console.warn('Microphone unavailable',error)}}
+}
+mic.addEventListener('click',()=>{if(active)stopVoice();else startVoice()});
+window.addEventListener('pagehide',()=>{if(active)stopVoice()});
+
 })();
 </script>
 </body>
