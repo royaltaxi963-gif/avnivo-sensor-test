@@ -3,10 +3,11 @@
   "status": "planned_not_uploaded",
   "storage": {
     "provider": "google-cloud-storage",
-    "bucket": "TO_BE_VERIFIED",
+    "bucket": "avnivo-offline-models-792624108019",
     "access": "private",
     "delivery": "backend-issued-short-lived-signed-urls",
-    "prefix": "multilingual-stt/"
+    "prefix": "multilingual-stt/",
+    "bucket_verified_in": "translator-api/offline_models.py source configuration; cloud existence not independently verified"
   },
   "selection": {
     "default_model": "whisper-small-q8_0",

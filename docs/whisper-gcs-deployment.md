@@ -1,14 +1,15 @@
-# AVNIVO — Whisper multilingual models in private GCS
+# GCS Whisper upload and release gate
 
-This is a **pre-upload configuration**, not evidence of upload, runtime integration, or successful inference.
+The backend already declares `AVNIVO_MODEL_BUCKET` with default `avnivo-offline-models-792624108019`. This is a **code-configured bucket name**, not confirmation that GCS access or objects are available.
 
-- Keep the existing Uzbek Sherpa-ONNX STT model, storage objects, and download route unchanged.
-- Default choice: Whisper Small Multilingual Q8_0 (~252 MiB). Optional quality choice: Whisper Large V3 Turbo Q5_0 (~547 MiB).
-- Users may install both, select one active runtime, and remove either independently.
-- Do not enable download until the actual existing GCS bucket, upstream model identity, license, SHA-256 and bytes are verified and the private objects are uploaded.
-- Extend the backend ticket allowlist for each model ID; return signed HTTPS URLs for private objects. Enforce authentication, quota/rate limits, and short TTL. Never publish service-account keys.
-- Android: resumable app-private download; streaming SHA-256; disk-space check; atomic install; native whisper.cpp initialization and a real offline transcription self-test before `active`.
-- Never report an installed or active model based solely on a download finishing. Do not alter Online/Offline routing until tested.
-- Verify installation, airplane mode, app restart, interrupted download, hash mismatch, removal, and switching between both installed models.
+The two Whisper objects are defined in `translator-api/whisper_model_catalog.py`. They are deliberately **not downloadable** until the following are completed:
 
-Current blocker: no Google Cloud Storage write connector is available in this chat, and no bucket/object upload has been performed.
+1. Verify model licensing and official upstream source for both binaries.
+2. Download binaries in a trusted cloud environment, verify format and exact byte size, compute SHA-256.
+3. Upload to the existing private GCS bucket at the object names in the catalog. Do not modify `stt-uzbek/`.
+4. Verify GCS metadata and independently re-download/check hashes.
+5. Set exact bytes, hashes and `uploaded_and_verified=True` in the model catalog, review and deploy.
+6. Add ready-only model entries to the existing signed-ticket endpoint, with authentication, distributed quotas, and signed-URL expiry.
+7. Integrate Android downloader and whisper.cpp runtime; require offline self-test before marking active.
+
+This change is a gated catalog and regression tests only. It does not claim GCS upload or runtime integration.
