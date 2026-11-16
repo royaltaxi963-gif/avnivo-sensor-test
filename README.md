@@ -1,1 +1,0 @@
-# avnivo-sensor-test
