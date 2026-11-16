@@ -34,11 +34,14 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
-          echo "## Active principal"
+          echo "## Active principal (CI)"
           gcloud auth list --filter=status:ACTIVE --format='value(account)'
           echo "## Cloud Run service"
           gcloud run services describe "$SERVICE" --project="$PROJECT_ID" --region="$REGION" \
             --format='yaml(metadata.name,spec.template.spec.serviceAccountName,status.traffic)' || true
+          echo "## Recent revisions (creation time + service account)"
+          gcloud run revisions list --service="$SERVICE" --project="$PROJECT_ID" --region="$REGION" \
+            --format='table(metadata.name,metadata.creationTimestamp,spec.serviceAccountName)' --limit=8 || true
 
       - name: Enabled relevant APIs
         shell: bash
@@ -47,29 +50,42 @@ jobs:
             --filter='config.name:(speech.googleapis.com OR run.googleapis.com)' \
             --format='value(config.name)' || true
 
-      - name: Speech-to-Text quota (recent usage + limits)
+      - name: Runtime service account state and IAM
         shell: bash
         run: |
-          echo "### Service usage / quota for speech.googleapis.com"
-          gcloud services list --project="$PROJECT_ID" --enabled \
-            --filter='config.name:speech.googleapis.com' --format='value(config.name)' || true
+          set -uo pipefail
+          SA="$(gcloud run services describe "$SERVICE" --project="$PROJECT_ID" --region="$REGION" \
+            --format='value(spec.template.spec.serviceAccountName)')"
+          echo "Runtime SA: $SA"
+          if [ -n "$SA" ]; then
+            gcloud iam service-accounts describe "$SA" --project="$PROJECT_ID" \
+              --format='yaml(email,disabled,displayName)' || true
+          fi
+          echo "## Project IAM bindings for that SA"
+          gcloud projects get-iam-policy "$PROJECT_ID" --format=json \
+            | jq -r --arg sa "$SA" '.bindings[] | select(.members | index("serviceAccount:"+$sa)) | .role' || true
+          echo "## All bindings mentioning roles/speech or the default compute SA"
+          gcloud projects get-iam-policy "$PROJECT_ID" --format=json \
+            | jq -r '.bindings[] | select((.role|test("speech|serviceusage|aiplatform")) or (.members|join(" ")|test("compute@developer"))) | "\(.role): \(.members|join(", "))"' || true
 
-      - name: Cloud Run logs for the STT route (last 2h)
+      - name: Cloud Run logs with full payload (last 3h)
         shell: bash
         run: |
           set -uo pipefail
           gcloud logging read \
-            'resource.type="cloud_run_revision" AND resource.labels.service_name="avnivo-sensor-test" AND (textPayload:"transcribe" OR textPayload:"Speech" OR textPayload:"502" OR jsonPayload.message:"Speech" OR jsonPayload.message:"transcribe")' \
-            --project="$PROJECT_ID" --limit=50 --freshness=2h \
-            --format='value(timestamp,severity,textPayload,jsonPayload.message)' || true
+            'resource.type="cloud_run_revision" AND resource.labels.service_name="avnivo-sensor-test" AND severity>=WARNING' \
+            --project="$PROJECT_ID" --limit=40 --freshness=3h \
+            --format='value(timestamp,severity,textPayload,jsonPayload.message,jsonPayload.error,jsonPayload.detail,httpRequest.status)' || true
 
-      - name: Cloud Run logs (all severity>=WARNING, last 2h)
+      - name: IAM / policy changes in the failure window
         shell: bash
         run: |
+          set -uo pipefail
+          echo "## Admin activity: SetIamPolicy and service account changes (last 6h)"
           gcloud logging read \
-            'resource.type="cloud_run_revision" AND resource.labels.service_name="avnivo-sensor-test" AND severity>=WARNING' \
-            --project="$PROJECT_ID" --limit=50 --freshness=2h \
-            --format='value(timestamp,severity,textPayload,jsonPayload.message)' || true
+            'logName:"cloudaudit.googleapis.com%2Factivity" AND (protoPayload.methodName:"SetIamPolicy" OR protoPayload.methodName:"DeleteServiceAccount" OR protoPayload.methodName:"CreateServiceAccount")' \
+            --project="$PROJECT_ID" --limit=40 --freshness=6h \
+            --format='value(timestamp,protoPayload.methodName,protoPayload.authenticationInfo.principalEmail)' || true
 
       - name: Direct Google Speech-to-Text V2 recognize probe
         shell: bash
