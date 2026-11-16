@@ -369,9 +369,43 @@ function beginHold(){
  }catch(e){hint('Ovoz tanishni ishga tushirib bo‘lmadi');finishHold()}
 }
 function clearHoldTimer(){clearTimeout(holdTimer);holdTimer=0}
+// Android IME policy: keep an already visible keyboard, but never resurrect a dismissed one.
+const viewport=window.visualViewport;
+let keyboardReferenceHeight=viewport?.height||window.innerHeight;
+let keyboardWasVisible=false;
+function isKeyboardVisible(){
+ const v=window.visualViewport;
+ if(!v)return false;
+ const occluded=Math.max(0,window.innerHeight-(v.height+v.offsetTop));
+ return Math.max(occluded,keyboardReferenceHeight-v.height)>140;
+}
+function reconcileKeyboardFocus(){
+ const visible=isKeyboardVisible();
+ if(keyboardWasVisible&&!visible&&document.activeElement===input){
+  input.blur(); // Back / keyboard-hide has dismissed the IME; release stale textarea focus.
+ }
+ keyboardWasVisible=visible;
+ if(!visible){
+  const height=viewport?.height||window.innerHeight;
+  keyboardReferenceHeight=Math.max(keyboardReferenceHeight,height);
+ }
+}
+if(viewport)viewport.addEventListener('resize',reconcileKeyboardFocus,{passive:true});
+window.addEventListener('resize',reconcileKeyboardFocus,{passive:true});
+function preserveKeyboardOnMicPress(event){
+ if(document.activeElement!==input)return;
+ if(isKeyboardVisible()){
+  // Prevent the button from stealing textarea focus while the IME is genuinely open.
+  event.preventDefault();
+ }else{
+  // Android may leave the textarea focused after the user hides the keyboard.
+  // Explicitly clear that stale focus before invoking audio capture.
+  input.blur();
+ }
+}
 mic.addEventListener('pointerdown',event=>{
  // Preserve textarea focus and Android keyboard while pressing the action button.
- if(input===document.activeElement)event.preventDefault();
+ preserveKeyboardOnMicPress(event);
  if(event.button!==0||!input.value.trim()||active)return;
  holdPointer=event.pointerId;holdSuppressClick=false;
  try{mic.setPointerCapture(event.pointerId)}catch(e){}
@@ -383,7 +417,7 @@ function releaseHold(event){
  if(wasHold){holdSuppressClick=true;finishHold()}
 }
 mic.addEventListener('pointerup',releaseHold);
-mic.addEventListener('mousedown',event=>{if(input===document.activeElement)event.preventDefault()});
+mic.addEventListener('mousedown',preserveKeyboardOnMicPress);
 mic.addEventListener('pointercancel',releaseHold);
 mic.addEventListener('lostpointercapture',event=>{if(holdPointer===event.pointerId)releaseHold(event)});
 mic.addEventListener('contextmenu',event=>{if(holdTimer||holdStarted)event.preventDefault()});
