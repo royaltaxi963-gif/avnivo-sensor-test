@@ -34,6 +34,8 @@ jobs:
         run: node i18n/validate.mjs
       - name: Run localization test suite
         run: node i18n/tests/run-tests.mjs
+      - name: Validate inline browser JavaScript syntax and onboarding wiring
+        run: node i18n/tests/browser-integration.mjs
       - name: Upload validation report
         uses: actions/upload-artifact@v4
         with:
