@@ -289,12 +289,13 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
     data = await audio.read(MAX_AUDIO + 1)
     if not data or len(data) > MAX_AUDIO:
         raise HTTPException(413, "Invalid audio size")
-    # Silence is answered locally: Chirp 2 can emit a spurious boosted phrase
-    # for near-silent input, and there is nothing to recognise anyway.
-    if _is_near_silent(data):
-        return {"text": "", "model": GOOGLE_MODEL, "language": language}
     ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown").split(",")[0].strip()
     _rate_limit(ip)
+    # Silence is answered locally: Chirp 2 can emit a spurious boosted phrase
+    # for near-silent input, and there is nothing to recognise anyway. This runs
+    # after the rate limiter so silent requests still count toward the window.
+    if _is_near_silent(data):
+        return {"text": "", "model": GOOGLE_MODEL, "language": language}
     try:
         token = await asyncio.to_thread(_google_token)
     except (DefaultCredentialsError, RefreshError):

@@ -324,6 +324,23 @@ def test_compressed_audio_is_not_gated(monkeypatch):
     assert calls["n"] == 1
 
 
+def test_silent_requests_still_count_toward_rate_limit(monkeypatch):
+    """The gate must run after the limiter so it cannot be used to bypass it."""
+    _fake_credentials(monkeypatch)
+    _stub_httpx(monkeypatch, _capture_handler(body={"results": []}))
+    codes = []
+    for _ in range(api_main.RATE_LIMIT + 2):
+        response = client.post(
+            "/api/transcribe-google",
+            files={"audio": ("s.wav", io.BytesIO(_wav([0] * 16000)), "audio/wav")},
+            data={"language": "uz-UZ"},
+            headers={"x-forwarded-for": "203.0.113.55"},
+        )
+        codes.append(response.status_code)
+    assert codes[: api_main.RATE_LIMIT] == [200] * api_main.RATE_LIMIT
+    assert codes[api_main.RATE_LIMIT] == 429
+
+
 # --------------------------------------------------------------------------- #
 # Uzbek baseline preservation
 # --------------------------------------------------------------------------- #
