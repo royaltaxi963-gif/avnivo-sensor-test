@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T07:25:38.926967+00:00",
+ "generated_at": "2026-11-16T07:26:48.957783+00:00",
  "verified_on": "2026-11-16",
  "model": "general/translation-llm",
  "sources": {
@@ -23,7 +23,7 @@
  "quality_passed_locales": 93,
  "coverage_percent": 100.0,
  "documentation_api_conflicts": 3,
- "final_rejected_records": 96,
+ "final_rejected_records": 24,
  "real_api_requests": 6881,
  "total_cost_usd": 4.19088,
  "budget_ceiling_usd": 30.0,

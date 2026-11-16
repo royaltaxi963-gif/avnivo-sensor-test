@@ -181,7 +181,9 @@ def build() -> dict:
         "quality_passed_locales": sum(1 for v in verdicts if v["quality_pass"]),
         "coverage_percent": round(100 * sum(1 for v in verdicts if v["api_tested"]) / len(verdicts), 1),
         "documentation_api_conflicts": sum(1 for v in verdicts if v.get("doc_api_conflict")),
-        "final_rejected_records": sum(1 for r in ev["records"] if r["http"] != 200),
+        "final_rejected_records": sum(
+            1 for r in ev["records"]
+            if r["http"] != 200 and not r.get("tag") and r.get("category") != "diagnosis"),
         "real_api_requests": ledger.get("requests", 0),
         "total_cost_usd": ledger.get("cost_usd", 0.0),
         "budget_ceiling_usd": ledger.get("budget_ceiling_usd", 30.0),
@@ -270,13 +272,15 @@ def write_html(verdicts: list[dict], summary: dict) -> None:
             "<td><code>{llm}</code></td><td>{cls}</td>"
             "<td>{req}</td><td>{ok}</td><td>{lat}</td>"
             "<td>{q}</td>"
+            "<td>{cause}</td>"
             "<td style='color:{col};font-weight:600'>{d}</td>"
             "</tr>".format(
                 d=v["final_decision"], n=html.escape(v["language_name"]),
                 o=v["order"], c=v["chirp2_code"], llm=v["translation_llm_code"],
                 cls=v["documented_class"], req=v["api_requests"], ok=v["api_success"],
                 lat=(v["avg_latency_s"] if v["avg_latency_s"] is not None else "-"),
-                q=("OK" if v["quality_pass"] else "-"), col=color))
+                q=("OK" if v["quality_pass"] else "-"),
+                cause=html.escape(str(v.get("failure_cause") or "-")), col=color))
     counts = summary["decisions"]
     doc = f"""<!doctype html>
 <html lang="uz"><head><meta charset="utf-8">
@@ -317,7 +321,7 @@ Xarajat: <b>${summary['total_cost_usd']}</b></p>
 </select>
 <div class="wrap"><table id="t">
 <thead><tr><th>#</th><th>Chirp 2</th><th>Til</th><th>LLM kod</th><th>Sinf</th>
-<th>So'rov</th><th>OK</th><th>Kechikish (s)</th><th>Sifat</th><th>Qaror</th></tr></thead>
+<th>So'rov</th><th>OK</th><th>Kechikish (s)</th><th>Sifat</th><th>Sabab</th><th>Qaror</th></tr></thead>
 <tbody>
 {''.join(rows_html)}
 </tbody></table></div>
