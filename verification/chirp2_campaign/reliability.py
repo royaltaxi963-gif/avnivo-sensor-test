@@ -81,8 +81,59 @@ def _silence(seconds=2.0):
     return header + b"\x00" * frames
 
 
+def _tone(seconds=2.0, amplitude=1):
+    """A valid 16-bit PCM mono WAV carrying a low-energy tone (near-silence).
+
+    Distinct from true silence: a quiet but non-empty signal exercises the
+    low-energy path the adaptation boost could otherwise turn into a
+    hallucinated word.
+    """
+    import math
+    frames = int(16000 * seconds)
+    samples = bytearray()
+    for n in range(frames):
+        value = int(amplitude * math.sin(2 * math.pi * 220 * n / 16000))
+        samples += value.to_bytes(2, "little", signed=True)
+    header = (
+        b"RIFF" + (36 + len(samples)).to_bytes(4, "little") + b"WAVE"
+        + b"fmt " + (16).to_bytes(4, "little") + (1).to_bytes(2, "little")
+        + (1).to_bytes(2, "little") + (16000).to_bytes(4, "little")
+        + (32000).to_bytes(4, "little") + (2).to_bytes(2, "little")
+        + (16).to_bytes(2, "little")
+        + b"data" + len(samples).to_bytes(4, "little")
+    )
+    return header + bytes(samples)
+
+
+def _known_good_wav():
+    """Reuse a cached real clip (with its locale) so repeats test real audio."""
+    from pathlib import Path
+    base = Path("/tmp/chirp2_samples")
+    if base.exists():
+        preferred = base / "en-US"
+        search = preferred if preferred.exists() else base
+        for wav in sorted(search.glob("*.16k.wav")):
+            return ("en-US" if preferred.exists() else wav.parent.name, wav.read_bytes())
+    return None
+
+
+def _rate_limit_burst(limit=12, count=14):
+    """Send `count` requests from one IP; the tail must be 429.
+
+    Rate-limited requests are rejected before the Google call, so this costs
+    nothing and never reaches the paid API.
+    """
+    codes = []
+    for n in range(count):
+        observed = _call(blob=b"", ip="203.0.113.77")
+        codes.append(observed["http_status"])
+    return codes
+
+
 def run():
     silence = _silence()
+    low_energy = _tone()
+    good = _known_good_wav()
     probes = [
         ("unsupported_locale_xx", dict(locale="xx-XX")),
         ("unsupported_locale_ar-AE", dict(locale="ar-AE")),
@@ -95,8 +146,14 @@ def run():
         ("cors_allowed_origin", dict(origin="https://royaltaxi963-gif.github.io", blob=silence)),
         ("garbage_bytes_as_wav", dict(blob=os.urandom(8192), content_type="audio/wav")),
         ("silent_audio_empty_result", dict(blob=silence)),
+        ("low_energy_tone", dict(blob=low_energy)),
         ("unreachable_host", dict(base="https://avnivo-does-not-exist.invalid")),
     ]
+    if good:
+        # Same audio, same locale, three times: recognition must be stable.
+        locale, blob = good
+        for repeat in range(3):
+            probes.append((f"repeat_recognition_{repeat + 1}", dict(blob=blob, locale=locale)))
     results = []
     for index, (name, kwargs) in enumerate(probes):
         kwargs.setdefault("ip", f"198.19.{index // 250}.{index % 250}")
@@ -107,6 +164,21 @@ def run():
             "observed": observed,
         })
         print(f"{name:32s} HTTP {observed['http_status']} {observed['body'][:70]}")
+
+    # Rate-limit burst: the tail of the window must be rejected with 429 and
+    # never reach Google, so this costs nothing.
+    burst = _rate_limit_burst()
+    results.append({
+        "probe": "rate_limit_burst",
+        "request": {"count": len(burst), "ip": "203.0.113.77"},
+        "observed": {
+            "codes": burst,
+            "http_status": burst[-1],
+            "body": f"first 429 at request {burst.index(429) + 1}" if 429 in burst else "no 429 seen",
+        },
+    })
+    print(f"{'rate_limit_burst':32s} {burst}")
+
     OUT.write_text(json.dumps(results, indent=1, ensure_ascii=False), encoding="utf-8")
     return results
 

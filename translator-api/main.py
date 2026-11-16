@@ -34,6 +34,12 @@ GOOGLE_PROJECT = "project-6bcf7fe6-cb55-49b7-9f4"
 MAX_AUDIO = CHIRP2_SYNC_MAX_BYTES
 RATE_LIMIT = 12
 WINDOW = 60
+# Transient upstream statuses that are safe to retry (server-side faults and
+# rate limits, never client payload faults like 400). Kept small so a genuinely
+# down provider still fails fast and the client is not held for long.
+RETRY_STATUSES = {429, 500, 502, 503, 504}
+RETRY_ATTEMPTS = 3
+RETRY_BASE_DELAY = 0.5
 app = FastAPI(title="AVNIVO Translator API", docs_url=None, redoc_url=None)
 app.add_middleware(CORSMiddleware, allow_origins=sorted(ALLOWED_ORIGINS), allow_methods=["POST"], allow_headers=["Content-Type"], allow_credentials=False)
 recent = defaultdict(deque)
@@ -170,6 +176,38 @@ def _google_token() -> str:
     return credentials.token
 
 
+async def _recognize_with_retry(url: str, token: str, payload: dict) -> httpx.Response:
+    """POST to Google Speech, retrying only genuinely transient failures.
+
+    Client faults (400/401/403/404) and any status outside RETRY_STATUSES are
+    returned immediately: retrying them cannot help and would mask the real
+    cause. Transport errors are retried because a dropped connection is
+    transient. The final attempt's response (or the last transport error) is
+    returned/raised so the caller's existing status mapping still applies.
+    """
+    last_error: Exception | None = None
+    for attempt in range(RETRY_ATTEMPTS):
+        try:
+            async with httpx.AsyncClient(timeout=90) as client:
+                response = await client.post(
+                    url,
+                    headers={"Authorization": f"Bearer {token}"},
+                    json=payload,
+                )
+        except httpx.RequestError as error:
+            last_error = error
+            response = None
+        else:
+            if response.status_code not in RETRY_STATUSES:
+                return response
+            last_error = None
+        if attempt < RETRY_ATTEMPTS - 1:
+            await asyncio.sleep(RETRY_BASE_DELAY * (2 ** attempt))
+    if response is not None:
+        return response
+    raise last_error if last_error else httpx.RequestError("unreachable")
+
+
 def _rate_limit(ip: str) -> None:
     now = time.monotonic()
     hits = recent[ip]
@@ -226,12 +264,7 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
         "content": base64.b64encode(data).decode("ascii"),
     }
     try:
-        async with httpx.AsyncClient(timeout=90) as client:
-            response = await client.post(
-                url,
-                headers={"Authorization": f"Bearer {token}"},
-                json=payload,
-            )
+        response = await _recognize_with_retry(url, token, payload)
     except httpx.RequestError:
         raise HTTPException(502, "Google Speech service unreachable")
     if response.status_code == 429:

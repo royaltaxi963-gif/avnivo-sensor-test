@@ -46,6 +46,9 @@ def _isolate(monkeypatch):
         raise DefaultCredentialsError("offline test: no credentials")
 
     monkeypatch.setattr("main.google.auth.default", no_credentials)
+    # Remove the retry backoff so a test that exercises a retryable status does
+    # not sleep; retry behaviour is asserted by call count, not wall-clock time.
+    monkeypatch.setattr("main.RETRY_BASE_DELAY", 0)
     api_main.recent.clear()
     yield
 
@@ -376,6 +379,54 @@ def test_transport_error_is_mapped_to_502(monkeypatch):
     _stub_httpx(monkeypatch, boom)
     response = client.post("/api/transcribe-google", files=_audio(), data={"language": "uz-UZ"})
     assert response.status_code == 502
+
+
+def test_transient_5xx_is_retried_then_succeeds(monkeypatch):
+    """A single transient 503 must not surface to the client if a retry works."""
+    _fake_credentials(monkeypatch)
+    calls = {"n": 0}
+
+    def handler(request):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return httpx.Response(503, json={"error": "unavailable"})
+        return httpx.Response(200, json={"results": [{"alternatives": [{"transcript": "salom"}]}]})
+
+    _stub_httpx(monkeypatch, handler)
+    response = client.post("/api/transcribe-google", files=_audio(), data={"language": "uz-UZ"})
+    assert response.status_code == 200
+    assert response.json()["text"] == "salom"
+    assert calls["n"] == 2
+
+
+def test_client_fault_is_not_retried(monkeypatch):
+    """400 INVALID_ARGUMENT must fail fast: retrying a bad payload cannot help."""
+    _fake_credentials(monkeypatch)
+    calls = {"n": 0}
+
+    def handler(request):
+        calls["n"] += 1
+        return httpx.Response(400, json={"error": "bad audio"})
+
+    _stub_httpx(monkeypatch, handler)
+    response = client.post("/api/transcribe-google", files=_audio(), data={"language": "uz-UZ"})
+    assert response.status_code == 400
+    assert calls["n"] == 1
+
+
+def test_persistent_5xx_stops_after_bounded_attempts(monkeypatch):
+    """A provider that stays down must fail after RETRY_ATTEMPTS, not loop."""
+    _fake_credentials(monkeypatch)
+    calls = {"n": 0}
+
+    def handler(request):
+        calls["n"] += 1
+        return httpx.Response(503, json={"error": "unavailable"})
+
+    _stub_httpx(monkeypatch, handler)
+    response = client.post("/api/transcribe-google", files=_audio(), data={"language": "uz-UZ"})
+    assert response.status_code == 502
+    assert calls["n"] == api_main.RETRY_ATTEMPTS
 
 
 def test_missing_credentials_return_503(monkeypatch):
