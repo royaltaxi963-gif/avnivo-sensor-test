@@ -29,9 +29,10 @@ response.
 | `corpus.py` | 20 test categories (uz + en source phrases) |
 | `quality.py` | Script/number/empty/identity scoring |
 | `harness.py` | Real API client, budget guard, checkpoint/resume |
+| `diagnose.py` | Targeted FAILED/experimental/disputed retests (tagged, fresh requests) |
 | `report.py` | Builds all deliverables from recorded evidence |
 | `fix_checkpoint.py` | One-off repair (drops degenerate/transient records) |
-| `run-config.json` | Phase, locale filter, `deep` list, request cap |
+| `run-config.json` | Phase, locale filter, `deep` list, `mode`, request cap |
 | `results/` | All generated evidence and reports |
 
 ## Running it
@@ -43,14 +44,36 @@ the deliverables and commits them back. Set `run-config.json`, push, and the
 run resumes from the checkpoint.
 
 Parameters: `phase` (`pilot`/`full`), `only` (locale filter), `deep`
-(locales to probe fully even when undocumented), `max_requests`.
+(locales to probe fully even when undocumented), `max_requests`, and `mode`
+(`failed`/`disputed`/`experimental`/`regression` to run `diagnose.py`).
+
+Retest requests are keyed with a per-mode `tag`, so a retest always issues new
+API calls instead of being served from the earlier corpus cache.
+
+## Recovery and targeted retest
+
+The audit was resumed from its verified checkpoint without repeating the
+original 6,651 requests. The preserved evidence is unchanged; additional
+targeted work was appended:
+
+* **FAILED diagnosis** — each of the 24 rejected locales was probed from both
+  `uz` and `en` sources. All 24 fail from both, so the *language code itself*
+  is unsupported, not merely the pair. All 24 are absent from Google's official
+  Translation LLM table. No supported alternative code or model exists for
+  them, and no language was silently substituted.
+* **Disputed retest** — `si-LK`, `xh-ZA`, `yo-NG` reproduce 20/20 success with
+  correct native scripts (Sinhala, Latin Xhosa, Yoruba with tone marks), though
+  they are absent from the official documentation. Kept RETEST_REQUIRED.
+* **Experimental retest** — all 13 experimental locales succeed 6/6 with the
+  expected script.
+* **Regression** — a 10-locale sample of PASSED locales still succeeds 20/20.
 
 ## Cost
 
 Translation LLM is billed at USD 10 per 1M input characters + USD 10 per 1M
-output characters. The harness stops before $25 and the ceiling is $30. The
-completed run cost **$4.01** for 6,651 real requests (6,606 recorded calls;
-rejected calls are not billed).
+output characters. The harness stops before $25 and the ceiling is $30. After
+the recovery and targeted retests the total is **$4.19** for 6,881 real
+requests (rejected calls are not billed).
 
 ## Result summary
 

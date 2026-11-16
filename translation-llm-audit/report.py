@@ -55,9 +55,15 @@ def is_degenerate(r: dict) -> bool:
 
 
 def group_records(records: list[dict]) -> dict[str, list[dict]]:
+    """Group the *main matrix* records per locale.
+
+    Tagged retest records and diagnosis probes are excluded here: the primary
+    verdict must rest on the preserved 6,651-request matrix alone. Retest
+    evidence is reported separately, so the two cannot double-count.
+    """
     by_chirp: dict[str, list[dict]] = defaultdict(list)
     for r in records:
-        if is_degenerate(r):
+        if is_degenerate(r) or r.get("tag") or r.get("category") == "diagnosis":
             continue
         by_chirp[r["chirp"]].append(r)
     return by_chirp
