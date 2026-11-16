@@ -281,7 +281,7 @@ function beginHold(){
   recognition.onerror=e=>{if(holdRecognizer===recognition)hint('Ovoz tanish: '+e.error)};
   recognition.onend=()=>{
    if(holdRecognizer!==recognition)return;
-   if(holdStarted){finishHold();return}
+   if(holdStarted){finishHold()}
    holdRecognizer=null;
    input.value=appendTranscript(holdBase,holdFinal||holdTranscript);
    resize();syncComposerMode();hint('');
