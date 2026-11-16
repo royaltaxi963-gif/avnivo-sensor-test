@@ -305,9 +305,9 @@ function renderOnlineLanguages(){
 function openOnlineLanguages(side){
  if(document.documentElement.dataset.avnivoMode!=='online')return;
  longPressSide=side;longPressFired=true;languageSearch.value='';
- languageSheet.hidden=false;renderOnlineLanguages();
+ languageSheet.hidden=false;renderOnlineLanguages();syncBackNavigation();
 }
-function closeOnlineLanguages(){languageSheet.hidden=true;longPressSide=null;languageSearch.blur()}
+function closeOnlineLanguages(){languageSheet.hidden=true;longPressSide=null;languageSearch.blur();syncBackNavigation()}
 languageSheet.querySelector('.online-language-close').addEventListener('click',closeOnlineLanguages);
 languageSheet.addEventListener('click',e=>{if(e.target===languageSheet)closeOnlineLanguages()});
 languageSearch.addEventListener('input',renderOnlineLanguages);
@@ -344,6 +344,7 @@ function setSettingsOpen(open){
  settingsOverlay.hidden=!open;settingsOverlay.classList.toggle('open',open);
  settingsDrawer.classList.toggle('open',open);settingsDrawer.setAttribute('aria-hidden',String(!open));settingsDrawer.inert=!open;
  settingsToggle.setAttribute('aria-expanded',String(open));
+ syncBackNavigation();
 }
 settingsToggle.addEventListener('click',()=>{if(historyOpen)setHistoryOpen(false);setSettingsOpen(!settingsOpen)});
 settingsClose.addEventListener('click',()=>setSettingsOpen(false));
@@ -448,6 +449,7 @@ function setHistoryOpen(open){
  historyOpen=open;historyOverlay.hidden=!open;historyOverlay.classList.toggle('open',open);historyDrawer.classList.toggle('open',open);
  historyDrawer.setAttribute('aria-hidden',String(!open));historyDrawer.inert=!open;historyToggle.setAttribute('aria-expanded',String(open));
  if(open)renderHistory();
+ syncBackNavigation();
 }
 const PREVIEW_TRANSLATION='Tarjima sinov so‘zi';
 let translationTimers=new Set();
@@ -538,7 +540,48 @@ historyToggle.addEventListener('click',()=>setHistoryOpen(!historyOpen));
 historyClose.addEventListener('click',()=>setHistoryOpen(false));
 historyOverlay.addEventListener('click',()=>setHistoryOpen(false));
 historyNew.addEventListener('click',()=>{chatFollowLatest=true;chatScrollRestore=0;stopSpeaking();clearTranslationTimers();persistDraft();currentHistoryId=null;persistActiveChat();messages.replaceChildren();loadDraft();syncComposerMode();if(!input.value){clearTimeout(timeout);timeout=0;delay(100)}setHistoryOpen(false)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(settingsOpen)setSettingsOpen(false);if(historyOpen)setHistoryOpen(false)}});
+/* Unified Android/Chrome Back: topmost transient layer closes first, then browser history exits normally. */
+const avnivoBackKey='avnivoOverlayEntry';
+const avnivoBackId='avnivo-'+Math.random().toString(36).slice(2);
+let avnivoBackPopping=false;
+let avnivoBackPending=false;
+function activeBackLayer(){
+ if(!languageSheet.hidden)return 'languages';
+ if(settingsOpen)return 'settings';
+ if(historyOpen)return 'history';
+ return null;
+}
+function syncBackNavigation(){
+ if(avnivoBackPopping)return;
+ const layer=activeBackLayer();
+ const current=window.history.state;
+ const owned=Boolean(current&&current[avnivoBackKey]===avnivoBackId);
+ if(layer){
+  if(owned){window.history.replaceState({...current,layer},'');return}
+  window.history.pushState({...current,[avnivoBackKey]:avnivoBackId,layer},'');
+  avnivoBackPending=false;
+ }else if(owned&&!avnivoBackPending){
+  avnivoBackPending=true;
+  window.history.back();
+ }
+}
+window.addEventListener('popstate',()=>{
+ avnivoBackPending=false;
+ avnivoBackPopping=true;
+ // Close only UI overlays; never switch online/offline mode or clear a chat.
+ if(!languageSheet.hidden)closeOnlineLanguages();
+ if(settingsOpen)setSettingsOpen(false);
+ if(historyOpen)setHistoryOpen(false);
+ avnivoBackPopping=false;
+});
+document.addEventListener('keydown',e=>{
+ if(e.key!=='Escape')return;
+ if(!activeBackLayer())return;
+ e.preventDefault();
+ if(!languageSheet.hidden)closeOnlineLanguages();
+ else if(settingsOpen)setSettingsOpen(false);
+ else if(historyOpen)setHistoryOpen(false);
+});
 // Initialize saved conversation only after microphone, brand and composer are ready.
 
 const brand=document.querySelector('.center-brand');
