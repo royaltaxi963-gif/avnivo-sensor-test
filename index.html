@@ -1216,7 +1216,7 @@ let wordOrder=shuffledIndices(names.length),languageOrder=shuffledIndices(langua
 let wi=0,wp=0,we=false,li=0,lp=0,le=false,selected=false,menuOpen=false;
 function typeWord(){if(selected)return;const chars=segment(names[wordOrder[wi]]);if(!we){wp=Math.min(chars.length,wp+1);word.textContent=chars.slice(0,wp).join('');if(wp===chars.length){we=true;setTimeout(typeWord,800)}else setTimeout(typeWord,95)}else{wp=Math.max(0,wp-1);word.textContent=chars.slice(0,wp).join('');if(!wp){we=false;wi++;if(wi>=wordOrder.length){const last=wordOrder[wordOrder.length-1];wordOrder=shuffledIndices(names.length);if(wordOrder.length>1&&wordOrder[0]===last){[wordOrder[0],wordOrder[1]]=[wordOrder[1],wordOrder[0]]}wi=0}setTimeout(typeWord,180)}else setTimeout(typeWord,45)}}
 function typeLanguage(){if(selected)return;const chars=segment(languageNames[languageOrder[li]]);if(!le){lp=Math.min(chars.length,lp+1);lang.textContent=chars.slice(0,lp).join('');if(lp===chars.length){le=true;setTimeout(typeLanguage,1200)}else setTimeout(typeLanguage,95)}else{lp=Math.max(0,lp-1);lang.textContent=chars.slice(0,lp).join('');if(!lp){le=false;li++;if(li>=languageOrder.length){const last=languageOrder[languageOrder.length-1];languageOrder=shuffledIndices(languageNames.length);if(languageOrder.length>1&&languageOrder[0]===last){[languageOrder[0],languageOrder[1]]=[languageOrder[1],languageOrder[0]]}li=0}setTimeout(typeLanguage,250)}else setTimeout(typeLanguage,55)}}
-async async function choose(code){
+async function choose(code){
  if(selected||!menuOpen)return;
  const api=window.AVNIVO_I18N;
  try{await window.avnivoI18nReady;await api.setLanguage(code||'uz')}catch(e){console.warn('Language unavailable',e);return}
