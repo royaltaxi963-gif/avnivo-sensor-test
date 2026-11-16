@@ -1,0 +1,36 @@
+name: Chirp 2 STT status timeline (read-only)
+
+# Extracts the per-request Google Speech-to-Text V2 outcome timeline from the
+# speech.googleapis.com logs so the 502 window can be bounded with evidence.
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/timeline-request']
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  timeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PROJECT_ID: project-6bcf7fe6-cb55-49b7-9f4
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Speech recognition outcome timeline (last 10h)
+        shell: bash
+        run: |
+          gcloud logging read 'logName:"speech.googleapis.com%2Fcloud_speech_recognition_stream"' \
+            --project="$PROJECT_ID" --limit=200 --freshness=10h --format=json \
+            | jq -r '.[] | [.timestamp, (.jsonPayload.recognize.recognizeResponse.status.code // 0), (.jsonPayload.recognize.recognizeResponse.status.message // "OK")] | @tsv' \
+            | sort | awk -F'\t' '{print}' | head -200 || true
+          echo "### Summary by status code"
+          gcloud logging read 'logName:"speech.googleapis.com%2Fcloud_speech_recognition_stream"' \
+            --project="$PROJECT_ID" --limit=500 --freshness=10h --format=json \
+            | jq -r '.[].jsonPayload.recognize.recognizeResponse.status.code // 0' | sort | uniq -c || true
