@@ -139551,17 +139551,1243 @@
     ],
     "length_ratio": 0.0
    }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "si",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "සුබ උදෑසනක්, අද ඔබේ වැඩකටයුතු හොඳින් සිදුවෙනවාද?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.329,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.2
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "si",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "සුබ උදෑසනක්, අද ඔබේ වැඩ කටයුතු හොඳින් සිදුවෙනවාද?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.233,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.114
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.2,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "en",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "Good morning, is your work going well today?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.308,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "si",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "මම ටෂ්කන්ට්වලින් පැමිණි අතර නව ව්‍යාපෘතියක වැඩ කරමි.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.261,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.963
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "si",
+   "source_text": "I come from Tashkent and I work on a new project.",
+   "translated": "මම පැමිණෙන්නේ ටෂ්කන්ට් නුවරින් වන අතර, මම නව ව්‍යාපෘතියක කටයුතු කරමින් සිටිමි.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.391,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.592
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.185,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "en",
+   "source_text": "I come from Tashkent and I work on a new project.",
+   "translated": "I come from Tashkent and I am working on a new project.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.291,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.122
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "si",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "සමාවෙන්න, ළඟම ඇති නැවතුම්පොළ පිහිටා ඇත්තේ කොහේද?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.257,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.021
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "si",
+   "source_text": "Excuse me, where is the nearest station located?",
+   "translated": "සමාවෙන්න, ළඟම ඇති දුම්රිය ස්ථානය පිහිටා ඇත්තේ කොහේද?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.373,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.083
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.162,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "en",
+   "source_text": "Excuse me, where is the nearest station located?",
+   "translated": "Excuse me, where is the nearest station located?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.315,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "si",
+   "source_text": "Bu mahsulotning narxi qancha va chegirma bormi?",
+   "translated": "මේ නිෂ්පාදනයේ මිල කොපමණද සහ වට්ටමක් තිබේද?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.212,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.894
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "si",
+   "source_text": "How much does this product cost and is there a discount?",
+   "translated": "මෙම නිෂ්පාදනයේ මිල කොපමණද සහ ඊට වට්ටමක් තිබේද?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.178,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.821
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "uz",
+   "source_text": "Bu mahsulotning narxi qancha va chegirma bormi?",
+   "translated": "Bu mahsulotning narxi qancha va chegirma bormi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.297,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "en",
+   "source_text": "How much does this product cost and is there a discount?",
+   "translated": "How much does this product cost, and is there a discount?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.252,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.018
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "si",
+   "source_text": "Uchrashuv ertaga soat o'n beshda boshlanadi.",
+   "translated": "හමුවීම හෙට දහවල් 3ට ආරම්භ වේ.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.193,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.659
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "si",
+   "source_text": "The meeting starts tomorrow at fifteen o'clock.",
+   "translated": "රැස්වීම හෙට දහහතරට (ප.ව. 3ට) ආරම්භ වේ.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.345,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.809
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "uz",
+   "source_text": "Uchrashuv ertaga soat o'n beshda boshlanadi.",
+   "translated": "Uchrashuv ertaga soat 15:00 da boshlanadi.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.315,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.955
+   }
+  },
+  {
+   "chirp": "si-LK",
+   "llm": "si",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "si",
+   "target": "en",
+   "source_text": "The meeting starts tomorrow at fifteen o'clock.",
+   "translated": "The meeting starts tomorrow at 15:00.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.263,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.787
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "xh",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Molweni, ingaba imisebenzi yakho ihamba kakuhle namhlanje?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.214,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.45
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "xh",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "Molweni, ingaba umsebenzi wakho uhamba kakuhle namhlanje?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.44,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.295
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.288,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "en",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "Good morning, is your work going well today?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.267,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "xh",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Ndivela eTashkent kwaye ndisebenza kwiprojekthi entsha.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.285,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.019
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "xh",
+   "source_text": "I come from Tashkent and I work on a new project.",
+   "translated": "Ndivela eTashkent kwaye ndisebenza kwiprojekthi entsha.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.285,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.122
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.305,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "en",
+   "source_text": "I come from Tashkent and I work on a new project.",
+   "translated": "I come from Tashkent and I am working on a new project.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.209,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.122
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "xh",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Uxolo, isikhululo esikufuphi sikuphi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.328,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.787
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "xh",
+   "source_text": "Excuse me, where is the nearest station located?",
+   "translated": "Uxolo, ikuphi isitishi esikufuphi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.321,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.708
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.178,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "en",
+   "source_text": "Excuse me, where is the nearest station located?",
+   "translated": "Excuse me, where is the nearest station located?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.146,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "xh",
+   "source_text": "Bu mahsulotning narxi qancha va chegirma bormi?",
+   "translated": "Ixabiso lale mveliso yintoni kwaye ingaba kukho isaphulelo?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.25,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.255
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "xh",
+   "source_text": "How much does this product cost and is there a discount?",
+   "translated": "Ibiza malini le mveliso kwaye ingaba ikho isaphulelo?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.286,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.946
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "uz",
+   "source_text": "Bu mahsulotning narxi qancha va chegirma bormi?",
+   "translated": "Bu mahsulotning narxi qancha va chegirma bormi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.254,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "en",
+   "source_text": "How much does this product cost and is there a discount?",
+   "translated": "How much does this product cost and is there a discount?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.261,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "xh",
+   "source_text": "Uchrashuv ertaga soat o'n beshda boshlanadi.",
+   "translated": "Intlanganiso iza kuqala ngentsimbi yesithathu emva kwemini ngomso.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.326,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.5
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "xh",
+   "source_text": "The meeting starts tomorrow at fifteen o'clock.",
+   "translated": "Intlanganiso iza kuqala ngomso ngo-15:00.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.186,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.872
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "uz",
+   "source_text": "Uchrashuv ertaga soat o'n beshda boshlanadi.",
+   "translated": "Uchrashuv ertaga soat 15:00 da boshlanadi.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.29,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.955
+   }
+  },
+  {
+   "chirp": "xh-ZA",
+   "llm": "xh",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "xh",
+   "target": "en",
+   "source_text": "The meeting starts tomorrow at fifteen o'clock.",
+   "translated": "The meeting starts tomorrow at 15:00.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.17,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.787
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "yo",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Ẹ kú àárọ̀, ṣé iṣẹ́ rẹ dára lónìí?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.334,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.85
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "yo",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "Ẹ kú àárọ̀, ṣé iṣẹ́ rẹ ń lọ dáadáa lónìí?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.313,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.932
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.191,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c01",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "en",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "Good morning, is your work going well today?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.154,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "yo",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Mo ti Tashkent wa, mo sì ń ṣiṣẹ́ lórí iṣẹ́-àkànṣe tuntun kan.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.237,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.13
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "yo",
+   "source_text": "I come from Tashkent and I work on a new project.",
+   "translated": "Mo wá láti Tashkent, mo sì ń ṣiṣẹ́ lórí iṣẹ́-àkànṣe tuntun kan.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.353,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.286
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.266,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c02",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "en",
+   "source_text": "I come from Tashkent and I work on a new project.",
+   "translated": "I come from Tashkent and I am working on a new project.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.293,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.122
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "yo",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Máà bínú, níbo ni ibùdó tó súnmọ́ jùlọ wà?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.252,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.894
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "yo",
+   "source_text": "Excuse me, where is the nearest station located?",
+   "translated": "Jọ̀wọ́, níbo ni ibùdó tó súnmọ́ jùlọ wà?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.258,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.833
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.185,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c03",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "en",
+   "source_text": "Excuse me, where is the nearest station located?",
+   "translated": "Excuse me, where is the nearest station located?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.182,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "yo",
+   "source_text": "Bu mahsulotning narxi qancha va chegirma bormi?",
+   "translated": "Elo yìí ní iye owó mélòó, ṣé wọ́n sì ti dín owó rẹ̀ kù?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.378,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.17
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "yo",
+   "source_text": "How much does this product cost and is there a discount?",
+   "translated": "Elo ni iye owo ọjà yii, ṣe wọn si n dín iye owo rẹ kù?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.208,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.964
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "uz",
+   "source_text": "Bu mahsulotning narxi qancha va chegirma bormi?",
+   "translated": "Bu mahsulotning narxi qancha va chegirma bormi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.278,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c04",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "en",
+   "source_text": "How much does this product cost and is there a discount?",
+   "translated": "How much does this product cost, and is there a discount?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.296,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.018
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "uz2X",
+   "tag": "diag-disputed",
+   "source": "uz",
+   "target": "yo",
+   "source_text": "Uchrashuv ertaga soat o'n beshda boshlanadi.",
+   "translated": "Ìpàdé náà yóò bẹ̀rẹ̀ ní aago mẹ́ẹ̀ẹ́dógún (3:00 p.m.) ọ̀la.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.239,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.341
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "en2X",
+   "tag": "diag-disputed",
+   "source": "en",
+   "target": "yo",
+   "source_text": "The meeting starts tomorrow at fifteen o'clock.",
+   "translated": "Ìpàdé náà yóò bẹ̀rẹ̀ ní ọ̀la ní aago mẹ́ẹ̀dógún.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.331,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.021
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "X2uz",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "uz",
+   "source_text": "Uchrashuv ertaga soat o'n beshda boshlanadi.",
+   "translated": "Uchrashuv ertaga soat 15:00 da boshlanadi.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.303,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.955
+   }
+  },
+  {
+   "chirp": "yo-NG",
+   "llm": "yo",
+   "class": "C",
+   "item": "c05",
+   "category": "disputed_retest",
+   "direction": "X2en",
+   "tag": "diag-disputed",
+   "source": "yo",
+   "target": "en",
+   "source_text": "The meeting starts tomorrow at fifteen o'clock.",
+   "translated": "The meeting starts tomorrow at 3:00 PM.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.272,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.83
+   }
   }
  ],
  "ledger": {
-  "requests": 6675,
+  "requests": 6735,
   "errors": 93,
-  "input_chars": 202895,
-  "output_chars": 199510,
-  "cost_usd": 4.02405,
+  "input_chars": 205751,
+  "output_chars": 202424,
+  "cost_usd": 4.08175,
   "budget_ceiling_usd": 30.0,
   "hard_stop_usd": 25.0,
-  "remaining_usd": 25.97595,
+  "remaining_usd": 25.91825,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  }
 }

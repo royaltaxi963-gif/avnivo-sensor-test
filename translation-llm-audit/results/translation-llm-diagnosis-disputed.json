@@ -1,0 +1,481 @@
+{
+ "mode": "disputed",
+ "diagnosis": [
+  {
+   "chirp2_code": "si-LK",
+   "llm_code": "si",
+   "language_name": "Sinhala (Sri Lanka)",
+   "success": 20,
+   "attempted": 20,
+   "reproduced": true,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "සුබ උදෑසනක්, අද ඔබේ වැඩකටයුතු හොඳින් සිදුවෙනවාද?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "en2X",
+     "http": 200,
+     "out": "සුබ උදෑසනක්, අද ඔබේ වැඩ කටයුතු හොඳින් සිදුවෙනවාද?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2en",
+     "http": 200,
+     "out": "Good morning, is your work going well today?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "මම ටෂ්කන්ට්වලින් පැමිණි අතර නව ව්‍යාපෘතියක වැඩ කරමි.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "en2X",
+     "http": 200,
+     "out": "මම පැමිණෙන්නේ ටෂ්කන්ට් නුවරින් වන අතර, මම නව ව්‍යාපෘතියක කටයුතු කරමින් සිටිමි.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2en",
+     "http": 200,
+     "out": "I come from Tashkent and I am working on a new project.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "සමාවෙන්න, ළඟම ඇති නැවතුම්පොළ පිහිටා ඇත්තේ කොහේද?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "en2X",
+     "http": 200,
+     "out": "සමාවෙන්න, ළඟම ඇති දුම්රිය ස්ථානය පිහිටා ඇත්තේ කොහේද?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c03",
+     "direction": "X2en",
+     "http": 200,
+     "out": "Excuse me, where is the nearest station located?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c04",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "මේ නිෂ්පාදනයේ මිල කොපමණද සහ වට්ටමක් තිබේද?",
+     "flags": []
+    },
+    {
+     "item": "c04",
+     "direction": "en2X",
+     "http": 200,
+     "out": "මෙම නිෂ්පාදනයේ මිල කොපමණද සහ ඊට වට්ටමක් තිබේද?",
+     "flags": []
+    },
+    {
+     "item": "c04",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Bu mahsulotning narxi qancha va chegirma bormi?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c04",
+     "direction": "X2en",
+     "http": 200,
+     "out": "How much does this product cost, and is there a discount?",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "හමුවීම හෙට දහවල් 3ට ආරම්භ වේ.",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "en2X",
+     "http": 200,
+     "out": "රැස්වීම හෙට දහහතරට (ප.ව. 3ට) ආරම්භ වේ.",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Uchrashuv ertaga soat 15:00 da boshlanadi.",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "X2en",
+     "http": 200,
+     "out": "The meeting starts tomorrow at 15:00.",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "xh-ZA",
+   "llm_code": "xh",
+   "language_name": "Xhosa (South Africa)",
+   "success": 20,
+   "attempted": 20,
+   "reproduced": true,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Molweni, ingaba imisebenzi yakho ihamba kakuhle namhlanje?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Molweni, ingaba umsebenzi wakho uhamba kakuhle namhlanje?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2en",
+     "http": 200,
+     "out": "Good morning, is your work going well today?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Ndivela eTashkent kwaye ndisebenza kwiprojekthi entsha.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Ndivela eTashkent kwaye ndisebenza kwiprojekthi entsha.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2en",
+     "http": 200,
+     "out": "I come from Tashkent and I am working on a new project.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Uxolo, isikhululo esikufuphi sikuphi?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Uxolo, ikuphi isitishi esikufuphi?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c03",
+     "direction": "X2en",
+     "http": 200,
+     "out": "Excuse me, where is the nearest station located?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c04",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Ixabiso lale mveliso yintoni kwaye ingaba kukho isaphulelo?",
+     "flags": []
+    },
+    {
+     "item": "c04",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Ibiza malini le mveliso kwaye ingaba ikho isaphulelo?",
+     "flags": []
+    },
+    {
+     "item": "c04",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Bu mahsulotning narxi qancha va chegirma bormi?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c04",
+     "direction": "X2en",
+     "http": 200,
+     "out": "How much does this product cost and is there a discount?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c05",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Intlanganiso iza kuqala ngentsimbi yesithathu emva kwemini ngomso.",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Intlanganiso iza kuqala ngomso ngo-15:00.",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Uchrashuv ertaga soat 15:00 da boshlanadi.",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "X2en",
+     "http": 200,
+     "out": "The meeting starts tomorrow at 15:00.",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "yo-NG",
+   "llm_code": "yo",
+   "language_name": "Yoruba (Nigeria)",
+   "success": 20,
+   "attempted": 20,
+   "reproduced": true,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Ẹ kú àárọ̀, ṣé iṣẹ́ rẹ dára lónìí?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Ẹ kú àárọ̀, ṣé iṣẹ́ rẹ ń lọ dáadáa lónìí?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2en",
+     "http": 200,
+     "out": "Good morning, is your work going well today?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Mo ti Tashkent wa, mo sì ń ṣiṣẹ́ lórí iṣẹ́-àkànṣe tuntun kan.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Mo wá láti Tashkent, mo sì ń ṣiṣẹ́ lórí iṣẹ́-àkànṣe tuntun kan.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2en",
+     "http": 200,
+     "out": "I come from Tashkent and I am working on a new project.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Máà bínú, níbo ni ibùdó tó súnmọ́ jùlọ wà?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Jọ̀wọ́, níbo ni ibùdó tó súnmọ́ jùlọ wà?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c03",
+     "direction": "X2en",
+     "http": 200,
+     "out": "Excuse me, where is the nearest station located?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c04",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Elo yìí ní iye owó mélòó, ṣé wọ́n sì ti dín owó rẹ̀ kù?",
+     "flags": []
+    },
+    {
+     "item": "c04",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Elo ni iye owo ọjà yii, ṣe wọn si n dín iye owo rẹ kù?",
+     "flags": []
+    },
+    {
+     "item": "c04",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Bu mahsulotning narxi qancha va chegirma bormi?",
+     "flags": [
+      "identical_to_source"
+     ]
+    },
+    {
+     "item": "c04",
+     "direction": "X2en",
+     "http": 200,
+     "out": "How much does this product cost, and is there a discount?",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Ìpàdé náà yóò bẹ̀rẹ̀ ní aago mẹ́ẹ̀ẹ́dógún (3:00 p.m.) ọ̀la.",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "en2X",
+     "http": 200,
+     "out": "Ìpàdé náà yóò bẹ̀rẹ̀ ní ọ̀la ní aago mẹ́ẹ̀dógún.",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Uchrashuv ertaga soat 15:00 da boshlanadi.",
+     "flags": []
+    },
+    {
+     "item": "c05",
+     "direction": "X2en",
+     "http": 200,
+     "out": "The meeting starts tomorrow at 3:00 PM.",
+     "flags": []
+    }
+   ]
+  }
+ ]
+}

@@ -26,9 +26,9 @@ Manbalar:
 | EXPERIMENTAL | 13 |
 | FAILED | 24 |
 | RETEST_REQUIRED | 3 |
-| Haqiqiy API so'rovlari soni | 6675 |
-| Umumiy xarajat (USD) | 4.02405 |
-| Qolgan budjet (USD) | 25.97595 |
+| Haqiqiy API so'rovlari soni | 6735 |
+| Umumiy xarajat (USD) | 4.08175 |
+| Qolgan budjet (USD) | 25.91825 |
 | Qamrov | 100.0% |
 
 Narx modeli: har 1 million kiruvchi belgi uchun $10 va har 1 million chiquvchi

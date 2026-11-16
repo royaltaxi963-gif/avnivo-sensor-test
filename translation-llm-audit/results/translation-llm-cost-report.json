@@ -3,21 +3,21 @@
  "rate": "USD 10 per 1M input characters + USD 10 per 1M output characters",
  "source": "https://cloud.google.com/translate/pricing",
  "ledger": {
-  "requests": 6675,
+  "requests": 6735,
   "errors": 93,
-  "input_chars": 202895,
-  "output_chars": 199510,
-  "cost_usd": 4.02405,
+  "input_chars": 205751,
+  "output_chars": 202424,
+  "cost_usd": 4.08175,
   "budget_ceiling_usd": 30.0,
   "hard_stop_usd": 25.0,
-  "remaining_usd": 25.97595,
+  "remaining_usd": 25.91825,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  },
  "errors_note": "ledger.errors counts every failed HTTP attempt across all runs, including transient 429/5xx that were retried. The final evidence file contains only 24 non-200 records, all of them definitive API rejections of unsupported languages.",
  "final_rejected_records": 48,
  "budget_ceiling_usd": 30.0,
  "hard_stop_usd": 25.0,
- "remaining_usd": 25.97595,
+ "remaining_usd": 25.91825,
  "checkpoints": [
   {
    "threshold_usd": 2,
