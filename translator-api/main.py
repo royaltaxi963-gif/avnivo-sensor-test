@@ -408,9 +408,15 @@ async def synthesize_emotional_speech(request: Request):
     if not isinstance(spoken, str) or not spoken.strip() or len(spoken) > 350:
         raise HTTPException(400, "Text must contain 1-350 characters")
     spoken = spoken.strip()
+    # Full Gemini prebuilt voice catalog; retain existing default for compatibility.
     allowed_voices = {
-        "Kore", "Aoede", "Leda", "Zephyr", "Achernar",
-        "Puck", "Charon", "Orus", "Achird", "Iapetus",
+        "Zephyr", "Puck", "Charon", "Kore", "Fenrir", "Leda",
+        "Orus", "Aoede", "Callirrhoe", "Autonoe", "Enceladus",
+        "Iapetus", "Umbriel", "Algieba", "Despina", "Erinome",
+        "Algenib", "Rasalgethi", "Laomedeia", "Achernar",
+        "Alnilam", "Schedar", "Gacrux", "Pulcherrima",
+        "Achird", "Zubenelgenubi", "Vindemiatrix",
+        "Sadachbia", "Sadaltager", "Sulafat",
     }
     voice = body.get("voice", "Kore")
     if not isinstance(voice, str) or voice not in allowed_voices:
@@ -424,7 +430,10 @@ async def synthesize_emotional_speech(request: Request):
         raise HTTPException(429, "Too many requests")
     hits.append(now)
 
-    style = _detect_tts_style(spoken)
+    requested_style = body.get("style", "auto")
+    if not isinstance(requested_style, str) or requested_style not in (*_TTS_STYLES.keys(), "auto"):
+        raise HTTPException(400, "Unsupported TTS style")
+    style = _detect_tts_style(spoken) if requested_style == "auto" else requested_style
     project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
     # Use the enabled Cloud Text-to-Speech API with a higher-quality Gemini voice.
     # Keep translation, ASR and the public /api/tts contract unchanged.
