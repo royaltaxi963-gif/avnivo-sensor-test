@@ -1,0 +1,1893 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>AVNIVO Translator — UI maket v11.49 — Multilingual Chirp 2 STT</title>
+<style>
+:root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}button:focus-visible{outline:3px solid #ffe0a0;outline-offset:3px}
+.app{--nav-height:86px;height:100dvh;min-height:360px;display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1fr) auto;row-gap:12px;position:relative;overflow:hidden;padding:calc(10px + env(safe-area-inset-top)) 11px 0;background:radial-gradient(ellipse at 12% 10%,#51391c 0%,transparent 48%),radial-gradient(ellipse at 95% 78%,#3c2b1d 0%,transparent 48%),#17120d}
+.speaker{min-height:0;min-width:0;padding:19px 17px;display:flex;flex-direction:column;gap:12px;overflow:auto;border-radius:26px;border:1px solid rgba(255,255,255,.11);box-shadow:0 12px 30px #0005,inset 0 1px #ffffff12;position:relative;isolation:isolate;will-change:transform}
+.speaker:before{content:"";position:absolute;inset:0 0 auto;height:2px;opacity:.7;background:linear-gradient(90deg,transparent,var(--speaker-accent),transparent);pointer-events:none}
+.speaker[data-speaker="2"]{--speaker-accent:#ffd68b;background:linear-gradient(145deg,#4a3422,#34271e 65%,#2c251e)}
+.speaker[data-speaker="1"]{--speaker-accent:#f6b84e;background:linear-gradient(145deg,#58401f,#3a2d1b 65%,#2e271c)}
+.header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.identity{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:750;letter-spacing:.1px}
+.avatar{height:32px;width:32px;display:grid;place-items:center;border-radius:12px;color:var(--speaker-accent);background:color-mix(in srgb,var(--speaker-accent) 13%,transparent);border:1px solid color-mix(in srgb,var(--speaker-accent) 24%,transparent)}
+.avatar svg{width:18px;height:18px}
+.language{color:#dce7f6;background:#ffffff0d;border:1px solid #ffffff20;border-radius:999px;padding:8px 11px;font-size:11px;white-space:nowrap;font-weight:600}
+.center{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:12px;min-height:0}
+.empty-art{width:68px;height:68px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,color-mix(in srgb,var(--speaker-accent) 20%,transparent),#ffffff04);border:1px solid color-mix(in srgb,var(--speaker-accent) 27%,transparent);box-shadow:inset 0 1px #ffffff17}
+.empty-art svg{width:34px;height:34px;stroke:var(--speaker-accent);stroke-width:1.7}
+.placeholder{font-size:clamp(16px,4.4vw,21px);font-weight:700;letter-spacing:-.35px;line-height:1.35;max-width:290px}
+.hint{color:var(--muted);font-size:12px;line-height:1.5}
+.swap{position:absolute;top:calc((100% - var(--nav-height) - env(safe-area-inset-bottom) - 12px + env(safe-area-inset-top) + 10px)/2);left:50%;transform:translate(-50%,-50%);width:62px;height:62px;display:flex;align-items:center;justify-content:center;gap:0;background:linear-gradient(145deg,#b97724,#6d461c);border:2px solid #ffdb89;border-radius:50%;color:#fff;box-shadow:0 0 0 5px #21170e,0 7px 25px #0009,0 0 22px #ffc45d55;z-index:5}
+.swap svg{width:22px;height:27px;stroke-width:3.1;filter:drop-shadow(0 0 5px #ffe7ae)}.swap:disabled{cursor:wait}
+.nav{--nav-height:86px;height:calc(var(--nav-height) + env(safe-area-inset-bottom));background:linear-gradient(180deg,#2c2118,#1a1511);border-top:1px solid #ffffff16;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;justify-items:center;padding:9px 12px calc(9px + env(safe-area-inset-bottom));gap:8px;margin:0 -11px}
+.nav-btn{background:transparent;border:0;color:#d1bfa4;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:75px;font-size:11px;font-weight:600}.nav-btn svg{width:25px;height:25px;stroke-width:1.8}.nav-btn:active{color:#ffe0a0}
+.mic{width:86px;height:86px;border-radius:50%;border:3px solid #fff0bf;background:linear-gradient(145deg,#ffe7a8,#e5a23a);color:#3b260e;display:grid;place-items:center;box-shadow:0 0 0 3px #ffdc8055,0 0 28px #ffc75caa,0 7px 28px #e6a43f99,inset 0 2px 3px #ffffffb0;transition:background .2s,box-shadow .2s}
+.mic svg{width:38px;height:38px;stroke-width:2.1}.mic.active{background:linear-gradient(145deg,#ff889d,#de466b);border-color:#ffc2cb;color:white;box-shadow:0 0 0 7px #df4e6522,0 5px 22px #df4e6555}
+@media(max-height:650px){.speaker{padding:10px 14px;gap:5px;border-radius:19px}.center{gap:6px}.empty-art{height:43px;width:43px;border-radius:14px}.empty-art svg{width:24px;height:24px}.placeholder{font-size:15px}.nav{--nav-height:70px}.app{--nav-height:70px}.mic{height:72px;width:72px}.swap{height:52px;width:52px}.hint{font-size:11px}}
+@media(min-width:650px){.app{max-width:540px;margin:auto;box-shadow:0 0 50px #0007}}
+@media(prefers-reduced-motion:reduce){.mic{transition:none}}
+
+/* V7: motion system — only composited transforms and opacity on icons */
+.swap{width:70px;height:70px;isolation:isolate;overflow:visible;transition:box-shadow .28s ease,background .28s ease,border-color .28s ease}
+.swap:before{content:"";position:absolute;inset:-6px;border:1px solid #ffd47d77;border-radius:50%;animation:swapAura 3.2s ease-in-out infinite;pointer-events:none}
+.swap-halo{position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#ffe9ac4a,transparent 63%);pointer-events:none}
+.swap-glyph{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:0;transition:transform 1.25s cubic-bezier(.2,.7,.2,1)}
+.swap .arrow{width:23px;height:32px;flex:none;stroke-width:3.8;filter:drop-shadow(0 0 5px #ffdd85);transition:filter .3s ease}
+.swap .arrow-down{animation:arrowDownIdle 2.4s ease-in-out infinite}
+.swap .arrow-up{animation:arrowUpIdle 2.4s ease-in-out infinite}
+.swap.is-swapping{box-shadow:0 0 0 5px #21170e,0 10px 35px #000a,0 0 32px #ffc45d99}
+.swap.is-swapping .swap-glyph{transform:rotate(180deg)}
+.swap.is-swapping .arrow{animation:none;filter:drop-shadow(0 0 9px #fff0b7)}
+.swap:active:not(:disabled){box-shadow:0 0 0 5px #21170e,0 3px 16px #0008,0 0 25px #ffc45d99}
+.avatar svg{animation:avatarBreathe 4.2s ease-in-out infinite;transform-origin:center}
+.empty-art svg{animation:messageFloat 3.5s ease-in-out infinite}
+.language{transition:border-color .25s,background .25s}
+.speaker:hover .language{border-color:#ffcc7955;background:#ffffff14}
+.nav-btn svg{transition:transform .28s cubic-bezier(.2,.8,.2,1),color .25s}
+.nav-btn:active svg{transform:scale(.84) rotate(-8deg)}
+.nav-btn:focus-visible svg{transform:scale(1.1)}
+.mic{position:relative;transition:transform .22s ease,box-shadow .25s ease,background .25s ease}
+.mic:before{content:"";position:absolute;inset:-6px;border:1px solid #e6bc6c66;border-radius:50%;animation:micRing 3s ease-in-out infinite;pointer-events:none}
+.mic svg{animation:micBreathe 3.2s ease-in-out infinite}
+.mic:active{transform:scale(.92)}
+.mic.active:before{border-color:#ff9ca8;animation:micActiveRing 1.5s ease-out infinite}
+.mic.active svg{animation:micBreathe 1.15s ease-in-out infinite}
+@keyframes swapAura{0%,100%{opacity:.35;transform:scale(.98)}50%{opacity:.8;transform:scale(1.07)}}
+@keyframes arrowDownIdle{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}
+@keyframes arrowUpIdle{0%,100%{transform:translateY(2px)}50%{transform:translateY(-2px)}}
+@keyframes avatarBreathe{0%,100%{opacity:.8;transform:scale(.98)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes messageFloat{0%,100%{transform:translateY(0);opacity:.75}50%{transform:translateY(-4px);opacity:1}}
+@keyframes micRing{0%,100%{opacity:.35;transform:scale(.98)}50%{opacity:.75;transform:scale(1.07)}}
+@keyframes micActiveRing{0%{opacity:.85;transform:scale(.92)}100%{opacity:0;transform:scale(1.22)}}
+@keyframes micBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.075)}}
+@media(max-height:650px){.swap{width:58px;height:58px}.swap .arrow{width:19px;height:28px}}
+@media(prefers-reduced-motion:reduce){
+.swap:before,.swap .arrow,.avatar svg,.empty-art svg,.mic:before,.mic svg{animation:none!important}
+.swap-glyph,.nav-btn svg,.mic{transition:none!important}
+}
+
+/* V8 cinematic exchange — identity-preserving layered orbital motion */
+.swap-glyph{transition:none}
+.swap.is-swapping .swap-glyph{transform:none}
+.swap-orbit{position:absolute;inset:-12px;border-radius:50%;border:2px dashed #ffd48077;opacity:0;pointer-events:none}
+.swap.is-swapping .swap-orbit{animation:orbitBurst 1.65s cubic-bezier(.15,.75,.2,1) both}
+.swap.is-swapping:before{animation:swapAura 1.65s ease-in-out both}
+.swap.is-swapping .arrow-down{animation:arrowLaunchDown 1.65s cubic-bezier(.25,.7,.15,1) both}
+.swap.is-swapping .arrow-up{animation:arrowLaunchUp 1.65s cubic-bezier(.25,.7,.15,1) both}
+.swap.is-swapping .arrow{filter:drop-shadow(0 0 10px #fff3c5)}
+.swap-flare{position:absolute;left:50%;top:calc((100% - var(--nav-height) - env(safe-area-inset-bottom) - 12px + env(safe-area-inset-top) + 10px)/2);width:100%;height:180px;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:0}
+.swap-flare i{display:block;position:absolute;left:50%;top:50%;height:2px;width:min(68vw,340px);border-radius:99px;background:linear-gradient(90deg,transparent,#ffe8a7,transparent);transform:translate(-50%,-50%) scaleX(.1);box-shadow:0 0 14px #ffcb68}
+.swap-flare i:nth-child(2){transform:translate(-50%,-50%) rotate(15deg) scaleX(.1);opacity:.6}
+.swap-flare i:nth-child(3){transform:translate(-50%,-50%) rotate(-15deg) scaleX(.1);opacity:.6}
+.swap-flare.active{animation:flareVisibility 1.65s ease-out both}
+.swap-flare.active i:nth-child(1){animation:flareLine 1.65s ease-out both}
+.swap-flare.active i:nth-child(2){animation:flareLine2 1.65s ease-out both}
+.swap-flare.active i:nth-child(3){animation:flareLine3 1.65s ease-out both}
+@keyframes arrowLaunchDown{0%,12%{transform:translateY(-2px) scale(1)}32%{transform:translateY(10px) scale(1.15)}58%{transform:translateY(-6px) scale(.88)}80%{transform:translateY(3px) scale(1.08)}100%{transform:translateY(-2px) scale(1)}}
+@keyframes arrowLaunchUp{0%,12%{transform:translateY(2px) scale(1)}32%{transform:translateY(-10px) scale(1.15)}58%{transform:translateY(6px) scale(.88)}80%{transform:translateY(-3px) scale(1.08)}100%{transform:translateY(2px) scale(1)}}
+@keyframes orbitBurst{0%{opacity:0;transform:rotate(0) scale(.7)}22%{opacity:1}75%{opacity:.7}100%{opacity:0;transform:rotate(230deg) scale(1.45)}}
+@keyframes flareVisibility{0%,15%,92%,100%{opacity:0}34%,66%{opacity:.9}}
+@keyframes flareLine{0%,15%,100%{transform:translate(-50%,-50%) scaleX(.1)}44%{transform:translate(-50%,-50%) scaleX(1)}}
+@keyframes flareLine2{0%,15%,100%{transform:translate(-50%,-50%) rotate(15deg) scaleX(.1)}44%{transform:translate(-50%,-50%) rotate(15deg) scaleX(.75)}}
+@keyframes flareLine3{0%,15%,100%{transform:translate(-50%,-50%) rotate(-15deg) scaleX(.1)}44%{transform:translate(-50%,-50%) rotate(-15deg) scaleX(.75)}}
+@media(prefers-reduced-motion:reduce){.swap.is-swapping .arrow,.swap.is-swapping .swap-orbit,.swap-flare.active,.swap-flare.active i{animation:none!important}.swap-flare{display:none}}
+
+.sensor-sheet[hidden]{display:none!important}.sensor-sheet{position:absolute;inset:0;z-index:20;background:#080603b8;display:flex;align-items:end;justify-content:center;padding:14px 12px calc(18px + env(safe-area-inset-bottom))}
+.sensor-card{width:100%;max-width:520px;background:linear-gradient(145deg,#332719,#211b16);border:1px solid #cfa65b70;border-radius:26px;padding:20px;color:#fff0d2;box-shadow:0 20px 70px #000b}.sensor-head{display:flex;align-items:center;justify-content:space-between;font-size:19px}.sensor-head button{border:0;background:#ffffff15;color:#ffdf9a;border-radius:50%;width:36px;height:36px;font-size:18px}.sensor-card p{font-size:13px;line-height:1.6;color:#d8c3a0}.sensor-toggle{background:linear-gradient(135deg,#ffdc8a,#db9c38);border:0;border-radius:14px;padding:13px 18px;color:#2b1b08;font-weight:750;width:100%}.sensor-readings{display:flex;gap:10px;margin:16px 0}.sensor-readings span{flex:1;background:#ffffff0c;border:1px solid #ffffff16;border-radius:13px;padding:12px;font-size:12px}.sensor-readings b{display:block;margin-top:8px;font-size:20px;font-variant-numeric:tabular-nums}.sensor-status{font-size:12px;color:#f5cf85;min-height:18px}
+
+/* Gravity stabilizer: keep the button hit target fixed; move only its visual glyph. */
+.mic-gyro{display:grid;place-items:center;pointer-events:none}
+/* Rotate the visible microphone button itself: reliable on Chrome Android. */
+#mic{transform:rotate(var(--mic-roll,0deg)) perspective(500px) rotateX(var(--mic-pitch,0deg));transform-origin:center center;will-change:transform;transition:transform 85ms linear,background .2s,box-shadow .2s}
+.mic-gyro svg{display:block}
+@media(prefers-reduced-motion:reduce){.mic-gyro{transition:none}}
+
+/* v9.0: fantasy microphone activation. Decorative layers never intercept taps or sensor rotation. */
+#mic.active{
+ background:radial-gradient(circle at 30% 20%,#ffb9df 0%,#ff73b4 33%,#f23d92 68%,#b71870 100%);
+ border:3px solid #ffe2f5;
+ color:#fff;
+ box-shadow:0 0 0 3px #ffacd8,0 0 0 8px #ff60b744,0 0 18px 6px #ff80d9,0 0 38px 12px #f73b9c99,0 0 65px 18px #d828a655,inset 0 3px 9px #fff9;
+ animation:micFantasyGlow 1.8s ease-in-out infinite;
+}
+#mic.active:before{
+ inset:-13px;border:3px solid #ffd7f2;
+ box-shadow:0 0 16px #ff8ddf,0 0 28px #ff50b7,inset 0 0 12px #ff7dd5;
+ animation:micFantasyHalo 1.8s ease-in-out infinite;
+}
+#mic:after{
+ content:"";position:absolute;inset:-24px;border-radius:50%;pointer-events:none;opacity:0;
+ background:conic-gradient(from 0deg,transparent 0deg,#ffb4ed 28deg,transparent 52deg,transparent 110deg,#fff1fa 132deg,transparent 152deg,transparent 230deg,#ff76d4 250deg,transparent 280deg);
+ -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4px));
+ mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4px));
+}
+#mic.active:after{opacity:.9;animation:micFantasyOrbit 4s linear infinite}
+#mic.active .mic-gyro svg{filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 10px #ffdbf7)}
+@keyframes micFantasyGlow{
+ 0%,100%{box-shadow:0 0 0 3px #ffacd8,0 0 0 8px #ff60b744,0 0 18px 6px #ff80d9,0 0 38px 12px #f73b9c99,0 0 65px 18px #d828a655,inset 0 3px 9px #fff9}
+ 50%{box-shadow:0 0 0 4px #fff0fa,0 0 0 12px #ff60b755,0 0 26px 10px #ffa7eb,0 0 52px 18px #ff3fa9bb,0 0 78px 24px #d828a677,inset 0 3px 12px #fff}
+}
+@keyframes micFantasyHalo{0%,100%{opacity:.8;transform:scale(.96)}50%{opacity:1;transform:scale(1.11)}}
+@keyframes micFantasyOrbit{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#mic.active,#mic.active:before,#mic.active:after{animation:none!important}}
+
+/* v9.1: active-only luminous pink aurora; gold idle appearance unchanged. */
+#mic{top:-12px}
+#mic.active{
+ background:radial-gradient(circle at 29% 19%,#fff3fc 0%,#ffb9ec 19%,#ff67c4 49%,#ed269b 76%,#b40b73 100%);
+ border-color:#fff3fd;
+ color:#fff;
+ animation:micAuroraPulse 2.35s ease-in-out infinite;
+}
+#mic.active:before{
+ inset:-11px;border:3px solid #fff0ff;
+ box-shadow:0 0 12px 4px #ffc2f5,0 0 30px 8px #ff56c7,inset 0 0 16px #ff7bda;
+ animation:micAuroraBreath 2.35s ease-in-out infinite;
+}
+#mic.active:after{
+ inset:-22px;
+ background:conic-gradient(from 0deg,transparent 0deg,#ffe9ff 16deg,#ff74d8 28deg,transparent 45deg,transparent 110deg,#fff 122deg,#ff9de5 136deg,transparent 151deg,transparent 230deg,#ffd7f6 242deg,#ff53c5 257deg,transparent 274deg);
+ opacity:1;filter:drop-shadow(0 0 6px #ffadf0) drop-shadow(0 0 12px #ff43bd);
+ animation:micAuroraOrbit 3.2s linear infinite;
+}
+#mic.active .mic-gyro svg{filter:drop-shadow(0 0 7px #fff) drop-shadow(0 0 14px #ffb5ef)}
+@keyframes micAuroraPulse{
+ 0%,100%{box-shadow:0 0 0 3px #fff0fa,0 0 0 8px #ff8dd766,0 0 24px 10px #ff8add,0 0 45px 16px #fa2fa9a8,inset 0 3px 9px #fff9}
+ 50%{box-shadow:0 0 0 4px #fff,0 0 0 12px #ff9ee899,0 0 33px 14px #ffc1f3,0 0 64px 23px #ff3cbec7,inset 0 3px 14px #fffd}
+}
+@keyframes micAuroraBreath{0%,100%{opacity:.83;transform:scale(.97)}50%{opacity:1;transform:scale(1.09)}}
+@keyframes micAuroraOrbit{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#mic.active,#mic.active:before,#mic.active:after{animation:none!important}}
+
+/* v9.2: modest pink glow and an actual upward layout offset, gold idle untouched. */
+.nav #mic{position:relative;top:-27px}
+#mic.active{
+ box-shadow:0 0 0 2px #ffe2f5,0 0 0 6px #ff8dd755,0 0 16px 5px #ff9cdbbb,0 0 30px 9px #ee55a777,inset 0 2px 8px #fff8;
+ animation:micSoftPinkPulse 2.5s ease-in-out infinite;
+}
+#mic.active:before{
+ box-shadow:0 0 9px 2px #ffb5e4,0 0 16px 4px #ff76c388;
+ opacity:.78;
+}
+#mic.active:after{
+ opacity:.56;
+ filter:drop-shadow(0 0 3px #ffa3dd);
+}
+@keyframes micSoftPinkPulse{
+ 0%,100%{box-shadow:0 0 0 2px #ffe2f5,0 0 0 6px #ff8dd755,0 0 16px 5px #ff9cdbbb,0 0 30px 9px #ee55a777,inset 0 2px 8px #fff8}
+ 50%{box-shadow:0 0 0 3px #fff0fa,0 0 0 8px #ff8dd766,0 0 21px 7px #ff9cdbcc,0 0 38px 11px #ee55a788,inset 0 2px 10px #fff9}
+}
+@media(prefers-reduced-motion:reduce){#mic.active{animation:none!important}}
+
+/* v9.3: character/flag confined to the Uzbek speaker identity; all other UI untouched. */
+.uz-portrait{display:block;width:128px;height:102px;flex:none;border-radius:15px;overflow:hidden;border:2px solid #e9bd70;box-shadow:0 3px 12px #0008,inset 0 0 0 2px #fff5;isolation:isolate;background:#226b8a}
+.uz-portrait svg{display:block;width:100%;height:100%}
+.uz-flag{transform-origin:0 50%;animation:uzFlagWave 3.5s ease-in-out infinite}
+.uz-boy{transform-origin:70px 93px;animation:uzBoyBreathe 3.2s ease-in-out infinite}
+.uz-waving-arm{transform-origin:89px 78px;animation:uzBoyHello 1.8s ease-in-out infinite}
+@keyframes uzFlagWave{0%,100%{transform:skewY(0deg) scaleX(1)}50%{transform:skewY(-2.2deg) scaleX(.98)}}
+@keyframes uzBoyBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+@keyframes uzBoyHello{0%,100%{transform:rotate(-9deg)}45%{transform:rotate(17deg)}75%{transform:rotate(-13deg)}}
+@media(prefers-reduced-motion:reduce){.uz-flag,.uz-boy,.uz-waving-arm{animation:none!important}}
+.uz-flag-mini{display:block;flex:none;width:118px;height:72px;overflow:visible;background:transparent;border:0;box-shadow:none}.uz-flag-mini iframe{display:block;width:100%;height:100%;border:0;background:transparent;pointer-events:none}\n.uz-flag-mini{width:118px;height:72px;overflow:hidden}.uz-flag-mini canvas{display:block;width:100%;height:100%;background:transparent;border:0}\n/* v9.6: free-floating transparent flag above speaker surface, no frame or clipping */\n.speaker[data-speaker="1"]{overflow:hidden}\n.speaker[data-speaker="1"]>.uz-flag-mini{position:absolute;left:4px;top:5px;width:280px;height:145px;z-index:2;pointer-events:none;overflow:visible;background:none;border:0;border-radius:0;box-shadow:none}\n.speaker[data-speaker="1"]>.uz-flag-mini canvas{width:100%;height:100%;display:block;background:transparent;border:0;box-shadow:none}\n
+/* v10.5: contained translucent flag, foreground labels and temporary opacity selector */
+.speaker[data-speaker="1"]{overflow:hidden}
+.speaker[data-speaker="1"]>.uz-flag-mini{z-index:0;opacity:var(--uz-flag-opacity,.55);max-width:calc(100% - 8px);max-height:calc(100% - 10px);overflow:hidden}
+.speaker[data-speaker="1"]>.header,.speaker[data-speaker="1"]>.center{position:relative;z-index:1;pointer-events:none}
+.flag-opacity-panel{position:absolute;right:9px;bottom:9px;z-index:5;padding:8px 10px;border:1px solid #ffffff44;border-radius:10px;background:#201b17e8;color:#fff;font:600 12px system-ui,sans-serif;display:flex;align-items:center;gap:8px;max-width:calc(100% - 18px)}
+.flag-opacity-panel input{width:90px;accent-color:#f6b84e}
+.flag-opacity-panel output{min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+
+.flag-opacity-panel{position:fixed;left:50%;right:auto;bottom:106px;transform:translateX(-50%);z-index:1000;display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;background:#241b15f5;border:1px solid #e6b65c88;box-shadow:0 5px 22px #0008}
+.flag-opacity-panel input{width:110px;touch-action:pan-x}
+
+/* v10.7: responsive preview controls and full-size cloth */
+.flag-opacity-panel{width:min(96vw,510px);max-width:calc(100vw - 12px);white-space:normal;flex-wrap:wrap;gap:5px 9px;font-size:11px;padding:9px;bottom:90px}
+.flag-opacity-panel input{width:clamp(75px,20vw,125px)}
+.flag-control-divider{width:1px;height:20px;background:#ffffff44}
+.speaker>.uz-flag-mini,.speaker[data-speaker="1"]>.uz-flag-mini{inset:0;left:0;top:0;width:100%;height:100%}
+
+/* v10.8: two always-visible sliders, only bottom speaker carries the flag */
+.flag-opacity-panel{position:fixed;left:50%;right:auto;bottom:88px;transform:translateX(-50%);z-index:1000;width:min(340px,calc(100vw - 20px));max-width:none;display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:12px 14px;box-sizing:border-box;white-space:normal}
+.flag-control-row{display:grid;grid-template-columns:82px minmax(80px,1fr) 42px;gap:9px;align-items:center;width:100%}
+.flag-control-row label{font-size:12px;font-weight:700}
+.flag-control-row input{display:block;width:100%;min-width:0;height:24px;accent-color:#f6b84e;touch-action:pan-x}
+.flag-control-row output{font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* v10.9: adjustable flag only in bottom speaker */
+.flag-settings-toggle{position:fixed;z-index:1002;bottom:88px;left:50%;transform:translateX(-50%);border:1px solid #e6b65c99;border-radius:12px;background:#302315;color:#ffe4aa;padding:10px 14px;font:700 12px system-ui;white-space:nowrap;box-shadow:0 5px 18px #0008}
+.flag-opacity-panel[hidden]{display:none!important}
+.flag-opacity-panel{bottom:136px;max-height:min(54vh,430px);overflow-y:auto;display:flex;flex-direction:column;gap:12px;width:min(350px,calc(100vw - 24px))}
+.flag-control-row{grid-template-columns:110px minmax(70px,1fr) 42px}
+.flag-control-row label{font-size:11px}
+
+/* v11.0 flag editor */
+.flag-settings-toggle{position:fixed;left:50%;bottom:90px;z-index:1002;transform:translateX(-50%);display:block!important;visibility:visible!important}
+.flag-opacity-panel{position:fixed;left:50%;bottom:137px;transform:translateX(-50%);z-index:1003;width:min(380px,calc(100vw - 20px));max-height:min(62dvh,550px);overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box;padding:13px;display:flex;flex-direction:column;align-items:stretch;gap:13px}
+.flag-opacity-panel[hidden]{display:none!important}
+.flag-editor-title{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:800;color:#ffdfa0}
+.flag-editor-title button{color:#fff;background:#59422b;border:1px solid #b99360;border-radius:7px;padding:5px 9px}
+.flag-control-row{display:grid;grid-template-columns:116px minmax(70px,1fr) 44px;gap:9px;align-items:center;width:100%}
+.flag-control-row label{font-size:12px;line-height:1.25;white-space:normal}
+.flag-control-row input{width:100%;min-width:0;accent-color:#f5b94d;touch-action:pan-x}
+.flag-control-row output{text-align:right;font-size:12px;font-variant-numeric:tabular-nums}
+
+.flag-copy-settings{width:100%;padding:11px;border:1px solid #e9bc68;border-radius:10px;background:#79501f;color:#fff4d5;font:700 13px system-ui;cursor:pointer}
+.flag-copy-status{margin:0;font-size:12px;color:#ffdda3;min-height:14px}
+
+/* v11.2 flag opacity is part of existing settings dialog */
+
+.flag-opacity-setting{display:grid;grid-template-columns:1fr 1fr 42px;align-items:center;gap:9px;padding:12px 0;border-top:1px solid #ffffff30;border-bottom:1px solid #ffffff30}
+.flag-opacity-setting label{font-size:12px;font-weight:700}
+.flag-opacity-setting input{width:100%;min-width:0;accent-color:#f4b64e}
+.flag-opacity-setting output{text-align:right;font-size:12px;font-variant-numeric:tabular-nums}
+
+
+/* v11.12: language captions in normal card flow, below headers and clear of swap */
+.speaker-language-title{position:static;transform:none;align-self:center;order:2;z-index:1;display:flex;align-items:center;justify-content:center;gap:9px;width:max-content;max-width:100%;min-height:40px;padding:8px 13px;border:1px solid rgba(248,201,106,.9);border-radius:999px;background:rgba(45,33,22,.96);color:#ffe0a0;font:750 clamp(16px,4.3vw,19px)/1.3 system-ui,sans-serif;white-space:nowrap;box-shadow:0 2px 12px #0004}
+.speaker .header{order:0;flex-shrink:0}
+.speaker .center{order:1}
+.speaker-language-title select{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:#ffe0a0;font:inherit;max-width:175px;min-width:0;cursor:pointer;text-align:center;text-align-last:center;outline-offset:3px}
+.speaker-language-title select option{background:#30251b;color:#fff}
+.speaker-language-title #upperLanguageUz,.speaker-language-title #bottomLanguageTranslation{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.speaker-language-title .language-divider{display:inline-block;flex:none;font-size:25px;font-weight:800;line-height:1;color:#ffd77b;text-shadow:0 0 7px rgba(255,210,115,.65);animation:avnivoApproxGlow 2.6s ease-in-out infinite}
+@keyframes avnivoApproxGlow{0%,100%{opacity:.75;text-shadow:0 0 4px rgba(255,210,115,.3);transform:scale(1)}50%{opacity:1;text-shadow:0 0 12px rgba(255,210,115,.9);transform:scale(1.12)}}
+@media(max-width:390px){.speaker-language-title{font-size:clamp(14px,4vw,17px);padding:7px 9px;gap:6px}.speaker-language-title select{max-width:145px}.speaker-language-title .language-divider{font-size:22px}}
+@media(prefers-reduced-motion:reduce){.speaker-language-title .language-divider{animation:none}}
+/* Keep language captions at the bottom of each card, safely inside its padding. */
+.speaker-language-title{flex-shrink:0;margin-top:auto;margin-bottom:18px}
+
+/* v11.16: stationary, frameless AVNIVO wordmark in the upper-left corner */
+.avnivo-brand{position:absolute;top:calc(20px + env(safe-area-inset-top));left:34px;width:104px;height:39px;z-index:8;pointer-events:none;background:none;border:0;box-shadow:none}
+.avnivo-brand svg{display:block;width:100%;height:100%;overflow:visible}
+@media(max-width:390px){.avnivo-brand{left:30px;width:94px;height:35px}}
+
+/* v11.17: sensor-driven glints, without altering sensor or swap behavior */
+.app{--shine-x:50%;--shine-y:40%;--shine-tilt:0deg}
+.avnivo-brand{width:119px;height:42px}
+.avnivo-brand svg{filter:none}
+.speaker::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;background:radial-gradient(circle at var(--shine-x) var(--shine-y),rgba(255,228,165,.23),transparent 52%);opacity:var(--shine-strength, .38);mix-blend-mode:screen}
+
+/* v11.21: keep message controls upright; preserve existing SVG idle animation */
+.message-button{font:inherit;color:var(--speaker-accent);cursor:default;opacity:1;flex-shrink:0;transform:rotate(var(--message-upright,0deg));transform-origin:center;transition:transform .08s linear}
+.message-button:disabled{opacity:1;color:var(--speaker-accent);pointer-events:none}
+.message-button svg{animation:messageFloat 3.5s ease-in-out infinite}
+
+/* v11.22: animated, accessible draft composer; existing gyro + idle motion remain */
+.message-button{cursor:pointer;pointer-events:auto}
+.message-button:disabled{pointer-events:auto}
+.message-button:active{filter:brightness(1.2)}
+.message-button.is-shaking{animation:messageTapShake .36s ease-in-out both}
+@keyframes messageTapShake{0%,100%{translate:0 0}20%{translate:-4px 0}40%{translate:4px 0}60%{translate:-3px 0}80%{translate:2px 0}}
+.center.is-composing{align-items:stretch;justify-content:flex-end;gap:9px;padding-bottom:8px}
+.center.is-composing .placeholder{display:none}
+.center.is-composing .message-button{align-self:flex-start;width:43px;height:43px;border-radius:15px;transition:width .25s,height .25s,border-radius .25s,transform .08s linear}
+.center.is-composing .message-button svg{width:25px;height:25px}
+.message-compose[hidden]{display:none!important}
+.message-compose{display:flex;align-items:center;gap:9px;min-width:0;position:relative;animation:composerEnter .25s ease-out both}
+@keyframes composerEnter{from{opacity:0;translate:14px 0}to{opacity:1;translate:0 0}}
+.message-caret{width:2px;height:23px;flex:0 0 2px;background:#ffe4a0;border-radius:2px;box-shadow:0 0 7px #ffcf65;animation:caretBlink 1s steps(1) infinite}
+@keyframes caretBlink{50%{opacity:0}}
+.message-compose:focus-within .message-caret{opacity:0;animation:none}
+.message-bubble{flex:1;min-width:0;display:block;position:relative;background:linear-gradient(140deg,#3f2d1e,#2b2119);border:1px solid #e7b967aa;border-radius:19px 19px 19px 6px;padding:10px 12px;box-shadow:0 3px 16px #0005,inset 0 1px #fff2}
+.message-input{display:block;width:100%;min-width:0;min-height:24px;max-height:clamp(48px,22dvh,180px);resize:none;overflow-y:auto;background:transparent;border:0;outline:0;color:#fff5dc;font:500 16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;caret-color:#ffe4a0;padding:0;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+@media(prefers-reduced-motion:reduce){.message-button.is-shaking,.message-compose,.message-caret{animation:none}}
+
+/* v11.23: keyboard/swap stability and synchronized composer transition */
+.app{min-height:0}
+.speaker{overflow:hidden}
+.speaker .center{min-height:0;overflow:hidden}
+.message-button{transition:width .85s ease,height .85s ease,border-radius .85s ease,transform .08s linear}
+.center.is-composing .message-button{transition:width .85s ease,height .85s ease,border-radius .85s ease,transform .08s linear}
+.center.is-composing .message-compose{width:100%}
+.center.is-composing .message-button{margin-left:0}
+.message-compose{animation:composerEnter .85s ease-out both}
+.app.is-editing .speaker:not(.is-editor){pointer-events:none}
+.app.is-editing .speaker:not(.is-editor) .message-button{opacity:.75}
+.speaker .message-input{max-height:min(19dvh,130px)}
+.speaker .message-bubble{max-width:100%}
+.app.keyboard-open{grid-template-rows:minmax(0,1fr) minmax(0,1fr) auto}
+.app.keyboard-open .speaker{padding-top:10px;padding-bottom:9px;gap:4px}
+.app.keyboard-open .speaker-language-title{min-height:30px;padding:4px 9px;font-size:clamp(11px,3.1vw,15px);margin-bottom:3px}
+.app.keyboard-open .speaker .center{gap:5px;padding-bottom:0}
+.app.keyboard-open .speaker .message-button{width:35px;height:35px;border-radius:12px}
+.app.keyboard-open .speaker .message-button svg{width:21px;height:21px}
+.app.keyboard-open .nav{height:64px;--nav-height:64px}
+.app.keyboard-open{--nav-height:64px}
+.app.keyboard-open .mic{width:57px;height:57px}
+.app.keyboard-open .swap{width:51px;height:51px}
+.speaker.is-translating .message-caret{display:none}
+.speaker.is-translating .message-input{caret-color:transparent}
+@media(prefers-reduced-motion:reduce){.message-button,.center.is-composing .message-button,.message-compose{transition:none;animation:none}}
+/* v11.24: visible slow slide; non-active panel stays centered until swap */
+.message-compose{animation:composerEnter 1.45s ease-out both}
+.center.is-composing .message-button{transition:width 1.45s ease,height 1.45s ease,border-radius 1.45s ease,transform .08s linear}
+/* v11.25: upper card cannot be edited or focused */
+.speaker.top .message-button{pointer-events:none;cursor:default}
+.speaker.top .message-input{pointer-events:none;user-select:text}
+
+/* v11.27: per-panel translation history above the draft composer */
+.speaker .center{position:relative}
+.translation-history{display:flex;flex-direction:column;gap:7px;align-self:stretch;min-width:0;max-height:38%;overflow-y:auto;overscroll-behavior:contain;text-align:left;scrollbar-width:thin}
+.translation-history:empty{display:none}
+.translation-line{flex:0 0 auto;padding:7px 10px;background:rgba(20,15,11,.35);border:1px solid rgba(242,197,115,.32);border-radius:12px;color:#ffe7b7;font:500 14px/1.5 system-ui,sans-serif;overflow-wrap:anywhere;animation:translationArrive .3s ease-out}
+.translation-prefix{font-weight:800;color:#ffcf70;margin-right:5px}
+.translation-body{white-space:pre-wrap}
+@keyframes translationArrive{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.center.is-composing .translation-history{margin-bottom:auto}
+.center.is-composing .message-button{flex-shrink:0}
+.center.is-composing .message-compose{flex-shrink:0}
+.app.keyboard-open .translation-history{max-height:26%;font-size:12px}
+@media(prefers-reduced-motion:reduce){.translation-line{animation:none}}
+
+/* v11.28: borderless translations, stacked directly above the message icon */
+.translation-history{width:100%;max-height:45%;display:flex;flex-direction:column;justify-content:flex-start;gap:5px;align-self:stretch;overflow-y:auto;scrollbar-width:none;text-align:left}
+.translation-history::-webkit-scrollbar{display:none}
+.translation-line{flex:0 0 auto;padding:0;margin:0;background:none;border:0;border-radius:0;box-shadow:none;color:#ffe7b7;font:500 15px/1.55 system-ui,sans-serif;overflow-wrap:anywhere}
+.center.is-composing .translation-history{margin-top:auto;margin-bottom:0}
+.center.is-composing .translation-history:not(:empty){padding-bottom:3px}
+.app.keyboard-open .translation-history{max-height:30%}
+/* v11.29: use the native blinking caret INSIDE the textarea */
+.message-compose .message-caret{display:none!important}
+.message-input{caret-color:#ffe4a0;cursor:text}
+
+/* v11.30: message history behaves like chat; new messages at bottom, old fade at top */
+.translation-history{display:flex;flex-direction:column;justify-content:flex-end;gap:9px;flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;overflow-x:hidden;align-self:stretch;text-align:left;scrollbar-width:none;mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.25) 12%,#000 35%,#000 100%);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.25) 12%,#000 35%,#000 100%)}
+.translation-history:empty{display:none}
+.translation-line{display:block;flex:0 0 auto;width:fit-content;max-width:90%;padding:0;border:0;background:none;box-shadow:none;border-radius:0;font:500 15px/1.5 system-ui,sans-serif;overflow-wrap:anywhere}
+.translation-line.outgoing{align-self:flex-end;text-align:right;color:#fff0d3}
+.translation-line.incoming{align-self:flex-start;text-align:left;color:#ffe7b7}
+.center.is-composing .translation-history{margin-top:0;margin-bottom:auto}
+.app.keyboard-open .translation-history{max-height:none}
+
+/* v11.31: larger conversation text; stable lower editor after panel exchange */
+.translation-line{font-size:17px;line-height:1.55}
+.translation-line .translation-prefix{font-size:0.9em}
+.speaker.middle .center.is-composing .message-compose:not([hidden]){display:flex}
+
+/* v11.32: tap the visible writing field directly, not the message icon */
+.speaker.middle .message-bubble{pointer-events:auto;cursor:text}
+.speaker.middle .message-input{pointer-events:auto;cursor:text;caret-color:#ffe4a0}
+.speaker.middle.is-translating .message-input{caret-color:#ffe4a0}
+
+/* v11.33: independently scrollable history in each conversation panel */
+.speaker .translation-history{
+  justify-content:flex-start;
+  overflow-y:auto;
+  overflow-x:hidden;
+  min-height:0;
+  flex:1 1 auto;
+  touch-action:pan-y;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:#d6aa6577 transparent;
+}
+.speaker .translation-history:not(:empty)>.translation-line:first-child{margin-top:auto}
+.speaker .translation-history::-webkit-scrollbar{display:block;width:3px}
+.speaker .translation-history::-webkit-scrollbar-thumb{background:#d6aa6577;border-radius:3px}
+
+/* v11.49.1: add scrollable headroom for the oldest chat line.
+   Keep the existing top fade mask and panel geometry unchanged. */
+.speaker .translation-history:not(:empty){padding-top:clamp(44px, 8dvh, 76px)}
+
+/* v11.34: upper speaker 1 previously disabled pointer events on its center.
+   Allow touch scrolling in both history panels without enabling upper editing. */
+.speaker[data-speaker="1"]>.center{pointer-events:auto}
+.speaker .translation-history{pointer-events:auto;touch-action:pan-y;overscroll-behavior-y:contain}
+.speaker.top .message-button{pointer-events:none}
+.speaker.top .message-compose{pointer-events:none}
+.app.is-editing .speaker:not(.is-editor) .translation-history{pointer-events:auto}
+
+/* v11.35: voice transcription indicator inside the existing writing bubble */
+.message-bubble{display:flex;align-items:flex-start;gap:9px}
+.voice-indicator{display:none;flex:0 0 27px;width:27px;height:27px;color:#f4c775;align-items:center;justify-content:center;position:relative;margin-top:0}
+.voice-indicator svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.speaker.voice-mode .voice-indicator{display:flex}
+.speaker.voice-listening .voice-indicator:after{content:"";position:absolute;inset:-3px;border:1px solid #f4c775;border-radius:50%;animation:voicePulse 1.25s ease-out infinite}
+.speaker.voice-listening .voice-indicator svg{animation:voiceBounce .75s ease-in-out infinite alternate}
+@keyframes voicePulse{0%{transform:scale(.65);opacity:.95}100%{transform:scale(1.45);opacity:0}}
+@keyframes voiceBounce{from{transform:scale(.92)}to{transform:scale(1.12)}}
+.voice-status{position:absolute;bottom:3px;left:8px;right:8px;text-align:center;color:#ffe3a8;font:500 11px system-ui,sans-serif;pointer-events:none}
+.translation-line{position:relative}
+.read-message{display:inline-flex;vertical-align:middle;align-items:center;justify-content:center;width:27px;height:27px;margin-inline-start:5px;border:0;background:transparent;color:#f4c775;cursor:pointer}
+.read-message svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* v11.49.2: accessible TTS control with playback-only aurora animation */
+.read-message{width:38px;height:38px;min-width:38px;position:relative;isolation:isolate;border-radius:50%;background:radial-gradient(circle at 30% 25%,#72512b99,#33271955 70%);border:1px solid #e9ba6d66;box-shadow:inset 0 1px #fff3,0 2px 9px #0005;transition:transform .2s ease,box-shadow .25s ease,color .2s ease;touch-action:manipulation}
+.read-message:active{transform:scale(.92)}
+.read-message:focus-visible{outline:2px solid #ffe4a0;outline-offset:3px}
+.read-message::before,.read-message::after{content:"";position:absolute;inset:-3px;border:1px solid #ffd98c;border-radius:50%;opacity:0;pointer-events:none}
+.read-message.is-tts-loading{color:#fff0bd;box-shadow:inset 0 0 10px #ffd68033,0 0 10px #f4b95d33}
+.read-message.is-tts-loading svg{animation:avnivoTtsWait 1.4s ease-in-out infinite}
+.read-message.is-tts-playing{color:#fff9e2;background:radial-gradient(circle at 35% 30%,#b98238,#65401c 75%);box-shadow:inset 0 1px 5px #fff6,0 0 13px #f9b94eaa,0 0 23px #ffcf6944}
+.read-message.is-tts-playing::before{animation:avnivoTtsRing 1.55s ease-out infinite}
+.read-message.is-tts-playing::after{animation:avnivoTtsRing 1.55s ease-out .77s infinite}
+.read-message.is-tts-playing svg{animation:avnivoTtsBreathe .75s ease-in-out infinite alternate;filter:drop-shadow(0 0 4px #fff0b5)}
+@keyframes avnivoTtsRing{0%{opacity:.85;transform:scale(.83)}85%,100%{opacity:0;transform:scale(1.55)}}
+@keyframes avnivoTtsBreathe{from{transform:scale(.94)}to{transform:scale(1.13)}}
+@keyframes avnivoTtsWait{0%,100%{opacity:.6;transform:scale(.94)}50%{opacity:1;transform:scale(1.08)}}
+@media(prefers-reduced-motion:reduce){.read-message,.read-message svg{animation:none!important;transition:none!important}.read-message::before,.read-message::after{animation:none!important}}
+/* v11.49.3: reserve side room inside the scroll viewport for TTS glow/rings.
+   The fade mask and its boundary remain exactly as before. */
+.speaker .translation-history:not(:empty){
+  padding:clamp(64px, 12dvh, 108px) 30px 30px;
+  box-sizing:border-box;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.speaker .translation-history::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+.speaker .translation-history::-webkit-scrollbar-thumb{display:none!important}
+.speaker .translation-history .translation-line{max-width:100%;font-size:19px;line-height:1.55;overflow-wrap:anywhere}
+.speaker .translation-history .translation-prefix{font-size:.92em}
+.speaker .translation-history .read-message{vertical-align:middle;margin:6px 8px;flex-shrink:0}
+
+
+
+
+
+/* AVNIVO local conversation archive, deliberately independent of translation/STT */
+.avnivo-archive{position:fixed;inset:0;z-index:3000;background:#17120d;color:#ffeac0;display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));font-family:system-ui,sans-serif}
+.avnivo-archive[hidden]{display:none!important}
+.avnivo-archive-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.avnivo-archive-header strong{font-size:21px;flex:1}
+.avnivo-archive button{cursor:pointer;color:#ffe4a0;background:#49341f;border:1px solid #b58b4e;border-radius:12px;padding:9px 12px}
+.avnivo-archive-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px}
+.avnivo-archive-entry{text-align:left;display:flex;flex-direction:column;gap:5px;width:100%}
+.avnivo-archive-entry small{color:#d5b98c}
+.avnivo-archive-detail{display:flex;flex-direction:column;flex:1;min-height:0}
+.avnivo-archive-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;min-height:0;flex:1}
+.avnivo-archive-column{overflow-y:auto;min-width:0;border:1px solid #745632;border-radius:12px;padding:8px;background:#302417}
+.avnivo-archive-column h3{font-size:14px;margin:0 0 12px;color:#ffcf75}
+.avnivo-archive-turn{font-size:12px;line-height:1.5;padding:9px 0;border-bottom:1px solid #ffffff17;overflow-wrap:anywhere}
+.avnivo-archive-turn .original{font-weight:700;color:#fff2d5}
+.avnivo-archive-turn .translated{color:#e5c897;margin-top:5px}
+.avnivo-archive-actions{display:flex;gap:6px;margin-top:6px}
+.avnivo-archive-actions button{font-size:13px;padding:5px 8px}
+.avnivo-copy{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;width:34px;height:34px;margin:4px 5px;border:1px solid #e9ba6d66;border-radius:50%;background:#47321e;color:#ffe4a0;cursor:pointer}
+.avnivo-copy svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}
+/* v11.49 history chat layout: one spacious conversation, no two-column grid */
+.avnivo-archive-detail{min-height:0;flex:1;display:flex;flex-direction:column}
+.avnivo-archive-detail>p{font-size:13px;color:#d9b981;margin:8px 0 14px}
+.avnivo-archive-chat{display:flex;flex-direction:column;gap:18px;overflow-y:auto;min-height:0;flex:1;padding:10px 6px 32px;scrollbar-width:none}
+.avnivo-archive-chat::-webkit-scrollbar{display:none}
+.avnivo-archive-message{display:flex;flex-direction:column;align-items:flex-start;width:100%;gap:7px}
+.avnivo-archive-message.from-second{align-items:flex-end}
+.avnivo-archive-bubble{max-width:min(88%,520px);min-width:0;border:1px solid #cfa66c66;border-radius:17px;padding:13px 15px;background:linear-gradient(145deg,#493321b8,#34271db8);box-shadow:0 2px 12px #0002;overflow-wrap:anywhere}
+.avnivo-archive-message.from-second .avnivo-archive-bubble{background:linear-gradient(145deg,#51402bba,#342a20c9)}
+.avnivo-archive-bubble .original{font-size:16px;line-height:1.5;font-weight:650;color:#fff0d4}
+.avnivo-archive-bubble .translated{font-size:15px;line-height:1.5;color:#e3c9a2;margin-top:9px;padding-top:9px;border-top:1px solid #e6bb7940}
+.avnivo-archive-actions{display:flex;align-items:center;gap:8px;margin:0 5px}
+.avnivo-archive-actions button{display:inline-grid;place-items:center;padding:0;width:36px;height:36px;border-radius:50%;border:1px solid #e9ba6d66;background:radial-gradient(circle at 30% 25%,#72512b99,#33271988);box-shadow:inset 0 1px #fff2,0 2px 8px #0003;color:#ffe4aa}
+.avnivo-archive-actions svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.avnivo-archive-actions button:active{transform:scale(.93)}
+/* v11.49 archive compact rows: each sentence has its own outline and inline bare actions */
+.avnivo-archive-chat{gap:9px;padding:5px 3px 18px}
+.avnivo-archive-message{gap:3px}
+.avnivo-archive-row{display:flex;align-items:center;gap:5px;width:100%;min-width:0}
+.avnivo-archive-message.from-second .avnivo-archive-row{flex-direction:row-reverse}
+.avnivo-archive-row .avnivo-archive-bubble{max-width:calc(100% - 77px);width:max-content;padding:8px 10px;border-radius:12px;box-shadow:none}
+.avnivo-archive-row .original,.avnivo-archive-row .translated{font-size:14px;line-height:1.4;margin:0;padding:0;border:0;font-weight:500;color:#ffedd0}
+.avnivo-archive-row .translated{color:#e4cba6}
+.avnivo-archive-row .avnivo-archive-actions{display:flex;gap:1px;margin:0;flex-shrink:0}
+.avnivo-archive-row .avnivo-archive-actions button{width:32px;height:34px;border:0;background:transparent;box-shadow:none;border-radius:8px;color:#edc88d}
+.avnivo-archive-row .avnivo-archive-actions button:focus-visible{outline:2px solid #ffd28c;outline-offset:1px}
+.avnivo-archive-row .avnivo-archive-actions svg{width:19px;height:19px}
+
+/* AVNIVO experimental deck: original UI preserved at commit 6fa995ed679470030077ef7e9ae40ac78cc267f4 */
+.app{grid-template-rows:minmax(0,1fr) auto;row-gap:0;padding-top:calc(10px + env(safe-area-inset-top))}
+.app>.speaker{grid-column:1;grid-row:1;min-height:0;align-self:stretch;overflow:hidden;transition:none}
+.app>.speaker.top{z-index:1;margin:0 13px 70px;transform:translateY(0) scale(.965);transform-origin:top center;filter:brightness(.82);pointer-events:none}
+.app>.speaker.middle{z-index:3;margin:58px 0 0;box-shadow:0 -9px 27px #0008,0 18px 32px #0007,inset 0 1px #ffffff23}
+.app>.nav{grid-column:1;grid-row:2;z-index:5}
+.app>.swap{position:absolute;z-index:12;top:calc(79px + env(safe-area-inset-top));right:26px;left:auto;bottom:auto;transform:none!important;width:43px;height:43px;border-radius:13px;background:linear-gradient(145deg,#ffe4a1,#e8ae4e);color:#3b2716;border:1px solid #fff0bc;box-shadow:0 4px 15px #0007}
+.app>.swap .swap-glyph{display:grid;place-items:center;width:100%;height:100%;transform:none!important}
+.app>.swap .swap-glyph svg{display:none!important}
+.app>.swap .swap-halo,.app>.swap .swap-orbit{display:none!important}
+.app>.swap .deck-plane{display:block!important;width:23px;height:23px;stroke:#3b2716;stroke-width:2;fill:none}
+.app>.speaker.middle .speaker-language-title{padding-right:47px}
+@media(max-height:520px){.app>.speaker.middle{margin-top:42px}.app>.speaker.top{margin-bottom:52px}.app>.swap{top:calc(62px + env(safe-area-inset-top))}}
+@media(prefers-reduced-motion:reduce){.app>.speaker{transition:none!important}}
+
+/* Deck v2: pinned plane button, visible language tabs, explicit over-and-behind animation */
+.app>.swap{position:absolute!important;top:auto!important;left:auto!important;right:19px!important;bottom:calc(var(--nav-height,86px) + 21px + env(safe-area-inset-bottom))!important;transform:none!important;z-index:30!important;width:54px!important;height:54px!important;border-radius:17px!important;display:grid!important;place-items:center!important}
+.app>.swap .swap-glyph{display:grid!important;place-items:center!important;transform:none!important}
+.app>.swap .swap-glyph svg:not(.deck-plane){display:none!important}
+.app>.swap .deck-plane{display:block!important;width:29px!important;height:29px!important;stroke:#342414!important;stroke-width:2.2!important;fill:none!important;transform:rotate(-12deg)}
+.app>.swap:disabled{opacity:.8}
+.app>.speaker{overflow:visible}
+.app>.speaker .center{min-height:0;overflow:hidden}
+.app>.speaker .speaker-language-title{position:absolute!important;top:10px!important;left:50%!important;transform:translateX(-50%)!important;order:unset!important;z-index:6!important;margin:0!important;padding:6px 12px!important;max-width:calc(100% - 30px)!important;min-height:35px!important;font-size:clamp(13px,3.5vw,16px)!important}
+.app>.speaker .header{margin-top:40px}
+.app>.speaker.middle .speaker-language-title{padding-right:12px!important}
+.app>.speaker.top{margin:0 13px 70px}
+.app>.speaker.middle{margin-top:64px}
+.app>.speaker.top .speaker-language-title{top:4px!important}
+.app>.speaker.middle .speaker-language-title{top:10px!important}
+.app>.speaker .speaker-language-title select{max-width:38vw!important}
+.app>.speaker.top{pointer-events:none}
+.app>.speaker.middle{pointer-events:auto}
+@media(max-height:520px){.app>.speaker.middle{margin-top:53px}.app>.speaker.top{margin-bottom:62px}.app>.swap{bottom:calc(var(--nav-height,86px) + 10px + env(safe-area-inset-bottom))!important}}
+
+/* Deck v3: remove legacy swap icon conflicts; visible paper plane */
+.app>.swap .swap-glyph svg.deck-plane{display:block!important;visibility:visible!important;opacity:1!important;stroke:#382515!important;fill:none!important;width:30px!important;height:30px!important;filter:none!important;transform:none!important}
+.app>.swap .swap-glyph{width:30px!important;height:30px!important;overflow:visible!important}
+.app>.speaker.top{transform:translateY(0) scale(.965)}
+.app>.speaker.middle{transform:translateY(0) scale(1)}
+
+/* Deck v6: clip all card contents to their own card; navigation stays on top */
+.app>.speaker{overflow:hidden!important;contain:layout paint}
+.app>.speaker .speaker-language-title{z-index:5}
+.app>.speaker .center{overflow:hidden;min-height:0}
+.app>.nav{position:relative;z-index:70!important}
+.app>.swap{z-index:80!important}
+
+/* Deck v7: permanent brand clearance; card motion is one continuous animation */
+.app{padding-top:calc(76px + env(safe-area-inset-top))!important}
+.app>.avnivo-brand{z-index:90!important;top:calc(17px + env(safe-area-inset-top))!important}
+.app>.speaker{will-change:transform;backface-visibility:hidden}
+.app>.nav{z-index:70!important}
+.app>.swap{z-index:80!important}
+@media(max-height:550px){.app{padding-top:calc(63px + env(safe-area-inset-top))!important}}
+
+/* Deck v8: original vertical card height; branding always composited above cards */
+.app{padding-top:calc(10px + env(safe-area-inset-top))!important;isolation:isolate}
+.app>.avnivo-brand{position:absolute!important;z-index:100!important;top:calc(20px + env(safe-area-inset-top))!important;pointer-events:none!important;isolation:isolate}
+.app>.speaker{will-change:transform;backface-visibility:hidden;contain:layout paint}
+.app>.nav{z-index:90!important;isolation:isolate}
+.app>.swap{z-index:95!important}
+
+/* Deck v9: cards remain attached to their contents; brand stays in front */
+.app>.speaker{overflow:hidden!important;contain:layout paint;transform-origin:top center!important}
+.app>.avnivo-brand{z-index:200!important;isolation:isolate!important}
+.app>.nav{z-index:150!important}
+.app>.swap{z-index:160!important}
+
+/* Deck v10: exact geometry, fixed card content, no layer jump */
+.app{isolation:isolate}
+.app>.speaker{overflow:hidden!important;contain:layout paint;backface-visibility:hidden}
+.app>.avnivo-brand{z-index:300!important;pointer-events:none!important}
+.app>.nav{z-index:250!important}
+.app>.swap{z-index:260!important}
+.app>.speaker.deck-moving{position:absolute!important;grid-row:auto!important;grid-column:auto!important;margin:0!important;transform:none!important;transform-origin:top left!important;filter:none!important;pointer-events:none!important;transition:none!important}
+
+/* V11: invariant card geometry, compositor-only movement, no resize or reflow */
+.app{isolation:isolate!important;overflow:hidden!important;padding-top:calc(10px + env(safe-area-inset-top))!important}
+.app>.speaker{position:absolute!important;grid-column:auto!important;grid-row:auto!important;left:11px!important;right:11px!important;width:auto!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;overflow:hidden!important;contain:layout paint!important;transform-origin:center center!important;transition:none!important;backface-visibility:hidden}
+.app>.speaker.top{top:calc(10px + env(safe-area-inset-top))!important;bottom:calc(var(--nav-height,86px) + env(safe-area-inset-bottom) + 70px)!important;z-index:1;transform:none!important;filter:brightness(.82);pointer-events:none}
+.app>.speaker.middle{top:calc(70px + env(safe-area-inset-top))!important;bottom:calc(var(--nav-height,86px) + env(safe-area-inset-bottom) + 10px)!important;z-index:3;transform:none!important;filter:none;pointer-events:auto}
+.app>.speaker.deck-v11-motion{will-change:transform;pointer-events:none!important}
+.app>.speaker .speaker-language-title{z-index:4!important}
+.app>.avnivo-brand{z-index:300!important;pointer-events:none!important;top:calc(20px + env(safe-area-inset-top))!important}
+.app>.nav{z-index:250!important}
+.app>.swap{z-index:260!important}
+
+/* AVNIVO single-screen translator: original brown/gold palette and editor retained */
+.app{grid-template-rows:minmax(0,1fr) auto!important;padding-top:calc(10px + env(safe-area-inset-top))!important}
+.app>.speaker.top{display:none!important}
+.app>.speaker.middle{position:relative!important;grid-column:1!important;grid-row:1!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important;margin:0 11px 0!important;width:auto!important;height:auto!important;min-height:0!important;max-height:none!important;transform:none!important;filter:none!important;display:flex!important;z-index:3!important}
+.app>.speaker.middle .speaker-language-title,.app>.speaker.middle .empty-art.message-button,.app>.speaker.middle .message-button.empty-art{display:none!important}
+.app>.speaker.middle .header{display:none!important}
+.app>.speaker.middle .center{flex:1;min-height:0!important}
+.app>.speaker.middle .message-compose{display:block!important}
+.app>.speaker.middle .message-compose[hidden]{display:block!important}
+.app>.swap{display:none!important}
+.app>.avnivo-brand{z-index:100!important}
+.app>.nav{grid-row:2!important;z-index:90!important}
+.avnivo-unified-languages{position:absolute;bottom:calc(var(--nav-height,86px) + env(safe-area-inset-bottom) + 113px);left:23px;right:23px;z-index:12;display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:auto}
+.avnivo-lang-pill{position:relative;min-width:0;flex:1;border:1px solid #bb9258;border-radius:14px;background:#322419;color:#ffe0a0;min-height:43px;display:flex;align-items:center;justify-content:center;padding:5px 7px;text-align:center;box-shadow:0 2px 9px #0005}
+.avnivo-lang-pill span{font-size:clamp(11px,3.1vw,14px);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.avnivo-lang-pill select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2}
+.avnivo-lang-flow{display:flex;flex-direction:column;align-items:center;gap:0;color:#e8bd74;flex-shrink:0}
+.avnivo-lang-flow svg{width:23px;height:14px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round}
+.avnivo-lang-flow svg:nth-child(2){animation:avnivo-flow 1.8s ease-in-out infinite .3s}
+.avnivo-lang-flow svg:nth-child(1){animation:avnivo-flow 1.8s ease-in-out infinite}
+@keyframes avnivo-flow{0%,100%{opacity:.55;transform:translateX(-2px)}50%{opacity:1;transform:translateX(2px)}}
+.avnivo-lang-exchange{border:0;background:transparent;color:#f6c978;width:38px;height:42px;flex-shrink:0;display:grid;place-items:center;padding:3px}
+.avnivo-lang-exchange svg{width:29px;height:29px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.avnivo-lang-exchange.rotating svg{animation:avnivo-exchange .48s ease-in-out}
+@keyframes avnivo-exchange{to{transform:rotate(360deg)}}
+.avnivo-lang-exchange.sensor-on svg{filter:drop-shadow(0 0 5px #ffd17b)}
+@media(max-width:370px){.avnivo-unified-languages{gap:3px;left:18px;right:18px}.avnivo-lang-exchange{width:33px}.avnivo-lang-flow svg{width:18px}}
+
+/* V13: directional language contrast and microphone-safe message composer */
+.avnivo-unified-languages{bottom:calc(var(--nav-height,86px) + env(safe-area-inset-bottom) + 146px)!important}
+.avnivo-lang-pill:first-child{border:2px solid #f5ca79;background:linear-gradient(145deg,#523922,#372617);box-shadow:0 0 13px #eab65a4d,inset 0 1px #ffdd9d66}
+.avnivo-lang-pill:nth-of-type(2){border:1px solid #816344;background:#2d241c;box-shadow:inset 0 1px #ffffff12}
+.avnivo-lang-flow svg{width:29px!important;height:17px!important;stroke-width:3.5!important}
+.avnivo-lang-exchange{width:40px!important;height:44px!important}
+.avnivo-lang-exchange svg{width:32px!important;height:32px!important;stroke-width:2.5!important}
+.avnivo-lang-flow.exchanging svg{animation:avnivo-flow-swap .46s ease-in-out both!important}
+@keyframes avnivo-flow-swap{50%{transform:translateX(5px) scale(1.15);opacity:1}}
+.app>.speaker.middle .message-compose{position:absolute!important;bottom:calc(var(--nav-height,86px) + env(safe-area-inset-bottom) + 66px)!important;left:12px;right:12px;z-index:25;display:flex!important;gap:7px;align-items:center}
+.app>.speaker.middle .message-bubble{flex:1;min-width:0}
+.avnivo-send-arrow{width:45px;height:45px;flex:0 0 45px;display:grid;place-items:center;border:1px solid #755b39;border-radius:14px;background:#30271e;color:#76644e;box-shadow:0 2px 9px #0005;transition:background .18s,color .18s,transform .18s,box-shadow .18s}
+.avnivo-send-arrow svg{width:26px;height:26px;stroke:currentColor;stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.avnivo-send-arrow.ready{color:#382514;background:linear-gradient(150deg,#ffe0a0,#e4ac51);border-color:#ffdf9c;box-shadow:0 0 12px #ffc76d55}
+.avnivo-send-arrow:disabled{opacity:.65;cursor:default}
+.avnivo-send-arrow.sending svg{animation:avnivo-send-up .4s ease}
+@keyframes avnivo-send-up{50%{transform:translateY(-6px) scale(1.15)}}
+
+/* V14 screenshot fix: language row and composer share the same card coordinate system */
+.app>.speaker.middle{overflow:hidden!important}
+.app>.speaker.middle .avnivo-unified-languages{
+ position:absolute!important;left:13px!important;right:13px!important;top:auto!important;
+ bottom:151px!important;z-index:35!important;margin:0!important;
+ display:flex!important;align-items:center!important;gap:5px!important;
+}
+.app>.speaker.middle .message-compose{
+ position:absolute!important;left:13px!important;right:13px!important;top:auto!important;
+ bottom:67px!important;z-index:36!important;margin:0!important;
+ display:flex!important;align-items:center!important;gap:8px!important;
+}
+.app>.speaker.middle .message-bubble{min-height:51px;display:flex!important;align-items:center!important}
+.app>.speaker.middle .message-input{width:100%;min-height:25px}
+.app>.speaker.middle .avnivo-lang-pill{min-width:0!important}
+.app>.speaker.middle .avnivo-lang-pill:first-child{flex:1.1!important}
+.app>.speaker.middle .avnivo-lang-pill:nth-of-type(2){flex:.95!important}
+.app>.speaker.middle .avnivo-lang-flow{flex:0 0 26px!important}
+.app>.speaker.middle .avnivo-lang-flow svg{width:25px!important}
+.app>.speaker.middle .avnivo-lang-exchange{flex:0 0 34px!important;width:34px!important}
+.app>.speaker.middle .avnivo-lang-exchange svg{width:27px!important}
+@media(max-width:380px){
+ .app>.speaker.middle .avnivo-unified-languages{left:9px!important;right:9px!important;gap:3px!important}
+ .app>.speaker.middle .avnivo-lang-pill span{font-size:11px!important}
+ .app>.speaker.middle .avnivo-lang-flow{flex-basis:22px!important}
+ .app>.speaker.middle .avnivo-lang-exchange{flex-basis:30px!important}
+}
+@media(max-height:650px){
+ .app>.speaker.middle .avnivo-unified-languages{bottom:135px!important}
+ .app>.speaker.middle .message-compose{bottom:56px!important}
+}
+
+/* V15: stable chat layout, chronological aligned turns, restrained microphone */
+.app>.speaker.middle .message-compose{bottom:53px!important;left:13px!important;right:13px!important;display:flex!important;align-items:stretch!important;gap:8px!important;min-height:52px!important}
+.app>.speaker.middle .message-bubble{min-width:0!important;flex:1 1 0!important;width:auto!important;max-width:none!important;display:flex!important;align-items:center!important;border-radius:15px!important}
+.app>.speaker.middle .message-input{flex:1!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+.app>.speaker.middle .avnivo-send-arrow{position:relative!important;flex:0 0 48px!important;width:48px!important;height:52px!important;margin:0!important;align-self:stretch!important}
+.app>.speaker.middle .avnivo-unified-languages{bottom:119px!important}
+.app>.speaker.middle .center{display:flex!important;flex-direction:column!important;min-height:0!important;overflow:hidden!important}
+.app>.speaker.middle .translation-history{display:flex!important;flex-direction:column!important;flex:1 1 auto!important;align-self:stretch!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;gap:0!important;padding:68px 10px 235px!important;box-sizing:border-box!important;scrollbar-width:none!important;mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.3) 7%,#000 19%,#000 100%)!important;-webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.3) 7%,#000 19%,#000 100%)!important}
+.app>.speaker.middle .translation-history::-webkit-scrollbar{display:none}
+.app>.speaker.middle .translation-line{display:block!important;flex:0 0 auto!important;width:fit-content!important;max-width:86%!important;min-width:0!important;margin:4px 0!important;padding:9px 12px!important;line-height:1.5!important;overflow-wrap:anywhere!important;word-break:normal!important;border-radius:15px!important;box-sizing:border-box!important}
+.app>.speaker.middle .translation-line.outgoing{align-self:flex-end!important;text-align:left!important;background:#6a4929!important;border:1px solid #d5a75f!important;color:#fff0d0!important}
+.app>.speaker.middle .translation-line.incoming{align-self:flex-start!important;text-align:left!important;background:#32291f!important;border:1px solid #7d6749!important;color:#f2dfbd!important}
+.app>.speaker.middle .translation-line .translation-prefix{font-weight:750!important}
+.app>.speaker.middle .translation-line .translation-body{white-space:pre-wrap!important}
+.app>.speaker.middle .avnivo-unified-transcript{display:contents!important}
+#mic,#mic.active{background:linear-gradient(145deg,#ffe7a8,#e5a23a)!important;border:3px solid #fff0bf!important;color:#3b260e!important;box-shadow:0 0 0 2px #ffdc8040,0 5px 15px #d39d4677!important;transition:box-shadow .2s ease,transform 85ms linear!important}
+#mic.active{box-shadow:0 0 0 3px #f7c66d80,0 0 13px #f5bf5a99!important}
+#mic:before,#mic:after,#mic.active:before,#mic.active:after,#mic .mic-gyro:before,#mic .mic-gyro:after{animation:none!important;display:none!important}
+#mic svg,#mic.active svg,#mic .mic-gyro svg{animation:none!important;filter:none!important}
+@media(max-height:650px){.app>.speaker.middle .avnivo-unified-languages{bottom:110px!important}.app>.speaker.middle .message-compose{bottom:47px!important}.app>.speaker.middle .translation-history{padding-bottom:220px!important}}
+</style>
+</head>
+<body>
+<main class="app" id="app" >
+<div class="avnivo-brand" role="img" aria-label="AVNIVO tarjimon"><svg viewBox="0 0 156 52" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="avnivoGold" x1="-20%" y1="0%" x2="120%" y2="0%"><stop offset="0%" stop-color="#ffb92d"/><stop offset="15%" stop-color="#ffe58d"/><stop offset="30%" stop-color="#fff7cf"/><stop offset="42%" stop-color="#ffffff"/><stop offset="52%" stop-color="#fffde9"/><stop offset="66%" stop-color="#ffd33f"/><stop offset="79%" stop-color="#fff2ac"/><stop offset="91%" stop-color="#e7a525"/><stop offset="100%" stop-color="#ffe6a0"/></linearGradient></defs><text x="0" y="29" font-family="system-ui,Arial,sans-serif" font-size="30" font-weight="900" letter-spacing=".5" fill="#fffdf7">AV</text><text x="43" y="29" font-family="system-ui,Arial,sans-serif" font-size="30" font-weight="900" letter-spacing=".5" fill="url(#avnivoGold)" stroke="#ffe59a" stroke-width=".23" paint-order="stroke fill" style="filter:drop-shadow(0 0 1.4px rgba(255,248,203,.95)) drop-shadow(0 0 3.4px rgba(255,194,54,.85))">NIVO</text><text x="0" y="47" font-family="system-ui,Arial,sans-serif" font-size="12" font-weight="700" fill="#f5dbac" textLength="118" lengthAdjust="spacing">tarjimon</text></svg></div>
+<section data-speaker="2" class="speaker top" aria-label="Yuqoridagi suhbatdosh">
+<div class="speaker-language-title" aria-label="Yuqori suhbat tili"><select id="upperLanguageSelect" aria-label="Yuqori bo‘lim tilini tanlash"><option value="ru">Русский язык</option><option value="en">English</option><option value="tr">Türkçe</option><option value="uz">O‘zbek tili</option></select><span class="language-divider" aria-hidden="true">≈</span><span id="upperLanguageUz">Rus tili</span></div>
+<div class="header"><div class="identity"><span id="topName" hidden>2-suhbatdosh</span></div></div>
+<div class="center"><div class="translation-history" role="log" aria-label="Tarjimalar tarixi" aria-live="polite" aria-relevant="additions"></div><button class="empty-art message-button" type="button" aria-label="Qo‘lda yozishni boshlash" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></button><div class="placeholder">Qo‘lda yozish uchun bosing!</div><div class="message-compose" hidden><label class="message-bubble"><span class="sr-only">Xabar matni</span><textarea class="message-input" rows="1" aria-label="Xabarni qo‘lda yozish" placeholder="" enterkeyhint="enter"></textarea></label></div></div>
+</section>
+<button class="swap" id="swap" type="button" aria-label="Suhbatdoshlar joyini almashtirish" title="Suhbatdoshlar joyini almashtirish">
+<span class="swap-halo" aria-hidden="true"></span><span class="swap-orbit" aria-hidden="true"></span>
+<span class="swap-glyph" aria-hidden="true"><svg class="deck-plane" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#382515" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display:block!important;visibility:visible!important;opacity:1!important"><path d="M21 3 3 10.5l7.6 2.8L13.5 21 21 3Z"/><path d="m10.6 13.3 10.4-10.3"/></svg></span>
+</button>
+<section data-speaker="1" class="speaker middle" aria-label="Pastdagi suhbatdosh">
+<div class="speaker-language-title" aria-label="Pastki suhbat tili"><select id="bottomLanguageSelect" aria-label="Pastki bo‘lim tilini tanlash"><option value="uz">O‘zbek tili</option><option value="ru">Русский язык</option><option value="en">English</option><option value="tr">Türkçe</option></select><span class="language-divider" aria-hidden="true">≈</span><span id="bottomLanguageTranslation">Узбекский язык</span></div>
+<div class="header"><div class="identity"><span id="bottomName" hidden>1-suhbatdosh</span></div></div>
+<div class="center"><div class="translation-history" role="log" aria-label="Tarjimalar tarixi" aria-live="polite" aria-relevant="additions"></div><button class="empty-art message-button" type="button" aria-label="Qo‘lda yozishni boshlash" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-5 3v-3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/><path d="M8 10h8M8 13.5h5"/></svg></button><div class="placeholder">Qo‘lda yozish uchun bosing!</div><div class="message-compose" hidden><label class="message-bubble"><span class="sr-only">Xabar matni</span><textarea class="message-input" rows="1" aria-label="Xabarni qo‘lda yozish" placeholder="" enterkeyhint="enter"></textarea></label></div></div>
+</section>
+<div class="swap-flare" aria-hidden="true"><i></i><i></i><i></i></div>
+<nav class="nav" aria-label="Asosiy navigatsiya">
+<button class="nav-btn" type="button" aria-label="Tarix (maket)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 11a9 9 0 1 1 2.8 6.5M3 4v7h7"/><path d="M12 7v5l3 2"/></svg><span>Tarix</span></button>
+<button class="mic" type="button" id="mic" aria-label="Demo mikrofon holatini almashtirish" aria-pressed="false"><span class="mic-gyro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg></span></button>
+<button class="nav-btn" type="button" id="settingsBtn" aria-label="Sozlamalar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l-1.8 1.8A1.7 1.7 0 0 0 16 18.4l-1.1.5-.5 2.1h-2.8l-.5-2.1-1.1-.5a1.7 1.7 0 0 0-1.9.3l-1.8-1.8A1.7 1.7 0 0 0 6.6 15l-.5-1.1L4 13.4v-2.8l2.1-.5.5-1.1a1.7 1.7 0 0 0-.3-1.9l1.8-1.8A1.7 1.7 0 0 0 10 5.6l1.1-.5.5-2.1h2.8l.5 2.1 1.1.5a1.7 1.7 0 0 0 1.9-.3l1.8 1.8a1.7 1.7 0 0 0-.3 1.9l.5 1.1 2.1.5v2.8l-2.1.5z"/></svg><span>Sozlamalar</span></button>
+</nav>
+<section class="sensor-sheet" id="sensorSheet" role="dialog" aria-modal="true" aria-labelledby="sensorTitle" hidden>
+<div class="sensor-card"><div class="sensor-head"><strong id="sensorTitle">Harakat sensori</strong><button id="sensorClose" type="button" aria-label="Yopish">✕</button></div>
+<p>Telefonni sekin egib ko‘ring. v8.7: sensor yoqilgach, oynani yopib mikrofon tugmasini kuzating.</p>
+<button type="button" id="sensorToggle" class="sensor-toggle">Sensorni yoqish</button>
+<div class="sensor-readings" aria-live="off"><span>Chap / o‘ng <b id="sensorX">—</b></span><span>Old / orqa <b id="sensorY">—</b></span></div>
+<div id="sensorStatus" class="sensor-status" role="status">Sensor o‘chirilgan</div>
+</div></section>
+</main>
+<script>
+const swapButton=document.getElementById('swap');
+let swapping=false;
+swapButton.addEventListener('click',()=>{});
+/* v11.35 microphone speech workflow is installed after composer initialization. */
+
+// Sensor preview only. No changes to swap animation or participant panels.
+(()=>{
+const sheet=document.getElementById('sensorSheet');
+const toggle=document.getElementById('sensorToggle');
+const status=document.getElementById('sensorStatus');
+const x=document.getElementById('sensorX'),y=document.getElementById('sensorY');
+let enabled=false,seen=false,raf=0,latest=null,startedAt=0;
+const onOrientation=e=>{
+ if(!enabled || !Number.isFinite(e.gamma) || !Number.isFinite(e.beta))return;
+ latest={gamma:e.gamma,beta:e.beta};seen=true;
+ // Sensor-controlled reflections: update CSS only, preserving the existing mic motion.
+ const root=document.getElementById('app');
+ root.style.setProperty('--shine-x',(50+Math.max(-35,Math.min(35,e.gamma*.7))).toFixed(1)+'%');
+ root.style.setProperty('--shine-y',(40+Math.max(-30,Math.min(30,(e.beta-45)*.45))).toFixed(1)+'%');
+ root.style.setProperty('--shine-strength','.85');
+ root.style.setProperty('--message-upright',Math.max(-80,Math.min(80,-e.gamma)).toFixed(1)+'deg');
+ const gold=document.getElementById('avnivoGold');if(gold)gold.setAttribute('gradientTransform','translate('+(Math.max(-.36,Math.min(.36,e.gamma/125))).toFixed(3)+' 0)');
+ // Counter-rotate the glyph, not the tappable button. Gamma is the portrait roll approximation.
+ const roll=Math.max(-80,Math.min(80,-e.gamma));
+ const pitch=Math.max(-10,Math.min(10,(e.beta-45)*0.12));
+ document.getElementById('mic').style.transform='rotate('+roll.toFixed(1)+'deg)';
+ status.textContent='v8.7 | Mikrofon burilishi: '+roll.toFixed(1)+'°';
+ if(!raf)raf=requestAnimationFrame(()=>{
+  raf=0;if(!enabled||!latest)return;
+  x.textContent=latest.gamma.toFixed(1)+'°';y.textContent=latest.beta.toFixed(1)+'°';
+  status.textContent='v8.7 | Mikrofon burilishi: '+Math.max(-80,Math.min(80,-latest.gamma)).toFixed(1)+'°';
+ });
+};
+function stop(){const root=document.getElementById('app');for(const key of ['--shine-x','--shine-y','--shine-strength','--message-upright'])root.style.removeProperty(key);const gold=document.getElementById('avnivoGold');if(gold)gold.removeAttribute('gradientTransform');enabled=false;document.getElementById('mic').style.removeProperty('transform');window.removeEventListener('deviceorientation',onOrientation);if(raf)cancelAnimationFrame(raf);raf=0;toggle.textContent='Sensorni yoqish';status.textContent='Sensor o‘chirilgan';x.textContent='—';y.textContent='—'}
+document.getElementById('settingsBtn').addEventListener('click',()=>{sheet.hidden=false;toggle.focus()});
+document.getElementById('sensorClose').addEventListener('click',()=>{sheet.hidden=true});
+sheet.addEventListener('click',e=>{if(e.target===sheet)sheet.hidden=true});
+toggle.addEventListener('click',async()=>{
+ if(enabled){stop();return}
+ if(!window.isSecureContext){status.textContent='Sensor uchun HTTPS talab qilinishi mumkin. Faylni xavfsiz manzilda oching.';return}
+ if(typeof DeviceOrientationEvent==='undefined'){status.textContent='Brauzer ushbu sensor API sini qo‘llamaydi.';return}
+ try{
+  if(typeof DeviceOrientationEvent.requestPermission==='function'){
+   const result=await DeviceOrientationEvent.requestPermission();
+   if(result!=='granted'){status.textContent='Sensor ruxsati berilmadi.';return}
+  }
+  enabled=true;seen=false;startedAt=Date.now();toggle.textContent='Sensorni o‘chirish';status.textContent='Sensor ma’lumotlari kutilmoqda…';
+  // Close the opaque sensor dialog so the microphone is actually visible during the test.
+  sheet.hidden=true;
+  window.addEventListener('deviceorientation',onOrientation,{passive:true});
+  setTimeout(()=>{if(enabled&&!seen&&Date.now()-startedAt>=2000)status.textContent='Ma’lumot kelmadi. Brauzer yoki telefon sensorni cheklayotgan bo‘lishi mumkin.'},2500);
+ }catch(err){status.textContent='Sensorni ishga tushirib bo‘lmadi: '+(err?.message||'ruxsat xatosi')}
+});
+})();
+</script>
+
+
+
+
+
+<script>
+window.CHIRP2_MATRIX=[
+  ["af-ZA","Afrikaans (South Africa)"],
+  ["am-ET","Amharic (Ethiopia)"],
+  ["ar-EG","Arabic (Egypt)"],
+  ["as-IN","Assamese (India)"],
+  ["ast-ES","Asturian (Spain)"],
+  ["az-AZ","Azerbaijani (Azerbaijan)"],
+  ["be-BY","Belarusian (Belarus)"],
+  ["bg-BG","Bulgarian (Bulgaria)"],
+  ["bn-BD","Bengali (Bangladesh)"],
+  ["bn-IN","Bengali (India)"],
+  ["bs-BA","Bosnian (Bosnia and Herzegovina)"],
+  ["ca-ES","Catalan (Spain)"],
+  ["ceb-PH","Cebuano (Philippines)"],
+  ["ckb-IQ","Central Kurdish (Iraq)"],
+  ["cmn-Hans-CN","Chinese (Simplified, China)"],
+  ["cmn-Hant-TW","Chinese, Mandarin (Traditional, Taiwan)"],
+  ["cs-CZ","Czech (Czech Republic)"],
+  ["cy-GB","Welsh (United Kingdom)"],
+  ["da-DK","Danish (Denmark)"],
+  ["de-DE","German (Germany)"],
+  ["el-GR","Greek (Greece)"],
+  ["en-AU","English (Australia)"],
+  ["en-GB","English (United Kingdom)"],
+  ["en-IN","English (India)"],
+  ["en-US","English (United States)"],
+  ["es-419","Spanish (Latin American)"],
+  ["es-ES","Spanish (Spain)"],
+  ["es-US","Spanish (United States)"],
+  ["et-EE","Estonian (Estonia)"],
+  ["eu-ES","Basque (Spain)"],
+  ["fa-IR","Persian (Iran)"],
+  ["ff-SN","Fulah (Senegal)"],
+  ["fi-FI","Finnish (Finland)"],
+  ["fil-PH","Filipino (Philippines)"],
+  ["fr-CA","French (Canada)"],
+  ["fr-FR","French (France)"],
+  ["ga-IE","Irish (Ireland)"],
+  ["gl-ES","Galician (Spain)"],
+  ["gu-IN","Gujarati (India)"],
+  ["ha-NG","Hausa (Nigeria)"],
+  ["hi-IN","Hindi (India)"],
+  ["hr-HR","Croatian (Croatia)"],
+  ["hu-HU","Hungarian (Hungary)"],
+  ["hy-AM","Armenian (Armenia)"],
+  ["id-ID","Indonesian (Indonesia)"],
+  ["ig-NG","Igbo (Nigeria)"],
+  ["is-IS","Icelandic (Iceland)"],
+  ["it-IT","Italian (Italy)"],
+  ["iw-IL","Hebrew (Israel)"],
+  ["ja-JP","Japanese (Japan)"],
+  ["jv-ID","Javanese (Indonesia)"],
+  ["ka-GE","Georgian (Georgia)"],
+  ["kam-KE","Kamba (Kenya)"],
+  ["kea-CV","Kabuverdianu (Cape Verde)"],
+  ["kk-KZ","Kazakh (Kazakhstan)"],
+  ["km-KH","Khmer (Cambodia)"],
+  ["kn-IN","Kannada (India)"],
+  ["ko-KR","Korean (South Korea)"],
+  ["ky-KG","Kyrgyz (Cyrillic)"],
+  ["lb-LU","Luxembourgish (Luxembourg)"],
+  ["lg-UG","Ganda (Uganda)"],
+  ["ln-CD","Lingala (Congo-Kinshasa)"],
+  ["lo-LA","Lao (Laos)"],
+  ["lt-LT","Lithuanian (Lithuania)"],
+  ["luo-KE","Luo (Kenya)"],
+  ["lv-LV","Latvian (Latvia)"],
+  ["mi-NZ","Maori (New Zealand)"],
+  ["mk-MK","Macedonian (North Macedonia)"],
+  ["ml-IN","Malayalam (India)"],
+  ["mn-MN","Mongolian (Mongolia)"],
+  ["mr-IN","Marathi (India)"],
+  ["ms-MY","Malay (Malaysia)"],
+  ["mt-MT","Maltese (Malta)"],
+  ["my-MM","Burmese (Myanmar)"],
+  ["ne-NP","Nepali (Nepal)"],
+  ["nl-NL","Dutch (Netherlands)"],
+  ["no-NO","Norwegian Bokmål (Norway)"],
+  ["nso-ZA","Sepedi (South Africa)"],
+  ["ny-MW","Nyanja (Malawi)"],
+  ["oc-FR","Occitan (France)"],
+  ["om-ET","Oromo (Ethiopia)"],
+  ["or-IN","Oriya (India)"],
+  ["pa-Guru-IN","Punjabi (Gurmukhi India)"],
+  ["pl-PL","Polish (Poland)"],
+  ["ps-AF","Pashto"],
+  ["pt-BR","Portuguese (Brazil)"],
+  ["pt-PT","Portuguese (Portugal)"],
+  ["ro-RO","Romanian (Romania)"],
+  ["ru-RU","Russian (Russia)"],
+  ["rup-BG","Aromanian (Bulgaria)"],
+  ["sd-IN","Sindhi (India)"],
+  ["si-LK","Sinhala (Sri Lanka)"],
+  ["sk-SK","Slovak (Slovakia)"],
+  ["sl-SI","Slovenian (Slovenia)"],
+  ["sn-ZW","Shona (Zimbabwe)"],
+  ["so-SO","Somali"],
+  ["sq-AL","Albanian (Albania)"],
+  ["sr-RS","Serbian (Serbia)"],
+  ["su-ID","Sundanese (Indonesia)"],
+  ["sv-SE","Swedish (Sweden)"],
+  ["sw","Swahili"],
+  ["sw-KE","Swahili (Kenya)"],
+  ["ta-IN","Tamil (India)"],
+  ["te-IN","Telugu (India)"],
+  ["tg-TJ","Tajik (Tajikistan)"],
+  ["th-TH","Thai (Thailand)"],
+  ["tr-TR","Turkish (Turkey)"],
+  ["uk-UA","Ukrainian (Ukraine)"],
+  ["umb-AO","Umbundu (Angola)"],
+  ["ur-PK","Urdu (Pakistan)"],
+  ["uz-UZ","Uzbek (Uzbekistan)"],
+  ["vi-VN","Vietnamese (Vietnam)"],
+  ["wo-SN","Wolof (Senegal)"],
+  ["xh-ZA","Xhosa (South Africa)"],
+  ["yo-NG","Yoruba (Nigeria)"],
+  ["yue-Hant-HK","Chinese, Cantonese (Traditional Hong Kong)"],
+  ["zu-ZA","Zulu (South Africa)"]
+];
+/* Make the entire language badge tappable on Android Chrome, including while editing. */
+ const languageTapStyle=document.createElement('style');
+ languageTapStyle.textContent='.speaker .speaker-language-title{position:relative;z-index:25;pointer-events:auto;cursor:pointer;touch-action:manipulation}.speaker .speaker-language-title select{pointer-events:auto;min-height:36px;cursor:pointer}.app.is-editing .speaker:not(.is-editor) .speaker-language-title,.app.is-editing .speaker:not(.is-editor) .speaker-language-title select{pointer-events:auto}';
+ document.head.appendChild(languageTapStyle);
+ /* Online language selection: both panels, reciprocal names, persisted choice. */
+(()=>{
+ const upper=document.getElementById('upperLanguageSelect');
+ const lower=document.getElementById('bottomLanguageSelect');
+ const upperTranslated=document.getElementById('upperLanguageUz');
+ const lowerTranslated=document.getElementById('bottomLanguageTranslation');
+ if(!upper||!lower||!upperTranslated||!lowerTranslated)return;
+ const native={uz:'O‘zbek tili',ru:'Русский язык',en:'English',tr:'Türkçe'};
+ // The original four language choices use short codes. Keep those exact
+ // values so existing translation, TTS and saved selections continue to work.
+ // Suppress their full BCP-47 aliases in the visible picker only; the STT
+ // resolver maps the short codes to the correct Chirp 2 locale.
+ const aliases=new Set(['uz-UZ','ru-RU','en-US','tr-TR']);
+ for(const [code,label] of (window.CHIRP2_MATRIX||[])){
+   if(!aliases.has(code))native[code]=label;
+ }
+ const names={
+  uz:{uz:'O‘zbek tili',ru:'Узбекский язык',en:'Uzbek language',tr:'Özbekçe'},
+  ru:{uz:'Rus tili',ru:'Русский язык',en:'Russian language',tr:'Rusça'},
+  en:{uz:'Ingliz tili',ru:'Английский язык',en:'English',tr:'İngilizce'},
+  tr:{uz:'Turk tili',ru:'Турецкий язык',en:'Turkish language',tr:'Türkçe'}
+ };
+ const supported=Object.keys(native);
+ for(const select of [upper,lower]){
+   for(const [code,label] of (window.CHIRP2_MATRIX||[])){
+     if(aliases.has(code))continue;
+     const option=document.createElement('option');option.value=code;option.textContent=label+' — '+code;select.append(option);
+   }
+ }
+ try{
+  const a=localStorage.getItem('avnivo.online.upper'),b=localStorage.getItem('avnivo.online.lower');
+  if(supported.includes(a))upper.value=a;
+  if(supported.includes(b))lower.value=b;
+ }catch(_){}
+ function apply(){
+  upperTranslated.textContent=names[upper.value]?.[lower.value]||native[upper.value];
+  lowerTranslated.textContent=names[lower.value]?.[upper.value]||native[lower.value];
+  const topLang=document.getElementById('topLang');
+  if(topLang)topLang.textContent=names[upper.value]?.uz||native[upper.value];
+  try{localStorage.setItem('avnivo.online.upper',upper.value);localStorage.setItem('avnivo.online.lower',lower.value)}catch(_){}
+ }
+ // Custom picker: native select.showPicker() is inconsistent in embedded mobile browsers.
+ // Keep native selects for state and existing translation handlers, but use a
+ // document-level modal so stacking contexts and pointer-event rules cannot hide it.
+ const modal=document.createElement('div');
+ modal.id='avnivoOnlineLanguageDialog';
+ modal.hidden=true;
+ modal.setAttribute('role','dialog');
+ modal.setAttribute('aria-modal','true');
+ modal.setAttribute('aria-label','Online tarjima tilini tanlash');
+ modal.innerHTML='<div class="avnivo-language-card"><div class="avnivo-language-head"><strong>Ovoz tanish tili · 117 til</strong><button type="button" data-close aria-label="Yopish">✕</button></div><div class="avnivo-language-search-toolbar"><button type="button" class="avnivo-language-search-toggle" aria-label="Til qidirishni ochish" aria-expanded="false" title="Til qidirish"><svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button><input type="search" class="avnivo-language-search" placeholder="Til nomi yoki kodi bo‘yicha qidirish" aria-label="Til qidirish" autocomplete="off" tabindex="-1"></div><div class="avnivo-language-options"></div></div>';
+ const css=document.createElement('style');
+ css.textContent=`
+ #avnivoOnlineLanguageDialog[hidden]{display:none!important}
+ #avnivoOnlineLanguageDialog{position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+ #avnivoOnlineLanguageDialog .avnivo-language-card{width:min(420px,100%);min-width:0;max-width:calc(100vw - 40px);max-height:80dvh;overflow:auto;overscroll-behavior:contain;-webkit-text-size-adjust:100%;border:1px solid #c79b58;border-radius:20px;background:#30251b;color:#ffe4aa;padding:18px;box-sizing:border-box}
+ .avnivo-language-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+ .avnivo-language-head button{background:transparent;border:0;color:inherit;font-size:24px;padding:8px}
+ .avnivo-language-search-toolbar{display:block;position:relative;width:100%;height:66px;margin:0 0 12px;overflow:visible;isolation:isolate}\n .avnivo-language-search-toolbar .avnivo-language-search{position:absolute;left:0;top:2px;width:calc(100% - 60px);height:50px;margin:0;transform:scaleX(0);transform-origin:right center;opacity:0;pointer-events:none;transition:transform .75s cubic-bezier(.22,.65,.18,1),opacity .45s ease}\n .avnivo-language-search-toolbar.is-open .avnivo-language-search{transform:scaleX(1);opacity:1;pointer-events:auto}\n .avnivo-language-search-toolbar.is-open .avnivo-language-search-toggle{animation:none;transform:none}\n .avnivo-language-search-toolbar .avnivo-language-search-toggle{position:absolute!important;top:7px!important;overflow:visible!important;left:calc(50% - 26px);z-index:2;box-sizing:border-box!important;min-width:52px!important;max-width:52px!important;min-height:52px!important;max-height:52px!important;padding:0!important;margin:0!important;flex:none!important;line-height:1!important;transition:left .75s cubic-bezier(.22,.65,.18,1)!important}\n .avnivo-language-search-toolbar.is-open .avnivo-language-search-toggle{left:calc(100% - 52px)}\n .avnivo-language-search-toggle svg{width:27px!important;height:27px!important;flex:none}\n .avnivo-language-search-toggle{display:grid;place-items:center;width:52px;height:52px;border:1px solid #d8aa62;border-radius:50%;background:#604329;color:#ffdf9c;cursor:pointer;animation:avnivo-loupe-float 2.8s ease-in-out infinite,avnivo-loupe-nudge 4.5s ease-in-out infinite;transform-origin:center}\n .avnivo-language-search-toggle:focus-visible{outline:2px solid #ffe4aa;outline-offset:3px}\n @keyframes avnivo-loupe-float{0%,100%{translate:0 0}50%{translate:0 -5px}}\n @keyframes avnivo-loupe-nudge{0%,65%,90%,100%{rotate:0deg;filter:brightness(1);box-shadow:0 0 0 rgba(255,218,140,0)}69%,79%{rotate:-15deg;filter:brightness(1.25);box-shadow:0 0 14px rgba(255,218,140,.55)}74%,84%{rotate:15deg;filter:brightness(1.35);box-shadow:0 0 20px rgba(255,218,140,.7)}87%{rotate:-7deg;filter:brightness(1.16);box-shadow:0 0 10px rgba(255,218,140,.35)}}\n @media(prefers-reduced-motion:reduce){.avnivo-language-search-toggle{animation:none}}\n .avnivo-language-search{display:block;width:100%;padding:12px;margin-bottom:12px;border:1px solid #a47a46;border-radius:12px;background:#211910;color:#fff4dc;font:15px system-ui;box-sizing:border-box}\n .avnivo-language-options{display:grid;gap:8px;max-height:58dvh;overflow-y:auto}
+ .avnivo-language-options button{display:block;width:100%;padding:14px;text-align:left;font:600 17px system-ui;color:#ffe4aa;background:#473426;border:1px solid #a47a46;border-radius:12px}
+ .avnivo-language-options button[aria-pressed=true]{border-color:#ffdc84;background:#684b27}
+ .speaker .speaker-language-title select{pointer-events:none!important}
+ .speaker .speaker-language-title{pointer-events:auto!important;z-index:30!important;cursor:pointer;-webkit-tap-highlight-color:transparent!important;outline:none}\n .speaker .speaker-language-title *, .speaker .speaker-language-title select{-webkit-tap-highlight-color:transparent!important}\n .speaker .speaker-language-title:focus-visible{outline:2px solid #ffdc84;outline-offset:3px}
+ `;
+ document.head.append(css);
+ document.body.append(modal);
+ let editingSelect=null;
+ const closePicker=()=>{modal.hidden=true;editingSelect=null;modal.querySelector('.avnivo-language-search-toolbar').classList.remove('is-open');};
+ function openPicker(select){
+   editingSelect=select;
+   const search=modal.querySelector('.avnivo-language-search');
+   search.value='';search.tabIndex=-1;
+   modal.querySelector('.avnivo-language-search-toolbar').classList.remove('is-open');
+   modal.querySelector('.avnivo-language-search-toggle').setAttribute('aria-expanded','false');
+   const options=modal.querySelector('.avnivo-language-options');
+   options.replaceChildren();
+   const query=modal.querySelector('.avnivo-language-search').value.trim().toLocaleLowerCase();
+   for(const code of supported){
+     if(query && !(native[code]+' '+code).toLocaleLowerCase().includes(query))continue;
+     const button=document.createElement('button');
+     button.type='button';button.textContent=native[code]+' · '+code;
+     button.setAttribute('aria-pressed',String(select.value===code));
+     button.addEventListener('click',()=>{
+       if(editingSelect){
+         editingSelect.value=code;
+         editingSelect.dispatchEvent(new Event('change',{bubbles:true}));
+       }
+       closePicker();
+     });
+     options.append(button);
+   }
+   modal.hidden=false;
+ }
+ modal.querySelector('.avnivo-language-search').addEventListener('input',()=>{if(editingSelect)openPickerResults(editingSelect)});
+ modal.querySelector('.avnivo-language-search-toggle').addEventListener('click',()=>{const search=modal.querySelector('.avnivo-language-search');const toolbar=modal.querySelector('.avnivo-language-search-toolbar');if(!toolbar.classList.contains('is-open')){toolbar.classList.add('is-open');search.tabIndex=0;modal.querySelector('.avnivo-language-search-toggle').setAttribute('aria-expanded','true');setTimeout(()=>{if(!modal.hidden&&toolbar.classList.contains('is-open'))search.focus();},790);}else{search.focus();}});
+ function openPickerResults(select){const options=modal.querySelector('.avnivo-language-options');options.replaceChildren();const query=modal.querySelector('.avnivo-language-search').value.trim().toLocaleLowerCase();for(const code of supported){if(query&&!(native[code]+' '+code).toLocaleLowerCase().includes(query))continue;const button=document.createElement('button');button.type='button';button.textContent=native[code]+' · '+code;button.setAttribute('aria-pressed',String(select.value===code));button.addEventListener('click',()=>{select.value=code;select.dispatchEvent(new Event('change',{bubbles:true}));closePicker()});options.append(button)}}
+ modal.addEventListener('click',e=>{if(e.target===modal||e.target.closest('[data-close]'))closePicker()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closePicker()});
+ // Capture the tap before card/editor handlers can consume it.
+ document.addEventListener('click',e=>{
+   if(!modal.hidden)return;
+   const badge=e.target.closest?.('.speaker-language-title');
+   if(!badge)return;
+   const select=badge.querySelector('select');
+   if(!select)return;
+   e.preventDefault();e.stopPropagation();
+   openPicker(select);
+ },true);
+  upper.addEventListener('change',apply);
+ lower.addEventListener('change',apply);
+ window.avnivoOnlineLanguageForSpeaker=id=>id==='1'?lower.value:upper.value;
+ apply();
+})();
+</script>
+
+<script>
+/* v11.30: persistent incoming/outgoing chat messages and draft clearing. */
+(()=>{
+ const app=document.getElementById('app');
+ const viewport=window.visualViewport;
+ const speakers=[...app.querySelectorAll('.speaker')];
+ const SLIDE_MS=1450;
+ const buttons=speakers.map(s=>s.querySelector('.message-button'));
+ let active=null,typingToken=0,keyboardTimer=0;
+ const baseline=window.innerHeight;
+ function resize(){
+   if(!viewport)return;
+   const h=Math.max(250,Math.round(viewport.height));
+   const keyboard=h<Math.min(baseline,window.innerHeight)-110;
+   app.classList.toggle('keyboard-open',keyboard);
+   // Position fixed app relative to the visible viewport, including browser pan.
+   app.style.height=h+'px';
+   app.style.top=Math.max(0,Math.round(viewport.offsetTop))+'px';
+ }
+ if(viewport){
+   viewport.addEventListener('resize',resize,{passive:true});
+   viewport.addEventListener('scroll',resize,{passive:true});
+ }
+ function grow(input){
+   input.style.height='24px';
+   const cap=Math.max(38,Math.min((viewport?.height||window.innerHeight)*.19,130));
+   input.style.height=Math.min(input.scrollHeight,cap)+'px';
+ }
+ function open(speaker,focus=true){
+   const wasOpen=speaker.querySelector('.center').classList.contains('is-composing');
+   const moving=speaker.querySelector('.message-button');
+   const from=wasOpen?null:moving.getBoundingClientRect();
+   const center=speaker.querySelector('.center');
+   const compose=center.querySelector('.message-compose');
+   const button=center.querySelector('.message-button');
+   compose.hidden=false;
+   center.classList.add('is-composing');
+   button.setAttribute('aria-expanded','true');
+   if(from){
+     const to=moving.getBoundingClientRect();
+     const dx=from.left-to.left,dy=from.top-to.top;
+     if(Math.abs(dx)+Math.abs(dy)>1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+       // FLIP: animate the actual icon's old position to its new left-aligned position.
+       moving.animate([{translate:dx+'px '+dy+'px'},{translate:'0px 0px'}],{duration:SLIDE_MS,easing:'cubic-bezier(.22,.61,.36,1)'});
+     }
+   }
+   if(focus){const input=speaker.querySelector('.message-input');input.focus({preventScroll:true});grow(input);resize();}
+ }
+ function lock(speaker){
+   active=speaker;app.classList.add('is-editing');
+   speakers.forEach(s=>s.classList.toggle('is-editor',s===speaker));
+ }
+ buttons.forEach(button=>{
+   const speaker=button.closest('.speaker');
+   const input=speaker.querySelector('.message-input');
+
+   button.addEventListener('click',()=>{
+     // Only the panel currently at the bottom may accept manual text.
+     if(!speaker.classList.contains('middle'))return;
+     // A stale editor lock must never block the currently visible lower panel.
+     if(active&&active!==speaker){active=null;app.classList.remove('is-editing');speakers.forEach(p=>p.classList.remove('is-editor'));}
+     button.classList.remove('is-shaking');void button.offsetWidth;button.classList.add('is-shaking');
+     setTimeout(()=>button.classList.remove('is-shaking'),400);
+     // Only the tapped speaker opens; the other icon stays exactly in place.
+     open(speaker,false);
+     lock(speaker);
+     // Focus must occur inside the trusted tap event for Android to show its keyboard.
+     input.focus({preventScroll:true});
+     grow(input);
+     resize();
+   });
+   // The visible text box is itself the tap target, even during demo translation.
+   const bubble=speaker.querySelector('.message-bubble');
+   bubble.addEventListener('click',()=>{
+     if(!speaker.classList.contains('middle'))return;
+     if(active&&active!==speaker){active=null;app.classList.remove('is-editing');speakers.forEach(p=>p.classList.remove('is-editor'));}
+     open(speaker,false);
+     lock(speaker);
+     if(input.readOnly)input.readOnly=false;
+     input.focus({preventScroll:true});
+   });
+   input.addEventListener('focus',()=>{
+     if(!speaker.classList.contains('middle')){input.blur();return;}
+     lock(speaker);
+   });
+   input.addEventListener('input',()=>grow(input));
+ });
+ function beforeSwap(){
+   // Prepare the text at the very start of the swap, without changing the UI.
+   const speaking=app.querySelector('.speaker.middle');
+   const original=speaking?.querySelector('.message-input')?.value.trim()||'';
+   if(original){
+     const detail=window.avnivoPrepareSpeech?.(original,speaking.dataset.speaker)||
+       {originalText:original,preparedText:original,sourceLanguage:'unknown'};
+     window.dispatchEvent(new CustomEvent('avnivo:speech-prepared',{detail}));
+   }
+   typingToken++;
+   active=null;app.classList.remove('is-editing');
+   speakers.forEach(s=>s.classList.remove('is-editor','is-translating'));
+   // Reset the keyboard-specific geometry before panel exchange.
+   app.classList.remove('keyboard-open');
+   app.style.height='';
+   app.style.top='';
+ }
+ async function afterSwap(nowTop,nowBottom){
+   // The authored message stays with its speaker, now at the top.
+   const input=nowTop.querySelector('.message-input');
+   const source=input.value.trim();
+   // Always clear the draft when its speaker changes position.
+   input.value='';
+   grow(input);
+   // The other speaker is now the bottom editor. Reveal without focusing:
+   // keyboard must open only after a user taps its text field.
+   open(nowBottom,false);
+   if(!source)return;
+   const language=document.getElementById('upperLanguageSelect')?.value||'ru';
+   const shortNames={ru:'РУ:',en:'EN:',tr:'TR:',uz:'UZ:'};
+   function appendMessage(speaker,side,label,message){
+     const history=speaker.querySelector('.translation-history');
+     const line=document.createElement('div');
+     line.className='translation-line '+side;
+     const prefix=document.createElement('span');
+     prefix.className='translation-prefix';
+     prefix.textContent=label;
+     const body=document.createElement('span');
+     body.className='translation-body';
+     body.textContent=message;
+     line.append(prefix,body);
+     history.append(line);
+     history.scrollTop=history.scrollHeight;
+     return {history,body};
+   }
+   const sourceLabel=(window.avnivoOnlineLanguageForSpeaker?.(nowTop.dataset.speaker)||'uz').toUpperCase()+':';
+   appendMessage(nowTop,'outgoing',sourceLabel,source);
+   const avnivoTurn={speaker:nowTop.dataset.speaker,source,sourceLang:window.avnivoOnlineLanguageForSpeaker?.(nowTop.dataset.speaker)||'uz',targetLang:window.avnivoOnlineLanguageForSpeaker?.(nowBottom.dataset.speaker)||'ru',translation:'',at:Date.now()};
+   window.dispatchEvent(new CustomEvent('avnivo:history-turn',{detail:{...avnivoTurn}}));
+   const destLabel=(window.avnivoOnlineLanguageForSpeaker?.(nowBottom.dataset.speaker)||'ru').toUpperCase()+':';
+   const target=appendMessage(nowBottom,'incoming',destLabel,'');
+   // Real Google Translation LLM; no fabricated demo translation or silent fallback.
+   const token=++typingToken;
+   const sourceLang=window.avnivoOnlineLanguageForSpeaker?.(nowTop.dataset.speaker)||'uz';
+   const targetLang=window.avnivoOnlineLanguageForSpeaker?.(nowBottom.dataset.speaker)||'ru';
+   if(sourceLang===targetLang){
+     target.body.textContent=source;
+     window.dispatchEvent(new CustomEvent('avnivo:history-translation',{detail:{at:avnivoTurn.at,translation:source}}));
+     return;
+   }
+   nowBottom.classList.add('is-translating');
+   target.body.textContent='Tarjima qilinmoqda…';
+   const controller=new AbortController();
+   const timeout=setTimeout(()=>controller.abort(),30000);
+   try{
+     const response=await fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate',{
+       method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({text:source,source:sourceLang,target:targetLang}),
+       signal:controller.signal
+     });
+     const data=await response.json().catch(()=>({}));
+     if(token!==typingToken)return;
+     if(!response.ok||typeof data.text!=='string'||!data.text.trim()){
+       throw new Error(response.status===429?'So‘rovlar chegarasi oshdi':response.status===503?'Tarjima xizmati sozlanmagan':('HTTP '+response.status));
+     }
+     target.body.textContent=data.text;
+     window.dispatchEvent(new CustomEvent('avnivo:history-translation',{detail:{at:avnivoTurn.at,translation:data.text}}));
+   }catch(error){
+     if(token===typingToken)target.body.textContent='Tarjima amalga oshmadi: '+(error.name==='AbortError'?'vaqt tugadi':error.message||'tarmoq xatosi');
+   }finally{
+     clearTimeout(timeout);
+     nowBottom.classList.remove('is-translating');
+     target.history.scrollTop=target.history.scrollHeight;
+   }
+ }
+ // Enforce the edit permission on every swap, including the previously edited panel.
+ function enforcePermissions(){
+   speakers.forEach(s=>{
+     const isBottom=s.classList.contains('middle');
+     const b=s.querySelector('.message-button');
+     const i=s.querySelector('.message-input');
+     b.disabled=!isBottom;
+     b.setAttribute('aria-disabled',String(!isBottom));
+     b.setAttribute('aria-label',isBottom?'Qo‘lda yozishni boshlash':'Yuqori bo‘lim: faqat tarjimani ko‘rish');
+     i.readOnly=!isBottom;
+     i.tabIndex=isBottom?0:-1;
+     if(!isBottom && document.activeElement===i)i.blur();
+   });
+ }
+ const oldAfterSwap=afterSwap;
+ function showBottomEditor(){
+   const bottom=app.querySelector('.speaker.middle');
+   if(!bottom)return;
+   const center=bottom.querySelector('.center');
+   const compose=bottom.querySelector('.message-compose');
+   compose.hidden=false;
+   center.classList.add('is-composing');
+   bottom.querySelector('.message-button').setAttribute('aria-expanded','true');
+   // Do not focus automatically: tapping the field opens the keyboard.
+   grow(bottom.querySelector('.message-input'));
+ }
+ window.avnivoComposer={beforeSwap,showBottomEditor,afterSwap:(top,bottom)=>{enforcePermissions();showBottomEditor();return oldAfterSwap(top,bottom)}};
+ enforcePermissions();
+ window.addEventListener('orientationchange',()=>setTimeout(resize,200),{passive:true});
+})();
+</script>
+<script>
+/* v11.35: real browser speech recognition when available; clearly labeled demo otherwise. */
+(()=>{
+ const app=document.getElementById('app');
+ const mic=document.getElementById('mic');
+ const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ const RECORDER_ONLY=true;
+ const demoText='Assalomu alaykum, bugun biz yangi tarjimon ilovasini sinab ko‘ryapmiz. Men ovozim orqali xabar yozmoqchiman va har bir aytilgan so‘z ekranda ketma-ket paydo bo‘lishini ko‘rmoqchiman. Suhbatimiz davomida barcha xabarlar tartib bilan saqlanadi.';
+ const wave='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg>';
+ const speakerSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM16 9q4 3 0 6M18 6q7 6 0 12"/></svg>';
+ app.querySelectorAll('.speaker').forEach(s=>{
+   const bubble=s.querySelector('.message-bubble');
+   const indicator=document.createElement('span');
+   indicator.className='voice-indicator';
+   indicator.setAttribute('aria-hidden','true');
+   indicator.innerHTML=wave;
+   bubble.insertBefore(indicator,bubble.querySelector('.message-input'));
+
+ });
+ let rec=null,activeSpeaker=null,demoTimer=null,session=0,spokenBase='',finalText='',isListening=false;
+ // Preserve the exact recognized words. No dialect detection or normalization.
+ window.avnivoPrepareSpeech=(original,speakerId)=>({
+   originalText:original,
+   preparedText:original,
+   sourceLanguage:window.avnivoOnlineLanguageForSpeaker?.(speakerId)||'uz'
+ });
+ function inputFor(s){return s.querySelector('.message-input')}
+ function render(s,text){const i=inputFor(s);i.value=text;i.dispatchEvent(new Event('input',{bubbles:true}));i.scrollTop=i.scrollHeight}
+ function clearVoice(){
+   isListening=false;
+   mic.classList.remove('active');
+   mic.setAttribute('aria-pressed','false');
+   mic.setAttribute('aria-label','Ovoz orqali yozishni boshlash');
+   app.querySelectorAll('.speaker').forEach(s=>s.classList.remove('voice-listening'));
+ }
+ function stop(){
+   session++;
+   if(demoTimer){clearTimeout(demoTimer);demoTimer=null}
+   if(rec){const old=rec;rec=null;try{old.stop()}catch(e){}}
+   clearVoice();
+ }
+ function demo(s,token){
+   const words=demoText.split(' ');
+   let n=0;
+   const next=()=>{
+     if(token!==session||!isListening)return;
+     n++;
+     render(s,spokenBase+(spokenBase?' ':'')+words.slice(0,n).join(' '));
+     if(n<words.length)demoTimer=setTimeout(next,260);
+     else{demoTimer=null;clearVoice()}
+   };
+   demoTimer=setTimeout(next,260);
+ }
+ function begin(){
+   const s=app.querySelector('.speaker.middle');
+   if(!s)return;
+   activeSpeaker=s;
+   window.avnivoComposer?.showBottomEditor();
+   const i=inputFor(s);
+   spokenBase=i.value.trim();
+   finalText='';
+   // No automatic keyboard: user can tap the field to edit.
+   if(document.activeElement===i)i.blur();
+   s.classList.add('voice-mode','voice-listening');
+   isListening=true;
+   mic.classList.add('active');
+   mic.setAttribute('aria-pressed','true');
+   mic.setAttribute('aria-label','Ovoz orqali yozishni to‘xtatish');
+   const token=++session;
+   if(!Recognition){demo(s,token);return}
+   try{
+     const recognition=new Recognition();
+     rec=recognition;
+     recognition.lang=({ru:'ru-RU',en:'en-US',tr:'tr-TR',uz:'uz-UZ'}[window.avnivoOnlineLanguageForSpeaker?.(s.dataset.speaker)]||'uz-UZ');
+     recognition.continuous=true;
+     recognition.interimResults=true;
+     recognition.onresult=e=>{
+       if(token!==session)return;
+       let interim='';
+       for(let k=e.resultIndex;k<e.results.length;k++){
+         const item=e.results[k],t=item[0].transcript.trim();
+         if(item.isFinal)finalText+=(finalText?' ':'')+t;
+         else interim+=(interim?' ':'')+t;
+       }
+       const combined=[spokenBase,finalText,interim].filter(Boolean).join(' ');
+       render(s,combined);
+     };
+     recognition.onerror=e=>{
+       if(token!==session)return;
+       clearVoice();
+       if(e.error==='not-allowed'||e.error==='service-not-allowed')alert('Mikrofonga ruxsat berilmagan. Brauzer sozlamalaridan ruxsat bering.');
+       else if(e.error!=='no-speech'&&e.error!=='aborted')alert('Ovozni tanib bo‘lmadi: '+e.error);
+     };
+     recognition.onend=()=>{if(token===session){rec=null;clearVoice()}};
+     recognition.start();
+   }catch(e){rec=null;clearVoice();alert('Brauzerda ovoz tanish ishga tushmadi: '+e.message)}
+ }
+ mic.setAttribute('aria-label','Ovoz orqali yozishni boshlash');
+ mic.addEventListener('click',()=>{if(RECORDER_ONLY)return;if(isListening)stop();else begin()});
+ const swap=document.getElementById('swap');
+ swap.addEventListener('click',()=>{if(isListening)stop()},{capture:true});
+
+ // Voice selection is independent of sensor and recognition settings.
+ const avnivoVoices=[
+  ['Kore','Ayol — qat’iy'],['Aoede','Ayol — yengil'],['Leda','Ayol — yosh'],
+  ['Zephyr','Ayol — yorqin'],['Achernar','Ayol — muloyim'],
+  ['Puck','Erkak — quvnoq'],['Charon','Erkak — ravon'],['Orus','Erkak — jiddiy'],
+  ['Achird','Erkak — samimiy'],['Iapetus','Erkak — tiniq']
+ ];
+ const voicePanel=document.createElement('section');
+ voicePanel.style.cssText='display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px;border:1px solid #b99360;border-radius:10px;color:#ffe4aa;background:#302315;font:13px system-ui';
+ const voiceTitle=document.createElement('strong');voiceTitle.textContent='AI ovozi';
+ const voiceLabel=document.createElement('label');voiceLabel.textContent='Ovoz turini tanlang';voiceLabel.htmlFor='avnivoTtsVoice';
+ const voiceSelect=document.createElement('select');voiceSelect.id='avnivoTtsVoice';
+ voiceSelect.style.cssText='width:100%;padding:10px;background:#21170f;color:#ffe4aa;border:1px solid #b99360;border-radius:8px';
+ for(const [name,description] of avnivoVoices){const option=document.createElement('option');option.value=name;option.textContent=name+' — '+description;voiceSelect.append(option);}
+ let savedVoice='Kore';try{savedVoice=localStorage.getItem('avnivoTtsVoice')||'Kore';}catch(_){}
+ if(avnivoVoices.some(([name])=>name===savedVoice))voiceSelect.value=savedVoice;
+ voiceSelect.addEventListener('change',()=>{try{localStorage.setItem('avnivoTtsVoice',voiceSelect.value)}catch(_){}});
+ const voiceHint=document.createElement('small');voiceHint.textContent='10 ta ovoz. Tanlov saqlanadi. Ovozlarni sinash uchun matn yonidagi 🔊 tugmasini bosing.';
+ voicePanel.append(voiceTitle,voiceLabel,voiceSelect,voiceHint);
+ document.querySelector('#sensorSheet .sensor-card')?.append(voicePanel);
+ // AVNIVO cloud TTS: preserve translation and recognition; animate only actual playback.
+ let activeAudio=null,activeUrl=null,activeButton=null,playbackId=0,pendingRequest=null;
+ function setTtsState(button,state){
+   if(!button)return;
+   button.classList.toggle('is-tts-loading',state==='loading');
+   button.classList.toggle('is-tts-playing',state==='playing');
+   button.setAttribute('aria-label',state==='playing'?'O‘qishni to‘xtatish':state==='loading'?'Ovoz tayyorlanmoqda':'Xabarni ovoz chiqarib o‘qish');
+   button.setAttribute('aria-pressed',String(state==='playing'));
+   button.setAttribute('aria-busy',String(state==='loading'));
+ }
+ function stopAudio(){
+   playbackId++;
+   if(pendingRequest){pendingRequest.abort();pendingRequest=null;}
+   if(activeAudio){activeAudio.pause();activeAudio.removeAttribute('src');activeAudio.load();activeAudio=null;}
+   if(activeUrl){URL.revokeObjectURL(activeUrl);activeUrl=null;}
+   setTtsState(activeButton,'idle');activeButton=null;
+ }
+ app.addEventListener('click',async e=>{
+   const btn=e.target.closest('.read-message');
+   if(!btn)return;
+   e.preventDefault();
+   if(btn===activeButton){stopAudio();return;}
+   const line=btn.closest('.translation-line');
+   const message=line?.querySelector('.translation-body')?.textContent?.trim();
+   if(!message)return;
+   stopAudio();
+   activeButton=btn;
+   setTtsState(btn,'loading');
+   const id=playbackId;
+   const controller=new AbortController();
+   pendingRequest=controller;
+   const speaker=btn.closest('.speaker');
+   const language=window.avnivoOnlineLanguageForSpeaker?.(speaker?.dataset.speaker)||'uz';
+   try{
+     const response=await fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts',{
+       method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({text:message.slice(0,350),language,voice:voiceSelect.value}),
+       signal:controller.signal
+     });
+     if(!response.ok)throw new Error('TTS HTTP '+response.status);
+     const blob=await response.blob();
+     if(!blob.size||!blob.type.startsWith('audio/'))throw new Error('Audio javobi noto‘g‘ri');
+     if(id!==playbackId)return;
+     pendingRequest=null;
+     activeUrl=URL.createObjectURL(blob);
+     activeAudio=new Audio(activeUrl);
+     const audio=activeAudio;
+     audio.onended=()=>{if(activeAudio===audio)stopAudio();};
+     audio.onerror=()=>{if(activeAudio===audio){stopAudio();alert('AI ovozini ijro etib bo‘lmadi');}};
+     await audio.play();
+     if(id===playbackId&&activeAudio===audio&&!audio.paused)setTtsState(btn,'playing');
+   }catch(err){
+     if(id===playbackId){
+       stopAudio();
+       if(err.name!=='AbortError')alert('AI ovozi ishlamadi: '+err.message);
+     }
+   }
+ });
+ const observer=new MutationObserver(records=>{
+   for(const record of records)for(const node of record.addedNodes){
+     if(node.nodeType!==1||!node.classList?.contains('translation-line')||node.querySelector('.read-message'))continue;
+     const b=document.createElement('button');
+     b.type='button';b.className='read-message';b.setAttribute('aria-label','Xabarni ovoz chiqarib o‘qish');
+     b.innerHTML=speakerSvg;
+     node.append(b);
+   }
+ });
+ app.querySelectorAll('.translation-history').forEach(h=>observer.observe(h,{childList:true}));
+})();
+</script>
+<script>
+/* AVNIVO Chirp 2 locale matrix (117 official BCP-47 codes).
+   Mirrors translator-api/chirp2_languages.py. Source: Google Cloud
+   Speech-to-Text V2 supported languages (chirp_2), see docs/chirp2-language-support.md. */
+
+</script>
+<script>
+/* AVNIVO Online STT: Google Chirp 2 only; offline bridge retained. */
+(()=>{
+ 'use strict';
+ const GOOGLE_API='https://chirp2-test---avnivo-sensor-test-5xwrf7netq-ew.a.run.app/api/transcribe-google';
+ const CHIRP2_REGISTRY_API='https://chirp2-test---avnivo-sensor-test-5xwrf7netq-ew.a.run.app/api/chirp2-languages';
+ // Full official Chirp 2 locale matrix (117 BCP-47 codes). This mirrors the
+ // backend registry in translator-api/chirp2_languages.py; the language
+ // resolver below is the single recognition path for every entry, so adding a
+ // language is a data change here, never a new recognition implementation.
+ const CHIRP2_LOCALE_NAMES=Object.freeze(Object.fromEntries(CHIRP2_MATRIX));
+ // Translation-panel base codes map onto their verified Chirp 2 locale. The
+ // translation selector stays unchanged; speech recognition resolves the code.
+ const CHIRP2_BASE_TO_LOCALE=Object.freeze({uz:'uz-UZ',ru:'ru-RU',en:'en-US',tr:'tr-TR'});
+ const enginePanel=document.createElement('div');
+ enginePanel.style.cssText='display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:12px;border:1px solid #b99360;border-radius:10px;background:#302315;color:#ffe4aa;font:12px system-ui';
+ enginePanel.innerHTML='<label for="avnivoSpeechEngine">Ovoz tanish: </label><select id="avnivoSpeechEngine" aria-label="Ovoz tanish modeli" style="background:#fff;color:#222;border-radius:6px;padding:5px"><option value="google">Google Chirp 2 (117 til)</option><option value="offline">Offline STT (Android ilova)</option></select><div id="avnivoSpeechStatus" role="status" aria-live="polite" style="margin-top:4px;max-width:250px;overflow-wrap:anywhere"></div>';
+
+ const settingsCard=document.querySelector('#sensorSheet .sensor-card');
+ if(settingsCard){
+   settingsCard.append(enginePanel);
+   document.querySelector('#sensorTitle').textContent='Sozlamalar';
+ }else{
+   console.error('AVNIVO: settings container missing');
+ }
+ // Online/offline settings tabs; existing controls are preserved and reparented.
+ const modeStyles=document.createElement('style');
+ modeStyles.textContent=`
+ .avnivo-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+ .avnivo-mode-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:83px;border:1px solid #67533b;border-radius:13px;background:#32271e;color:#9e8a73;cursor:pointer;font:600 14px system-ui}
+ .avnivo-mode-tab svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+ .avnivo-mode-tab[aria-selected=true][data-mode=online]{background:#49371e;border:2px solid #f3ba52;color:#ffd16d}
+ .avnivo-mode-tab[aria-selected=true][data-mode=offline]{background:#1d4238;border:2px solid #55d6ab;color:#76edc4}
+ .avnivo-mode-title{text-align:center;font:700 17px system-ui;margin:4px 0 12px}
+ .avnivo-mode-content[hidden]{display:none!important}
+ `;
+ document.head.append(modeStyles);
+ if(settingsCard){
+   const header=settingsCard.querySelector('.sensor-head');
+   const tabs=document.createElement('div');
+   tabs.className='avnivo-mode-tabs';
+   tabs.setAttribute('role','tablist');
+   tabs.setAttribute('aria-label','AVNIVO ish rejimi');
+   tabs.innerHTML=`<button type="button" class="avnivo-mode-tab" data-mode="online" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.8a16 16 0 0 1 20 0M5 12.5a11 11 0 0 1 14 0M8.5 16.2a6 6 0 0 1 7 0"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg><span>Online</span></button><button type="button" class="avnivo-mode-tab" data-mode="offline" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.8a16 16 0 0 1 20 0M5 12.5a11 11 0 0 1 14 0M8.5 16.2a6 6 0 0 1 7 0M3 3l18 18"/></svg><span>Offline</span></button>`;
+   const heading=document.createElement('div');
+   heading.className='avnivo-mode-title';
+   heading.setAttribute('aria-live','polite');
+   const onlineContent=document.createElement('div');
+   onlineContent.className='avnivo-mode-content';
+   const offlineContent=document.createElement('div');
+   offlineContent.className='avnivo-mode-content';
+   offlineContent.hidden=true;
+   const existing=Array.from(settingsCard.children).filter(el=>el!==header&&el!==enginePanel);
+   existing.forEach(el=>onlineContent.append(el));
+   const offlineHelp=document.createElement('p');
+   offlineHelp.textContent='O‘zbekcha ovoz tanish: sherpa-onnx. Android modulining o‘rnatilgan va modeli tayyor bo‘lishi kerak. Veb-sahifa o‘zi ONNX modelini ishga tushirmaydi.';
+   offlineContent.append(offlineHelp);
+   header.after(tabs,heading,onlineContent,offlineContent);
+   onlineContent.append(enginePanel);
+   const modeKey='avnivo-speech-mode';
+   const engineKey='avnivo-speech-engine';
+   const selectedEngine=enginePanel.querySelector('#avnivoSpeechEngine');
+   const applyMode=(mode)=>{
+     const offline=mode==='offline';
+     tabs.querySelectorAll('button').forEach(btn=>btn.setAttribute('aria-selected',String(btn.dataset.mode===mode)));
+     onlineContent.hidden=offline;
+     offlineContent.hidden=!offline;
+     heading.textContent=offline?'OFFLINE':'ONLINE';
+     heading.style.color=offline?'#76edc4':'#ffd16d';
+     if(offline){offlineContent.append(enginePanel);selectedEngine.value='offline';}
+     else{onlineContent.append(enginePanel);if(selectedEngine.value==='offline')selectedEngine.value='google';}
+     selectedEngine.querySelectorAll('option').forEach(option=>option.hidden=offline?option.value!=='offline':option.value==='offline');
+     try{localStorage.setItem(modeKey,mode);localStorage.setItem(engineKey,selectedEngine.value)}catch(_){}
+   };
+   tabs.addEventListener('click',event=>{
+     const btn=event.target.closest('button[data-mode]');
+     if(btn)applyMode(btn.dataset.mode);
+   });
+   selectedEngine.addEventListener('change',()=>{
+     try{localStorage.setItem(engineKey,selectedEngine.value)}catch(_){}
+     if(selectedEngine.value==='offline')applyMode('offline');
+   });
+   let initialMode='online',savedEngine=null;
+   try{
+     initialMode=localStorage.getItem(modeKey)==='offline'?'offline':'online';
+     savedEngine=localStorage.getItem(engineKey);
+   }catch(_){}
+   applyMode(initialMode);
+   // Restore the saved engine selection (Settings-only control). The value is
+   // read before applyMode runs, because applyMode persists the engine too.
+   if(savedEngine==='offline')applyMode('offline');
+ }
+ // Android offline STT callback can arrive on initial load or into an existing tab.
+ // Keep the fragment until the text has actually reached an editable field.
+ function receiveOfflineTranscript(){
+   const text=new URLSearchParams(location.hash.replace(/^#/, '')).get('avnivo_offline_text');
+   if(text===null)return;
+   const field=document.querySelector('#app .speaker.middle .message-input');
+   if(!field){
+     window.setTimeout(receiveOfflineTranscript,250);
+     return;
+   }
+   window.avnivoComposer?.showBottomEditor();
+   const recognized=text.trim();
+   if(recognized){
+     field.value=[field.value.trim(),recognized].filter(Boolean).join(' ');
+     field.dispatchEvent(new Event('input',{bubbles:true}));
+     field.scrollIntoView({block:'nearest'});
+     const output=document.getElementById('avnivoSpeechStatus');
+     if(output)output.textContent='Offline matn yozish maydoniga qo‘shildi.';
+   }
+   const url=new URL(location.href);
+   url.hash='';
+   history.replaceState(null,'',url.pathname+url.search);
+ }
+ receiveOfflineTranscript();
+ window.addEventListener('hashchange',receiveOfflineTranscript);
+ window.addEventListener('pageshow',receiveOfflineTranscript);
+ const engineSelect=enginePanel.querySelector('#avnivoSpeechEngine');
+ const speechStatus=enginePanel.querySelector('#avnivoSpeechStatus');
+ const voiceNotice=document.createElement('div');
+ voiceNotice.id='avnivoVoiceNotice';
+ voiceNotice.setAttribute('role','status');
+ voiceNotice.setAttribute('aria-live','polite');
+ voiceNotice.style.cssText='position:absolute;left:50%;bottom:calc(2px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);width:max-content;max-width:calc(100% - 150px);padding:0;border:0;background:transparent;color:#ffe4aa;font:500 10px/1.25 system-ui;overflow-wrap:anywhere;box-shadow:none;z-index:3;pointer-events:none;display:none;text-align:center';
+ const nav=document.querySelector('.nav');
+ if(nav){nav.style.position='relative';nav.append(voiceNotice)}else document.body.append(voiceNotice);
+ let noticeTimer=0;
+ function status(text,kind='info'){
+   speechStatus.textContent=text||'';
+   clearTimeout(noticeTimer);
+   voiceNotice.textContent=text||'';
+   voiceNotice.style.display=text?'block':'none';
+   voiceNotice.style.borderColor=kind==='error'?'#ff8c83':'#d5a95f';
+   voiceNotice.style.color=kind==='error'?'#ffd3cd':'#ffe4aa';
+   if(text && kind!=='error')noticeTimer=setTimeout(()=>{voiceNotice.style.display='none'},kind==='success'?6500:12000);
+ }
+
+ const mic=document.getElementById('mic');
+ const swap=document.getElementById('swap');
+ const app=document.getElementById('app');
+ if(!mic||!swap||!app)return;
+ mic.style.position='relative';
+ mic.style.top='-45px';
+ let recorder=null,stream=null,chunks=[],busy=false,recording=false,requestId=0,startedAt=0;
+ function message(t){if(t){console.warn('AVNIVO voice:',t);status(t,'error')}}
+ function clean(){recording=false;mic.classList.remove('active');mic.setAttribute('aria-pressed','false');stream?.getTracks().forEach(t=>t.stop());stream=null;recorder=null;app.querySelectorAll('.speaker').forEach(s=>s.classList.remove('voice-listening'))}
+ // Resolve the panel's translation language to an official Chirp 2 locale.
+ // Returns null when the language has no verified Chirp 2 support, so the
+ // caller can report it instead of silently substituting another language.
+ function chirp2LocaleFor(baseCode){
+   const locale=Object.hasOwn(CHIRP2_LOCALE_NAMES,baseCode)?baseCode:CHIRP2_BASE_TO_LOCALE[baseCode];
+   return locale&&Object.hasOwn(CHIRP2_LOCALE_NAMES,locale)?locale:null;
+ }
+ // Best-effort registry drift check against the backend; never blocks recognition.
+ (async()=>{
+   try{
+     const response=await fetch(CHIRP2_REGISTRY_API,{cache:'no-store'});
+     if(!response.ok)return;
+     const data=await response.json();
+     const remote=Array.isArray(data?.locales)?data.locales:[];
+     const missing=remote.filter(code=>!Object.hasOwn(CHIRP2_LOCALE_NAMES,code));
+     if(missing.length)console.warn('AVNIVO: backend Chirp 2 locales missing in frontend registry:',missing);
+   }catch(_){/* offline or blocked: recognition still works */}
+ })();
+ function cyrillicToLatin(text){
+   const map={'А':'A','а':'a','Б':'B','б':'b','В':'V','в':'v','Г':'G','г':'g','Д':'D','д':'d','Е':'E','е':'e','Ё':'Yo','ё':'yo','Ж':'J','ж':'j','З':'Z','з':'z','И':'I','и':'i','Й':'Y','й':'y','К':'K','к':'k','Л':'L','л':'l','М':'M','м':'m','Н':'N','н':'n','О':'O','о':'o','П':'P','п':'p','Р':'R','р':'r','С':'S','с':'s','Т':'T','т':'t','У':'U','у':'u','Ф':'F','ф':'f','Х':'X','х':'x','Ц':'Ts','ц':'ts','Ч':'Ch','ч':'ch','Ш':'Sh','ш':'sh','Ъ':"'",'ъ':"'",'Ь':'','ь':'','Э':'E','э':'e','Ю':'Yu','ю':'yu','Я':'Ya','я':'ya','Ў':"O'",'ў':"o'",'Қ':'Q','қ':'q','Ғ':"G'",'ғ':"g'",'Ҳ':'H','ҳ':'h'};
+   return text.replace(/[А-Яа-яЁёЎўҚқҒғҲҳ]/g,char=>map[char]??char);
+ }
+ async function upload(blob,id,locale,field,base,language){
+   const diagnosticStart=performance.now();
+   let responseAt=null;
+   busy=true;
+   status('Ovoz aniqlanmoqda...');
+   try{
+     const form=new FormData();
+     const extension=blob.type.includes('mp4')?'mp4':blob.type.includes('ogg')?'ogg':blob.type.includes('wav')?'wav':blob.type.includes('flac')?'flac':'webm';
+     form.append('audio',blob,'speech.'+extension);
+     form.append('language',locale);
+     const ctrl=new AbortController();
+     const timer=setTimeout(()=>ctrl.abort(),90000);
+     let response;
+     try{response=await fetch(GOOGLE_API,{method:'POST',body:form,signal:ctrl.signal})}finally{clearTimeout(timer)}
+     responseAt=performance.now();
+     if(id!==requestId)return;
+     if(!response.ok)throw new Error(response.status===429?'So‘rovlar limiti tugadi':response.status===503?'Ovoz tanish servisi hozir mavjud emas':response.status===403?'Server bu test sahifasiga ruxsat bermadi (403)':'Server xatosi: '+response.status);
+     const data=await response.json();
+     if(id!==requestId)return;
+     let text=String(data.text||'').trim();
+     if(!text)throw new Error('Ovozdan matn aniqlanmadi');
+     if(language==='uz')text=cyrillicToLatin(text);
+     // The server returns a transcription, not a translation. Keep its original words.
+     field.value=[base,text].filter(Boolean).join(' ');
+     field.dispatchEvent(new Event('input',{bubbles:true}));
+     const total=((performance.now()-diagnosticStart)/1000).toFixed(1);
+     const network=((responseAt-diagnosticStart)/1000).toFixed(1);
+     status('Ovoz tanish ishlayapti','success');
+   }catch(err){if(id===requestId){const seconds=((performance.now()-diagnosticStart)/1000).toFixed(1);message('Ovoz tanilmadi ('+seconds+' s): '+(err.name==='AbortError'?'Server javobi kechikdi':err instanceof TypeError?'Server bilan aloqa uzildi yoki CORS ruxsati yo‘q':err.message))}}
+   finally{busy=false}
+ }
+ async function start(){
+   if(busy)return
+   const speaker=app.querySelector('.speaker.middle'),field=speaker?.querySelector('.message-input');
+   if(!field){message('Yozish maydoni topilmadi');return}
+   const language=window.avnivoOnlineLanguageForSpeaker?.(speaker.dataset.speaker);
+   const engine=engineSelect.value;
+   if(engine==='offline'){
+     status('Offline STT ilovasi ochilmoqda. Tayyor model bo‘lishi kerak.');
+     window.location.href='avnivo-offline://recognize';
+     return;
+   }
+   const locale=chirp2LocaleFor(language);
+   if(!locale){message('Bu til uchun Google Chirp 2 ovoz tanish hali sozlanmagan');return}
+   if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){message('Brauzer ovoz yozishni qo‘llamaydi');return}
+   window.avnivoComposer?.showBottomEditor();
+   const base=field.value.trim();
+   if(document.activeElement===field)field.blur();
+   speaker.classList.add('voice-mode','voice-listening');
+   const id=++requestId;
+   try{
+     stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+     if(id!==requestId){stream.getTracks().forEach(t=>t.stop());return}
+     const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported(t));
+     if(!mime)throw new Error('Mos audio formati topilmadi');
+     chunks=[];
+     recorder=new MediaRecorder(stream,{mimeType:mime});
+     recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+     recorder.onerror=()=>{message('Ovoz yozishda xato');clean()};
+     recorder.onstop=()=>{
+       status('Audio tayyorlanmoqda...');
+       const blob=new Blob(chunks,{type:mime.split(';')[0]});
+       clean();
+       if(id!==requestId)return;
+       if(blob.size<1000){message('Ovoz juda qisqa, qayta urinib ko‘ring');return}
+       if(blob.size>10*1024*1024){message('Audio hajmi 10 MB dan oshdi');return}
+       upload(blob,id,locale,field,base,language);
+     };
+     recorder.start();
+     startedAt=Date.now();recording=true;
+     status('Ovoz yozilmoqda...');
+     mic.classList.add('active');mic.setAttribute('aria-pressed','true');
+
+   }catch(err){clean();message('Mikrofon ishga tushmadi: '+err.message)}
+ }
+ function stop(){if(!recording||!recorder)return;try{recorder.stop()}catch(e){clean()}}
+ mic.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();if(recording)stop();else start()},{capture:true});
+ swap.addEventListener('click',()=>{if(recording)stop()},{capture:true});
+})();
+</script>
+
+<script>
+/* AVNIVO history v1: browser-local, per-origin archive; not account authentication. */
+(()=>{
+'use strict';
+const app=document.getElementById('app');
+const key='avnivo.local.history.v1';
+const copySvg='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
+const readSvg='<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM16 9q4 3 0 6M18 6q7 6 0 12"/></svg>';
+let sessions=[];try{const stored=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(stored))sessions=stored.filter(x=>x&&Array.isArray(x.turns));}catch(_){}
+let session=null;
+function persist(){try{localStorage.setItem(key,JSON.stringify(sessions.slice(-120)));}catch(err){console.warn('AVNIVO history storage unavailable',err);}}
+function newSession(d){return {id:String(Date.now())+'-'+Math.random().toString(36).slice(2),started:Date.now(),ended:Date.now(),langs:[d.sourceLang,d.targetLang],turns:[]};}
+window.addEventListener('avnivo:history-turn',e=>{
+ const d=e.detail;
+ if(!session){session=newSession(d);sessions.push(session);}
+ session.ended=Date.now();session.turns.push({...d});persist();
+});
+window.addEventListener('avnivo:history-translation',e=>{
+ if(!session)return;
+ const turn=session.turns.find(t=>t.at===e.detail.at);
+ if(turn){turn.translation=e.detail.translation;session.ended=Date.now();persist();}
+});
+window.addEventListener('pagehide',()=>{if(session){session.ended=Date.now();persist();}});
+const panel=document.createElement('section');panel.className='avnivo-archive';panel.hidden=true;
+panel.setAttribute('aria-label','Suhbatlar tarixi');
+panel.innerHTML='<div class="avnivo-archive-header"><strong>Tarix</strong><button type="button" data-archive-close>Yopish ✕</button></div><div class="avnivo-archive-list"></div>';
+document.body.append(panel);
+const list=panel.querySelector('.avnivo-archive-list');
+const lang=x=>({ru:'РУ',uz:'UZ',en:'EN',tr:'TR'}[x]||String(x||'').toUpperCase());
+const stamp=n=>new Date(n).toLocaleString('uz-UZ',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+function node(tag,cls,value){const el=document.createElement(tag);if(cls)el.className=cls;if(value!==undefined)el.textContent=value;return el;}
+function renderList(){
+ list.replaceChildren();
+ if(!sessions.length){list.append(node('p','', 'Hozircha saqlangan suhbatlar yo‘q.'));return;}
+ for(const entry of [...sessions].reverse()){
+  const btn=node('button','avnivo-archive-entry');
+  btn.append(node('strong','',lang(entry.langs[0])+' ↔ '+lang(entry.langs[1])),node('small','',stamp(entry.started)+' · '+entry.turns.length+' xabar'));
+  btn.addEventListener('click',()=>renderDetail(entry));list.append(btn);
+ }
+}
+let archiveAudio=null,archiveUrl=null;
+function stopArchiveAudio(){if(archiveAudio){archiveAudio.pause();archiveAudio=null;}if(archiveUrl){URL.revokeObjectURL(archiveUrl);archiveUrl=null;}}
+async function speak(text,language,button){
+ if(archiveAudio){stopArchiveAudio();return;}
+ button.disabled=true;
+ try{
+  const res=await fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text.slice(0,350),language,voice:document.getElementById('avnivoTtsVoice')?.value||'Kore'})});
+  if(!res.ok)throw Error('HTTP '+res.status);
+  const blob=await res.blob();if(!blob.type.startsWith('audio/'))throw Error('Audio javobi noto‘g‘ri');
+  archiveUrl=URL.createObjectURL(blob);archiveAudio=new Audio(archiveUrl);
+  archiveAudio.onended=stopArchiveAudio;archiveAudio.onerror=stopArchiveAudio;await archiveAudio.play();
+ }catch(err){stopArchiveAudio();alert('Ovozda o‘qish: '+err.message);}finally{button.disabled=false;}
+}
+function actions(parent,text,language){
+ const controls=node('div','avnivo-archive-actions');
+ const copy=node('button');copy.type='button';copy.setAttribute('aria-label','Matnni nusxalash');copy.innerHTML=copySvg;copy.addEventListener('click',()=>copyText(text,copy));
+ const voice=node('button');voice.type='button';voice.setAttribute('aria-label','Ovozda o‘qish');voice.innerHTML=readSvg;voice.addEventListener('click',()=>speak(text,language,voice));
+ controls.append(copy,voice);parent.append(controls);
+}
+function renderDetail(entry){
+ stopArchiveAudio();list.replaceChildren();
+ const back=node('button','','← Ro‘yxat');back.addEventListener('click',renderList);list.append(back);
+ const detail=node('div','avnivo-archive-detail');
+ detail.append(node('p','',lang(entry.langs[0])+' ↔ '+lang(entry.langs[1])+' · '+stamp(entry.started)));
+ const chat=node('div','avnivo-archive-chat');
+ const firstSpeaker=String(entry.turns[0]?.speaker||'1');
+ function sentenceRow(text,language,kind){
+  const row=node('div','avnivo-archive-row');
+  const bubble=node('div','avnivo-archive-bubble');
+  bubble.append(node('div',kind,lang(language)+': '+text));
+  row.append(bubble);
+  actions(row,text,language);
+  return row;
+ }
+ for(const t of entry.turns){
+  const item=node('div','avnivo-archive-message'+(String(t.speaker)===firstSpeaker?'':' from-second'));
+  item.append(sentenceRow(t.source,t.sourceLang,'original'));
+  if(t.translation)item.append(sentenceRow(t.translation,t.targetLang,'translated'));
+  else item.append(sentenceRow('Tarjima kutilmoqda',t.targetLang,'translated'));
+  chat.append(item);
+ }
+ detail.append(chat);list.append(detail);
+}
+function copyText(text,btn){
+ const fallback=()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.append(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(!ok)throw Error('copy failed');};
+ Promise.resolve().then(async()=>{if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);else fallback();btn.setAttribute('aria-label','Nusxalandi');}).catch(()=>alert('Nusxalash bajarilmadi'));
+}
+const historyButton=app.querySelector('.nav-btn[aria-label="Tarix (maket)"]');
+if(historyButton){historyButton.setAttribute('aria-label','Tarix');historyButton.addEventListener('click',()=>{renderList();panel.hidden=false;});}
+panel.querySelector('[data-archive-close]').addEventListener('click',()=>{stopArchiveAudio();panel.hidden=true;});
+function decorate(line){
+ if(line.querySelector('.avnivo-copy'))return;
+ const body=line.querySelector('.translation-body');if(!body)return;
+ const b=node('button','avnivo-copy');b.type='button';b.setAttribute('aria-label','Xabarni nusxalash');b.innerHTML=copySvg;
+ b.addEventListener('click',()=>copyText(body.textContent||'',b));
+ const read=line.querySelector('.read-message');if(read)line.insertBefore(b,read);else line.append(b);
+}
+const observer=new MutationObserver(()=>app.querySelectorAll('.translation-line').forEach(decorate));
+app.querySelectorAll('.translation-history').forEach(h=>observer.observe(h,{childList:true,subtree:true}));
+app.querySelectorAll('.translation-line').forEach(decorate);
+})();
+</script>
+
+<script>
+/* Unified single-device conversation UI; source and target selectors stay wired to original translation logic. */
+(()=>{
+ const app=document.getElementById('app');
+ const source=document.getElementById('bottomLanguageSelect');
+ const target=document.getElementById('upperLanguageSelect');
+ const front=app.querySelector('.speaker.middle');
+ if(!source||!target||!front)return;
+ const bar=document.createElement('div');
+ bar.className='avnivo-unified-languages';
+ bar.innerHTML='<label class="avnivo-lang-pill"><span id="avnivoSourceName"></span></label><div class="avnivo-lang-flow" aria-hidden="true"><svg viewBox="0 0 24 14"><path d="M2 7h19m-6-5 6 5-6 5"/></svg><svg viewBox="0 0 24 14"><path d="M2 7h19m-6-5 6 5-6 5"/></svg></div><label class="avnivo-lang-pill"><span id="avnivoTargetName"></span></label><button type="button" class="avnivo-lang-exchange" id="avnivoLangExchange" aria-label="Tillar o‘rnini almashtirish" title="Tillarni almashtirish"><svg viewBox="0 0 32 32"><path d="M5 14a11 11 0 0 1 18-7l3 3"/><path d="M26 4v6h-6"/><path d="M27 18a11 11 0 0 1-18 7l-3-3"/><path d="M6 28v-6h6"/></svg></button>';
+ front.append(bar);
+ const pills=bar.querySelectorAll('.avnivo-lang-pill');
+ pills[0].append(source);pills[1].append(target);
+ const code=v=>String(v||'').split('-')[0].toUpperCase();
+ const update=()=>{
+  for(const [el,sel] of [[document.getElementById('avnivoSourceName'),source],[document.getElementById('avnivoTargetName'),target]]){
+   const option=sel.selectedOptions[0];
+   el.textContent=(option?.textContent||sel.value).trim()+' ( '+code(sel.value)+' )';
+  }
+ };
+ source.addEventListener('change',update);target.addEventListener('change',update);
+ const exchange=document.getElementById('avnivoLangExchange');
+ exchange.addEventListener('click',()=>{
+  const a=source.value,b=target.value;
+  source.value=b;target.value=a;
+  source.dispatchEvent(new Event('change',{bubbles:true}));
+  target.dispatchEvent(new Event('change',{bubbles:true}));
+  exchange.classList.remove('rotating');void exchange.offsetWidth;exchange.classList.add('rotating');bar.querySelector('.avnivo-lang-flow')?.classList.add('exchanging');
+  setTimeout(()=>{exchange.classList.remove('rotating');bar.querySelector('.avnivo-lang-flow')?.classList.remove('exchanging');},500);
+  update();
+ });
+ // Reuse the existing sensor permission flow; persist its user-selected state.
+ const sensorToggle=document.getElementById('sensorToggle');
+ const key='avnivo.single.sensor.enabled.v1';
+ const originalLabel=()=>{exchange.classList.toggle('sensor-on',localStorage.getItem(key)==='1');};
+ sensorToggle?.addEventListener('click',()=>setTimeout(()=>{
+  const active=sensorToggle.textContent.includes('o‘chirish');
+  localStorage.setItem(key,active?'1':'0');originalLabel();
+ },180));
+ originalLabel();
+ if(localStorage.getItem(key)==='1'){
+  window.addEventListener('load',()=>setTimeout(()=>{
+   if(sensorToggle && !sensorToggle.textContent.includes('o‘chirish'))sensorToggle.click();
+  },350),{once:true});
+ }
+ // Existing message history is still produced in two speaker logs.
+ // Present both in the one visible conversation without modifying the underlying records.
+ // The two-panel transcript mirroring was removed: it duplicated messages.
+ // The visible chat is the single chronological message log.
+ const reveal=()=>window.avnivoComposer?.showBottomEditor?.();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',reveal,{once:true});
+ else setTimeout(reveal,0);
+ update();
+})();
+</script>
+
+<script>
+/* V13 single-screen send: independent of removed card-swap mechanism. */
+(()=>{
+ const app=document.getElementById('app');
+ const speaker=app.querySelector('.speaker.middle');
+ const input=speaker?.querySelector('.message-input');
+ const compose=speaker?.querySelector('.message-compose');
+ const history=speaker?.querySelector('.translation-history');
+ const source=document.getElementById('bottomLanguageSelect');
+ const target=document.getElementById('upperLanguageSelect');
+ if(!input||!compose||!history||!source||!target)return;
+ const send=document.createElement('button');
+ send.type='button';send.className='avnivo-send-arrow';
+ send.setAttribute('aria-label','Xabarni tarjimaga yuborish');
+ send.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V4M5 11l7-7 7 7"/></svg>';
+ compose.append(send);
+ let busy=false;
+ const refresh=()=>{const ready=!!input.value.trim();send.classList.toggle('ready',ready);send.disabled=!ready||busy;};
+ input.addEventListener('input',refresh);
+ const initialSource=source.value;
+ const add=(lang,text,kind)=>{
+  const line=document.createElement('div');line.className='translation-line '+kind;
+  const prefix=document.createElement('span');prefix.className='translation-prefix';prefix.textContent=lang.toUpperCase()+':';
+  const body=document.createElement('span');body.className='translation-body';body.textContent=text;
+  line.append(prefix,body);history.append(line);
+  requestAnimationFrame(()=>{history.scrollTop=history.scrollHeight;});
+  return body;
+ };
+ send.addEventListener('click',async()=>{
+  const text=input.value.trim();if(!text||busy)return;
+  const sourceLang=source.value,targetLang=target.value,at=Date.now();
+  input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));
+  send.classList.remove('sending');void send.offsetWidth;send.classList.add('sending');
+  const sameDirection=sourceLang===initialSource;
+  add(sourceLang,text,sameDirection?'outgoing':'incoming');
+  const translation=add(targetLang,'Tarjima qilinmoqda…',sameDirection?'incoming':'outgoing');
+  window.dispatchEvent(new CustomEvent('avnivo:history-turn',{detail:{speaker:'1',source:text,sourceLang,targetLang,translation:'',at}}));
+  busy=true;refresh();
+  try{
+   if(sourceLang===targetLang){translation.textContent=text;}
+   else{
+    const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),30000);
+    try{
+     const response=await fetch('https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text,source:sourceLang,target:targetLang}),signal:controller.signal
+     });
+     const data=await response.json().catch(()=>({}));
+     if(!response.ok||typeof data.text!=='string'||!data.text.trim())throw Error('Tarjima xatosi: HTTP '+response.status);
+     translation.textContent=data.text;
+    }finally{clearTimeout(timeout);}
+   }
+   window.dispatchEvent(new CustomEvent('avnivo:history-translation',{detail:{at,translation:translation.textContent}}));
+  }catch(e){translation.textContent=e.name==='AbortError'?'Tarjima vaqti tugadi':(e.message||'Tarjima bajarilmadi');}
+  finally{busy=false;refresh();}
+ });
+ refresh();
+})();
+</script>
+</body></html>
