@@ -1,0 +1,79 @@
+name: Translation LLM language audit (real API, budget-guarded)
+
+# Independent audit of Google Cloud Translation LLM (general/translation-llm)
+# against the 117 Chirp 2 locales AVNIVO exposes. It never touches the AVNIVO
+# application, HTML interface, offline model or Chirp 2 recognition engine.
+#
+# Authentication reuses the repository's existing Workload Identity Federation
+# secrets (GCP_WORKLOAD_IDENTITY_PROVIDER / GCP_SERVICE_ACCOUNT). No long-lived
+# key is stored anywhere. Results are committed back to this dedicated branch.
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: "pilot or full"
+        required: true
+        default: "pilot"
+      only:
+        description: "Optional comma-separated Chirp 2 locales (e.g. uz-UZ,ru-RU)"
+        required: false
+        default: ""
+      max_requests:
+        description: "Hard cap on new paid requests for this run"
+        required: true
+        default: "500"
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: translation-llm-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out the audit branch
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (Workload Identity Federation)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install harness dependencies
+        run: python -m pip install --quiet httpx google-auth
+
+      - name: Language matrix self-check
+        run: python translation-llm-audit/language_matrix.py
+
+      - name: Run audit against the real Translation LLM API
+        env:
+          AVNIVO_TRANSLATION_PROJECT: project-6bcf7fe6-cb55-49b7-9f4
+          AVNIVO_TRANSLATION_REGION: us-central1
+        run: |
+          python translation-llm-audit/harness.py \
+            --phase "${{ inputs.phase }}" \
+            --only "${{ inputs.only }}" \
+            --max-requests "${{ inputs.max_requests }}"
+
+      - name: Commit results back to the audit branch
+        run: |
+          git config user.name "avnivo-audit-bot"
+          git config user.email "avnivo-audit-bot@users.noreply.github.com"
+          git add translation-llm-audit/results/
+          if git diff --cached --quiet; then
+            echo "No new results to commit."
+          else
+            git commit -m "audit: translation-llm ${{ inputs.phase }} run (${{ inputs.only }})"
+            git push
+          fi
