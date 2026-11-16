@@ -17,4 +17,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+    sourceSets.getByName("main").assets.srcDir(layout.buildDirectory.dir("generated/avnivoAssets"))
 }
+dependencies {
+    implementation("androidx.webkit:webkit:1.12.1")
+}
+val prepareAvnivoAssets by tasks.registering(Copy::class) {
+    from(rootProject.projectDir.parentFile) {
+        include("index.html", "offline-uzbek-download.js", "offline-module-manager.js")
+        include("i18n/**")
+    }
+    into(layout.buildDirectory.dir("generated/avnivoAssets"))
+}
+tasks.named("preBuild") { dependsOn(prepareAvnivoAssets) }
