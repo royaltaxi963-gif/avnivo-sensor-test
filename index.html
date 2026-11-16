@@ -104,7 +104,7 @@ function shuffleRound(){
 let order=shuffleRound();
 const delay=ms=>{clearTimeout(timeout);timeout=setTimeout(tick,ms)};
 function tick(){
- if(input.value.length||messages.children.length||shell.classList.contains("voice-active")||shell.classList.contains("hold-voice")){label.hidden=true;delay(350);return}
+ if(input.value.length||messages.children.length){label.hidden=true;delay(350);return}
  label.hidden=false;
  const [lang,word]=greetings[order[index]];const letters=segment(word);
  label.lang=lang;label.dir=/^(ar|fa|ur|ps|ug|sd|dv|ku|yi|he)$/.test(lang)?'rtl':'auto';
@@ -179,9 +179,9 @@ function resize(){
   if(wasFollowing){pane.scrollTop=pane.scrollHeight}
   else{pane.scrollTop=oldScroll}
  });
- label.hidden=Boolean(input.value)||Boolean(document.querySelector(".sent-messages")?.children.length)||shell.classList.contains("voice-active");
+ label.hidden=Boolean(input.value)||Boolean(document.querySelector(".sent-messages")?.children.length);
 
- if(!input.value&&!timeout&&!shell.classList.contains("voice-active"))delay(180);
+ if(!input.value&&!timeout)delay(180);
 }
 input.addEventListener('input',()=>{clearTimeout(timeout);timeout=0;resize()});
 window.addEventListener('resize',resize,{passive:true});
@@ -461,7 +461,7 @@ function shuffleTranslationOrder(){
  translationLast=a[a.length-1];return a;
 }
 translationOrder=shuffleTranslationOrder();
-function updateBrandVisibility(){brand.classList.toggle('brand-hidden',Boolean(input.value)||messages.children.length>0||shell.classList.contains('voice-active')||shell.classList.contains('hold-voice'))}
+function updateBrandVisibility(){brand.classList.toggle('brand-hidden',Boolean(input.value)||messages.children.length>0)}
 function translationTick(){
  const id=translationOrder[translationIndex];
  const [lang]=greetings[id],word=translationWords[id],chars=segment(word);
@@ -490,7 +490,7 @@ function syncComposerMode(){
  mic.setAttribute('aria-pressed',String(active));
  mic.disabled=typing&&!active&&!input.value.trim();
  updateBrandVisibility();
- label.hidden=typing||messages.children.length>0||active||shell.classList.contains('hold-voice');
+ label.hidden=typing||messages.children.length>0;
 }
 const ONLINE_TRANSLATION_ENDPOINT='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate';
 async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,historyId){
@@ -602,7 +602,7 @@ async function startVoice(){
   if(document.documentElement.dataset.avnivoMode==='online'){
    if(!beginOnlineRecording(stream)){await stopVoice();return}
   }
-  clearTimeout(timeout);timeout=0;label.hidden=true;
+  clearTimeout(timeout);timeout=0;
   mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label','Mikrofonni o‘chirish');
   shell.classList.add('voice-active');shell.classList.remove('text-mode');updateBrandVisibility();
   frame=requestAnimationFrame(draw);
