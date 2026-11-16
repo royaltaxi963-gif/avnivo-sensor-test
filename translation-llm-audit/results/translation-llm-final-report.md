@@ -22,25 +22,23 @@ Manbalar:
 | D — aniqlanmadi | 0 |
 | Haqiqiy API sinovidan o'tgan variantlar | 117 |
 | Sifat sinovidan o'tgan variantlar | 93 |
-| PASSED | 77 |
+| PASSED | 67 |
 | EXPERIMENTAL | 13 |
 | FAILED | 24 |
-| RETEST_REQUIRED | 3 |
-| Haqiqiy API so'rovlari soni | 6813 |
-| Umumiy xarajat (USD) | 4.1552 |
-| Qolgan budjet (USD) | 25.8448 |
+| RETEST_REQUIRED | 13 |
+| Haqiqiy API so'rovlari soni | 6833 |
+| Umumiy xarajat (USD) | 4.17072 |
+| Qolgan budjet (USD) | 25.82928 |
 | Qamrov | 100.0% |
 
 Narx modeli: har 1 million kiruvchi belgi uchun $10 va har 1 million chiquvchi
 belgi uchun $10. $25 da yangi pullik so'rovlar avtomatik to'xtatiladi; mutlaq
 chegara $30.
 
-## 2. PASSED (77)
+## 2. PASSED (67)
 
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
-| 1 | `af-ZA` | Afrikaans (South Africa) | `af` | official_support_and_quality_ok |
-| 3 | `ar-EG` | Arabic (Egypt) | `ar` | official_support_and_quality_ok |
 | 6 | `az-AZ` | Azerbaijani (Azerbaijan) | `az` | official_support_and_quality_ok |
 | 7 | `be-BY` | Belarusian (Belarus) | `be` | official_support_and_quality_ok |
 | 8 | `bg-BG` | Bulgarian (Bulgaria) | `bg` | official_support_and_quality_ok |
@@ -48,12 +46,10 @@ chegara $30.
 | 10 | `bn-IN` | Bengali (India) | `bn-IN` | official_support_and_quality_ok |
 | 11 | `bs-BA` | Bosnian (Bosnia and Herzegovina) | `bs` | official_support_and_quality_ok |
 | 12 | `ca-ES` | Catalan (Spain) | `ca` | official_support_and_quality_ok |
-| 15 | `cmn-Hans-CN` | Chinese (Simplified, China) | `zh` | official_support_and_quality_ok |
 | 16 | `cmn-Hant-TW` | Chinese, Mandarin (Traditional, Taiwan) | `zh-TW` | official_support_and_quality_ok |
 | 17 | `cs-CZ` | Czech (Czech Republic) | `cs` | official_support_and_quality_ok |
 | 18 | `cy-GB` | Welsh (United Kingdom) | `cy` | official_support_and_quality_ok |
 | 19 | `da-DK` | Danish (Denmark) | `da` | official_support_and_quality_ok |
-| 20 | `de-DE` | German (Germany) | `de` | official_support_and_quality_ok |
 | 21 | `el-GR` | Greek (Greece) | `el` | official_support_and_quality_ok |
 | 22 | `en-AU` | English (Australia) | `en-AU` | official_support_and_quality_ok |
 | 23 | `en-GB` | English (United Kingdom) | `en-GB` | official_support_and_quality_ok |
@@ -70,18 +66,15 @@ chegara $30.
 | 36 | `fr-FR` | French (France) | `fr` | official_support_and_quality_ok |
 | 38 | `gl-ES` | Galician (Spain) | `gl` | official_support_and_quality_ok |
 | 39 | `gu-IN` | Gujarati (India) | `gu` | official_support_and_quality_ok |
-| 41 | `hi-IN` | Hindi (India) | `hi` | official_support_and_quality_ok |
 | 42 | `hr-HR` | Croatian (Croatia) | `hr` | official_support_and_quality_ok |
 | 43 | `hu-HU` | Hungarian (Hungary) | `hu` | official_support_and_quality_ok |
 | 45 | `id-ID` | Indonesian (Indonesia) | `id` | official_support_and_quality_ok |
 | 47 | `is-IS` | Icelandic (Iceland) | `is` | official_support_and_quality_ok |
 | 48 | `it-IT` | Italian (Italy) | `it` | official_support_and_quality_ok |
 | 49 | `iw-IL` | Hebrew (Israel) | `iw` | official_support_and_quality_ok |
-| 50 | `ja-JP` | Japanese (Japan) | `ja` | official_support_and_quality_ok |
 | 52 | `ka-GE` | Georgian (Georgia) | `ka` | official_support_and_quality_ok |
 | 56 | `km-KH` | Khmer (Cambodia) | `km` | official_support_and_quality_ok |
 | 57 | `kn-IN` | Kannada (India) | `kn` | official_support_and_quality_ok |
-| 58 | `ko-KR` | Korean (South Korea) | `ko` | official_support_and_quality_ok |
 | 59 | `ky-KG` | Kyrgyz (Cyrillic) | `ky` | official_support_and_quality_ok |
 | 62 | `ln-CD` | Lingala (Congo-Kinshasa) | `ln` | official_support_and_quality_ok |
 | 63 | `lo-LA` | Lao (Laos) | `lo` | official_support_and_quality_ok |
@@ -97,10 +90,8 @@ chegara $30.
 | 77 | `no-NO` | Norwegian Bokmal (Norway) | `no` | official_support_and_quality_ok |
 | 83 | `pa-Guru-IN` | Punjabi (Gurmukhi India) | `pa` | official_support_and_quality_ok |
 | 84 | `pl-PL` | Polish (Poland) | `pl` | official_support_and_quality_ok |
-| 86 | `pt-BR` | Portuguese (Brazil) | `pt-BR` | official_support_and_quality_ok |
 | 87 | `pt-PT` | Portuguese (Portugal) | `pt-PT` | official_support_and_quality_ok |
 | 88 | `ro-RO` | Romanian (Romania) | `ro` | official_support_and_quality_ok |
-| 89 | `ru-RU` | Russian (Russia) | `ru` | official_support_and_quality_ok |
 | 93 | `sk-SK` | Slovak (Slovakia) | `sk` | official_support_and_quality_ok |
 | 94 | `sl-SI` | Slovenian (Slovenia) | `sl` | official_support_and_quality_ok |
 | 97 | `sq-AL` | Albanian (Albania) | `sq` | official_support_and_quality_ok |
@@ -110,7 +101,6 @@ chegara $30.
 | 103 | `ta-IN` | Tamil (India) | `ta` | official_support_and_quality_ok |
 | 104 | `te-IN` | Telugu (India) | `te` | official_support_and_quality_ok |
 | 106 | `th-TH` | Thai (Thailand) | `th` | official_support_and_quality_ok |
-| 107 | `tr-TR` | Turkish (Turkey) | `tr` | official_support_and_quality_ok |
 | 108 | `uk-UA` | Ukrainian (Ukraine) | `uk` | official_support_and_quality_ok |
 | 110 | `ur-PK` | Urdu (Pakistan) | `ur` | official_support_and_quality_ok |
 | 111 | `uz-UZ` | Uzbek (Uzbekistan) | `uz` | official_support_and_quality_ok |
@@ -170,13 +160,23 @@ Manba koddan **hech narsa o'chirilmadi**; faqat tavsiya ro'yxati tayyorlandi.
 | 113 | `wo-SN` | Wolof (Senegal) | `wo` | api_rejected_unsupported_language |
 | 116 | `yue-Hant-HK` | Chinese, Cantonese (Traditional Hong Kong) | `yue` | api_rejected_unsupported_language |
 
-## 5. RETEST_REQUIRED (3)
+## 5. RETEST_REQUIRED (13)
 
 Vaqtinchalik API muammosi, noaniq natija yoki yetarli sifat dalili yo'q.
 
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
+| 1 | `af-ZA` | Afrikaans (South Africa) | `af` | quality_signals_need_review |
+| 3 | `ar-EG` | Arabic (Egypt) | `ar` | quality_signals_need_review |
+| 15 | `cmn-Hans-CN` | Chinese (Simplified, China) | `zh` | quality_signals_need_review |
+| 20 | `de-DE` | German (Germany) | `de` | quality_signals_need_review |
+| 41 | `hi-IN` | Hindi (India) | `hi` | quality_signals_need_review |
+| 50 | `ja-JP` | Japanese (Japan) | `ja` | quality_signals_need_review |
+| 58 | `ko-KR` | Korean (South Korea) | `ko` | quality_signals_need_review |
+| 86 | `pt-BR` | Portuguese (Brazil) | `pt-BR` | quality_signals_need_review |
+| 89 | `ru-RU` | Russian (Russia) | `ru` | quality_signals_need_review |
 | 92 | `si-LK` | Sinhala (Sri Lanka) | `si` | undocumented_but_api_accepts |
+| 107 | `tr-TR` | Turkish (Turkey) | `tr` | quality_signals_need_review |
 | 114 | `xh-ZA` | Xhosa (South Africa) | `xh` | undocumented_but_api_accepts |
 | 115 | `yo-NG` | Yoruba (Nigeria) | `yo` | undocumented_but_api_accepts |
 

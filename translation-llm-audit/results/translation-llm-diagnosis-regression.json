@@ -1,0 +1,195 @@
+{
+ "mode": "regression",
+ "diagnosis": [
+  {
+   "chirp2_code": "af-ZA",
+   "llm_code": "af",
+   "language_name": "Afrikaans (South Africa)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Goeie môre, gaan dit goed met jou werk vandag?",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "ar-EG",
+   "llm_code": "ar",
+   "language_name": "Arabic (Egypt)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "صباح الخير، هل تسير أمورك على ما يرام اليوم؟",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "de-DE",
+   "llm_code": "de",
+   "language_name": "German (Germany)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Guten Morgen, laufen Ihre Geschäfte heute gut?",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "ja-JP",
+   "llm_code": "ja",
+   "language_name": "Japanese (Japan)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "おはようございます。今日はお仕事の調子はいかがですか？",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "ru-RU",
+   "llm_code": "ru",
+   "language_name": "Russian (Russia)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Доброе утро! Как у вас сегодня дела?",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "tr-TR",
+   "llm_code": "tr",
+   "language_name": "Turkish (Turkey)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Günaydın, bugün işleriniz iyi mi?",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "cmn-Hans-CN",
+   "llm_code": "zh",
+   "language_name": "Chinese (Simplified, China)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "早上好，今天工作顺利吗？",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "hi-IN",
+   "llm_code": "hi",
+   "language_name": "Hindi (India)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "शुभ प्रभात, क्या आज आपका काम-काज अच्छा चल रहा है?",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "ko-KR",
+   "llm_code": "ko",
+   "language_name": "Korean (South Korea)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "좋은 아침입니다. 오늘 일은 잘 되고 계신가요?",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "chirp2_code": "pt-BR",
+   "llm_code": "pt-BR",
+   "language_name": "Portuguese (Brazil)",
+   "results": [
+    {
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Bom dia! Como vão as coisas hoje?",
+     "flags": []
+    },
+    {
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    }
+   ]
+  }
+ ]
+}

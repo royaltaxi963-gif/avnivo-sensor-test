@@ -142363,17 +142363,417 @@
     ],
     "length_ratio": 1.0
    }
+  },
+  {
+   "chirp": "af-ZA",
+   "llm": "af",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "af",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Goeie môre, gaan dit goed met jou werk vandag?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.379,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.15
+   }
+  },
+  {
+   "chirp": "af-ZA",
+   "llm": "af",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "af",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.169,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ar-EG",
+   "llm": "ar",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "ar",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "صباح الخير، هل تسير أمورك على ما يرام اليوم؟",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.192,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.1
+   }
+  },
+  {
+   "chirp": "ar-EG",
+   "llm": "ar",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "ar",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.176,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "de-DE",
+   "llm": "de",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "de",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Guten Morgen, laufen Ihre Geschäfte heute gut?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.159,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.15
+   }
+  },
+  {
+   "chirp": "de-DE",
+   "llm": "de",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "de",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.274,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ja-JP",
+   "llm": "ja",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "ja",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "おはようございます。今日はお仕事の調子はいかがですか？",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.3,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.675
+   }
+  },
+  {
+   "chirp": "ja-JP",
+   "llm": "ja",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "ja",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.185,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ru-RU",
+   "llm": "ru",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "ru",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Доброе утро! Как у вас сегодня дела?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.279,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.9
+   }
+  },
+  {
+   "chirp": "ru-RU",
+   "llm": "ru",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "ru",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.28,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "tr-TR",
+   "llm": "tr",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "tr",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Günaydın, bugün işleriniz iyi mi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.295,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.825
+   }
+  },
+  {
+   "chirp": "tr-TR",
+   "llm": "tr",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "tr",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.281,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "cmn-Hans-CN",
+   "llm": "zh",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "zh",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "早上好，今天工作顺利吗？",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.284,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.3
+   }
+  },
+  {
+   "chirp": "cmn-Hans-CN",
+   "llm": "zh",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "zh",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.291,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "hi-IN",
+   "llm": "hi",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "hi",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "शुभ प्रभात, क्या आज आपका काम-काज अच्छा चल रहा है?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.319,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.225
+   }
+  },
+  {
+   "chirp": "hi-IN",
+   "llm": "hi",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "hi",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.299,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ko-KR",
+   "llm": "ko",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "ko",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "좋은 아침입니다. 오늘 일은 잘 되고 계신가요?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.179,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.65
+   }
+  },
+  {
+   "chirp": "ko-KR",
+   "llm": "ko",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "ko",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.171,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "pt-BR",
+   "llm": "pt-BR",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "uz2X",
+   "tag": "diag-regression",
+   "source": "uz",
+   "target": "pt-BR",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Bom dia! Como vão as coisas hoje?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.167,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.825
+   }
+  },
+  {
+   "chirp": "pt-BR",
+   "llm": "pt-BR",
+   "class": "A",
+   "item": "c01",
+   "category": "regression",
+   "direction": "X2uz",
+   "tag": "diag-regression",
+   "source": "pt-BR",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.261,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
   }
  ],
  "ledger": {
-  "requests": 6813,
+  "requests": 6833,
   "errors": 93,
-  "input_chars": 209417,
-  "output_chars": 206103,
-  "cost_usd": 4.1552,
+  "input_chars": 210217,
+  "output_chars": 206855,
+  "cost_usd": 4.17072,
   "budget_ceiling_usd": 30.0,
   "hard_stop_usd": 25.0,
-  "remaining_usd": 25.8448,
+  "remaining_usd": 25.82928,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  }
 }
