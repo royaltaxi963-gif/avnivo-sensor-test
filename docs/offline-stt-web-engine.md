@@ -55,22 +55,41 @@ skipped. "Tayyor" is only shown after the model has actually loaded and run.
 
 ## Honest accuracy evidence
 
-Measured in headless Chromium (CPU / WASM, no WebGPU), one sample per language, model
-read from device storage with `huggingface.co` unreachable.
+Measured in headless Chromium (CPU / WASM, no WebGPU) on **8 real speech samples per
+language**, model read from device storage with `huggingface.co` unreachable. Audio
+sources: FLEURS validation for ru/en/hi/tr; `arif11/Bengali_AI_Speech` and
+`imonghose/bengali-asr-data` for bn (FLEURS ships Bengali as `bn_in`); `rozumov/TurkmenSpeech`
+for tk (FLEURS has no Turkmen). WER and CER are computed against the dataset reference
+transcripts.
 
-| Language | Sample | WER | RTF | Notes |
-| --- | --- | --- | --- | --- |
-| English | en-00 | 0.000 | 2.00 | exact match |
-| Russian | ru-00 | 0.115 | 1.27 | |
-| Turkish | tr-00 | 0.130 | 0.96 | |
-| Hindi | hi-00 | 0.433 | 1.75 | |
-| Bengali | bn-00 | 1.000 | 2.39 | output came back in the wrong script |
-| Turkmen | tk-00 | 1.286 | 3.89 | effectively unusable |
+| Language | Samples | WER mean | WER median | CER mean | RTF median | Verdict |
+| --- | --- | --- | --- | --- | --- | --- |
+| English | 8 | 0.114 | 0.048 | 0.033 | 1.83 | usable |
+| Turkish | 8 | 0.199 | 0.156 | 0.062 | 0.93 | usable |
+| Russian | 8 | 0.211 | 0.211 | 0.075 | 1.20 | usable |
+| Hindi | 8 | 0.425 | 0.396 | 0.295 | 1.60 | degraded but readable |
+| Turkmen | 8 | 1.167 | 1.072 | 0.966 | 2.15 | **not usable** |
+| Bengali | 8 | 2.969 | 1.000 | 3.378 | 3.05 | **not usable** |
 
-These are **single-sample, CPU-only, non-Android** numbers. They are evidence that the
-engine runs and transcribes, not a quality guarantee. A wider benchmark is required
-before claiming per-language accuracy, and Turkmen/Bengali should be treated as
-unsupported until proven otherwise on the target device.
+Model load time was 3.3 s; zero requests to `huggingface.co` occurred during inference.
+
+### Bengali and Turkmen: cause, not a pipeline bug
+
+A focused diagnostic confirmed the `language` argument is genuinely applied:
+
+- Turkmen (`tk`): forcing `tk` gives Turkic-looking but wrong text; forcing the related
+  `turkish` token on the same clip produces the correct sentence content. The model's
+  Turkmen weights are simply weak.
+- Bengali (`bn`): forcing `bn` returns Devanagari (Hindi) text and, on some clips,
+  degenerate repetition. Whisper Small does not reliably cover Bengali.
+
+So these are **model-quality limits of Whisper Small**, not an integration fault. Both
+language tokens (`<|bn|>` = 50302, `<|tk|>` = 50341) exist in the model and in the
+vendored runtime, and forcing them changes the output.
+
+These numbers are CPU-only and non-Android. They show the engine really transcribes;
+they are not a device-quality guarantee. Bengali and Turkmen should be treated as
+unsupported until proven otherwise on the target device, and the interface should say so.
 
 ## Offline behaviour and limits
 

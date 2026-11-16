@@ -6,7 +6,7 @@ import { OfflineStorage, MODEL_CACHE_NAME } from '../offline-storage.mjs';
 import { ModelManager, MODEL_STATE, ModelError } from '../model-manager.mjs';
 import { SHARED_MODEL, SHARED_MODEL_BYTES, MODEL_REVISION } from '../model-spec.mjs';
 import { LANGUAGE_REGISTRY, usesWhisper, whisperLanguages, assertRegistryConsistent } from '../language-registry.mjs';
-import { routeLanguage, ROUTE, appendTranscript } from '../stt-router.mjs';
+import { routeLanguage, ROUTE, appendTranscript, decideMicRoute, MIC_ACTION } from '../stt-router.mjs';
 import { createMemoryCache } from './helpers.mjs';
 
 // ---- sha256 ----------------------------------------------------------------
@@ -72,6 +72,42 @@ test('appendTranscript joins without duplicating separators', () => {
   assert.equal(appendTranscript('', 'dunyo'), 'dunyo');
   assert.equal(appendTranscript('salom ', ' dunyo'), 'salom dunyo');
   assert.equal(appendTranscript('salom', ''), 'salom');
+});
+
+// ---- online/offline isolation and microphone routing -----------------------
+
+test('online engine always keeps the microphone (Chirp 2 isolation)', () => {
+  for (const code of ['uz', 'ru', 'en', 'hi', 'bn', 'tr', 'tk']) {
+    const d = decideMicRoute({ languageCode: code, modelInstalled: true, onlineEngine: true });
+    assert.equal(d.action, MIC_ACTION.HOST);
+    assert.equal(d.reason, 'online_engine');
+  }
+});
+
+test('Uzbek is handed back to the custom module in offline mode', () => {
+  const d = decideMicRoute({ languageCode: 'uz', modelInstalled: true, onlineEngine: false });
+  assert.equal(d.action, MIC_ACTION.HOST);
+  assert.equal(d.reason, 'custom_module');
+});
+
+test('Whisper languages run offline only when the model is installed', () => {
+  for (const code of ['ru', 'en', 'hi', 'bn', 'tr', 'tk']) {
+    assert.equal(decideMicRoute({ languageCode: code, modelInstalled: false }).action, MIC_ACTION.BLOCK);
+    const ready = decideMicRoute({ languageCode: code, modelInstalled: true });
+    assert.equal(ready.action, MIC_ACTION.WHISPER);
+    assert.ok(ready.whisperLanguage);
+  }
+});
+
+test('offline mode blocks unsupported languages instead of substituting one', () => {
+  const d = decideMicRoute({ languageCode: 'xx', modelInstalled: true });
+  assert.equal(d.action, MIC_ACTION.BLOCK);
+  assert.equal(d.reason, 'unknown_language');
+});
+
+test('languages measured as unreliable are flagged for the UI', () => {
+  const poor = LANGUAGE_REGISTRY.filter((e) => e.quality === 'poor').map((e) => e.code);
+  assert.deepEqual(poor.sort(), ['bn', 'tk']);
 });
 
 // ---- storage ---------------------------------------------------------------

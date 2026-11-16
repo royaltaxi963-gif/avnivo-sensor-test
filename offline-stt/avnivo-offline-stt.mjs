@@ -17,7 +17,7 @@ import { ModelManager, MODEL_STATE } from './model-manager.mjs';
 import { SHARED_MODEL } from './model-spec.mjs';
 import { AudioRecorder, isRecordingSupported } from './audio-recorder.mjs';
 import { STTEngine } from './stt-engine.mjs';
-import { routeLanguage, ROUTE, appendTranscript } from './stt-router.mjs';
+import { routeLanguage, ROUTE, appendTranscript, decideMicRoute, MIC_ACTION } from './stt-router.mjs';
 
 const storage = new OfflineStorage();
 const manager = new ModelManager({ storage, model: SHARED_MODEL });
@@ -128,6 +128,11 @@ function renderRows() {
       el('td', { textContent: entry.module === 'custom' ? 'Maxsus STT' : 'Whisper Small' }),
       el('td', { className: entry.module === 'custom' ? 'ok' : (installed ? 'ok' : 'pending'), textContent: stateText })
     ]));
+    if (entry.quality === 'poor') {
+      ui.tbody.append(el('tr', {}, [
+        el('td', { colSpan: 3, className: 'pending', textContent: `Ogohlantirish: Whisper Small ${entry.displayName} tilida aniqligi past (sinovda yaroqsiz).` })
+      ]));
+    }
   }
 }
 
@@ -285,11 +290,15 @@ function installMicRouter() {
       return;
     }
     if (hostIsOnline()) return; // online engine (Chirp 2) owns the microphone
-    const decision = routeLanguage(currentLanguageCode(), { modelInstalled: installed });
-    if (decision.route === ROUTE.CUSTOM) return; // existing module keeps the microphone
+    const decision = decideMicRoute({
+      languageCode: currentLanguageCode(),
+      modelInstalled: installed,
+      onlineEngine: hostIsOnline()
+    });
+    if (decision.action === MIC_ACTION.HOST) return; // existing module keeps the microphone
     event.preventDefault();
     event.stopImmediatePropagation();
-    if (decision.route === ROUTE.UNAVAILABLE) {
+    if (decision.action === MIC_ACTION.BLOCK) {
       setStatus(decision.message, 'error');
       return;
     }

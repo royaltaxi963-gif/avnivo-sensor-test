@@ -21,9 +21,12 @@ export const LANGUAGE_REGISTRY = Object.freeze([
   Object.freeze({ code: 'ru', languageTag: 'ru-RU', whisperLanguage: 'russian', displayName: 'Rus', module: 'whisper' }),
   Object.freeze({ code: 'en', languageTag: 'en-US', whisperLanguage: 'english', displayName: 'Ingliz', module: 'whisper' }),
   Object.freeze({ code: 'hi', languageTag: 'hi-IN', whisperLanguage: 'hindi', displayName: 'Hind', module: 'whisper' }),
-  Object.freeze({ code: 'bn', languageTag: 'bn-BD', whisperLanguage: 'bengali', displayName: 'Bengal', module: 'whisper' }),
+  // Measured with 8 real samples: Whisper Small does not reliably cover Bengali
+  // (WER ~3.0, wrong script). Kept selectable but flagged so the UI can warn.
+  Object.freeze({ code: 'bn', languageTag: 'bn-BD', whisperLanguage: 'bengali', displayName: 'Bengal', module: 'whisper', quality: 'poor' }),
   Object.freeze({ code: 'tr', languageTag: 'tr-TR', whisperLanguage: 'turkish', displayName: 'Turk', module: 'whisper' }),
-  Object.freeze({ code: 'tk', languageTag: 'tk-TM', whisperLanguage: 'turkmen', displayName: 'Turkman', module: 'whisper' })
+  // Measured with 8 real samples: Turkmen weights are weak (WER ~1.2).
+  Object.freeze({ code: 'tk', languageTag: 'tk-TM', whisperLanguage: 'turkmen', displayName: 'Turkman', module: 'whisper', quality: 'poor' })
 ]);
 
 // Every Whisper language above shares this one model. Selecting another language must
