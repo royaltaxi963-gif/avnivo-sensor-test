@@ -142763,17 +142763,1073 @@
     "flags": [],
     "length_ratio": 1.0
    }
+  },
+  {
+   "chirp": "as-IN",
+   "llm": "as",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "as",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,as\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.112,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "as-IN",
+   "llm": "as",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "as",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,as\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.216,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ast-ES",
+   "llm": "ast",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "ast",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: ast\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.052,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ast-ES",
+   "llm": "ast",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "ast",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: ast\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.059,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ceb-PH",
+   "llm": "ceb",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "ceb",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,ceb\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.064,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ceb-PH",
+   "llm": "ceb",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "ceb",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ceb\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.059,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ckb-IQ",
+   "llm": "ckb",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "ckb",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,ckb\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.213,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ckb-IQ",
+   "llm": "ckb",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "ckb",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ckb\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.056,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ff-SN",
+   "llm": "ff",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "ff",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,ff\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.074,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ff-SN",
+   "llm": "ff",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "ff",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ff\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.069,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "jv-ID",
+   "llm": "jv",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "jv",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,jv\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.061,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "jv-ID",
+   "llm": "jv",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "jv",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,jv\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.212,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "kam-KE",
+   "llm": "kam",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "kam",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: kam\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.214,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "kam-KE",
+   "llm": "kam",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "kam",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: kam\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.211,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "kea-CV",
+   "llm": "kea",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "kea",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: kea\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.051,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "kea-CV",
+   "llm": "kea",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "kea",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: kea\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.043,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "kk-KZ",
+   "llm": "kk",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "kk",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,kk\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.061,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "kk-KZ",
+   "llm": "kk",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "kk",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,kk\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.221,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "lg-UG",
+   "llm": "lg",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "lg",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,lg\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.056,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "lg-UG",
+   "llm": "lg",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "lg",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,lg\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.049,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "luo-KE",
+   "llm": "luo",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "luo",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,luo\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.062,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "luo-KE",
+   "llm": "luo",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "luo",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,luo\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.058,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "mi-NZ",
+   "llm": "mi",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "mi",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,mi\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.067,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "mi-NZ",
+   "llm": "mi",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "mi",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,mi\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.052,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "nso-ZA",
+   "llm": "nso",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "nso",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,nso\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.061,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "nso-ZA",
+   "llm": "nso",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "nso",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,nso\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.071,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ny-MW",
+   "llm": "ny",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "ny",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,ny\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.064,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ny-MW",
+   "llm": "ny",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "ny",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ny\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.043,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "oc-FR",
+   "llm": "oc",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "oc",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,oc\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.044,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "oc-FR",
+   "llm": "oc",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "oc",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,oc\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.202,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "om-ET",
+   "llm": "om",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "om",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,om\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.061,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "om-ET",
+   "llm": "om",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "om",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,om\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.054,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ps-AF",
+   "llm": "ps",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "ps",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,ps\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.204,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ps-AF",
+   "llm": "ps",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "ps",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ps\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.044,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "rup-BG",
+   "llm": "rup",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "rup",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: rup\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.043,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "rup-BG",
+   "llm": "rup",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "rup",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: rup\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.043,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "sd-IN",
+   "llm": "sd",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "sd",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,sd\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.068,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "sd-IN",
+   "llm": "sd",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "sd",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,sd\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.054,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "sn-ZW",
+   "llm": "sn",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "sn",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,sn\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.22,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "sn-ZW",
+   "llm": "sn",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "sn",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,sn\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.057,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "su-ID",
+   "llm": "su",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "su",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,su\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.202,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "su-ID",
+   "llm": "su",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "su",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,su\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.043,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "umb-AO",
+   "llm": "umb",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "umb",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: umb\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.043,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "umb-AO",
+   "llm": "umb",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "umb",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: umb\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.043,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "wo-SN",
+   "llm": "wo",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "wo",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,wo\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.064,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "wo-SN",
+   "llm": "wo",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "wo",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,wo\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.047,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "yue-Hant-HK",
+   "llm": "yue",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "uz2X",
+   "tag": "diag-failed",
+   "source": "uz",
+   "target": "yue",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: uz,yue\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.055,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "yue-Hant-HK",
+   "llm": "yue",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "tag": "diag-failed",
+   "source": "en",
+   "target": "yue",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,yue\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.201,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
   }
  ],
  "ledger": {
-  "requests": 6833,
-  "errors": 93,
-  "input_chars": 210217,
+  "requests": 6881,
+  "errors": 141,
+  "input_chars": 212233,
   "output_chars": 206855,
-  "cost_usd": 4.17072,
+  "cost_usd": 4.19088,
   "budget_ceiling_usd": 30.0,
   "hard_stop_usd": 25.0,
-  "remaining_usd": 25.82928,
+  "remaining_usd": 25.80912,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  }
 }

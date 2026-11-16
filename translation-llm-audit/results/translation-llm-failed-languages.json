@@ -9,9 +9,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -21,7 +21,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 5,
@@ -33,9 +33,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -45,7 +45,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 13,
@@ -57,9 +57,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -69,7 +69,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 14,
@@ -81,9 +81,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -93,7 +93,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 32,
@@ -105,9 +105,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -117,7 +117,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 51,
@@ -129,9 +129,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -141,7 +141,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 53,
@@ -153,9 +153,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -165,7 +165,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 54,
@@ -177,9 +177,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -189,7 +189,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 55,
@@ -201,9 +201,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -213,7 +213,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 61,
@@ -225,9 +225,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -237,7 +237,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 65,
@@ -249,9 +249,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -261,7 +261,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 67,
@@ -273,9 +273,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -285,7 +285,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 78,
@@ -297,9 +297,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -309,7 +309,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 79,
@@ -321,9 +321,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -333,7 +333,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 80,
@@ -345,9 +345,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -357,7 +357,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 81,
@@ -369,9 +369,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -381,7 +381,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 85,
@@ -393,9 +393,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -405,7 +405,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 90,
@@ -417,9 +417,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -429,7 +429,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 91,
@@ -441,9 +441,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -453,7 +453,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 95,
@@ -465,9 +465,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -477,7 +477,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 99,
@@ -489,9 +489,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -501,7 +501,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 109,
@@ -513,9 +513,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -525,7 +525,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 113,
@@ -537,9 +537,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -549,7 +549,7 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  },
  {
   "order": 116,
@@ -561,9 +561,9 @@
   "experimental": false,
   "documented_class": "C",
   "api_tested": true,
-  "api_requests": 2,
+  "api_requests": 4,
   "api_success": 0,
-  "api_unsupported": 2,
+  "api_unsupported": 4,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
   "avg_latency_s": null,
@@ -573,6 +573,6 @@
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
   "sample_translation": "",
-  "failure_cause": null
+  "failure_cause": "language_code_unsupported"
  }
 ]

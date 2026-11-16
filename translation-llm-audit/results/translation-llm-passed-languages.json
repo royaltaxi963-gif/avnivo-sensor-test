@@ -14,7 +14,7 @@
   "api_unsupported": 0,
   "api_transient_errors": 0,
   "doc_api_conflict": false,
-  "avg_latency_s": 0.238,
+  "avg_latency_s": 0.239,
   "quality_pass": true,
   "critical_flags": {},
   "stability_ok": true,

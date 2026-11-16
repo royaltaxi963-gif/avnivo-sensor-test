@@ -26,9 +26,9 @@ Manbalar:
 | EXPERIMENTAL | 13 |
 | FAILED | 24 |
 | RETEST_REQUIRED | 3 |
-| Haqiqiy API so'rovlari soni | 6833 |
-| Umumiy xarajat (USD) | 4.17072 |
-| Qolgan budjet (USD) | 25.82928 |
+| Haqiqiy API so'rovlari soni | 6881 |
+| Umumiy xarajat (USD) | 4.19088 |
+| Qolgan budjet (USD) | 25.80912 |
 | Qamrov | 100.0% |
 
 Narx modeli: har 1 million kiruvchi belgi uchun $10 va har 1 million chiquvchi
@@ -178,30 +178,30 @@ til kodining o'zida.
 
 | Chirp 2 | Til | LLM kod | Aniqlangan sabab (haqiqiy API) |
 |---------|-----|---------|------------------------------|
-| `as-IN` | Assamese (India) | `as` | — |
-| `ast-ES` | Asturian (Spain) | `ast` | — |
-| `ceb-PH` | Cebuano (Philippines) | `ceb` | — |
-| `ckb-IQ` | Central Kurdish (Iraq) | `ckb` | — |
-| `ff-SN` | Fulah (Senegal) | `ff` | — |
-| `jv-ID` | Javanese (Indonesia) | `jv` | — |
-| `kam-KE` | Kamba (Kenya) | `kam` | — |
-| `kea-CV` | Kabuverdianu (Cape Verde) | `kea` | — |
-| `kk-KZ` | Kazakh (Kazakhstan) | `kk` | — |
-| `lg-UG` | Ganda (Uganda) | `lg` | — |
-| `luo-KE` | Luo (Kenya) | `luo` | — |
-| `mi-NZ` | Maori (New Zealand) | `mi` | — |
-| `nso-ZA` | Sepedi (South Africa) | `nso` | — |
-| `ny-MW` | Nyanja (Malawi) | `ny` | — |
-| `oc-FR` | Occitan (France) | `oc` | — |
-| `om-ET` | Oromo (Ethiopia) | `om` | — |
-| `ps-AF` | Pashto | `ps` | — |
-| `rup-BG` | Aromanian (Bulgaria) | `rup` | — |
-| `sd-IN` | Sindhi (India) | `sd` | — |
-| `sn-ZW` | Shona (Zimbabwe) | `sn` | — |
-| `su-ID` | Sundanese (Indonesia) | `su` | — |
-| `umb-AO` | Umbundu (Angola) | `umb` | — |
-| `wo-SN` | Wolof (Senegal) | `wo` | — |
-| `yue-Hant-HK` | Chinese, Cantonese (Traditional Hong Kong) | `yue` | — |
+| `as-IN` | Assamese (India) | `as` | language_code_unsupported |
+| `ast-ES` | Asturian (Spain) | `ast` | language_code_unsupported |
+| `ceb-PH` | Cebuano (Philippines) | `ceb` | language_code_unsupported |
+| `ckb-IQ` | Central Kurdish (Iraq) | `ckb` | language_code_unsupported |
+| `ff-SN` | Fulah (Senegal) | `ff` | language_code_unsupported |
+| `jv-ID` | Javanese (Indonesia) | `jv` | language_code_unsupported |
+| `kam-KE` | Kamba (Kenya) | `kam` | language_code_unsupported |
+| `kea-CV` | Kabuverdianu (Cape Verde) | `kea` | language_code_unsupported |
+| `kk-KZ` | Kazakh (Kazakhstan) | `kk` | language_code_unsupported |
+| `lg-UG` | Ganda (Uganda) | `lg` | language_code_unsupported |
+| `luo-KE` | Luo (Kenya) | `luo` | language_code_unsupported |
+| `mi-NZ` | Maori (New Zealand) | `mi` | language_code_unsupported |
+| `nso-ZA` | Sepedi (South Africa) | `nso` | language_code_unsupported |
+| `ny-MW` | Nyanja (Malawi) | `ny` | language_code_unsupported |
+| `oc-FR` | Occitan (France) | `oc` | language_code_unsupported |
+| `om-ET` | Oromo (Ethiopia) | `om` | language_code_unsupported |
+| `ps-AF` | Pashto | `ps` | language_code_unsupported |
+| `rup-BG` | Aromanian (Bulgaria) | `rup` | language_code_unsupported |
+| `sd-IN` | Sindhi (India) | `sd` | language_code_unsupported |
+| `sn-ZW` | Shona (Zimbabwe) | `sn` | language_code_unsupported |
+| `su-ID` | Sundanese (Indonesia) | `su` | language_code_unsupported |
+| `umb-AO` | Umbundu (Angola) | `umb` | language_code_unsupported |
+| `wo-SN` | Wolof (Senegal) | `wo` | language_code_unsupported |
+| `yue-Hant-HK` | Chinese, Cantonese (Traditional Hong Kong) | `yue` | language_code_unsupported |
 
 ### 4c. Muqobil yechimlar
 
@@ -280,10 +280,10 @@ ammo bu holat alohida qayd etildi.
 
 | Ko'rsatkich | Qiymat |
 |-------------|--------|
-| Umumiy haqiqiy so'rovlar | 6833 |
-| Umumiy xarajat (USD) | 4.17072 |
-| Qolgan budjet (USD) | 25.82928 |
-| Kiruvchi belgilar | 210217 |
+| Umumiy haqiqiy so'rovlar | 6881 |
+| Umumiy xarajat (USD) | 4.19088 |
+| Qolgan budjet (USD) | 25.80912 |
+| Kiruvchi belgilar | 212233 |
 | Chiquvchi belgilar | 206855 |
 
 ## 8. Online ro'yxat tavsiyasi
