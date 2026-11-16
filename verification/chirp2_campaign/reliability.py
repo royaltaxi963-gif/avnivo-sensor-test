@@ -117,15 +117,19 @@ def _known_good_wav():
     return None
 
 
-def _rate_limit_burst(limit=12, count=14):
-    """Send `count` requests from one IP; the tail must be 429.
+def _rate_limit_burst(count=14):
+    """Send `count` valid requests from one IP; the tail must be 429.
 
-    Rate-limited requests are rejected before the Google call, so this costs
-    nothing and never reaches the paid API.
+    The audio must be valid (non-empty, allowed type, supported locale) so the
+    request reaches the rate limiter: the endpoint checks locale, content type
+    and size before it counts the request. Silence is used so the calls that do
+    reach Google are as cheap as possible, and requests past the window limit
+    are rejected before any upstream call.
     """
+    blob = _silence()
     codes = []
     for n in range(count):
-        observed = _call(blob=b"", ip="203.0.113.77")
+        observed = _call(blob=blob, ip="203.0.113.77")
         codes.append(observed["http_status"])
     return codes
 
@@ -179,7 +183,7 @@ def run():
     })
     print(f"{'rate_limit_burst':32s} {burst}")
 
-    OUT.write_text(json.dumps(results, indent=1, ensure_ascii=False), encoding="utf-8")
+    OUT.write_text(json.dumps({"base_url": BASE_URL, "probes": results}, indent=1, ensure_ascii=False), encoding="utf-8")
     return results
 
 

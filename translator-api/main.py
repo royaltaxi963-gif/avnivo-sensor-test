@@ -5,9 +5,12 @@ The legacy ``/api/transcribe`` routes below remain only for backward
 compatibility and are unused by the AVNIVO Online frontend.
 """
 import os
+import io
 import time
+import wave
 import base64
 import asyncio
+from array import array
 from collections import defaultdict, deque
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -169,6 +172,43 @@ def _join_transcripts(payload: object) -> str:
     return " ".join(parts).strip()
 
 
+def _pcm_rms(wav_bytes: bytes) -> float | None:
+    """Return the normalised RMS of a 16-bit PCM WAV, or None if not that format.
+
+    Only uncompressed 16-bit PCM WAV is inspected: it is the format the API
+    tests and the verification campaign send, and it can be parsed with the
+    standard library. Compressed containers (webm/opus from the browser) are
+    left to Google, which decodes them itself.
+    """
+    try:
+        with wave.open(io.BytesIO(wav_bytes), "rb") as handle:
+            if handle.getsampwidth() != 2:
+                return None
+            frames = handle.readframes(handle.getnframes())
+    except (wave.Error, EOFError, ValueError):
+        return None
+    if not frames:
+        return 0.0
+    samples = array("h")
+    samples.frombytes(frames[: len(frames) - (len(frames) % 2)])
+    if not samples:
+        return 0.0
+    total = sum(sample * sample for sample in samples)
+    return (total / len(samples)) ** 0.5 / 32768.0
+
+
+def _is_near_silent(wav_bytes: bytes, threshold: float = 1e-3) -> bool:
+    """True when a 16-bit PCM WAV is effectively silent.
+
+    Silence fed to Chirp 2 is not guaranteed to return an empty transcript: the
+    ``uz-UZ`` phrase boost (``"Avnivo"`` at 20.0) turns it into a spurious
+    ``"avnivo"``. A quiet input below the threshold is answered with an empty
+    transcript locally, which avoids both the hallucination and the paid call.
+    """
+    rms = _pcm_rms(wav_bytes)
+    return rms is not None and rms < threshold
+
+
 def _google_token() -> str:
     credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
     if not credentials.valid:
@@ -249,6 +289,10 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
     data = await audio.read(MAX_AUDIO + 1)
     if not data or len(data) > MAX_AUDIO:
         raise HTTPException(413, "Invalid audio size")
+    # Silence is answered locally: Chirp 2 can emit a spurious boosted phrase
+    # for near-silent input, and there is nothing to recognise anyway.
+    if _is_near_silent(data):
+        return {"text": "", "model": GOOGLE_MODEL, "language": language}
     ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown").split(",")[0].strip()
     _rate_limit(ip)
     try:

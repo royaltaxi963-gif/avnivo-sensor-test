@@ -155,6 +155,15 @@ def write_csv(table):
     return path
 
 
+def load_reliability():
+    if not RELIABILITY.exists():
+        return [], None
+    data = json.loads(RELIABILITY.read_text(encoding="utf-8"))
+    if isinstance(data, dict):
+        return data.get("probes", []), data.get("base_url")
+    return data, None
+
+
 def write_html(table, stats, reliability):
     def pct(value):
         return "—" if value is None else f"{value * 100:.1f}%"
@@ -232,10 +241,11 @@ WER marked <code>*</code> is character-level (scripts without word spacing).</sm
 
 def main():
     rows = load_rows()
-    reliability = json.loads(RELIABILITY.read_text(encoding="utf-8")) if RELIABILITY.exists() else []
+    reliability, reliability_url = load_reliability()
     table = aggregate(rows)
     stats = summary(rows, table)
     stats["base_url"] = "https://chirp2-test---avnivo-sensor-test-5xwrf7netq-ew.a.run.app"
+    stats["reliability_url"] = reliability_url
     json_path = HERE / "report.json"
     json_path.write_text(json.dumps({"summary": stats, "locales": table, "reliability": reliability},
                                     indent=1, ensure_ascii=False), encoding="utf-8")

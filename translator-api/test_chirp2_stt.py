@@ -12,6 +12,7 @@ import io
 import json
 import re
 import sys
+from array import array
 from pathlib import Path
 
 import httpx
@@ -246,6 +247,81 @@ def test_origin_is_enforced():
         headers={"origin": "https://evil.example"},
     )
     assert response.status_code == 403
+
+
+# --------------------------------------------------------------------------- #
+# Near-silence gate
+# --------------------------------------------------------------------------- #
+
+def _wav(samples, sample_rate=16000):
+    import wave as _wave
+    buffer = io.BytesIO()
+    with _wave.open(buffer, "wb") as handle:
+        handle.setnchannels(1)
+        handle.setsampwidth(2)
+        handle.setframerate(sample_rate)
+        handle.writeframes(array("h", samples).tobytes())
+    return buffer.getvalue()
+
+
+def test_silent_wav_is_answered_empty_without_calling_google(monkeypatch):
+    """Silence must not reach Google: the uz-UZ boost turns it into 'avnivo'."""
+    _fake_credentials(monkeypatch)
+    calls = {"n": 0}
+
+    def handler(request):
+        calls["n"] += 1
+        return httpx.Response(200, json={"results": [{"alternatives": [{"transcript": "avnivo"}]}]})
+
+    _stub_httpx(monkeypatch, handler)
+    response = client.post(
+        "/api/transcribe-google",
+        files={"audio": ("silence.wav", io.BytesIO(_wav([0] * 16000)), "audio/wav")},
+        data={"language": "uz-UZ"},
+    )
+    assert response.status_code == 200
+    assert response.json()["text"] == ""
+    assert calls["n"] == 0
+
+
+def test_real_wav_still_reaches_google(monkeypatch):
+    """A non-silent WAV must not be gated: it is forwarded to Google."""
+    _fake_credentials(monkeypatch)
+    calls = {"n": 0}
+
+    def handler(request):
+        calls["n"] += 1
+        return httpx.Response(200, json={"results": [{"alternatives": [{"transcript": "salom"}]}]})
+
+    _stub_httpx(monkeypatch, handler)
+    loud = [30000 if i % 2 else -30000 for i in range(16000)]
+    response = client.post(
+        "/api/transcribe-google",
+        files={"audio": ("loud.wav", io.BytesIO(_wav(loud)), "audio/wav")},
+        data={"language": "uz-UZ"},
+    )
+    assert response.status_code == 200
+    assert response.json()["text"] == "salom"
+    assert calls["n"] == 1
+
+
+def test_compressed_audio_is_not_gated(monkeypatch):
+    """webm/opus cannot be inspected locally, so it must always be forwarded."""
+    _fake_credentials(monkeypatch)
+    calls = {"n": 0}
+
+    def handler(request):
+        calls["n"] += 1
+        return httpx.Response(200, json={"results": [{"alternatives": [{"transcript": "hi"}]}]})
+
+    _stub_httpx(monkeypatch, handler)
+    response = client.post(
+        "/api/transcribe-google",
+        files={"audio": ("speech.webm", io.BytesIO(b"\x00" * 2048), "audio/webm")},
+        data={"language": "uz-UZ"},
+    )
+    assert response.status_code == 200
+    assert calls["n"] == 1
 
 
 # --------------------------------------------------------------------------- #
