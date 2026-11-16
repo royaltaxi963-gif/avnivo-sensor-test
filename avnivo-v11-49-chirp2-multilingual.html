@@ -1373,15 +1373,15 @@ window.CHIRP2_MATRIX=[
    if(busy)return
    const speaker=app.querySelector('.speaker.middle'),field=speaker?.querySelector('.message-input');
    if(!field){message('Yozish maydoni topilmadi');return}
-   const language=window.avnivoOnlineLanguageForSpeaker?.(speaker.dataset.speaker)||'uz';
+   const language=window.avnivoOnlineLanguageForSpeaker?.(speaker.dataset.speaker);
    const engine=engineSelect.value;
    if(engine==='offline'){
      status('Offline STT ilovasi ochilmoqda. Tayyor model bo‘lishi kerak.');
      window.location.href='avnivo-offline://recognize';
      return;
    }
-   const locale=CHIRP2_BASE_TO_LOCALE[language]||language;
-   if(!Object.hasOwn(CHIRP2_LOCALE_NAMES,locale)){message('Tanlangan til Chirp 2 tomonidan qo‘llab-quvvatlanmaydi');return}
+   const locale=chirp2LocaleFor(language);
+   if(!locale){message('Bu til uchun Google Chirp 2 ovoz tanish hali sozlanmagan');return}
    if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){message('Brauzer ovoz yozishni qo‘llamaydi');return}
    window.avnivoComposer?.showBottomEditor();
    const base=field.value.trim();
