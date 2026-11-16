@@ -104,7 +104,7 @@ function shuffleRound(){
 let order=shuffleRound();
 const delay=ms=>{clearTimeout(timeout);timeout=setTimeout(tick,ms)};
 function tick(){
- if(input.value.length||messages.children.length||shell.classList.contains("voice-active")||shell.classList.contains("hold-voice")){label.hidden=true;delay(350);return}
+ if(input.value.length||messages.children.length||awaitingVoiceText){label.hidden=true;delay(350);return}
  label.hidden=false;
  const [lang,word]=greetings[order[index]];const letters=segment(word);
  label.lang=lang;label.dir=/^(ar|fa|ur|ps|ug|sd|dv|ku|yi|he)$/.test(lang)?'rtl':'auto';
@@ -179,9 +179,9 @@ function resize(){
   if(wasFollowing){pane.scrollTop=pane.scrollHeight}
   else{pane.scrollTop=oldScroll}
  });
- label.hidden=Boolean(input.value)||Boolean(document.querySelector(".sent-messages")?.children.length)||shell.classList.contains("voice-active");
+ label.hidden=Boolean(input.value)||Boolean(document.querySelector(".sent-messages")?.children.length)||awaitingVoiceText;
 
- if(!input.value&&!timeout&&!shell.classList.contains("voice-active"))delay(180);
+ if(!input.value&&!timeout)delay(180);
 }
 input.addEventListener('input',()=>{clearTimeout(timeout);timeout=0;resize()});
 window.addEventListener('resize',resize,{passive:true});
@@ -461,7 +461,8 @@ function shuffleTranslationOrder(){
  translationLast=a[a.length-1];return a;
 }
 translationOrder=shuffleTranslationOrder();
-function updateBrandVisibility(){brand.classList.toggle('brand-hidden',Boolean(input.value)||messages.children.length>0||shell.classList.contains('voice-active')||shell.classList.contains('hold-voice'))}
+let awaitingVoiceText=false;
+function updateBrandVisibility(){brand.classList.toggle('brand-hidden',Boolean(input.value)||messages.children.length>0||awaitingVoiceText)}
 function translationTick(){
  const id=translationOrder[translationIndex];
  const [lang]=greetings[id],word=translationWords[id],chars=segment(word);
@@ -490,7 +491,7 @@ function syncComposerMode(){
  mic.setAttribute('aria-pressed',String(active));
  mic.disabled=typing&&!active&&!input.value.trim();
  updateBrandVisibility();
- label.hidden=typing||messages.children.length>0||active||shell.classList.contains('hold-voice');
+ label.hidden=typing||messages.children.length>0||awaitingVoiceText;
 }
 const ONLINE_TRANSLATION_ENDPOINT='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate';
 async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,historyId){
@@ -578,6 +579,7 @@ function draw(){
  frame=requestAnimationFrame(draw);
 }
 async function stopVoice(){
+ if(document.documentElement.dataset.avnivoMode==='online'&&onlineRecorder?.state==='recording')awaitingVoiceText=true;
  requestToken++;active=false;cancelAnimationFrame(frame);
  shell.classList.remove('voice-active');mic.setAttribute('aria-pressed','false');mic.setAttribute('aria-label','Mikrofonni yoqish');syncComposerMode();
  if(onlineRecorder&&onlineRecorder.state==='recording'){onlineState('loading');try{onlineRecorder.stop()}catch(e){onlineState('error')}}
@@ -587,6 +589,7 @@ async function stopVoice(){
  if(!input.value){clearTimeout(timeout);timeout=0;delay(300)}
 }
 async function startVoice(){
+ awaitingVoiceText=false;syncComposerMode();
  if(!navigator.mediaDevices?.getUserMedia){return}
  const token=++requestToken;
  try{
@@ -602,7 +605,7 @@ async function startVoice(){
   if(document.documentElement.dataset.avnivoMode==='online'){
    if(!beginOnlineRecording(stream)){await stopVoice();return}
   }
-  clearTimeout(timeout);timeout=0;label.hidden=true;
+  clearTimeout(timeout);timeout=0;
   mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label','Mikrofonni o‘chirish');
   shell.classList.add('voice-active');shell.classList.remove('text-mode');updateBrandVisibility();
   frame=requestAnimationFrame(draw);
@@ -646,7 +649,7 @@ function beginOnlineRecording(stream){
    if(onlineRecorder===recorder)onlineRecorder=null;
    if(session!==onlineSession)return;
    const blob=new Blob(parts,{type:recorder.mimeType.split(';')[0]});
-   if(blob.size<500||blob.size>10*1024*1024){onlineState('error');return}
+   if(blob.size<500||blob.size>10*1024*1024){awaitingVoiceText=false;syncComposerMode();onlineState('error');return}
    sendOnlineAudio(blob,locale,session);
   };
   recorder.start();
@@ -658,7 +661,7 @@ async function sendOnlineAudio(blob,locale,session){
  if(document.documentElement.dataset.avnivoMode!=='online')return;
  if(onlineAbort)onlineAbort.abort();
  const ctrl=new AbortController();onlineAbort=ctrl;
- if(!onlineLanguagesByCode.has(locale)){onlineState('error');return}
+ if(!onlineLanguagesByCode.has(locale)){awaitingVoiceText=false;syncComposerMode();onlineState('error');return}
   const extension=blob.type==='audio/ogg'?'ogg':'webm';
   const form=new FormData();form.append('audio',blob,'speech.'+extension);form.append('language',locale);
  onlineState('loading');
@@ -674,16 +677,18 @@ async function sendOnlineAudio(blob,locale,session){
   if(result.language!==locale||result.model!=='chirp_2')throw Error('Server noto‘g‘ri til yoki model qaytardi');
    if(locale!==onlineLocale())return;
   const recognized=typeof result.text==='string'?result.text.trim():'';
-  if(recognized){
+  awaitingVoiceText=false;
+   if(recognized){
    input.value=appendTranscript(input.value,recognized);
    persistDraft();resize();syncComposerMode();onlineState('done');
-  }else onlineState('error');
+  }else {syncComposerMode();onlineState('error')}
  }catch(e){
   if(session!==onlineSession||document.documentElement.dataset.avnivoMode!=='online')return;
-  console.warn('Chirp 2 recognition failed:',e);onlineState('error');
+  awaitingVoiceText=false;syncComposerMode();console.warn('Chirp 2 recognition failed:',e);onlineState('error');
  }finally{clearTimeout(timer);if(onlineAbort===ctrl)onlineAbort=null}
 }
 function cancelOnlineRecording(){
+ awaitingVoiceText=false;syncComposerMode();
  onlineSession++;
  if(onlineAbort){onlineAbort.abort();onlineAbort=null}
  if(onlineRecorder){const recorder=onlineRecorder;onlineRecorder=null;try{if(recorder.state==='recording')recorder.stop()}catch(e){}}
