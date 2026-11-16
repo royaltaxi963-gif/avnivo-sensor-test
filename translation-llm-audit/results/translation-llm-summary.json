@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T06:58:29.185271+00:00",
+ "generated_at": "2026-11-16T07:14:02.474719+00:00",
  "verified_on": "2026-11-16",
  "model": "general/translation-llm",
  "sources": {
@@ -23,20 +23,20 @@
  "quality_passed_locales": 93,
  "coverage_percent": 100.0,
  "documentation_api_conflicts": 3,
- "final_rejected_records": 24,
- "real_api_requests": 6651,
- "total_cost_usd": 4.01349,
+ "final_rejected_records": 48,
+ "real_api_requests": 6675,
+ "total_cost_usd": 4.02405,
  "budget_ceiling_usd": 30.0,
- "remaining_usd": 25.98651,
+ "remaining_usd": 25.97595,
  "ledger": {
-  "requests": 6651,
-  "errors": 69,
-  "input_chars": 201839,
+  "requests": 6675,
+  "errors": 93,
+  "input_chars": 202895,
   "output_chars": 199510,
-  "cost_usd": 4.01349,
+  "cost_usd": 4.02405,
   "budget_ceiling_usd": 30.0,
   "hard_stop_usd": 25.0,
-  "remaining_usd": 25.98651,
+  "remaining_usd": 25.97595,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  }
 }

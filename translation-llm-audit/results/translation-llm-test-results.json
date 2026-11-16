@@ -139047,17 +139047,521 @@
     "length_ratio": 1.316
    },
    "model": "general/translation-llm"
+  },
+  {
+   "chirp": "as-IN",
+   "llm": "as",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "as",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,as\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.252,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ast-ES",
+   "llm": "ast",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "ast",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: ast\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.18,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ceb-PH",
+   "llm": "ceb",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "ceb",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ceb\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.077,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ckb-IQ",
+   "llm": "ckb",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "ckb",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ckb\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.047,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ff-SN",
+   "llm": "ff",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "ff",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ff\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.184,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "jv-ID",
+   "llm": "jv",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "jv",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,jv\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.185,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "kam-KE",
+   "llm": "kam",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "kam",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: kam\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.181,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "kea-CV",
+   "llm": "kea",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "kea",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: kea\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.177,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "kk-KZ",
+   "llm": "kk",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "kk",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,kk\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.075,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "lg-UG",
+   "llm": "lg",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "lg",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,lg\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.16,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "luo-KE",
+   "llm": "luo",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "luo",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,luo\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.185,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "mi-NZ",
+   "llm": "mi",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "mi",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,mi\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.187,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "nso-ZA",
+   "llm": "nso",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "nso",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,nso\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.192,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ny-MW",
+   "llm": "ny",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "ny",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ny\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.192,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "oc-FR",
+   "llm": "oc",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "oc",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,oc\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.189,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "om-ET",
+   "llm": "om",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "om",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,om\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.174,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "ps-AF",
+   "llm": "ps",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "ps",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,ps\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.044,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "rup-BG",
+   "llm": "rup",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "rup",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: rup\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.171,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "sd-IN",
+   "llm": "sd",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "sd",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,sd\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.162,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "sn-ZW",
+   "llm": "sn",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "sn",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,sn\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.162,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "su-ID",
+   "llm": "su",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "su",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,su\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.162,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "umb-AO",
+   "llm": "umb",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "umb",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Target language is unsupported.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.BadRequest\",\n        \"fieldViolations\": [\n          {\n            \"field\": \"target_language_code\",\n            \"description\": \"Target language: umb\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   "latency_s": 0.185,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "wo-SN",
+   "llm": "wo",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "wo",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,wo\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.162,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
+  },
+  {
+   "chirp": "yue-Hant-HK",
+   "llm": "yue",
+   "class": "C",
+   "item": "c01",
+   "category": "diagnosis",
+   "direction": "en2X",
+   "source": "en",
+   "target": "yue",
+   "source_text": "Good morning, is your work going well today?",
+   "translated": "",
+   "http": 400,
+   "error": "{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"Unsupported language pair: en,yue\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n",
+   "latency_s": 0.221,
+   "quality": {
+    "flags": [
+     "empty_output"
+    ],
+    "length_ratio": 0.0
+   }
   }
  ],
  "ledger": {
-  "requests": 6651,
-  "errors": 69,
-  "input_chars": 201839,
+  "requests": 6675,
+  "errors": 93,
+  "input_chars": 202895,
   "output_chars": 199510,
-  "cost_usd": 4.01349,
+  "cost_usd": 4.02405,
   "budget_ceiling_usd": 30.0,
   "hard_stop_usd": 25.0,
-  "remaining_usd": 25.98651,
+  "remaining_usd": 25.97595,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  }
 }
