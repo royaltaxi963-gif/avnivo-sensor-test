@@ -37,8 +37,8 @@ html[data-avnivo-mode=offline] .mic-symbol{animation-name:offlineMicBreathe}
 @keyframes offlineMicBreathe{0%,100%{filter:drop-shadow(0 0 1px #4fbaff);transform:scale(1)}50%{filter:drop-shadow(0 0 9px #65cfff);transform:scale(1.09)}}
 @media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .mic-symbol{animation:none}}
 /* Online-only STT status icon inside the composer, never overlapping the text. */
-html[data-avnivo-mode=online] .writing-area{padding-left:48px}
-html[data-avnivo-mode=online] .animated-greeting{left:48px}
+html[data-avnivo-mode=online] .writing-area{padding-left:41px}
+html[data-avnivo-mode=online] .animated-greeting{left:41px}
 .online-stt-status{display:none;position:absolute;z-index:3;left:12px;top:50%;transform:translateY(-50%) scale(.75);width:25px;height:25px;align-items:center;justify-content:center;pointer-events:none;color:#ffd493;opacity:0}
 html[data-avnivo-mode=online] .online-stt-status[data-state=recording],html[data-avnivo-mode=online] .online-stt-status[data-state=loading],html[data-avnivo-mode=online] .online-stt-status[data-state=error]{display:flex;opacity:1;transform:translateY(-50%) scale(1)}
 .online-stt-status svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -50,6 +50,7 @@ html[data-avnivo-mode=online] .online-stt-status[data-state=recording],html[data
 @keyframes avnivo-record-blink{0%,100%{opacity:1}50%{opacity:.15}}
 @keyframes avnivo-record-leave{from{opacity:1;transform:translateY(-50%) scale(1)}to{opacity:0;transform:translateY(-50%) scale(.12)}}
 @media(prefers-reduced-motion:reduce){.online-stt-status[data-state=recording],.online-stt-status[data-state=loading]{animation:none}}
+html[data-avnivo-mode=online] .voice-trace{left:40px;right:55px}
 </style>
 </head>
 <body>
