@@ -58,5 +58,34 @@ async function run(onProgress,onStatus){
  onStatus('Model yuklandi va SHA-256 tasdiqlandi. Ovoz tanish dvigateli hali ulanmagan.');
  return true;
 }
-window.avnivoVerifiedUzbekDownload={run};
+// Resume automatically when connectivity returns while this page remains open.
+function waitUntilOnline(onStatus){
+ if(navigator.onLine)return Promise.resolve();
+ onStatus('Internet uzildi. Yuklangan qism saqlandi; aloqa qaytsa avtomatik davom etadi.');
+ return new Promise(resolve=>{
+  const resume=()=>{if(!navigator.onLine)return;window.removeEventListener('online',resume);resolve()};
+  window.addEventListener('online',resume);
+  if(navigator.onLine)resume();
+ });
+}
+let activeRun=null;
+function runWithAutoResume(onProgress,onStatus){
+ if(activeRun)return activeRun;
+ activeRun=(async()=>{
+  let reconnects=0;
+  while(true){
+   await waitUntilOnline(onStatus);
+   try{
+    if(reconnects)onStatus('Internet tiklandi. Yuklangan bo‘laklardan davom etmoqda…');
+    return await run(onProgress,onStatus);
+   }catch(error){
+    if(navigator.onLine)throw error; // Server, storage or integrity errors must not loop forever.
+    reconnects++;
+    await waitUntilOnline(onStatus);
+   }
+  }
+ })().finally(()=>{activeRun=null});
+ return activeRun;
+}
+window.avnivoVerifiedUzbekDownload={run:runWithAutoResume};
 })();
