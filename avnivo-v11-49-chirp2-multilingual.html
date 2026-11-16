@@ -1430,7 +1430,8 @@ window.CHIRP2_MATRIX=[
      recorder=new MediaRecorder(stream,{mimeType:mime});
      recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
      recorder.onerror=()=>{message('Ovoz yozishda xato');clean()};
-     recorder.onstop=()=>{\n       status('Audio tayyorlanmoqda...');
+     recorder.onstop=()=>{
+       status('Audio tayyorlanmoqda...');
        const blob=new Blob(chunks,{type:mime.split(';')[0]});
        clean();
        if(id!==requestId)return;
