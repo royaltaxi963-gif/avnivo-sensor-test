@@ -18,6 +18,7 @@ on:
       - audit/translation-llm-117
     paths:
       - 'translation-llm-audit/harness.py'
+      - 'translation-llm-audit/diagnose.py'
       - 'translation-llm-audit/corpus.py'
       - 'translation-llm-audit/language_matrix.py'
       - 'translation-llm-audit/run-config.json'
@@ -65,10 +66,12 @@ jobs:
           print("phase=" + str(c.get("phase", "pilot")))
           print("only=" + str(c.get("only", "")))
           print("deep=" + str(c.get("deep", "")))
+          print("mode=" + str(c.get("mode", "")))
           print("max_requests=" + str(c.get("max_requests", 120)))
           PY
 
       - name: Run audit against the real Translation LLM API
+        if: steps.cfg.outputs.mode == ''
         env:
           AVNIVO_TRANSLATION_PROJECT: project-6bcf7fe6-cb55-49b7-9f4
           AVNIVO_TRANSLATION_REGION: us-central1
@@ -77,6 +80,16 @@ jobs:
             --phase "${{ steps.cfg.outputs.phase }}" \
             --only "${{ steps.cfg.outputs.only }}" \
             --deep "${{ steps.cfg.outputs.deep }}" \
+            --max-requests "${{ steps.cfg.outputs.max_requests }}"
+
+      - name: Run targeted diagnosis / retest against the real Translation LLM API
+        if: steps.cfg.outputs.mode != ''
+        env:
+          AVNIVO_TRANSLATION_PROJECT: project-6bcf7fe6-cb55-49b7-9f4
+          AVNIVO_TRANSLATION_REGION: us-central1
+        run: |
+          python translation-llm-audit/diagnose.py \
+            --mode "${{ steps.cfg.outputs.mode }}" \
             --max-requests "${{ steps.cfg.outputs.max_requests }}"
 
       - name: Generate audit deliverables

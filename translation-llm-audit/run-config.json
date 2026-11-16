@@ -1,6 +1,4 @@
 {
-  "phase": "full",
-  "only": "",
-  "deep": "si-LK,xh-ZA,yo-NG",
-  "max_requests": 400
+  "mode": "failed",
+  "max_requests": 120
 }
