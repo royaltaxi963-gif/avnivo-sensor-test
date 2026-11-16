@@ -15,7 +15,8 @@ from offline_models import router as offline_models_router
 
 MODEL = "whisper-large-v3"
 GROQ_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
-ALLOWED_ORIGINS = {"https://royaltaxi963-gif.github.io", "http://localhost:3000", "http://localhost:8080", "null"}
+# Explicit browser hosts for the AVNIVO HTML preview; never use wildcard CORS.
+ALLOWED_ORIGINS = {"https://royaltaxi963-gif.github.io", "https://raw.githack.com", "https://rawcdn.githack.com", "http://localhost:3000", "http://localhost:8080", "null"}
 GOOGLE_PROJECT = "project-6bcf7fe6-cb55-49b7-9f4"
 GOOGLE_REGION = "us-central1"
 GOOGLE_MODEL = "chirp_2"
