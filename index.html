@@ -200,7 +200,7 @@ function applyMode(mode){
  try{localStorage.setItem('avnivo.ui.mode.v1',chosen)}catch(e){}
 }
 modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online');updateOnlineLanguageLabels()});
-modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
+modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){requestToken++;cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
 try{applyMode(localStorage.getItem('avnivo.ui.mode.v1'))}catch(e){applyMode('online')}
 const mic=shell.querySelector('.mic-icon');
 const trace=shell.querySelector('.voice-trace-glow');
@@ -209,6 +209,9 @@ const leftLanguage=languageRow.querySelector('.source-language'),rightLanguage=l
 let languageTransitionTimer=0;
 function selectLanguage(side){
  if(languageRow.dataset.selected===side)return;
+ if(document.documentElement.dataset.avnivoMode==='online'){
+  requestToken++;cancelOnlineRecording();if(active)stopVoice();
+ }
  languageRow.dataset.selected=side;
  leftLanguage.classList.toggle('is-selected',side==='left');
  rightLanguage.classList.toggle('is-selected',side==='right');
