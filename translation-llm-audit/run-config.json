@@ -1,4 +1,4 @@
 {
-  "mode": "experimental",
-  "max_requests": 200
+  "mode": "regression",
+  "max_requests": 60
 }
