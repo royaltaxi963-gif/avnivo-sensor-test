@@ -121,6 +121,36 @@ jobs:
             --project="$PROJECT_ID" --limit=60 --freshness=3h \
             --format='value(timestamp,severity,textPayload)' || true
 
+      - name: Deployed revision image and labels
+        shell: bash
+        run: |
+          set -uo pipefail
+          for rev in avnivo-sensor-test-00014-qf9 avnivo-sensor-test-00013-qeq avnivo-sensor-test-00011-xl4; do
+            echo "## $rev"
+            gcloud run revisions describe "$rev" --project="$PROJECT_ID" --region="$REGION" \
+              --format='yaml(spec.containers[0].image,metadata.labels,metadata.annotations."run.googleapis.com/execution-environment")' || true
+          done
+
+      - name: Any log mentioning the runtime SA or speech API (last 4h)
+        shell: bash
+        run: |
+          set -uo pipefail
+          echo "## runtime SA principal in any log"
+          gcloud logging read \
+            '"avnivo-speech-translator@project-6bcf7fe6-cb55-49b7-9f4.iam.gserviceaccount.com"' \
+            --project="$PROJECT_ID" --limit=40 --freshness=4h \
+            --format='value(timestamp,severity,resource.type,textPayload,jsonPayload.message)' || true
+          echo "## speech.googleapis.com API logs"
+          gcloud logging read \
+            'logName:"speech.googleapis.com"' \
+            --project="$PROJECT_ID" --limit=40 --freshness=4h \
+            --format='value(timestamp,severity,protoPayload.status,protoPayload.authenticationInfo.principalEmail)' || true
+
+      - name: Billing status
+        shell: bash
+        run: |
+          gcloud billing projects describe "$PROJECT_ID" --format=json || true
+
       - name: Direct Google Speech-to-Text V2 recognize probe
         shell: bash
         run: |
