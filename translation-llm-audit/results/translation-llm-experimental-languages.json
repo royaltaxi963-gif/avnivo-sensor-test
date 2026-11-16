@@ -1,0 +1,24 @@
+[
+ {
+  "order": 2,
+  "chirp2_code": "am-ET",
+  "language_name": "Amharic (Ethiopia)",
+  "translation_llm_code": "am",
+  "regional_variant": "base",
+  "official_support": false,
+  "experimental": true,
+  "documented_class": "B",
+  "api_tested": true,
+  "api_requests": 8,
+  "api_success": 8,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "avg_latency_s": 0.363,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": null,
+  "final_decision": "EXPERIMENTAL",
+  "decision_reason": "google_experimental_support",
+  "sample_translation": "ሰላም፣ እንዴት ነዎት?"
+ }
+]

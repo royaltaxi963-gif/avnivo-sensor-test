@@ -1,0 +1,37 @@
+{
+ "model": "general/translation-llm",
+ "rate": "USD 10 per 1M input characters + USD 10 per 1M output characters",
+ "source": "https://cloud.google.com/translate/pricing",
+ "ledger": {
+  "requests": 120,
+  "errors": 1,
+  "input_chars": 3083,
+  "output_chars": 2994,
+  "cost_usd": 0.06077,
+  "budget_ceiling_usd": 30.0,
+  "hard_stop_usd": 25.0,
+  "remaining_usd": 29.93923,
+  "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
+ },
+ "budget_ceiling_usd": 30.0,
+ "hard_stop_usd": 25.0,
+ "remaining_usd": 29.93923,
+ "checkpoints": [
+  {
+   "threshold_usd": 2,
+   "status": "observed in pilot (real spend tracked)"
+  },
+  {
+   "threshold_usd": 10,
+   "status": "not exceeded at any point"
+  },
+  {
+   "threshold_usd": 20,
+   "status": "not exceeded at any point"
+  },
+  {
+   "threshold_usd": 25,
+   "status": "hard stop enforced in harness before each request"
+  }
+ ]
+}

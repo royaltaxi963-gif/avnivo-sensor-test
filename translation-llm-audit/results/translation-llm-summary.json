@@ -1,0 +1,39 @@
+{
+ "generated_at": "2026-11-16T06:22:27.704777+00:00",
+ "verified_on": "2026-11-16",
+ "model": "general/translation-llm",
+ "sources": {
+  "languages": "https://cloud.google.com/translate/docs/languages",
+  "pricing": "https://cloud.google.com/translate/pricing"
+ },
+ "total_locales": 117,
+ "documented_classes": {
+  "A_official": 77,
+  "B_experimental": 13,
+  "C_unsupported": 27,
+  "D_undetermined": 0
+ },
+ "decisions": {
+  "RETEST_REQUIRED": 113,
+  "EXPERIMENTAL": 1,
+  "PASSED": 2,
+  "FAILED": 1
+ },
+ "api_tested_locales": 4,
+ "coverage_percent": 3.4,
+ "real_api_requests": 120,
+ "total_cost_usd": 0.06077,
+ "budget_ceiling_usd": 30.0,
+ "remaining_usd": 29.93923,
+ "ledger": {
+  "requests": 120,
+  "errors": 1,
+  "input_chars": 3083,
+  "output_chars": 2994,
+  "cost_usd": 0.06077,
+  "budget_ceiling_usd": 30.0,
+  "hard_stop_usd": 25.0,
+  "remaining_usd": 29.93923,
+  "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
+ }
+}

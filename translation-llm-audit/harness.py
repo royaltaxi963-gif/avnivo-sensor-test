@@ -213,41 +213,34 @@ def build_plan(rows: list[dict]) -> list[dict]:
     for chirp, row in by_chirp.items():
         llm = row["translation_llm_code"]
         cls = row["documented_class"]
+
+        def emit(iid, cat, src_field, direction, source, target):
+            # A source equal to the target is degenerate (e.g. uz->uz for the
+            # Uzbek locale itself); the API rejects it and it tests nothing.
+            if source == target:
+                return
+            plan.append({"chirp": chirp, "llm": llm, "class": cls, "item": iid,
+                         "category": cat, "src_field": src_field, "direction": direction,
+                         "source": source, "target": target})
+
         if cls == "A":
             for item in ITEMS:
                 iid, cat, _uz, _en = item
-                plan.append({"chirp": chirp, "llm": llm, "class": cls, "item": iid,
-                             "category": cat, "src_field": "uz", "direction": "uz2X",
-                             "source": "uz", "target": llm})
-                plan.append({"chirp": chirp, "llm": llm, "class": cls, "item": iid,
-                             "category": cat, "src_field": "en", "direction": "en2X",
-                             "source": "en", "target": llm})
-                plan.append({"chirp": chirp, "llm": llm, "class": cls, "item": iid,
-                             "category": cat, "src_field": "X", "direction": "X2uz",
-                             "source": llm, "target": "uz"})
-                plan.append({"chirp": chirp, "llm": llm, "class": cls, "item": iid,
-                             "category": cat, "src_field": "X", "direction": "X2en",
-                             "source": llm, "target": "en"})
+                emit(iid, cat, "uz", "uz2X", "uz", llm)
+                emit(iid, cat, "en", "en2X", "en", llm)
+                emit(iid, cat, "X", "X2uz", llm, "uz")
+                emit(iid, cat, "X", "X2en", llm, "en")
             for rep in range(_STABILITY_REPEATS - 1):
-                plan.append({"chirp": chirp, "llm": llm, "class": cls,
-                             "item": _STABILITY_ITEM, "category": "stability_repeat",
-                             "src_field": "uz", "direction": f"uz2X_rep{rep + 2}",
-                             "source": "uz", "target": llm})
+                emit(_STABILITY_ITEM, "stability_repeat", "uz", f"uz2X_rep{rep + 2}", "uz", llm)
         elif cls == "B":
             # Reduced probe for experimental locales: record real behaviour only.
             for item in ITEMS[:4]:
                 iid, cat, _uz, _en = item
-                plan.append({"chirp": chirp, "llm": llm, "class": cls, "item": iid,
-                             "category": cat, "src_field": "uz", "direction": "uz2X",
-                             "source": "uz", "target": llm})
-                plan.append({"chirp": chirp, "llm": llm, "class": cls, "item": iid,
-                             "category": cat, "src_field": "X", "direction": "X2uz",
-                             "source": llm, "target": "uz"})
+                emit(iid, cat, "uz", "uz2X", "uz", llm)
+                emit(iid, cat, "X", "X2uz", llm, "uz")
         else:
             # Class C: a single confirmation probe (rejected calls are not billed).
-            plan.append({"chirp": chirp, "llm": llm, "class": cls, "item": "c01",
-                         "category": "greeting", "src_field": "uz", "direction": "uz2X",
-                         "source": "uz", "target": llm})
+            emit("c01", "greeting", "uz", "uz2X", "uz", llm)
     return plan
 
 

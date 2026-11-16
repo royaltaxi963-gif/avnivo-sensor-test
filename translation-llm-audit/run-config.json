@@ -1,5 +1,5 @@
 {
   "phase": "full",
   "only": "",
-  "max_requests": 6500
+  "max_requests": 400
 }

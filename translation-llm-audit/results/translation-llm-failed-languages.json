@@ -1,0 +1,24 @@
+[
+ {
+  "order": 4,
+  "chirp2_code": "as-IN",
+  "language_name": "Assamese (India)",
+  "translation_llm_code": "as",
+  "regional_variant": "base",
+  "official_support": false,
+  "experimental": false,
+  "documented_class": "C",
+  "api_tested": true,
+  "api_requests": 1,
+  "api_success": 0,
+  "api_unsupported": 1,
+  "api_transient_errors": 0,
+  "avg_latency_s": null,
+  "quality_pass": false,
+  "critical_flags": {},
+  "stability_ok": null,
+  "final_decision": "FAILED",
+  "decision_reason": "api_rejected_unsupported_language",
+  "sample_translation": ""
+ }
+]
