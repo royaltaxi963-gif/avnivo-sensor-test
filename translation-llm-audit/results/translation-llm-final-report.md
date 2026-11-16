@@ -21,6 +21,7 @@ Manbalar:
 | C — qo'llab-quvvatlanmaydi | 27 |
 | D — aniqlanmadi | 0 |
 | Haqiqiy API sinovidan o'tgan variantlar | 117 |
+| Sifat sinovidan o'tgan variantlar | 93 |
 | PASSED | 77 |
 | EXPERIMENTAL | 13 |
 | FAILED | 24 |

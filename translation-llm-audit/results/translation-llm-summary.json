@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T06:57:01.858485+00:00",
+ "generated_at": "2026-11-16T06:57:50.220991+00:00",
  "verified_on": "2026-11-16",
  "model": "general/translation-llm",
  "sources": {
@@ -20,6 +20,7 @@
   "RETEST_REQUIRED": 3
  },
  "api_tested_locales": 117,
+ "quality_passed_locales": 93,
  "coverage_percent": 100.0,
  "documentation_api_conflicts": 3,
  "real_api_requests": 6651,

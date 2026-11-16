@@ -144,6 +144,7 @@ def build() -> dict:
                                "C_unsupported": classes["C"], "D_undetermined": classes["D"]},
         "decisions": dict(decisions),
         "api_tested_locales": sum(1 for v in verdicts if v["api_tested"]),
+        "quality_passed_locales": sum(1 for v in verdicts if v["quality_pass"]),
         "coverage_percent": round(100 * sum(1 for v in verdicts if v["api_tested"]) / len(verdicts), 1),
         "documentation_api_conflicts": sum(1 for v in verdicts if v.get("doc_api_conflict")),
         "real_api_requests": ledger.get("requests", 0),
@@ -330,6 +331,7 @@ Manbalar:
 | C — qo'llab-quvvatlanmaydi | {c['C_unsupported']} |
 | D — aniqlanmadi | {c['D_undetermined']} |
 | Haqiqiy API sinovidan o'tgan variantlar | {summary['api_tested_locales']} |
+| Sifat sinovidan o'tgan variantlar | {summary['quality_passed_locales']} |
 | PASSED | {counts.get('PASSED', 0)} |
 | EXPERIMENTAL | {counts.get('EXPERIMENTAL', 0)} |
 | FAILED | {counts.get('FAILED', 0)} |
