@@ -562,7 +562,11 @@ function syncBackNavigation(){
   avnivoBackPending=false;
  }else if(owned&&!avnivoBackPending){
   avnivoBackPending=true;
-  window.history.back();
+  queueMicrotask(()=>{
+   if(activeBackLayer()){avnivoBackPending=false;syncBackNavigation();return}
+   if(window.history.state?.[avnivoBackKey]===avnivoBackId)window.history.back();
+   else avnivoBackPending=false;
+  });
  }
 }
 window.addEventListener('popstate',()=>{
