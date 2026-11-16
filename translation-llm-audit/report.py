@@ -147,6 +147,7 @@ def build() -> dict:
         "quality_passed_locales": sum(1 for v in verdicts if v["quality_pass"]),
         "coverage_percent": round(100 * sum(1 for v in verdicts if v["api_tested"]) / len(verdicts), 1),
         "documentation_api_conflicts": sum(1 for v in verdicts if v.get("doc_api_conflict")),
+        "final_rejected_records": sum(1 for r in ev["records"] if r["http"] != 200),
         "real_api_requests": ledger.get("requests", 0),
         "total_cost_usd": ledger.get("cost_usd", 0.0),
         "budget_ceiling_usd": ledger.get("budget_ceiling_usd", 30.0),
@@ -197,6 +198,13 @@ def write_json_lists(verdicts: list[dict], summary: dict) -> None:
         "rate": "USD 10 per 1M input characters + USD 10 per 1M output characters",
         "source": PRICING_URL,
         "ledger": summary["ledger"],
+        "errors_note": (
+            "ledger.errors counts every failed HTTP attempt across all runs, "
+            "including transient 429/5xx that were retried. The final evidence "
+            "file contains only 24 non-200 records, all of them definitive API "
+            "rejections of unsupported languages."
+        ),
+        "final_rejected_records": summary.get("final_rejected_records"),
         "budget_ceiling_usd": summary["budget_ceiling_usd"],
         "hard_stop_usd": summary["ledger"].get("hard_stop_usd", 25.0),
         "remaining_usd": summary["remaining_usd"],

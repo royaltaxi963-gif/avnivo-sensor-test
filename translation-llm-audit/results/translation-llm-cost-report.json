@@ -13,6 +13,8 @@
   "remaining_usd": 25.98651,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  },
+ "errors_note": "ledger.errors counts every failed HTTP attempt across all runs, including transient 429/5xx that were retried. The final evidence file contains only 24 non-200 records, all of them definitive API rejections of unsupported languages.",
+ "final_rejected_records": 24,
  "budget_ceiling_usd": 30.0,
  "hard_stop_usd": 25.0,
  "remaining_usd": 25.98651,
