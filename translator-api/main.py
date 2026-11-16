@@ -375,6 +375,65 @@ _TTS_STYLES = {
     "calm": "Speak clearly, naturally and conversationally with a calm neutral tone.",
 }
 
+_TTS_EXTRA_STYLES = {
+    "friendly": "Speak warmly and in a friendly manner.",
+    "professional": "Speak clearly and professionally.",
+    "narrator": "Narrate expressively like an audiobook reader.",
+    "documentary": "Narrate with calm documentary-style authority.",
+    "news": "Read evenly like a professional news presenter.",
+    "storytelling": "Tell the story with engaging intonation.",
+    "dramatic": "Speak with theatrical emphasis and dramatic timing.",
+    "mysterious": "Speak quietly and mysteriously.",
+    "serious": "Speak seriously and with focus.",
+    "confident": "Speak confidently and decisively.",
+    "gentle": "Speak gently and reassuringly.",
+    "empathetic": "Speak with sensitivity and empathy.",
+    "curious": "Speak with inquisitive intonation.",
+    "surprised": "Speak with surprised inflection.",
+    "nervous": "Speak with nervous uncertainty.",
+    "fearful": "Speak with restrained fear.",
+    "angry": "Speak with an angry, tense tone.",
+    "frustrated": "Speak with restrained frustration.",
+    "sarcastic": "Speak with dry sarcasm.",
+    "ironic": "Speak with subtle irony.",
+    "bored": "Speak with a bored, flat delivery.",
+    "tired": "Speak in a tired, low-energy voice.",
+    "whisper": "Whisper softly and clearly.",
+    "mutter": "Speak as if muttering.",
+    "breathy": "Use a breathy vocal quality.",
+    "robotic": "Speak in a robotic cadence.",
+    "monotone": "Speak with minimal pitch variation.",
+    "playful": "Speak playfully.",
+    "energetic": "Speak energetically.",
+    "thoughtful": "Speak thoughtfully.",
+    "persuasive": "Speak persuasively.",
+    "teacher": "Explain clearly like a patient teacher.",
+    "poetic": "Recite with lyrical rhythm.",
+    "slow": "Speak slowly and naturally.",
+    "fast": "Speak quickly but intelligibly.",
+}
+_TTS_DELIVERY = {
+    "normal": "",
+    "whisper": "Keep the delivery whispered.",
+    "breathy": "Use a gentle breathy voice.",
+    "clear": "Articulate crisply.",
+    "soft": "Speak softly.",
+    "projected": "Project the voice without shouting.",
+}
+_TTS_PITCH = {
+    "normal": "",
+    "low": "Use a lower pitch.",
+    "high": "Use a higher pitch.",
+    "flat": "Use an even pitch.",
+    "expressive": "Use expressive pitch and inflection.",
+}
+_TTS_PACE = {
+    "normal": "",
+    "slow": "Speak slowly.",
+    "fast": "Speak quickly but clearly.",
+    "deliberate": "Use deliberate pauses.",
+}
+
 def _detect_tts_style(text: str) -> str:
     lowered = text.casefold()
     if any(x in lowered for x in ("qayerda yurd", "izlayapman", "izlayabman", "nega kelmad", "где ты был", "я тебя ищу", "where have you been")):
@@ -431,9 +490,25 @@ async def synthesize_emotional_speech(request: Request):
     hits.append(now)
 
     requested_style = body.get("style", "auto")
-    if not isinstance(requested_style, str) or requested_style not in (*_TTS_STYLES.keys(), "auto"):
+    if not isinstance(requested_style, str) or requested_style not in (*_TTS_STYLES, *_TTS_EXTRA_STYLES, "auto", "custom"):
         raise HTTPException(400, "Unsupported TTS style")
+    delivery = body.get("delivery", "normal")
+    pitch = body.get("pitch", "normal")
+    pace = body.get("pace", "normal")
+    custom_style = body.get("custom_style", "")
+    if (not isinstance(delivery, str) or delivery not in _TTS_DELIVERY
+            or not isinstance(pitch, str) or pitch not in _TTS_PITCH
+            or not isinstance(pace, str) or pace not in _TTS_PACE
+            or not isinstance(custom_style, str) or len(custom_style) > 240
+            or any(ord(ch) < 32 for ch in custom_style)):
+        raise HTTPException(400, "Invalid TTS delivery settings")
+    if requested_style == "custom" and not custom_style.strip():
+        raise HTTPException(400, "Custom style is empty")
     style = _detect_tts_style(spoken) if requested_style == "auto" else requested_style
+    base_style = (custom_style.strip() if style == "custom" else
+                  _TTS_STYLES.get(style, _TTS_EXTRA_STYLES.get(style, "")))
+    style_prompt = " ".join(filter(None, (base_style, _TTS_DELIVERY[delivery],
+                                          _TTS_PITCH[pitch], _TTS_PACE[pace])))
     project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
     # Use the enabled Cloud Text-to-Speech API with a higher-quality Gemini voice.
     # Keep translation, ASR and the public /api/tts contract unchanged.
@@ -454,7 +529,7 @@ async def synthesize_emotional_speech(request: Request):
     tts_payload = {
         "contents": [{"role": "user", "parts": [{
             "text": spoken,
-            "speechMetadata": {"style": _TTS_STYLES[style]},
+            "speechMetadata": {"style": style_prompt},
         }]}],
         "generationConfig": {
             "responseModalities": ["AUDIO"],
