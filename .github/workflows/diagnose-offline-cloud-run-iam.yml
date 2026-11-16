@@ -24,7 +24,10 @@ jobs:
           echo "Project: $PROJECT; region: $REGION" >> "$GITHUB_STEP_SUMMARY"
           echo "Active principal:"
           gcloud auth list --filter=status:ACTIVE --format='value(account)'
+          FAILURES=0
+          WARNINGS=0
           probe() {
+            local severity="$1"; shift
             local title="$1"; shift
             echo "::group::$title"
             echo "### $title" >> "$GITHUB_STEP_SUMMARY"
@@ -33,7 +36,8 @@ jobs:
               cat /tmp/avnivo-probe.out
             else
               code=$?
-              echo "FAILED (exit $code)" >> "$GITHUB_STEP_SUMMARY"
+              echo "$severity (exit $code)" >> "$GITHUB_STEP_SUMMARY"
+              if [ "$severity" = "FAIL" ]; then FAILURES=$((FAILURES + 1)); else WARNINGS=$((WARNINGS + 1)); fi
               cat /tmp/avnivo-probe.out
             fi
             echo "::endgroup::"
@@ -52,15 +56,25 @@ jobs:
           else
             echo "Cannot read project IAM policy:"
             cat /tmp/avnivo-iam-error
-            echo "Project IAM policy not readable; inspect in Cloud Console." >> "$GITHUB_STEP_SUMMARY"
+            echo "WARNING: Project IAM policy not readable; this does not prove deploy access is missing." >> "$GITHUB_STEP_SUMMARY"
+            WARNINGS=$((WARNINGS + 1))
           fi
           echo "::endgroup::"
-          probe "Cloud Run API status" gcloud services list --project="$PROJECT" --enabled --filter='config.name:run.googleapis.com' --format='value(config.name)'
-          probe "Runtime service account describe" gcloud iam service-accounts describe "792624108019-compute@developer.gserviceaccount.com" --project="$PROJECT" --format='value(email)'
-          probe "Project describe" gcloud projects describe "$PROJECT" --format='value(projectId)'
-          probe "Cloud Run services list" gcloud run services list --project="$PROJECT" --region="$REGION" --format='table(metadata.name)'
-          probe "Staging service describe" gcloud run services describe avnivo-offline-model-api-staging --project="$PROJECT" --region="$REGION" --format='yaml(metadata.name,spec.template.spec.serviceAccountName)'
-          probe "Cloud Build API status" gcloud services list --project="$PROJECT" --enabled --filter='config.name:cloudbuild.googleapis.com' --format='value(config.name)'
-          probe "Artifact Registry repositories list" gcloud artifacts repositories list --project="$PROJECT" --location="$REGION" --format='table(name)'
-          probe "Cloud Build staging buckets list" gcloud storage buckets list --project="$PROJECT" --format='value(name)'
+          probe FAIL "Cloud Run API status" gcloud services list --project="$PROJECT" --enabled --filter='config.name:run.googleapis.com' --format='value(config.name)'
+          probe FAIL "Runtime service account describe" gcloud iam service-accounts describe "792624108019-compute@developer.gserviceaccount.com" --project="$PROJECT" --format='value(email)'
+          probe FAIL "Project describe" gcloud projects describe "$PROJECT" --format='value(projectId)'
+          probe FAIL "Cloud Run services list" gcloud run services list --project="$PROJECT" --region="$REGION" --format='table(metadata.name)'
+          probe WARN "Staging service describe" gcloud run services describe avnivo-offline-model-api-staging --project="$PROJECT" --region="$REGION" --format='yaml(metadata.name,spec.template.spec.serviceAccountName)'
+          probe FAIL "Cloud Build API status" gcloud services list --project="$PROJECT" --enabled --filter='config.name:cloudbuild.googleapis.com' --format='value(config.name)'
+          probe FAIL "Artifact Registry repositories list" gcloud artifacts repositories list --project="$PROJECT" --location="$REGION" --format='table(name)'
+          probe FAIL "Cloud Build staging buckets list" gcloud storage buckets list --project="$PROJECT" --format='value(name)'
           echo "NOTE: Read-only probes cannot prove create/deploy or actAs authorization. A failed probe may also mean missing read access. Check IAM Policy Troubleshooter and audit logs for the exact denied permission." >> "$GITHUB_STEP_SUMMARY"
+          echo "### Diagnostic outcome" >> "$GITHUB_STEP_SUMMARY"
+          echo "Critical failures: $FAILURES; warnings: $WARNINGS" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$FAILURES" -gt 0 ]; then
+            echo "::error::$FAILURES critical read-only diagnostic probes failed"
+            exit 1
+          fi
+          if [ "$WARNINGS" -gt 0 ]; then
+            echo "::warning::$WARNINGS expected/permission-limited diagnostic probes require review"
+          fi
