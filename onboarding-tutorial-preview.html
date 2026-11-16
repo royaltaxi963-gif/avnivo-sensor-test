@@ -134,20 +134,23 @@ html[data-avnivo-mode=online] .offline-modules{display:none}
 #avnivo-first-launch.reveal .intro-brand{top:calc(env(safe-area-inset-top) + 95px);transform:translate(-50%,-50%) scale(.65)}
 #avnivo-first-launch .lang-pill{position:absolute;left:50%;top:55%;width:min(84vw,390px);height:65px;display:flex;align-items:center;justify-content:center;transform:translate(-50%,80px);opacity:0;border:1px solid #d9af6c80;border-radius:22px;background:linear-gradient(115deg,#102d46d9,#30251bd9 55%,#132e48d9);box-shadow:0 12px 42px #0007,inset 0 1px #ffffff23;backdrop-filter:blur(20px);font-size:clamp(17px,5vw,21px);font-weight:550;color:#f6e6d1;transition:opacity 1.4s,transform 1.55s cubic-bezier(.22,.72,.16,1);cursor:pointer}
 #avnivo-first-launch.reveal .lang-pill{opacity:1;transform:translate(-50%,-50%)}
-#avnivo-first-launch .lang-pill.selected{animation:avnivo-bounce .8s cubic-bezier(.2,.7,.3,1) forwards}
-@keyframes avnivo-bounce{0%{transform:translate(-50%,-50%)}34%{transform:translate(-50%,-78%)}68%{transform:translate(-50%,-40%)}100%{transform:translate(-50%,-50%)}}
-#avnivo-tutorial-dim{position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:2000;display:none;pointer-events:auto;animation:avnivo-dim-in .6s ease both}
-@keyframes avnivo-dim-in{from{opacity:0}to{opacity:1}}
-#avnivo-tutorial-dim.active{display:block}
+#avnivo-first-launch .lang-pill.selected{animation:avnivo-pill-depart 1.85s cubic-bezier(.22,.65,.26,1) forwards;pointer-events:none}
+@keyframes avnivo-pill-depart{0%{transform:translate(-50%,-50%);opacity:1}16%{transform:translate(-50%,-89%);opacity:1}36%{transform:translate(-50%,-28%);opacity:1}53%{transform:translate(-50%,-56%);opacity:1}100%{transform:translate(-50%,calc(55dvh + 100px));opacity:0}}
+#avnivo-first-launch.departing{background:transparent;pointer-events:auto}
+#avnivo-first-launch.departing .intro-colors,#avnivo-first-launch.departing .intro-brand{opacity:0;transition:opacity .95s ease}
+#avnivo-first-launch.departing .lang-pill{transition:none}
+#avnivo-first-launch.departing #avnivo-language-menu{display:none}
+#avnivo-first-launch.departing{transition:background .9s ease}
+#avnivo-tutorial-dim{position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:2000;visibility:hidden;opacity:0;pointer-events:none;transition:opacity 1.15s ease,visibility 1.15s}
+#avnivo-tutorial-dim.active{visibility:visible;opacity:1;pointer-events:auto}
 #avnivo-tutorial-spot{position:fixed;z-index:2001;display:none;pointer-events:none;border-radius:14px;box-shadow:0 0 0 2px #ffdc9d,0 0 18px 7px #e7b85bba,0 0 48px 15px #d79e4777;animation:avnivo-spot-glow 2.2s ease-in-out infinite alternate;transition:left .5s ease,top .5s ease,opacity .4s ease}
-#avnivo-tutorial-spot.active{display:grid;place-items:center}
+#avnivo-tutorial-spot.active{display:grid;place-items:center}#avnivo-tutorial-spot{opacity:0;transition:opacity .7s ease,left .5s ease,top .5s ease}#avnivo-tutorial-spot.illuminated{opacity:1}
 #avnivo-tutorial-spot svg{width:23px;height:23px}
 @keyframes avnivo-spot-glow{to{box-shadow:0 0 0 2px #ffe9bc,0 0 26px 11px #f5cb7bdc,0 0 60px 20px #d79e4788}}
-#avnivo-tutorial-label{position:fixed;z-index:2002;left:50%;top:54%;transform:translate(-50%,-50%);width:min(87vw,390px);text-align:center;display:none;color:#fff;pointer-events:auto}
-#avnivo-tutorial-label.active{display:block;animation:avnivo-label-in .5s ease both}
-@keyframes avnivo-label-in{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}
+#avnivo-tutorial-label{position:fixed;z-index:2002;left:50%;top:54%;transform:translate(-50%,-50%);width:min(87vw,390px);text-align:center;display:block;visibility:hidden;opacity:0;transition:opacity .7s ease,visibility .7s;pointer-events:none;color:#fff}
+#avnivo-tutorial-label.active{visibility:visible;opacity:1;pointer-events:auto}
 #avnivo-tutorial-label strong{display:block;font-size:25px;color:#f6d393;margin-bottom:16px;text-shadow:0 2px 12px #000}
-#avnivo-tutorial-label p{font-size:15px;line-height:1.75;color:#f4f0e8;margin:0 0 24px;text-shadow:0 2px 8px #000}
+#avnivo-tutorial-label p{font-size:15px;line-height:1.75;color:#fff;margin:0 0 24px;text-shadow:0 2px 12px #000,0 0 2px #fff5;font-weight:520}
 #avnivo-tutorial-next{border:1px solid #ffdfa3;border-radius:16px;background:linear-gradient(120deg,#f4d79d,#d5a457);color:#251b10;font:750 16px system-ui;padding:13px 28px;min-width:170px;cursor:pointer;box-shadow:0 6px 24px #bb8a4755}
 #avnivo-tutorial-next:focus-visible{outline:3px solid #fff;outline-offset:3px}
 @media(max-height:530px){#avnivo-first-launch.reveal .intro-brand{top:55px;transform:translate(-50%,-50%) scale(.52)}#avnivo-first-launch .lang-pill{top:65%}}
@@ -1197,13 +1200,39 @@ let wordOrder=shuffledIndices(names.length),languageOrder=shuffledIndices(langua
 let wi=0,wp=0,we=false,li=0,lp=0,le=false,selected=false,menuOpen=false;
 function typeWord(){if(selected)return;const chars=segment(names[wordOrder[wi]]);if(!we){wp=Math.min(chars.length,wp+1);word.textContent=chars.slice(0,wp).join('');if(wp===chars.length){we=true;setTimeout(typeWord,800)}else setTimeout(typeWord,95)}else{wp=Math.max(0,wp-1);word.textContent=chars.slice(0,wp).join('');if(!wp){we=false;wi++;if(wi>=wordOrder.length){const last=wordOrder[wordOrder.length-1];wordOrder=shuffledIndices(names.length);if(wordOrder.length>1&&wordOrder[0]===last){[wordOrder[0],wordOrder[1]]=[wordOrder[1],wordOrder[0]]}wi=0}setTimeout(typeWord,180)}else setTimeout(typeWord,45)}}
 function typeLanguage(){if(selected)return;const chars=segment(languageNames[languageOrder[li]]);if(!le){lp=Math.min(chars.length,lp+1);lang.textContent=chars.slice(0,lp).join('');if(lp===chars.length){le=true;setTimeout(typeLanguage,1200)}else setTimeout(typeLanguage,95)}else{lp=Math.max(0,lp-1);lang.textContent=chars.slice(0,lp).join('');if(!lp){le=false;li++;if(li>=languageOrder.length){const last=languageOrder[languageOrder.length-1];languageOrder=shuffledIndices(languageNames.length);if(languageOrder.length>1&&languageOrder[0]===last){[languageOrder[0],languageOrder[1]]=[languageOrder[1],languageOrder[0]]}li=0}setTimeout(typeLanguage,250)}else setTimeout(typeLanguage,55)}}
-function choose(){if(selected||!menuOpen)return;selected=true;menuOpen=false;document.getElementById('avnivo-language-menu').classList.remove('open');pill.setAttribute('aria-expanded','false');lang.textContent='O‘zbek tili';pill.classList.add('selected');localStorage.setItem('avnivo-onboarding-language','uz');setTimeout(()=>{root.classList.add('finished');setTimeout(()=>{root.remove();startTutorial();},1150)},700)}
+function choose(){if(selected||!menuOpen)return;selected=true;menuOpen=false;document.getElementById('avnivo-language-menu').classList.remove('open');pill.setAttribute('aria-expanded','false');lang.textContent='O‘zbek tili';localStorage.setItem('avnivo-onboarding-language','uz');pill.classList.add('selected');setTimeout(()=>root.classList.add('departing'),300);setTimeout(()=>{root.classList.add('finished');setTimeout(()=>{root.remove();startTutorial()},1150)},1900)}
 const dim=document.getElementById('avnivo-tutorial-dim'),spot=document.getElementById('avnivo-tutorial-spot'),label=document.getElementById('avnivo-tutorial-label'),next=document.getElementById('avnivo-tutorial-next'),heading=document.getElementById('avnivo-tutorial-heading'),description=document.getElementById('avnivo-tutorial-description');
 let tutorialStage=-1;
 function spotlight(selector){const source=document.querySelector(selector);if(!source)return;const rect=source.getBoundingClientRect();spot.style.left=rect.left+'px';spot.style.top=rect.top+'px';spot.style.width=rect.width+'px';spot.style.height=rect.height+'px';spot.style.background=getComputedStyle(source).background;spot.style.color=getComputedStyle(source).color;spot.style.border=getComputedStyle(source).border;spot.innerHTML=source.querySelector('svg')?.outerHTML||'';spot.classList.add('active')}
-function showTutorialStage(n){tutorialStage=n;label.classList.remove('active');spot.style.opacity='0';setTimeout(()=>{if(n===0){heading.textContent='Chatlar tarixi';description.textContent='Tarjimon bilan olib borgan suhbatlaringiz tarixi shu bo‘limda saqlanadi. Bu yerdan oldingi tarjima chatlarini topishingiz, suhbatdagi xabarlarni qayta ko‘rishingiz va kerakli suhbatni davom ettirishingiz mumkin. Yangi chat ochish imkoniyati ham mavjud.';spotlight('.history-toggle')}else{heading.textContent='Sozlamalar';description.textContent='Bu bo‘limda AVNIVO tarjimonining ishlashini o‘zingizga moslashtirasiz. Ovoz chiqarib o‘qish, ovoz tanlash va o‘qish uslubiga oid mavjud parametrlarni boshqarish, shuningdek Online va Offline rejimlariga tegishli sozlamalar hamda qo‘llab-quvvatlanadigan modullar holatini ko‘rish mumkin. Mavjud imkoniyatlar tanlangan rejimga bog‘liq.';spotlight('.settings-toggle')}spot.style.opacity='1';label.classList.add('active');next.focus({preventScroll:true})},340)}
-function startTutorial(){document.body.classList.add('avnivo-tutorial');dim.classList.add('active');showTutorialStage(0)}
-next.addEventListener('click',()=>{if(tutorialStage===0){showTutorialStage(1)}else{next.disabled=true;next.textContent='Davom etish';/* The next tutorial step will be added after approval; keep the screen locked. */}});
+let tutorialTransitioning=false;
+function showTutorialStage(n){
+ tutorialStage=n;
+ if(n===0){
+  heading.textContent='Chatlar tarixi';
+  description.textContent='Bu — tarjima suhbatlaringiz tarixi. AVNIVO bilan oldin yozishgan xabarlaringiz va tarjima chatlaringiz shu bo‘limda saqlanadi. Kerakli suhbatni topib, avvalgi xabarlarni qayta ko‘rishingiz, tarjimalarni tekshirishingiz yoki o‘sha suhbatni davom ettirishingiz mumkin. Yangi suhbat boshlash uchun ham tarix bo‘limidagi tegishli tugmadan foydalanasiz.';
+ }else{
+  heading.textContent='Sozlamalar';
+  description.textContent='Sozlamalar bo‘limida tarjimonning ishlash usulini o‘zingizga moslashtirasiz. Online rejimda ovoz chiqarib o‘qish, mavjud ovozlar, o‘qish ohangi va uslubi kabi imkoniyatlarni boshqarish mumkin. Offline rejimda esa qurilmaga yuklanadigan ovoz tanish, tarjima va ovozli o‘qish modullarini hamda ularning holatini ko‘rishingiz mumkin. Ayrim imkoniyatlar tanlangan rejim va o‘rnatilgan modullarga bog‘liq.';
+ }
+ spotlight(n===0?'.history-toggle':'.settings-toggle');
+ requestAnimationFrame(()=>{spot.classList.add('illuminated');label.classList.add('active')});
+ next.disabled=false;next.textContent='Tushunarli';next.focus({preventScroll:true});
+}
+function startTutorial(){
+ document.body.classList.add('avnivo-tutorial');
+ dim.classList.add('active');
+ // Wait for the screen to finish darkening before highlighting the history icon.
+ setTimeout(()=>showTutorialStage(0),1250);
+}
+next.addEventListener('click',()=>{
+ if(tutorialTransitioning||tutorialStage!==0)return;
+ tutorialTransitioning=true;
+ next.disabled=true;
+ label.classList.remove('active');
+ spot.classList.remove('illuminated');
+ // History spotlight and description fade away together, then settings fades in.
+ setTimeout(()=>{showTutorialStage(1);tutorialTransitioning=false},800);
+});
 window.addEventListener('resize',()=>{if(tutorialStage>=0)spotlight(tutorialStage===0?'.history-toggle':'.settings-toggle')});
 function openMenu(){if(selected||!root.classList.contains('reveal'))return;menuOpen=true;document.getElementById('avnivo-language-menu').classList.add('open');pill.setAttribute('aria-expanded','true')}pill.addEventListener('click',openMenu);pill.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openMenu()}});document.getElementById('avnivo-language-option').addEventListener('click',choose);
 setTimeout(typeWord,600);setTimeout(()=>{root.classList.add('reveal');setTimeout(typeLanguage,300)},4700);
