@@ -1,0 +1,82 @@
+name: AVNIVO main app validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - '.github/workflows/avnivo-main-app.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - '.github/workflows/avnivo-main-app.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-main-app:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main application
+        uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate HTML and required AVNIVO features
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+
+          html = Path("index.html").read_text(encoding="utf-8")
+          assert html.lstrip().lower().startswith("<!doctype html>"), "Missing HTML doctype"
+          required = [
+              'class="sent-messages"',
+              'class="settings-drawer"',
+              'class="history-drawer"',
+              "function sendMessage()",
+              "function typeTranslation(",
+              "function scrollChatToLatest()",
+              "function playMessage(",
+              "chatFollowLatest",
+              "PREVIEW_TRANSLATION",
+          ]
+          for feature in required:
+              assert feature in html, f"Missing main app feature: {feature}"
+
+          class Scripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.in_script = False
+                  self.inline = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == "script":
+                      self.in_script = True
+                      self.inline.append("")
+              def handle_endtag(self, tag):
+                  if tag == "script":
+                      self.in_script = False
+              def handle_data(self, data):
+                  if self.in_script:
+                      self.inline[-1] += data
+
+          parser = Scripts()
+          parser.feed(html)
+          scripts = [script for script in parser.inline if script.strip()]
+          assert scripts, "No inline JavaScript found"
+          Path("/tmp/avnivo-main-app.js").write_text("\n;\n".join(scripts), encoding="utf-8")
+          print(f"AVNIVO HTML validated; {len(scripts)} inline script(s)")
+          PY
+      - name: Check JavaScript syntax
+        run: node --check /tmp/avnivo-main-app.js
+      - name: Package Chrome-ready main application
+        uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-main-html
+          path: index.html
+          if-no-files-found: error
+          retention-days: 30
