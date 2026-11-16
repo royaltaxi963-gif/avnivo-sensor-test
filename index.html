@@ -60,11 +60,25 @@ html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,
 html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{display:flex;opacity:1;transform:translateY(-50%) scale(1);animation:avnivo-offline-record-pulse 1.15s ease-in-out infinite}
 @keyframes avnivo-offline-record-pulse{0%,100%{opacity:.58;filter:drop-shadow(0 0 1px #4ab9f4)}50%{opacity:1;filter:drop-shadow(0 0 8px #75d9ff)}}
 @media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{animation:none}}
+
+/* Online-only 93-locale selector, long-press to open; offline chips unchanged. */
+.online-language-sheet[hidden]{display:none}
+.online-language-sheet{position:fixed;z-index:55;inset:0;display:flex;align-items:flex-end;justify-content:center;background:#090704b8}
+.online-language-panel{width:min(540px,100%);height:min(75dvh,650px);display:flex;flex-direction:column;background:#302419;border:1px solid #b58a52;border-radius:24px 24px 0 0;padding:16px 14px max(15px,env(safe-area-inset-bottom));color:#fff2d9;box-shadow:0 -12px 45px #0009}
+.online-language-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.online-language-head strong{font-size:17px}
+.online-language-close{background:#4b3525;border:1px solid #bd9561;color:#ffe2ac;border-radius:12px;width:36px;height:36px;font-size:24px}
+.online-language-search{width:100%;height:43px;border:1px solid #a47d50;border-radius:12px;background:#201911;color:#fff4e5;font:16px system-ui;padding:0 13px;margin:12px 0;outline:none}
+.online-language-results{overflow:auto;flex:1;overscroll-behavior:contain}
+.online-language-item{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;gap:12px;padding:11px 9px;background:transparent;color:#fff4e5;border:0;border-bottom:1px solid #9c795039;font:15px system-ui}
+.online-language-item small{color:#d5ac75;font-size:12px;white-space:nowrap}
+.online-language-item:active,.online-language-item[aria-selected=true]{background:#76512c}
+.online-language-help{font-size:12px;color:#d4b78e;margin:7px 0 0}
 </style>
 </head>
 <body>
 <main class="app" aria-label="AVNIVO fon">
-<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
+<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="online-language-sheet" hidden role="dialog" aria-modal="true" aria-label="Online tillar"><div class="online-language-panel"><div class="online-language-head"><strong>Online tillar · 93</strong><button class="online-language-close" type="button" aria-label="Yopish">×</button></div><input class="online-language-search" type="search" placeholder="Til nomi yoki kodini qidiring" aria-label="Til qidirish"><div class="online-language-results"></div><p class="online-language-help">77 tasdiqlangan · 13 tajribaviy · 3 qayta sinov talab qiladi</p></div></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
 </main>
 <script>
 (()=>{'use strict';
@@ -185,8 +199,8 @@ function applyMode(mode){
  document.querySelector('meta[name="theme-color"]').content=chosen==='offline'?'#080f19':'#17120d';
  try{localStorage.setItem('avnivo.ui.mode.v1',chosen)}catch(e){}
 }
-modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online')});
-modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();if(active)stopVoice()}applyMode('offline')});
+modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online');updateOnlineLanguageLabels()});
+modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
 try{applyMode(localStorage.getItem('avnivo.ui.mode.v1'))}catch(e){applyMode('online')}
 const mic=shell.querySelector('.mic-icon');
 const trace=shell.querySelector('.voice-trace-glow');
@@ -216,6 +230,67 @@ for(const chip of [leftLanguage,rightLanguage]){
 }
 leftLanguage.addEventListener('click',()=>selectLanguage('left'));
 rightLanguage.addEventListener('click',()=>selectLanguage('right'));
+
+// Audited exact Chirp 2 locale -> Translation LLM code. No language substitutions.
+const ONLINE_LANGUAGES=[["af-ZA","af","official"],["am-ET","am","experimental"],["ar-EG","ar","official"],["az-AZ","az","official"],["be-BY","be","official"],["bg-BG","bg","official"],["bn-BD","bn","official"],["bn-IN","bn-IN","official"],["bs-BA","bs","official"],["ca-ES","ca","official"],["cmn-Hans-CN","zh","official"],["cmn-Hant-TW","zh-TW","official"],["cs-CZ","cs","official"],["cy-GB","cy","official"],["da-DK","da","official"],["de-DE","de","official"],["el-GR","el","official"],["en-AU","en-AU","official"],["en-GB","en-GB","official"],["en-IN","en","official"],["en-US","en-US","official"],["es-419","es-419","official"],["es-ES","es-ES","official"],["es-US","es-US","official"],["et-EE","et","official"],["eu-ES","eu","experimental"],["fa-IR","fa","official"],["fi-FI","fi","official"],["fil-PH","fil","official"],["fr-CA","fr-CA","official"],["fr-FR","fr","official"],["ga-IE","ga","experimental"],["gl-ES","gl","official"],["gu-IN","gu","official"],["ha-NG","ha","experimental"],["hi-IN","hi","official"],["hr-HR","hr","official"],["hu-HU","hu","official"],["hy-AM","hy","experimental"],["id-ID","id","official"],["ig-NG","ig","experimental"],["is-IS","is","official"],["it-IT","it","official"],["iw-IL","iw","official"],["ja-JP","ja","official"],["ka-GE","ka","official"],["km-KH","km","official"],["kn-IN","kn","official"],["ko-KR","ko","official"],["ky-KG","ky","official"],["lb-LU","lb","experimental"],["ln-CD","ln","official"],["lo-LA","lo","official"],["lt-LT","lt","official"],["lv-LV","lv","official"],["mk-MK","mk","official"],["ml-IN","ml","official"],["mn-MN","mn","experimental"],["mr-IN","mr","official"],["ms-MY","ms","official"],["mt-MT","mt","experimental"],["my-MM","my","official"],["ne-NP","ne","official"],["nl-NL","nl","official"],["no-NO","no","official"],["or-IN","or","experimental"],["pa-Guru-IN","pa","official"],["pl-PL","pl","official"],["pt-BR","pt-BR","official"],["pt-PT","pt-PT","official"],["ro-RO","ro","official"],["ru-RU","ru","official"],["si-LK","si","retest"],["sk-SK","sk","official"],["sl-SI","sl","official"],["so-SO","so","experimental"],["sq-AL","sq","official"],["sr-RS","sr","experimental"],["sv-SE","sv","official"],["sw","sw","official"],["sw-KE","sw","official"],["ta-IN","ta","official"],["te-IN","te","official"],["tg-TJ","tg","experimental"],["th-TH","th","official"],["tr-TR","tr","official"],["uk-UA","uk","official"],["ur-PK","ur","official"],["uz-UZ","uz","official"],["vi-VN","vi","official"],["xh-ZA","xh","retest"],["yo-NG","yo","retest"],["zu-ZA","zu","official"]];
+const onlineLanguagesByCode=new Map(ONLINE_LANGUAGES.map(x=>[x[0],x]));
+const onlineChoice={left:'uz-UZ',right:'ru-RU'};
+const languageSheet=document.querySelector('.online-language-sheet'),languageSearch=languageSheet.querySelector('.online-language-search'),languageResults=languageSheet.querySelector('.online-language-results');
+let longPressTimer=0,longPressSide=null,longPressFired=false;
+const languageDisplay=typeof Intl.DisplayNames==='function'?new Intl.DisplayNames(['uz'],{type:'language'}):null;
+function onlineLanguageName(locale){
+ const base=locale.startsWith('cmn-Hans')?'zh':locale.startsWith('cmn-Hant')?'zh':locale.startsWith('pa-Guru')?'pa':locale.split('-')[0];
+ try{return languageDisplay?.of(base)||base}catch(e){return base}
+}
+function updateOnlineLanguageLabels(){
+ if(document.documentElement.dataset.avnivoMode!=='online')return;
+ for(const [side,button] of [['left',leftLanguage],['right',rightLanguage]]){
+  const locale=onlineChoice[side],name=onlineLanguageName(locale);
+  button.querySelector('.language-name').textContent=name;
+  button.querySelector('.language-code').textContent=locale.split('-')[0].toUpperCase();
+  button.setAttribute('aria-label',name+' ('+locale+')');
+ }
+}
+function renderOnlineLanguages(){
+ const q=languageSearch.value.trim().toLocaleLowerCase();
+ languageResults.replaceChildren();
+ for(const [locale,translationCode,status] of ONLINE_LANGUAGES){
+  const name=onlineLanguageName(locale);
+  if(q&&!((name+' '+locale+' '+translationCode).toLocaleLowerCase().includes(q)))continue;
+  const item=document.createElement('button');item.type='button';item.className='online-language-item';
+  const title=document.createElement('span');title.textContent=name+' · '+locale;
+  const note=document.createElement('small');note.textContent=status==='official'?'Tasdiqlangan':status==='experimental'?'Tajribaviy':'Qayta sinov';
+  item.append(title,note);item.setAttribute('aria-selected',String(onlineChoice[longPressSide]===locale));
+  item.addEventListener('click',()=>{
+   if(!onlineLanguagesByCode.has(locale))return;
+   onlineChoice[longPressSide]=locale;
+   updateOnlineLanguageLabels();closeOnlineLanguages();
+  });
+  languageResults.append(item);
+ }
+}
+function openOnlineLanguages(side){
+ if(document.documentElement.dataset.avnivoMode!=='online')return;
+ longPressSide=side;longPressFired=true;languageSearch.value='';
+ languageSheet.hidden=false;renderOnlineLanguages();
+}
+function closeOnlineLanguages(){languageSheet.hidden=true;longPressSide=null;languageSearch.blur()}
+languageSheet.querySelector('.online-language-close').addEventListener('click',closeOnlineLanguages);
+languageSheet.addEventListener('click',e=>{if(e.target===languageSheet)closeOnlineLanguages()});
+languageSearch.addEventListener('input',renderOnlineLanguages);
+for(const [side,chip] of [['left',leftLanguage],['right',rightLanguage]]){
+ chip.addEventListener('pointerdown',e=>{
+  if(document.documentElement.dataset.avnivoMode!=='online'||e.button!==0)return;
+  longPressFired=false;clearTimeout(longPressTimer);
+  longPressTimer=setTimeout(()=>openOnlineLanguages(side),1100);
+ });
+ for(const name of ['pointerup','pointercancel','pointerleave'])chip.addEventListener(name,()=>clearTimeout(longPressTimer));
+ chip.addEventListener('click',e=>{if(longPressFired){e.stopImmediatePropagation();longPressFired=false}},true);
+ chip.addEventListener('contextmenu',e=>{if(document.documentElement.dataset.avnivoMode==='online')e.preventDefault()});
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!languageSheet.hidden)closeOnlineLanguages()});
+
+updateOnlineLanguageLabels();
 const messages=document.querySelector('.sent-messages');
 messages.addEventListener('scroll',()=>{if(!chatProgrammaticScroll)trackChatScroll()},{passive:true});
 let chatProgrammaticScroll=false;
@@ -512,7 +587,7 @@ function onlineState(state){
  }
 }
 
-function onlineLocale(){return languageRow.dataset.selected==='right'?'ru-RU':'uz-UZ'}
+function onlineLocale(){return onlineChoice[languageRow.dataset.selected==='right'?'right':'left']}
 function beginOnlineRecording(stream){
  if(!window.MediaRecorder){onlineState('error');return false}
  const mime=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'].find(t=>MediaRecorder.isTypeSupported(t));
