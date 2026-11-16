@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>AVNIVO — Toza fon</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:#17120d}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{height:100dvh;min-height:320px;max-width:540px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 11px calc(10px + env(safe-area-inset-bottom));background:radial-gradient(ellipse at 12% 10%,#51391c 0%,transparent 48%),radial-gradient(ellipse at 95% 78%,#3c2b1d 0%,transparent 48%),#17120d}
+.background{height:100%;width:100%;position:relative;border-radius:26px;border:1px solid rgba(255,255,255,.11);background:linear-gradient(145deg,#4a3422,#34271e 65%,#2c251e);box-shadow:0 12px 30px #0005,inset 0 1px #ffffff12}
+.writing-area{position:absolute;bottom:clamp(14px,3vh,26px);left:clamp(14px,4vw,24px);right:clamp(14px,4vw,24px);width:calc(100% - 2 * clamp(14px,4vw,24px));height:60px;resize:none;border-radius:24px;border:1px solid rgba(255,224,168,.35);background:#2c221a;color:#fff8e9;font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;padding:17px 18px;outline:none;box-shadow:inset 0 1px 4px #0003}.writing-area:focus{border-color:#e9c483}.writing-area::placeholder{color:#b6a48c}@media(min-width:650px){.app{box-shadow:0 0 50px #0007}}
+</style>
+</head>
+<body>
+<main class="app" aria-label="AVNIVO fon">
+<div class="background"><textarea class="writing-area" aria-label="Matn yozish" placeholder="Matn yozing..." rows="1"></textarea></div>
+</main>
+</body>
+</html>
