@@ -13,7 +13,8 @@ body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
 .app{height:100dvh;min-height:320px;max-width:540px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 11px calc(10px + env(safe-area-inset-bottom));background:radial-gradient(ellipse at 12% 10%,#51391c 0%,transparent 48%),radial-gradient(ellipse at 95% 78%,#3c2b1d 0%,transparent 48%),#17120d}
 .background{height:100%;width:100%;position:relative;border-radius:26px;border:1px solid rgba(255,255,255,.11);background:linear-gradient(145deg,#4a3422,#34271e 65%,#2c251e);box-shadow:0 12px 30px #0005,inset 0 1px #ffffff12}
 .writing-shell{position:fixed;bottom:var(--input-bottom,18px);left:var(--input-left,28px);width:var(--input-width,calc(100% - 56px));border-radius:24px;z-index:10;border:1px solid rgba(255,224,168,.35);background:#2c221a;box-shadow:inset 0 1px 4px #0003;min-height:60px;max-height:var(--input-max,300px);overflow:hidden;display:flex;align-items:flex-end}.writing-shell:focus-within{border-color:#e9c483}.writing-area{display:block;position:relative;z-index:1;box-sizing:border-box;width:100%;height:60px;min-height:60px;max-height:var(--input-max,300px);overflow-y:auto;resize:none;border:0;border-radius:24px;background:transparent;color:#fff8e9;font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:17px 12px 17px 18px;outline:none;overflow-wrap:anywhere;flex:1;min-width:0}.mic-icon{width:48px;height:58px;flex:0 0 48px;display:grid;place-items:center;color:#f6c977;pointer-events:none;align-self:flex-end}.mic-icon svg{width:25px;height:25px;display:block}.animated-greeting{position:absolute;z-index:0;top:17px;left:18px;right:62px;color:#fffdf7;text-shadow:0 0 8px #ffffff55;font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:clip}.animated-greeting[hidden]{display:none}.animated-greeting:after{content:"";display:inline-block;vertical-align:-2px;height:1em;border-right:1.5px solid currentColor;margin-inline-start:2px;animation:blink .85s step-end infinite}@keyframes blink{50%{opacity:0}}@media(prefers-reduced-motion:reduce){.animated-greeting:after{animation:none}}@media(min-width:650px){.app{box-shadow:0 0 50px #0007}}
-.mic-icon{position:relative;z-index:5;width:48px;height:58px;flex:0 0 48px;display:grid;place-items:center;color:#f6c977;pointer-events:auto;align-self:flex-end;cursor:pointer;background:transparent;border:0;padding:0;isolation:isolate;outline-offset:-5px}.mic-icon svg{grid-area:1/1;transition:transform .6s cubic-bezier(.22,.8,.2,1),opacity .4s ease,filter .5s ease}.mic-symbol{opacity:1;transform:rotate(0) scale(1);animation:micBreathe 2.2s ease-in-out infinite}.close-symbol{opacity:0;transform:rotate(-130deg) scale(.25)}.writing-shell.voice-active .mic-symbol{opacity:0;transform:rotate(135deg) scale(.25);animation:none}.writing-shell.voice-active .close-symbol{opacity:1;transform:rotate(0) scale(1);filter:drop-shadow(0 0 6px #f6c977)}.writing-shell.voice-active .mic-icon{color:#f6c977}.mic-icon:focus-visible{outline:none}.mic-icon{-webkit-tap-highlight-color:transparent;outline:none;box-shadow:none}.mic-icon:focus,.mic-icon:active{outline:none;box-shadow:none}.voice-trace{position:absolute;left:18px;right:55px;top:50%;height:32px;transform:translateY(-50%);pointer-events:none;opacity:0;z-index:2;overflow:visible}.voice-trace-fill{position:absolute;inset:0;transform:scaleX(0);transform-origin:right center;transition:transform .9s cubic-bezier(.16,.85,.23,1);background:linear-gradient(90deg,transparent,#22a7ff 25%,#82ecff 75%,#55c9ff);height:2px;top:15px;box-shadow:0 0 7px #00aaff,0 0 16px #008bff}.voice-trace-glow{position:absolute;left:0;right:0;top:0;height:32px;opacity:0;transition:opacity .5s;filter:drop-shadow(0 0 5px #25baff);background:transparent}.writing-shell.voice-active .voice-trace{opacity:1}.writing-shell.voice-active .voice-trace-fill{transform:scaleX(1)}.writing-shell.voice-active .voice-trace-glow{opacity:1}.writing-shell.voice-active .animated-greeting{display:none!important}@keyframes micBreathe{0%,100%{filter:drop-shadow(0 0 1px #eebd6e);transform:scale(1)}50%{filter:drop-shadow(0 0 9px #ffc974);transform:scale(1.09)}}@media(prefers-reduced-motion:reduce){.mic-symbol{animation:none}}.send-symbol{opacity:0;transform:translateY(9px) rotate(-110deg) scale(.4)}.writing-shell.text-mode .mic-symbol{opacity:0;transform:rotate(110deg) scale(.3);animation:none}.writing-shell.text-mode .close-symbol{opacity:0;transform:rotate(-90deg) scale(.3)}.writing-shell.text-mode .send-symbol{opacity:1;transform:translateY(0) rotate(0) scale(1);filter:drop-shadow(0 0 5px #e8b766)}.writing-shell.text-mode .mic-icon{color:#f6c977}.writing-shell.text-mode .mic-icon:disabled{opacity:.52;cursor:default}.sent-messages{position:fixed;z-index:3;top:var(--chat-top,70px);left:var(--chat-left,14px);width:var(--chat-width,calc(100% - 28px));bottom:var(--chat-bottom,230px);min-height:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:7px;overflow-y:auto;overflow-x:hidden;pointer-events:auto;overscroll-behavior:contain;scrollbar-width:none;touch-action:pan-y;overflow-anchor:none}.sent-messages>.message-line:first-child{margin-top:auto}.sent-messages:empty{display:none}.message-line{display:flex;flex-direction:row-reverse;align-items:center;gap:7px;max-width:100%;min-width:0;align-self:flex-end}.message-line.line-left{align-self:flex-start;flex-direction:row}.message-line .sent-message{align-self:auto;min-width:0;max-width:calc(100% - 43px)}.speak-message{flex:0 0 36px;width:36px;height:40px;padding:0;border:0;background:transparent;color:#eac58d;display:grid;place-items:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;outline-offset:2px}.speak-message svg{width:26px;height:26px;overflow:visible}.speak-message .sound-bars{opacity:.48;transform-origin:16px 16px;transition:opacity .2s}.speak-message .speaker-core{transform-origin:12px 16px}.speak-message.is-speaking{color:#fff1c9;filter:drop-shadow(0 0 5px #ffd68a99) drop-shadow(0 0 11px #f5b84a66)}.speak-message.is-speaking .sound-bars{opacity:1;animation:avnivo-wave-breathe 1.15s ease-in-out infinite}.speak-message.is-speaking .speaker-core{animation:avnivo-speaker-breathe 1.15s ease-in-out infinite}@keyframes avnivo-wave-breathe{0%,100%{opacity:.32;transform:scale(.94)}50%{opacity:1;transform:scale(1.04)}}@keyframes avnivo-speaker-breathe{0%,100%{opacity:.85}50%{opacity:1}}@media(prefers-reduced-motion:reduce){.speak-message.is-speaking .sound-bars,.speak-message.is-speaking .speaker-core{animation:none;opacity:1}}.sent-message{align-self:flex-end;max-width:88%;padding:7px 13px;border-radius:18px 18px 5px 18px;background:#57402a;border:1px solid #c99a5966;color:#fff6e9;overflow-wrap:anywhere;white-space:pre-wrap;font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 3px 9px #0003}.sent-message.message-left{align-self:flex-start;border-radius:18px 18px 18px 5px;background:#40352d;border-color:#a88a6c66}.sent-message.message-right{align-self:flex-end}.sent-message.translation-preview{border-color:#d8b47c88;background:#3c332a;color:#ffe6bc}.translation-preview.typing:after{content:"";display:inline-block;height:1em;margin-left:2px;border-right:2px solid #ffd69a;vertical-align:-2px;animation:blink .7s step-end infinite}.writing-shell.text-mode .voice-trace{opacity:0!important}.center-brand{position:fixed;left:50%;top:var(--brand-center,50%);transform:translate(-50%,-50%);width:min(90vw,490px);text-align:center;pointer-events:none;z-index:1;transition:opacity .24s ease,visibility .24s ease;visibility:visible;opacity:1}.center-brand[hidden]{display:none}.center-brand.brand-hidden{opacity:0;visibility:hidden}.brand-name{display:flex;justify-content:center;align-items:baseline;letter-spacing:.065em;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:800;font-size:clamp(39px,11vw,64px);line-height:1.12;white-space:nowrap;text-shadow:0 4px 16px #0005}.brand-av{color:#fff}.brand-nivo{color:#e6b76c}.brand-translator{display:flex;align-items:center;justify-content:center;width:100%;height:42px;margin-top:12px;font-size:clamp(17px,5vw,24px);font-weight:450;line-height:1.35;color:#e8c89a;white-space:nowrap;direction:ltr;unicode-bidi:isolate;overflow:visible}.brand-translator-text{display:inline-block;direction:inherit;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:clip}.brand-caret{height:1.05em;border-right:2px solid #e6b76c;flex:0 0 2px;margin-left:2px;animation:blink .85s step-end infinite}.brand-translator[dir=rtl] .brand-caret{margin-left:0;margin-right:2px;border-right:0;border-left:2px solid #e6b76c}@media(max-height:470px){.brand-name{font-size:clamp(30px,9vw,46px)}.brand-translator{margin-top:5px;height:34px}}.writing-shell.hold-voice .writing-area{opacity:.32;transition:opacity .25s ease}.writing-shell .writing-area{transition:opacity .25s ease}.writing-shell.hold-voice .mic-symbol,.writing-shell.hold-voice .send-symbol{opacity:0!important;transform:rotate(120deg) scale(.3)!important;animation:none}.writing-shell.hold-voice .close-symbol{opacity:1!important;transform:rotate(0) scale(1)!important;filter:drop-shadow(0 0 6px #f6c977)}.writing-shell.hold-voice .voice-trace{opacity:1}.writing-shell.hold-voice .voice-trace-fill{transform:scaleX(1)}.writing-shell.hold-voice .voice-trace-glow{opacity:1}.mic-icon{touch-action:none;user-select:none;-webkit-user-select:none}.voice-hint{position:fixed;bottom:calc(var(--input-bottom,44px) + 70px);left:50%;transform:translateX(-50%);color:#bde9ff;background:#23323b;border:1px solid #54b5e477;border-radius:12px;padding:7px 12px;font:13px/1.3 system-ui,sans-serif;white-space:nowrap;z-index:15;pointer-events:none}.voice-hint[hidden]{display:none}.language-row{position:fixed;z-index:9;bottom:var(--language-bottom,38px);left:var(--input-left,28px);width:var(--input-width,calc(100% - 56px));display:grid;grid-template-columns:minmax(0,1fr) 52px minmax(0,1fr);align-items:center;gap:4px;height:60px;user-select:none;-webkit-user-select:none}.language-chip{height:49px;min-width:0;border:1.5px solid #8c765b;border-radius:14px;background:linear-gradient(150deg,#443526,#30251d);display:flex;justify-content:center;align-items:center;gap:5px;white-space:nowrap;padding:0 5px;box-shadow:inset 0 1px #ffffff10,0 3px 9px #0002;transition:border-color .42s,box-shadow .42s,background .42s,transform .35s;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;color:inherit;font-family:inherit}.language-chip:focus-visible{outline:2px solid #ffe0a0;outline-offset:2px}.language-chip.is-selected{border:2px solid #ffe0a0;box-shadow:0 0 0 1px #fbd68c75,0 0 19px #ffd08365,inset 0 1px #fff0bb72,inset 0 0 11px #d8a35e25;background:linear-gradient(145deg,#775634,#43301f)}.language-name{font-size:clamp(13px,3.85vw,17px);font-weight:700;color:#fff0d9;overflow:hidden;text-overflow:ellipsis}.language-code{font-size:clamp(10px,2.8vw,12px);font-weight:800;color:#f7ce8c;flex-shrink:0}.language-controls{display:grid;place-items:center;height:60px;pointer-events:none}.direction-arrows{width:46px;height:44px;color:#f0cb8d;overflow:visible;filter:drop-shadow(0 0 3px #e4b76566);transform:rotate(0deg);transition:transform .78s cubic-bezier(.22,.75,.24,1),filter .78s}.direction-arrows path{fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}.language-row[data-selected="right"] .direction-arrows{transform:rotate(180deg)}.language-row.direction-changing .direction-arrows{filter:drop-shadow(0 0 10px #ffe0a0bb)}.language-row.direction-changing .language-chip.is-selected{animation:selectionPulse .78s ease-out}@keyframes selectionPulse{0%{transform:scale(.97)}45%{transform:scale(1.035)}100%{transform:scale(1)}}@media(max-width:360px){.language-row{grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);gap:2px}.direction-arrows{width:39px;height:40px}.language-name{font-size:clamp(12px,3.55vw,14px)}.language-code{font-size:10px}.language-chip{gap:3px;padding:0 3px}}@media(prefers-reduced-motion:reduce){.direction-arrows{transition:none}.language-row.direction-changing .language-chip.is-selected{animation:none}}.history-toggle{position:absolute;z-index:25;top:19px;left:19px;width:43px;height:43px;display:grid;place-items:center;border:1px solid #e4bb7a85;border-radius:14px;color:#f8d59b;background:linear-gradient(145deg,#58412c,#30251e);box-shadow:0 4px 14px #0005,inset 0 1px #fff2;cursor:pointer;-webkit-tap-highlight-color:transparent}.history-toggle svg{width:23px;height:23px}.history-overlay{position:fixed;z-index:29;inset:0;background:#0007;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}.history-overlay.open{opacity:1;visibility:visible}.history-drawer{position:fixed;z-index:30;top:0;bottom:0;left:0;width:min(78vw,310px);max-width:310px;padding:calc(20px + env(safe-area-inset-top)) 13px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(155deg,#463223,#2b211b 80%);border-right:1px solid #e6b76c77;box-shadow:12px 0 35px #0008;transform:translateX(-105%);transition:transform .35s cubic-bezier(.22,.8,.22,1);display:flex;flex-direction:column;gap:15px;visibility:hidden}.history-drawer.open{transform:translateX(0);visibility:visible}.history-header{display:flex;justify-content:space-between;align-items:center;color:#ffe1aa;font-weight:750;font-size:19px;padding:0 3px}.history-close{background:transparent;border:0;color:#ffe1aa;font-size:27px;cursor:pointer;width:38px;height:38px}.history-new{border:1px solid #e7c17c9c;border-radius:13px;padding:11px;color:#ffe4b7;background:#63462c;font:600 14px system-ui;cursor:pointer}.history-items{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:7px;overscroll-behavior:contain}.history-entry{width:100%;text-align:left;background:#ffffff0a;border:1px solid #ffffff18;border-radius:12px;padding:11px 10px;color:#fff4df;cursor:pointer;display:flex;flex-direction:column;gap:5px}.history-entry.current{border-color:#edc17caa;background:#a67a4029}.history-entry-title{font:600 14px/1.35 system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-entry-date{font:12px system-ui;color:#c6ad8e}.history-empty{padding:18px 9px;color:#c9b89e;font-size:13px;line-height:1.6}.history-toggle:focus-visible,.history-entry:focus-visible,.history-close:focus-visible,.history-new:focus-visible{outline:2px solid #ffe2a0;outline-offset:2px}@media(prefers-reduced-motion:reduce){.history-drawer,.history-overlay{transition:none}}.settings-toggle{position:absolute;z-index:25;top:19px;right:19px;width:43px;height:43px;display:grid;place-items:center;border:1px solid #e4bb7a85;border-radius:14px;color:#f8d59b;background:linear-gradient(145deg,#58412c,#30251e);box-shadow:0 4px 14px #0005,inset 0 1px #fff2;cursor:pointer;-webkit-tap-highlight-color:transparent}.settings-toggle svg{width:23px;height:23px}.settings-overlay{position:fixed;z-index:29;inset:0;background:#0007;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}.settings-overlay.open{opacity:1;visibility:visible}.settings-drawer{position:fixed;z-index:30;top:0;bottom:0;right:0;width:min(78vw,310px);max-width:310px;padding:calc(20px + env(safe-area-inset-top)) 13px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(205deg,#463223,#2b211b 80%);border-left:1px solid #e6b76c77;box-shadow:-12px 0 35px #0008;transform:translateX(105%);transition:transform .35s cubic-bezier(.22,.8,.22,1);display:flex;flex-direction:column;gap:15px;visibility:hidden}.settings-drawer.open{transform:translateX(0);visibility:visible}.settings-header{display:flex;justify-content:space-between;align-items:center;color:#ffe1aa;font-weight:750;font-size:19px;padding:0 3px}.settings-close{background:transparent;border:0;color:#ffe1aa;font-size:27px;cursor:pointer;width:38px;height:38px}.settings-description{color:#c9b89e;font:13px/1.6 system-ui;padding:0 3px}.settings-toggle:focus-visible,.settings-close:focus-visible{outline:2px solid #ffe2a0;outline-offset:2px}@media(prefers-reduced-motion:reduce){.settings-drawer,.settings-overlay{transition:none}}.mode-switch{position:fixed;z-index:26;top:calc(22px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;gap:5px;padding:4px;border-radius:17px;background:#211a17ed;border:1px solid #caa36a55;box-shadow:0 3px 13px #0005}.mode-switch button{width:39px;height:35px;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#b7a897;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}.mode-switch svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.mode-switch button[aria-pressed=true]{color:#ffe1a5;background:#73502b;box-shadow:inset 0 0 0 1px #e8b97770,0 0 9px #e6ad4933}.mode-switch button:focus-visible{outline:2px solid currentColor;outline-offset:2px}html[data-avnivo-mode=offline],html[data-avnivo-mode=offline] body{background:#080f19}html[data-avnivo-mode=offline] .mode-switch{background:#081827ed;border-color:#3a9bd077}html[data-avnivo-mode=offline] .mode-switch button{color:#79b4d5}html[data-avnivo-mode=offline] .mode-switch button[aria-pressed=true]{background:#145077;color:#b8eeff;box-shadow:inset 0 0 0 1px #4bcaff77,0 0 12px #27baff55}html[data-avnivo-mode=offline] .app{background:radial-gradient(ellipse at 12% 10%,#103956,transparent 48%),radial-gradient(ellipse at 95% 78%,#0a2b47,transparent 48%),#080f19}html[data-avnivo-mode=offline] .background{background:linear-gradient(145deg,#102c42,#0c1b2c 65%,#081522);border-color:#4aa8e833}html[data-avnivo-mode=offline] .writing-shell{background:#0b2134;border-color:#3688b888}html[data-avnivo-mode=offline] .writing-area{color:#e9f8ff}html[data-avnivo-mode=offline] .brand-nivo{color:#63c8ff}html[data-avnivo-mode=offline] .sent-message{background:#16364d;border-color:#4baee177;color:#edf9ff}html[data-avnivo-mode=offline] .sent-message.message-left{background:#10283e;border-color:#408bb677}html[data-avnivo-mode=offline] .sent-message.translation-preview{background:#123147;border-color:#59b9ec88;color:#aee8ff}html[data-avnivo-mode=offline] .speak-message{color:#75cfff}html[data-avnivo-mode=offline] .speak-message.is-speaking{color:#d8f7ff;filter:drop-shadow(0 0 6px #39bfffbb) drop-shadow(0 0 12px #168fff77)}html[data-avnivo-mode=offline] .history-drawer{background:linear-gradient(155deg,#103049,#091a2b);border-color:#4ba7d877;color:#eaf8ff}html[data-avnivo-mode=offline] .settings-drawer{background:linear-gradient(155deg,#103049,#091a2b);border-color:#4ba7d877;color:#eaf8ff}html[data-avnivo-mode=offline] .history-toggle{color:#91d8ff}html[data-avnivo-mode=offline] .settings-toggle{color:#91d8ff}html[data-avnivo-mode=offline] .mic-icon{color:#91d8ff}html[data-avnivo-mode=offline] .voice-trace-fill{background:linear-gradient(90deg,transparent,#c68c37 25%,#ffe19a 75%,#e8b65e);box-shadow:0 0 7px #ffc46e,0 0 16px #e9a840}html[data-avnivo-mode=offline] .translation-preview.typing:after{border-color:#7cdaff}html[data-avnivo-mode=offline] .writing-shell.voice-active .mic-icon,html[data-avnivo-mode=offline] .writing-shell.text-mode .mic-icon{color:#91d8ff}html[data-avnivo-mode=offline] .history-overlay,html[data-avnivo-mode=offline] .settings-overlay{background:#020b18aa}html[data-avnivo-mode=offline] .voice-trace-glow{filter:drop-shadow(0 0 5px #f2c16e)}
+.mic-icon{position:relative;z-index:5;width:48px;height:58px;flex:0 0 48px;display:grid;place-items:center;color:#f6c977;pointer-events:auto;align-self:flex-end;cursor:pointer;background:transparent;border:0;padding:0;isolation:isolate;outline-offset:-5px}.mic-icon svg{grid-area:1/1;transition:transform .6s cubic-bezier(.22,.8,.2,1),opacity .4s ease,filter .5s ease}.mic-symbol{opacity:1;transform:rotate(0) scale(1);animation:micBreathe 2.2s ease-in-out infinite}.close-symbol{opacity:0;transform:rotate(-130deg) scale(.25)}.writing-shell.voice-active .mic-symbol{opacity:0;transform:rotate(135deg) scale(.25);animation:none}.writing-shell.voice-active .close-symbol{opacity:1;transform:rotate(0) scale(1);filter:drop-shadow(0 0 6px #f6c977)}.writing-shell.voice-active .mic-icon{color:#f6c977}.mic-icon:focus-visible{outline:none}.mic-icon{-webkit-tap-highlight-color:transparent;outline:none;box-shadow:none}.mic-icon:focus,.mic-icon:active{outline:none;box-shadow:none}.voice-trace{position:absolute;left:18px;right:55px;top:50%;height:32px;transform:translateY(-50%);pointer-events:none;opacity:0;z-index:2;overflow:visible}.voice-trace-fill{position:absolute;inset:0;transform:scaleX(0);transform-origin:right center;transition:transform .9s cubic-bezier(.16,.85,.23,1);background:linear-gradient(90deg,transparent,#22a7ff 25%,#82ecff 75%,#55c9ff);height:2px;top:15px;box-shadow:0 0 7px #00aaff,0 0 16px #008bff}.voice-trace-glow{position:absolute;left:0;right:0;top:0;height:32px;opacity:0;transition:opacity .5s;filter:drop-shadow(0 0 5px #25baff);background:transparent}.writing-shell.voice-active .voice-trace{opacity:1}.writing-shell.voice-active .voice-trace-fill{transform:scaleX(1)}.writing-shell.voice-active .voice-trace-glow{opacity:1}.writing-shell.voice-active .animated-greeting{display:none!important}@keyframes micBreathe{0%,100%{filter:drop-shadow(0 0 1px #eebd6e);transform:scale(1)}50%{filter:drop-shadow(0 0 9px #ffc974);transform:scale(1.09)}}@media(prefers-reduced-motion:reduce){.mic-symbol{animation:none}}.send-symbol{opacity:0;transform:translateY(9px) rotate(-110deg) scale(.4)}.writing-shell.text-mode .mic-symbol{opacity:0;transform:rotate(110deg) scale(.3);animation:none}.writing-shell.text-mode .close-symbol{opacity:0;transform:rotate(-90deg) scale(.3)}.writing-shell.text-mode .send-symbol{opacity:1;transform:translateY(0) rotate(0) scale(1);filter:drop-shadow(0 0 5px #e8b766)}.writing-shell.text-mode .mic-icon{color:#f6c977}.writing-shell.text-mode .mic-icon:disabled{opacity:.52;cursor:default}.sent-messages{position:fixed;z-index:3;top:var(--chat-top,70px);left:var(--chat-left,14px);width:var(--chat-width,calc(100% - 28px));bottom:var(--chat-bottom,230px);min-height:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:7px;overflow-y:auto;overflow-x:hidden;pointer-events:auto;overscroll-behavior:contain;scrollbar-width:none;touch-action:pan-y;overflow-anchor:none}.sent-messages>.message-line:first-child{margin-top:auto}.sent-messages:empty{display:none}.message-line{display:flex;flex-direction:row-reverse;align-items:center;gap:7px;max-width:100%;min-width:0;align-self:flex-end}.message-line.line-left{align-self:flex-start;flex-direction:row}.message-line .sent-message{align-self:auto;min-width:0;max-width:calc(100% - 43px)}.speak-message{flex:0 0 36px;width:36px;height:40px;padding:0;border:0;background:transparent;color:#eac58d;display:grid;place-items:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;outline-offset:2px}.speak-message svg{width:26px;height:26px;overflow:visible}.speak-message .sound-bars{opacity:.48;transform-origin:16px 16px;transition:opacity .2s}.speak-message .speaker-core{transform-origin:12px 16px}.speak-message.is-speaking{color:#fff1c9;filter:drop-shadow(0 0 5px #ffd68a99) drop-shadow(0 0 11px #f5b84a66)}.speak-message.is-speaking .sound-bars{opacity:1;animation:avnivo-wave-breathe 1.15s ease-in-out infinite}.speak-message.is-speaking .speaker-core{animation:avnivo-speaker-breathe 1.15s ease-in-out infinite}@keyframes avnivo-wave-breathe{0%,100%{opacity:.32;transform:scale(.94)}50%{opacity:1;transform:scale(1.04)}}@keyframes avnivo-speaker-breathe{0%,100%{opacity:.85}50%{opacity:1}}@media(prefers-reduced-motion:reduce){.speak-message.is-speaking .sound-bars,.speak-message.is-speaking .speaker-core{animation:none;opacity:1}}.sent-message{align-self:flex-end;max-width:88%;padding:7px 13px;border-radius:18px 18px 5px 18px;background:#57402a;border:1px solid #c99a5966;color:#fff6e9;overflow-wrap:anywhere;white-space:pre-wrap;font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 3px 9px #0003}.sent-message.message-left{align-self:flex-start;border-radius:18px 18px 18px 5px;background:#40352d;border-color:#a88a6c66}.sent-message.message-right{align-self:flex-end}.sent-message.translation-preview{border-color:#d8b47c88;background:#3c332a;color:#ffe6bc}.translation-preview.typing:after{content:"";display:inline-block;height:1em;margin-left:2px;border-right:2px solid #ffd69a;vertical-align:-2px;animation:blink .7s step-end infinite}.writing-shell.text-mode .voice-trace{opacity:0!important}.center-brand{position:fixed;left:50%;top:var(--brand-center,50%);transform:translate(-50%,-50%);width:min(90vw,490px);text-align:center;pointer-events:none;z-index:1;transition:opacity .24s ease,visibility .24s ease;visibility:visible;opacity:1}.center-brand[hidden]{display:none}.center-brand.brand-hidden{opacity:0;visibility:hidden}.brand-name{display:flex;justify-content:center;align-items:baseline;letter-spacing:.065em;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:800;font-size:clamp(39px,11vw,64px);line-height:1.12;white-space:nowrap;text-shadow:0 4px 16px #0005}.brand-av{color:#fff}.brand-nivo{color:#e6b76c}.brand-translator{display:flex;align-items:center;justify-content:center;width:100%;height:42px;margin-top:12px;font-size:clamp(17px,5vw,24px);font-weight:450;line-height:1.35;color:#e8c89a;white-space:nowrap;direction:ltr;unicode-bidi:isolate;overflow:visible}.brand-translator-text{display:inline-block;direction:inherit;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:clip}.brand-caret{height:1.05em;border-right:2px solid #e6b76c;flex:0 0 2px;margin-left:2px;animation:blink .85s step-end infinite}.brand-translator[dir=rtl] .brand-caret{margin-left:0;margin-right:2px;border-right:0;border-left:2px solid #e6b76c}@media(max-height:470px){.brand-name{font-size:clamp(30px,9vw,46px)}.brand-translator{margin-top:5px;height:34px}}.writing-shell.hold-voice .writing-area{opacity:.32;transition:opacity .25s ease}.writing-shell .writing-area{transition:opacity .25s ease}.writing-shell.hold-voice .mic-symbol,.writing-shell.hold-voice .send-symbol{opacity:0!important;transform:rotate(120deg) scale(.3)!important;animation:none}.writing-shell.hold-voice .close-symbol{opacity:1!important;transform:rotate(0) scale(1)!important;filter:drop-shadow(0 0 6px #f6c977)}.writing-shell.hold-voice .voice-trace{opacity:1}.writing-shell.hold-voice .voice-trace-fill{transform:scaleX(1)}.writing-shell.hold-voice .voice-trace-glow{opacity:1}.mic-icon{touch-action:none;user-select:none;-webkit-user-select:none}.voice-hint{position:fixed;bottom:calc(var(--input-bottom,44px) + 70px);left:50%;transform:translateX(-50%);color:#bde9ff;background:#23323b;border:1px solid #54b5e477;border-radius:12px;padding:7px 12px;font:13px/1.3 system-ui,sans-serif;white-space:nowrap;z-index:15;pointer-events:none}.voice-hint[hidden]{display:none}.language-row{position:fixed;z-index:9;bottom:var(--language-bottom,38px);left:var(--input-left,28px);width:var(--input-width,calc(100% - 56px));display:grid;grid-template-columns:minmax(0,1fr) 52px minmax(0,1fr);align-items:center;gap:4px;height:60px;user-select:none;-webkit-user-select:none}.language-chip{height:49px;min-width:0;border:1.5px solid #8c765b;border-radius:14px;background:linear-gradient(150deg,#443526,#30251d);display:flex;justify-content:center;align-items:center;gap:5px;white-space:nowrap;padding:0 5px;box-shadow:inset 0 1px #ffffff10,0 3px 9px #0002;transition:border-color .42s,box-shadow .42s,background .42s,transform .35s;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;color:inherit;font-family:inherit}.language-chip:focus-visible{outline:2px solid #ffe0a0;outline-offset:2px}.language-chip.is-selected{border:2px solid #ffe0a0;box-shadow:0 0 0 1px #fbd68c75,0 0 19px #ffd08365,inset 0 1px #fff0bb72,inset 0 0 11px #d8a35e25;background:linear-gradient(145deg,#775634,#43301f)}.language-name{font-size:clamp(13px,3.85vw,17px);font-weight:700;color:#fff0d9;overflow:hidden;text-overflow:ellipsis}.language-code{font-size:clamp(10px,2.8vw,12px);font-weight:800;color:#f7ce8c;flex-shrink:0}.language-controls{display:grid;place-items:center;height:60px;pointer-events:none}.direction-arrows{width:46px;height:44px;color:#f0cb8d;overflow:visible;filter:drop-shadow(0 0 3px #e4b76566);transform:rotate(0deg);transition:transform .78s cubic-bezier(.22,.75,.24,1),filter .78s}.direction-arrows path{fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}.language-row[data-selected="right"] .direction-arrows{transform:rotate(180deg)}.language-row.direction-changing .direction-arrows{filter:drop-shadow(0 0 10px #ffe0a0bb)}.language-row.direction-changing .language-chip.is-selected{animation:selectionPulse .78s ease-out}@keyframes selectionPulse{0%{transform:scale(.97)}45%{transform:scale(1.035)}100%{transform:scale(1)}}@media(max-width:360px){.language-row{grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);gap:2px}.direction-arrows{width:39px;height:40px}.language-name{font-size:clamp(12px,3.55vw,14px)}.language-code{font-size:10px}.language-chip{gap:3px;padding:0 3px}}@media(prefers-reduced-motion:reduce){.direction-arrows{transition:none}.language-row.direction-changing .language-chip.is-selected{animation:none}}.history-toggle{position:absolute;z-index:25;top:19px;left:19px;width:43px;height:43px;display:grid;place-items:center;border:1px solid #e4bb7a85;border-radius:14px;color:#f8d59b;background:linear-gradient(145deg,#58412c,#30251e);box-shadow:0 4px 14px #0005,inset 0 1px #fff2;cursor:pointer;-webkit-tap-highlight-color:transparent}.history-toggle svg{width:23px;height:23px}.history-overlay{position:fixed;z-index:29;inset:0;background:#0007;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}.history-overlay.open{opacity:1;visibility:visible}.history-drawer{position:fixed;z-index:30;top:0;bottom:0;left:0;width:min(78vw,310px);max-width:310px;padding:calc(20px + env(safe-area-inset-top)) 13px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(155deg,#463223,#2b211b 80%);border-right:1px solid #e6b76c77;box-shadow:12px 0 35px #0008;transform:translateX(-105%);transition:transform .35s cubic-bezier(.22,.8,.22,1);display:flex;flex-direction:column;gap:15px;visibility:hidden}.history-drawer.open{transform:translateX(0);visibility:visible}.history-header{display:flex;justify-content:space-between;align-items:center;color:#ffe1aa;font-weight:750;font-size:19px;padding:0 3px}.history-close{background:transparent;border:0;color:#ffe1aa;font-size:27px;cursor:pointer;width:38px;height:38px}.history-new{border:1px solid #e7c17c9c;border-radius:13px;padding:11px;color:#ffe4b7;background:#63462c;font:600 14px system-ui;cursor:pointer}.history-items{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:7px;overscroll-behavior:contain}.history-entry{width:100%;text-align:left;background:#ffffff0a;border:1px solid #ffffff18;border-radius:12px;padding:11px 10px;color:#fff4df;cursor:pointer;display:flex;flex-direction:column;gap:5px}.history-entry.current{border-color:#edc17caa;background:#a67a4029}.history-entry-title{font:600 14px/1.35 system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-entry-date{font:12px system-ui;color:#c6ad8e}.history-empty{padding:18px 9px;color:#c9b89e;font-size:13px;line-height:1.6}.history-toggle:focus-visible,.history-entry:focus-visible,.history-close:focus-visible,.history-new:focus-visible{outline:2px solid #ffe2a0;outline-offset:2px}@media(prefers-reduced-motion:reduce){.history-drawer,.history-overlay{transition:none}}.settings-toggle{position:absolute;z-index:25;top:19px;right:19px;width:43px;height:43px;display:grid;place-items:center;border:1px solid #e4bb7a85;border-radius:14px;color:#f8d59b;background:linear-gradient(145deg,#58412c,#30251e);box-shadow:0 4px 14px #0005,inset 0 1px #fff2;cursor:pointer;-webkit-tap-highlight-color:transparent}.settings-toggle svg{width:23px;height:23px}.settings-overlay{position:fixed;z-index:29;inset:0;background:#0007;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}.settings-overlay.open{opacity:1;visibility:visible}.settings-drawer{position:fixed;z-index:30;top:0;bottom:0;right:0;width:min(78vw,310px);max-width:310px;padding:calc(20px + env(safe-area-inset-top)) 13px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(205deg,#463223,#2b211b 80%);border-left:1px solid #e6b76c77;box-shadow:-12px 0 35px #0008;transform:translateX(105%);transition:transform .35s cubic-bezier(.22,.8,.22,1);display:flex;flex-direction:column;gap:15px;visibility:hidden}.settings-drawer.open{transform:translateX(0);visibility:visible}.settings-drawer{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#8b7156 transparent;gap:12px}.settings-header{position:sticky;top:0;z-index:3;background:#463223;padding:5px 3px 9px;margin:-5px 0 0;border-bottom:1px solid #c99c5b33;flex-shrink:0}.offline-settings-top{display:none;flex-shrink:0}.offline-settings-top-title{font:700 14px/1.4 system-ui;color:#ffe1aa;margin:0 0 5px}.offline-settings-top-note{font:11.5px/1.5 system-ui;color:#c9b89e;margin:0}.offline-modules{margin-top:auto;flex-shrink:0;border-top:1px solid #57748866;padding-top:14px}html[data-avnivo-mode=offline] .offline-settings-top{display:block}.settings-header{display:flex;justify-content:space-between;align-items:center;color:#ffe1aa;font-weight:750;font-size:19px;padding:0 3px}.settings-close{background:transparent;border:0;color:#ffe1aa;font-size:27px;cursor:pointer;width:38px;height:38px}.settings-description{color:#c9b89e;font:13px/1.6 system-ui;padding:0 3px}.settings-toggle:focus-visible,.settings-close:focus-visible{outline:2px solid #ffe2a0;outline-offset:2px}@media(prefers-reduced-motion:reduce){.settings-drawer,.settings-overlay{transition:none}}.mode-switch{position:fixed;z-index:26;top:calc(22px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;gap:5px;padding:4px;border-radius:17px;background:#211a17ed;border:1px solid #caa36a55;box-shadow:0 3px 13px #0005}.mode-switch button{width:39px;height:35px;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#b7a897;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}.mode-switch svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.mode-switch button[aria-pressed=true]{color:#ffe1a5;background:#73502b;box-shadow:inset 0 0 0 1px #e8b97770,0 0 9px #e6ad4933}.mode-switch button:focus-visible{outline:2px solid currentColor;outline-offset:2px}html[data-avnivo-mode=offline],html[data-avnivo-mode=offline] body{background:#080f19}html[data-avnivo-mode=offline] .mode-switch{background:#081827ed;border-color:#3a9bd077}html[data-avnivo-mode=offline] .mode-switch button{color:#79b4d5}html[data-avnivo-mode=offline] .mode-switch button[aria-pressed=true]{background:#145077;color:#b8eeff;box-shadow:inset 0 0 0 1px #4bcaff77,0 0 12px #27baff55}html[data-avnivo-mode=offline] .app{background:radial-gradient(ellipse at 12% 10%,#103956,transparent 48%),radial-gradient(ellipse at 95% 78%,#0a2b47,transparent 48%),#080f19}html[data-avnivo-mode=offline] .background{background:linear-gradient(145deg,#102c42,#0c1b2c 65%,#081522);border-color:#4aa8e833}html[data-avnivo-mode=offline] .writing-shell{background:#0b2134;border-color:#3688b888}html[data-avnivo-mode=offline] .writing-area{color:#e9f8ff}html[data-avnivo-mode=offline] .brand-nivo{color:#63c8ff}html[data-avnivo-mode=offline] .sent-message{background:#16364d;border-color:#4baee177;color:#edf9ff}html[data-avnivo-mode=offline] .sent-message.message-left{background:#10283e;border-color:#408bb677}html[data-avnivo-mode=offline] .sent-message.translation-preview{background:#123147;border-color:#59b9ec88;color:#aee8ff}html[data-avnivo-mode=offline] .speak-message{color:#75cfff}html[data-avnivo-mode=offline] .speak-message.is-speaking{color:#d8f7ff;filter:drop-shadow(0 0 6px #39bfffbb) drop-shadow(0 0 12px #168fff77)}html[data-avnivo-mode=offline] .history-drawer{background:linear-gradient(155deg,#103049,#091a2b);border-color:#4ba7d877;color:#eaf8ff}html[data-avnivo-mode=offline] .settings-drawer{background:linear-gradient(155deg,#103049,#091a2b);border-color:#4ba7d877;color:#eaf8ff}
+html[data-avnivo-mode=offline] .settings-header{background:#103049;border-bottom-color:#4ba7d833}html[data-avnivo-mode=offline] .history-toggle{color:#91d8ff}html[data-avnivo-mode=offline] .settings-toggle{color:#91d8ff}html[data-avnivo-mode=offline] .mic-icon{color:#91d8ff}html[data-avnivo-mode=offline] .voice-trace-fill{background:linear-gradient(90deg,transparent,#c68c37 25%,#ffe19a 75%,#e8b65e);box-shadow:0 0 7px #ffc46e,0 0 16px #e9a840}html[data-avnivo-mode=offline] .translation-preview.typing:after{border-color:#7cdaff}html[data-avnivo-mode=offline] .writing-shell.voice-active .mic-icon,html[data-avnivo-mode=offline] .writing-shell.text-mode .mic-icon{color:#91d8ff}html[data-avnivo-mode=offline] .history-overlay,html[data-avnivo-mode=offline] .settings-overlay{background:#020b18aa}html[data-avnivo-mode=offline] .voice-trace-glow{filter:drop-shadow(0 0 5px #f2c16e)}
 /* Offline: consistent blue-black visual palette, retaining gold microphone waveform. */
 html[data-avnivo-mode=offline] .language-chip{border-color:#376c90;background:linear-gradient(150deg,#15334b,#0b2032);box-shadow:inset 0 1px #c8ecff14,0 3px 9px #0004}
 html[data-avnivo-mode=offline] .language-chip.is-selected{border-color:#8cdbff;box-shadow:0 0 0 1px #5ac6f877,0 0 19px #25baff66,inset 0 1px #c5f0ff88,inset 0 0 11px #3b9dcd33;background:linear-gradient(145deg,#235476,#102d45)}
@@ -74,12 +75,54 @@ html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{disp
 .online-language-item small{color:#d5ac75;font-size:12px;white-space:nowrap}
 .online-language-item:active,.online-language-item[aria-selected=true]{background:#76512c}
 .online-language-help{font-size:12px;color:#d4b78e;margin:7px 0 0}
+
+/* Compact offline module list: icon / content / action, mobile-first. */
+.offline-modules{display:none;padding:4px 14px 20px;color:#e4f5ff}
+html[data-avnivo-mode=offline] .offline-modules{display:block}
+html[data-avnivo-mode=offline] .settings-description{display:none}
+.offline-modules-title{font:700 16px/1.35 system-ui;margin:8px 0 5px}
+.offline-modules-subtitle{font:11.5px/1.5 system-ui;color:#a8c6da;margin:0 0 13px}
+.offline-module-card{display:grid;grid-template-columns:38px minmax(0,1fr) 36px;align-items:center;column-gap:10px;row-gap:0;padding:12px 11px;margin:0 0 9px;border:1px solid #386783;border-radius:15px;background:linear-gradient(125deg,#18384a,#112737);box-shadow:0 3px 12px #0002}
+.offline-module-mark{width:38px;height:38px;border-radius:12px;background:#285470;display:grid;place-items:center;color:#bde7ff;align-self:start}
+.offline-module-mark svg,.offline-module-action svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.offline-module-copy{min-width:0;text-align:left}
+.offline-module-name{font:700 12.8px/1.32 system-ui;color:#f1fbff;margin:0 0 4px;overflow-wrap:anywhere}
+.offline-module-desc{font:11px/1.42 system-ui;color:#b4d2e3;margin:0 0 7px;overflow-wrap:anywhere}
+.offline-module-meta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.offline-module-size{font:600 10.5px/1.3 system-ui;color:#d0e9f7;margin:0}
+.offline-module-state{font:10.5px/1.3 system-ui;color:#91b8d1;margin:0}
+.offline-module-action{-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;border:0;border-radius:50%;width:36px;height:36px;background:#1c455f;color:#c2eaff;display:grid;place-items:center;cursor:pointer;align-self:center;justify-self:end;isolation:isolate;overflow:hidden;transition:transform .24s ease,background .24s ease}
+.offline-module-action:focus-visible{outline:2px solid #a8e4ff;outline-offset:3px}
+.offline-module-action:active{transform:scale(.88)}
+.offline-module-action.is-tapped{animation:avnivoDownloadTap .45s ease}
+@keyframes avnivoDownloadTap{0%{transform:scale(1)}40%{transform:scale(.83)}75%{transform:scale(1.1)}100%{transform:scale(1)}}
+.offline-module-action[disabled]{cursor:wait}
+.offline-module-action.is-downloading{background:conic-gradient(#65d7f3 var(--module-progress,0%),#20475d 0);color:white}
+.offline-module-action.is-downloading::before{content:"";position:absolute;inset:3px;border-radius:50%;background:#122e40;z-index:-1}
+.offline-module-action .module-percent{font:700 9px/1 system-ui;letter-spacing:-.2px;font-variant-numeric:tabular-nums}
+.offline-module-action.is-ready{background:#137d55;color:white}
+.offline-module-action.is-ready svg{stroke-width:2.5}
+@media(prefers-reduced-motion:reduce){.offline-module-action{transition:none}.offline-module-action.is-tapped{animation:none}}
+.offline-module-progress{grid-column:1/-1;width:100%;margin-top:10px}
+.offline-module-progress[hidden]{display:none}
+.offline-module-progress-label{display:flex;justify-content:space-between;align-items:center;gap:8px;font:600 11px/1.4 system-ui;color:#cbe8f9;margin-bottom:6px}
+.offline-module-track{height:9px;border-radius:999px;background:#092030;overflow:hidden;border:1px solid #366a83}
+.offline-module-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,#398ac2,#69d7ed);transition:width .15s ease}
+.offline-module-notice{font:11px/1.45 system-ui;color:#ffdba4;margin:7px 0 0;min-height:16px}
+@media(max-width:360px){.offline-module-card{grid-template-columns:34px minmax(0,1fr) 34px;column-gap:8px;padding:10px 9px}.offline-module-mark{width:34px;height:34px}.offline-module-action{width:34px;height:34px}}
+
+
+/* Keep Online AI voice controls separate from Offline model downloads. */
+.avnivo-online-tts-settings{padding:0 15px 24px}
+html[data-avnivo-mode=offline] .avnivo-online-tts-settings{display:none}
+html[data-avnivo-mode=online] .offline-modules{display:none}
 </style>
 </head>
 <body>
 <main class="app" aria-label="AVNIVO fon">
-<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="online-language-sheet" hidden role="dialog" aria-modal="true" aria-label="Online tillar"><div class="online-language-panel"><div class="online-language-head"><strong>Online tillar · 93</strong><button class="online-language-close" type="button" aria-label="Yopish">×</button></div><input class="online-language-search" type="search" placeholder="Til nomi yoki kodini qidiring" aria-label="Til qidirish"><div class="online-language-results"></div><p class="online-language-help">77 tasdiqlangan · 13 tajribaviy · 3 qayta sinov talab qiladi</p></div></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
+<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p><section class="offline-settings-top" aria-label="Offline sozlamalar"><h2 class="offline-settings-top-title">Offline sozlamalar</h2><p class="offline-settings-top-note">Qo‘shimcha sozlamalar shu yerda, modullar ro‘yxatidan yuqorida joylashadi.</p></section><section class="offline-modules" aria-label="Offline modullar" id="offline-modules"><h2 class="offline-modules-title">Offline modullar</h2><p class="offline-modules-subtitle">Modullarni oldindan yuklab oling va internetsiz ham foydalaning. Ayrim imkoniyatlar Online rejimdan farq qilishi mumkin.</p><div class="offline-modules-list"></div><p class="offline-module-notice" role="status" aria-live="polite"></p></section></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="online-language-sheet" hidden role="dialog" aria-modal="true" aria-label="Online tillar"><div class="online-language-panel"><div class="online-language-head"><strong>Online tillar · 93</strong><button class="online-language-close" type="button" aria-label="Yopish">×</button></div><input class="online-language-search" type="search" placeholder="Til nomi yoki kodini qidiring" aria-label="Til qidirish"><div class="online-language-results"></div><p class="online-language-help">77 tasdiqlangan · 13 tajribaviy · 3 qayta sinov talab qiladi</p></div></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
 </main>
+<script src="offline-uzbek-download.js"></script>
 <script>
 (()=>{'use strict';
 const greetings=[["uz","Assalomu alaykum"],["ar","السلام عليكم"],["fa","السلام علیکم"],["ur","السلام علیکم"],["ps","السلام علیکم"],["tg","Ассалому алайкум"],["ky","Ассалому алейкум"],["kk","Ассалаумағалейкум"],["tk","Essalawmaleýkim"],["az","Əssəlamu əleykum"],["tr","Selamünaleyküm"],["ug","ئەسسالامۇ ئەلەيكۇم"],["sd","السلام عليڪم"],["ku","سڵاو"],["ms","Assalamualaikum"],["id","Assalamualaikum"],["bn","আসসালামু আলাইকুম"],["so","Asalaamu calaykum"],["sw","As-salaam alaikum"],["ha","Assalamu alaikum"],["dv","އައްސަލާމު އަލައިކުމް"],["bs","Esselamu alejkum"],["sq","Es-selamu alejkum"],["ff","Assalaamu alaikum"],["wo","Salaam aleekum"],["mn","Сайн байна уу"],["ru","Привет"],["en","Hello"],["fr","Bonjour"],["de","Hallo"],["es","Hola"],["it","Ciao"],["pt","Olá"],["nl","Hallo"],["sv","Hej"],["no","Hei"],["da","Hej"],["fi","Hei"],["is","Halló"],["et","Tere"],["lv","Sveiki"],["lt","Labas"],["pl","Cześć"],["cs","Ahoj"],["sk","Ahoj"],["sl","Živjo"],["hr","Bok"],["sr","Здраво"],["mk","Здраво"],["bg","Здравей"],["ro","Salut"],["hu","Szia"],["el","Γεια σου"],["hy","Բարև"],["ka","გამარჯობა"],["he","שלום"],["hi","नमस्ते"],["ne","नमस्ते"],["mr","नमस्कार"],["gu","નમસ્તે"],["pa","ਸਤ ਸ੍ਰੀ ਅਕਾਲ"],["ta","வணக்கம்"],["te","నమస్కారం"],["kn","ನಮಸ್ಕಾರ"],["ml","നമസ്കാരം"],["si","ආයුබෝවන්"],["th","สวัสดี"],["lo","ສະບາຍດີ"],["km","សួស្តី"],["my","မင်္ဂလာပါ"],["vi","Xin chào"],["zh","你好"],["ja","こんにちは"],["ko","안녕하세요"],["bo","བཀྲ་ཤིས་བདེ་ལེགས"],["am","ሰላም"],["ti","ሰላም"],["om","Akkam"],["zu","Sawubona"],["xh","Molo"],["af","Hallo"],["ny","Moni"],["sn","Mhoro"],["rw","Muraho"],["lg","Oli otya"],["yo","Ẹ n lẹ"],["ig","Ndewo"],["ak","Maakye"],["ee","Ŋdi"],["ln","Mbote"],["mg","Salama"],["ht","Bonjou"],["eo","Saluton"],["la","Salve"],["ga","Dia dhuit"],["cy","Helo"],["gd","Halò"],["eu","Kaixo"],["ca","Hola"],["gl","Ola"]];
@@ -276,9 +319,9 @@ function renderOnlineLanguages(){
 function openOnlineLanguages(side){
  if(document.documentElement.dataset.avnivoMode!=='online')return;
  longPressSide=side;longPressFired=true;languageSearch.value='';
- languageSheet.hidden=false;renderOnlineLanguages();
+ languageSheet.hidden=false;renderOnlineLanguages();syncBackNavigation();
 }
-function closeOnlineLanguages(){languageSheet.hidden=true;longPressSide=null;languageSearch.blur()}
+function closeOnlineLanguages(){languageSheet.hidden=true;longPressSide=null;languageSearch.blur();syncBackNavigation()}
 languageSheet.querySelector('.online-language-close').addEventListener('click',closeOnlineLanguages);
 languageSheet.addEventListener('click',e=>{if(e.target===languageSheet)closeOnlineLanguages()});
 languageSearch.addEventListener('input',renderOnlineLanguages);
@@ -315,10 +358,95 @@ function setSettingsOpen(open){
  settingsOverlay.hidden=!open;settingsOverlay.classList.toggle('open',open);
  settingsDrawer.classList.toggle('open',open);settingsDrawer.setAttribute('aria-hidden',String(!open));settingsDrawer.inert=!open;
  settingsToggle.setAttribute('aria-expanded',String(open));
+ syncBackNavigation();
 }
 settingsToggle.addEventListener('click',()=>{if(historyOpen)setHistoryOpen(false);setSettingsOpen(!settingsOpen)});
 settingsClose.addEventListener('click',()=>setSettingsOpen(false));
 settingsOverlay.addEventListener('click',()=>setSettingsOpen(false));
+
+/* Offline module UI: only installer-verified states may show success. */
+const offlineModuleCatalog=[
+ {id:'uz-stt',serverModelId:'uzbek-stt',name:'O‘zbekcha ovoz tanish',desc:'O‘zbekcha nutqni tushunib, aytilgan so‘zlarni matnga aylantiradi.',icon:'mic',bytes:591649160,sizeNote:'Model fayli: 591,6 MB · qo‘shimcha fayllar alohida'},
+ {id:'multilingual-stt',name:'Ko‘p tilli ovoz tanish',desc:'Turli tillardagi nutqni matnga aylantiradi. 99 til sifati hali tasdiqlanmagan.',icon:'languages',bytes:251875316,sizeNote:'Model: 251,9 MB · qo‘shimcha runtime alohida'},
+ {id:'offline-translate',name:'Internetsiz tarjima',desc:'Matnlarni internetga ulanmasdan boshqa tilga tarjima qilishga yordam beradi.',icon:'translate',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'},
+ {id:'offline-tts',name:'Matnni ovozli o‘qish',desc:'Yozilgan matn va tarjimalarni internetsiz ovoz chiqarib o‘qiydi.',icon:'speaker',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'}
+];
+const offlineModuleIcons={
+ mic:'<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/>',
+ languages:'<path d="M3 5h12M9 3v2m4 0c-.5 6-4 10-9 12M5 9c2 4 5 6 9 8M15 13l4-9 4 9m-7-3h6"/>',
+ translate:'<path d="M4 5h11M9 3v2m4 0c-.5 5-3 8-8 11M5 9c1 3 4 6 8 8M15 21l4-10 4 10m-7-4h6"/>',
+ speaker:'<path d="M4 10h4l5-4v12l-5-4H4zM17 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/>',
+ download:'<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
+ check:'<path d="m5 12 4 4L19 6"/>'
+};
+const offlineSvg=name=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+offlineModuleIcons[name]+'</svg>';
+const offlineList=document.querySelector('.offline-modules-list');
+const offlineNotice=document.querySelector('.offline-module-notice');
+const offlineState=new Map();
+const offlineMb=bytes=>(bytes/1e6).toFixed(1).replace('.',',')+' MB';
+function updateOfflineModule(id,state,progress){
+ const module=offlineModuleCatalog.find(m=>m.id===id);
+ if(!module||!['not_installed','downloading','verifying','ready','error'].includes(state))return false;
+ const row=offlineList.querySelector('[data-module-id="'+id+'"]');if(!row)return false;
+ offlineState.set(id,state);
+ const btn=row.querySelector('.offline-module-action'),status=row.querySelector('.offline-module-state');
+ const progressEl=row.querySelector('.offline-module-progress');
+ const fill=row.querySelector('.offline-module-fill');
+ const pct=row.querySelector('.offline-module-percent'),mb=row.querySelector('.offline-module-mb');
+ const ready=state==='ready';
+ btn.classList.toggle('is-ready',ready);
+ btn.classList.toggle('is-downloading',state==='downloading'||state==='verifying');
+ btn.disabled=state==='downloading'||state==='verifying';
+ btn.innerHTML=offlineSvg(ready?'check':'download');
+ btn.setAttribute('aria-label',ready?'Modul faol':module.name+' — yuklab olish');
+ status.textContent=({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state];
+ const hasProgress=progress&&Number.isFinite(progress.downloadedBytes)&&Number.isFinite(progress.totalBytes)&&progress.totalBytes>0&&progress.downloadedBytes>=0;
+ progressEl.hidden=!(state==='downloading'||state==='verifying')||!hasProgress;
+ if(hasProgress){
+  const done=Math.min(progress.downloadedBytes,progress.totalBytes),percent=Math.min(100,Math.floor(done/progress.totalBytes*100));
+  fill.style.width=percent+'%';pct.textContent=percent+'%';mb.textContent=offlineMb(done)+' / '+offlineMb(progress.totalBytes);
+  btn.style.setProperty('--module-progress',percent+'%');
+  if(state==='downloading'||state==='verifying')btn.innerHTML='<span class="module-percent">'+percent+'%</span>';
+  progressEl.querySelector('[role="progressbar"]').setAttribute('aria-valuenow',String(percent));
+ }
+ return true;
+}
+for(const module of offlineModuleCatalog){
+ const row=document.createElement('article');row.className='offline-module-card';row.dataset.moduleId=module.id;
+ const mark=document.createElement('span');mark.className='offline-module-mark';mark.innerHTML=offlineSvg(module.icon);
+ const copy=document.createElement('div');copy.className='offline-module-copy';
+ const name=document.createElement('h3');name.className='offline-module-name';name.textContent=module.name;
+ const desc=document.createElement('p');desc.className='offline-module-desc';desc.textContent=module.desc;
+ const size=document.createElement('p');size.className='offline-module-size';size.textContent=module.bytes?'Hajmi: '+offlineMb(module.bytes):'Hajmi: aniqlanmoqda';size.title=module.sizeNote;
+ const status=document.createElement('p');status.className='offline-module-state';status.textContent='Yuklanmagan';
+ const meta=document.createElement('div');meta.className='offline-module-meta';meta.append(size,status);copy.append(name,desc,meta);
+ const btn=document.createElement('button');btn.type='button';btn.className='offline-module-action';btn.innerHTML=offlineSvg('download');btn.setAttribute('aria-label',module.name+' — yuklab olish');
+ const progress=document.createElement('div');progress.className='offline-module-progress';progress.hidden=true;
+ progress.innerHTML='<div class="offline-module-progress-label"><span class="offline-module-percent">0%</span><span class="offline-module-mb">0 MB</span></div><div class="offline-module-track" role="progressbar" aria-label="Yuklash jarayoni" aria-valuemin="0" aria-valuemax="100"><div class="offline-module-fill"></div></div>';
+ btn.addEventListener('click',()=>{
+  if(document.documentElement.dataset.avnivoMode!=='offline'||offlineState.get(module.id)==='ready')return;
+  btn.classList.remove('is-tapped');void btn.offsetWidth;btn.classList.add('is-tapped');
+  if(module.serverModelId){
+   const downloader=window.avnivoVerifiedUzbekDownload;
+   if(!downloader){offlineNotice.textContent='Yuklash moduli ochilmadi. Sahifani yangilang.';return}
+   btn.disabled=true;
+   offlineNotice.textContent='Haqiqiy yuklash boshlanmoqda. Internet uzilsa qayta bosib davom ettiring.';
+   downloader.run(
+    (done,total)=>updateOfflineModule(module.id,'downloading',{downloadedBytes:done,totalBytes:total}),
+    text=>{offlineNotice.textContent=text;if(text.startsWith('SHA-256'))updateOfflineModule(module.id,'verifying',{downloadedBytes:module.bytes,totalBytes:module.bytes})}
+   ).then(()=>{updateOfflineModule(module.id,'not_installed');status.textContent='Yuklangan va tekshirilgan · dvigatel ulanmagan';offlineNotice.textContent='Fayllar saqlandi va SHA-256 tasdiqlandi. Sherpa-ONNX ijro mexanizmi ulanmaguncha faol emas.'})
+    .catch(err=>{updateOfflineModule(module.id,'error');offlineNotice.textContent='Yuklash to‘xtadi: '+err.message+'. Qayta bosilsa saqlangan bo‘laklardan davom etadi.'})
+    .finally(()=>{btn.disabled=false});
+   return;
+  }
+  offlineNotice.textContent=module.name+': yuklash manbasi hali ulanmagan. Yuklash boshlanmadi.';
+ });
+ btn.addEventListener('animationend',()=>btn.classList.remove('is-tapped'));
+ row.append(mark,copy,btn,progress);offlineList.append(row);offlineState.set(module.id,'not_installed');
+}
+// The future verified installer must supply actual byte counts; no simulated progress.
+window.avnivoOfflineModuleUi={setVerifiedState:updateOfflineModule};
+
 const historyStorageKey='avnivo.preview.chat-history.v1';
 const activeHistoryKey='avnivo.preview.active-chat.v1';
 const draftHistoryKey='avnivo.preview.chat-drafts.v1';
@@ -355,6 +483,7 @@ function setHistoryOpen(open){
  historyOpen=open;historyOverlay.hidden=!open;historyOverlay.classList.toggle('open',open);historyDrawer.classList.toggle('open',open);
  historyDrawer.setAttribute('aria-hidden',String(!open));historyDrawer.inert=!open;historyToggle.setAttribute('aria-expanded',String(open));
  if(open)renderHistory();
+ syncBackNavigation();
 }
 const PREVIEW_TRANSLATION='Tarjima sinov so‘zi';
 let translationTimers=new Set();
@@ -377,23 +506,157 @@ function messageData(entry,firstLanguage){
  if(entry&&typeof entry==='object'&&!Array.isArray(entry))return {text:String(entry.text||''),language:entry.language==='right'?'right':'left'};
  return {text:String(entry),language:firstLanguage||'left'};
 }
-let speakingButton=null;
-function stopSpeaking(){
- if(window.speechSynthesis)window.speechSynthesis.cancel();
- if(speakingButton){speakingButton.classList.remove('is-speaking');speakingButton.setAttribute('aria-pressed','false');speakingButton=null}
+const onlineTtsSettings=document.createElement('section');
+onlineTtsSettings.className='avnivo-online-tts-settings';
+onlineTtsSettings.setAttribute('aria-label','Online ovoz sozlamalari');
+document.querySelector('.settings-drawer')?.append(onlineTtsSettings);
+// Existing Gemini Cloud TTS is used only in Online mode. Offline keeps device speech.
+const AVNIVO_TTS_URL='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts';
+const AVNIVO_TTS_VOICES=["Zephyr","Puck","Charon","Kore","Fenrir","Leda","Orus","Aoede","Callirrhoe","Autonoe","Enceladus","Iapetus","Umbriel","Algieba","Despina","Erinome","Algenib","Rasalgethi","Laomedeia","Achernar","Alnilam","Schedar","Gacrux","Pulcherrima","Achird","Zubenelgenubi","Vindemiatrix","Sadachbia","Sadaltager","Sulafat"];
+const ttsVoiceSelect=document.createElement('select');
+ttsVoiceSelect.setAttribute('aria-label','AI ovoz turini tanlash');
+ttsVoiceSelect.style.cssText='width:100%;max-width:280px;margin:10px 0;padding:10px;border-radius:10px;background:#241b15;color:#ffe7b9;border:1px solid #b58a52;font:15px system-ui';
+for(const voice of AVNIVO_TTS_VOICES){const option=document.createElement('option');option.value=voice;option.textContent=voice;ttsVoiceSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsVoice');if(AVNIVO_TTS_VOICES.includes(saved))ttsVoiceSelect.value=saved}catch(e){}
+ttsVoiceSelect.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsVoice',ttsVoiceSelect.value)}catch(e){}});
+const ttsVoiceLabel=document.createElement('label');
+ttsVoiceLabel.textContent='AI ovozi (Online)';
+ttsVoiceLabel.style.cssText='display:block;margin:14px 0 0;color:#ffe7b9;font:14px system-ui';
+ttsVoiceLabel.append(ttsVoiceSelect);
+onlineTtsSettings.append(ttsVoiceLabel);
+
+const ttsStyleSelect=document.createElement('select');
+ttsStyleSelect.setAttribute('aria-label','Ovoz ohangini tanlash');
+ttsStyleSelect.style.cssText=ttsVoiceSelect.style.cssText;
+const AVNIVO_TTS_STYLES=[['auto','Avtomatik'],['calm','Xotirjam'],['happy','Quvnoq'],['sad','Qayg‘uli'],['excited','Hayajonli'],['concerned','Xavotirli'],["friendly","Do‘stona"],["professional","Professional"],["narrator","Audiokitob"],["documentary","Hujjatli film"],["news","Yangiliklar"],["storytelling","Hikoyachi"],["dramatic","Dramatik"],["mysterious","Sirli"],["serious","Jiddiy"],["confident","Ishonchli"],["gentle","Muloyim"],["empathetic","Hamdard"],["curious","Qiziquvchan"],["surprised","Hayratlangan"],["nervous","Asabiy"],["fearful","Qo‘rqqan"],["angry","G‘azablangan"],["frustrated","Jahli chiqqan"],["sarcastic","Kinoyali"],["ironic","Istehzo"],["bored","Zerikkan"],["tired","Charchagan"],["whisper","Pichirlash"],["mutter","Pichirlab ming‘irlash"],["breathy","Nafasli ovoz"],["robotic","Robotdek"],["monotone","Bir maromda"],["playful","O‘ynoqi"],["energetic","G‘ayratli"],["thoughtful","O‘ychan"],["persuasive","Ishontiruvchi"],["teacher","O‘qituvchi"],["poetic","She’riy"],["slow","Sekin nutq"],["fast","Tez nutq"],["custom","O‘zim belgilayman"]];
+for(const [value,label] of AVNIVO_TTS_STYLES){const option=document.createElement('option');option.value=value;option.textContent=label;ttsStyleSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsStyle');if(AVNIVO_TTS_STYLES.some(item=>item[0]===saved))ttsStyleSelect.value=saved}catch(e){}
+ttsStyleSelect.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsStyle',ttsStyleSelect.value)}catch(e){}});
+const ttsStyleLabel=document.createElement('label');
+ttsStyleLabel.textContent='O‘qish ohangi (Online)';
+ttsStyleLabel.style.cssText=ttsVoiceLabel.style.cssText;
+ttsStyleLabel.append(ttsStyleSelect);
+onlineTtsSettings.append(ttsStyleLabel);
+const ttsRateSelect=document.createElement('select');
+ttsRateSelect.setAttribute('aria-label','Ovozli o‘qish tezligi');
+ttsRateSelect.style.cssText=ttsVoiceSelect.style.cssText;
+for(const rate of [0.5,0.65,0.75,0.85,1,1.15,1.25,1.5,1.75,2]){const option=document.createElement('option');option.value=String(rate);option.textContent=rate===1?'1× — Oddiy':rate<1?rate+'× — Sekin':rate+'× — Tez';ttsRateSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsRate');if([...ttsRateSelect.options].some(option=>option.value===saved))ttsRateSelect.value=saved}catch(e){ }
+ttsRateSelect.addEventListener('change',()=>{if(ttsAudio)ttsAudio.playbackRate=Number(ttsRateSelect.value);try{localStorage.setItem('avnivoTtsRate',ttsRateSelect.value)}catch(e){}});
+const ttsRateLabel=document.createElement('label');
+ttsRateLabel.textContent='O‘qish tezligi (Online va Offline)';
+ttsRateLabel.style.cssText=ttsVoiceLabel.style.cssText;
+ttsRateLabel.append(ttsRateSelect);
+onlineTtsSettings.append(ttsRateLabel);
+
+function addTtsSetting(labelText,storageKey,items){
+ const select=document.createElement('select');select.setAttribute('aria-label',labelText);select.style.cssText=ttsVoiceSelect.style.cssText;
+ for(const [value,title] of items){const option=document.createElement('option');option.value=value;option.textContent=title;select.append(option)}
+ try{const saved=localStorage.getItem(storageKey);if(items.some(x=>x[0]===saved))select.value=saved}catch(e){}
+ select.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem(storageKey,select.value)}catch(e){}});
+ const label=document.createElement('label');label.textContent=labelText;label.style.cssText=ttsVoiceLabel.style.cssText;label.append(select);
+ onlineTtsSettings.append(label);return select;
 }
-function playMessage(button,bubble,language){
+const ttsDeliverySelect=addTtsSetting('Ovoz chiqarish usuli','avnivoTtsDelivery',[
+ ['normal','Oddiy'],['whisper','Pichirlash'],['breathy','Nafasli'],['clear','Ravshan talaffuz'],['soft','Past ovoz'],['projected','Baland va aniq']]);
+const ttsPitchSelect=addTtsSetting('Ovoz baland-pastligi','avnivoTtsPitch',[
+ ['normal','Tabiiy'],['low','Pastroq'],['high','Yuqoriroq'],['flat','Bir tekis'],['expressive','Ifodali']]);
+const ttsPaceSelect=addTtsSetting('AI nutq maromi','avnivoTtsPace',[
+ ['normal','Tabiiy'],['slow','Sekin'],['fast','Tez'],['deliberate','Tanaffusli']]);
+const ttsCustomLabel=document.createElement('label');
+ttsCustomLabel.textContent='Maxsus ohang tavsifi (240 belgigacha)';
+ttsCustomLabel.style.cssText=ttsVoiceLabel.style.cssText;
+const ttsCustomInput=document.createElement('textarea');
+ttsCustomInput.maxLength=240;ttsCustomInput.rows=2;ttsCustomInput.placeholder='Masalan: Speak warmly with gentle pauses.';
+ttsCustomInput.style.cssText=ttsVoiceSelect.style.cssText+';resize:vertical;display:block;';
+try{ttsCustomInput.value=localStorage.getItem('avnivoTtsCustomStyle')||''}catch(e){}
+ttsCustomInput.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsCustomStyle',ttsCustomInput.value)}catch(e){}});
+ttsCustomLabel.append(ttsCustomInput);
+onlineTtsSettings.append(ttsCustomLabel);
+const ttsTagNote=document.createElement('p');
+ttsTagNote.textContent='Matnda maxsus ovoz belgilari: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. Bu belgilar faqat yozilgan joyda qo‘llanadi; natija modelga bog‘liq.';
+ttsTagNote.style.cssText='font:12px/1.5 system-ui;color:#d6b68c;margin:10px 0;';
+onlineTtsSettings.append(ttsTagNote);
+
+
+let speakingButton=null,ttsAudio=null,ttsAudioUrl=null,ttsAbort=null,ttsGeneration=0;
+function stopSpeaking(){
+ ttsGeneration++;
+ if(ttsAbort){ttsAbort.abort();ttsAbort=null}
+ if(ttsAudio){ttsAudio.pause();ttsAudio.removeAttribute('src');ttsAudio.load();ttsAudio=null}
+ if(ttsAudioUrl){URL.revokeObjectURL(ttsAudioUrl);ttsAudioUrl=null}
+ if(window.speechSynthesis)window.speechSynthesis.cancel();
+ if(speakingButton){speakingButton.classList.remove('is-speaking');speakingButton.removeAttribute('data-loading');speakingButton.setAttribute('aria-pressed','false');speakingButton=null}
+}
+function ttsChunks(text){
+ // Preserve the complete text. Prefer sentence/word boundaries within the API's 350-character limit.
+ const result=[];let rest=text.trim();
+ while(rest){
+  if(rest.length<=350){result.push(rest);break}
+  let cut=350;
+  const section=rest.slice(0,351);
+  const sentence=[section.lastIndexOf('. '),section.lastIndexOf('! '),section.lastIndexOf('? '),section.lastIndexOf('。'),section.lastIndexOf('؟')].reduce((a,b)=>Math.max(a,b),-1);
+  if(sentence>=130)cut=sentence+1;
+  else {const space=section.lastIndexOf(' ',350);if(space>=130)cut=space}
+  // Do not split a UTF-16 surrogate pair.
+  if(cut<rest.length&&cut>0){const prev=rest.charCodeAt(cut-1),next=rest.charCodeAt(cut);if(prev>=0xD800&&prev<=0xDBFF&&next>=0xDC00&&next<=0xDFFF)cut--;}
+  result.push(rest.slice(0,cut).trim());rest=rest.slice(cut).trim();
+ }
+ return result.filter(Boolean);
+}
+async function playMessage(button,bubble,language){
  if(speakingButton===button){stopSpeaking();return}
  stopSpeaking();
  const text=bubble.textContent.trim();
- if(!text||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
- const utterance=new SpeechSynthesisUtterance(text);
- utterance.lang=document.documentElement.dataset.avnivoMode==='online'?onlineChoice[language]:language==='right'?'ru-RU':'uz-UZ';
- utterance.rate=.95;
- const finish=()=>{if(speakingButton===button){button.classList.remove('is-speaking');button.setAttribute('aria-pressed','false');speakingButton=null}};
- utterance.onend=finish;utterance.onerror=finish;
+ if(!text)return;
+ const generation=ttsGeneration;
  speakingButton=button;button.classList.add('is-speaking');button.setAttribute('aria-pressed','true');
- try{speechSynthesis.speak(utterance)}catch(e){finish()}
+ const finish=()=>{if(generation===ttsGeneration)stopSpeaking()};
+ if(document.documentElement.dataset.avnivoMode!=='online'){
+  if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){finish();return}
+  const utterance=new SpeechSynthesisUtterance(text);
+  utterance.lang=language==='right'?'ru-RU':'uz-UZ';utterance.rate=Number(ttsRateSelect.value);
+  utterance.onend=finish;utterance.onerror=finish;
+  try{speechSynthesis.speak(utterance)}catch(e){finish()}
+  return;
+ }
+ const voice=ttsVoiceSelect.value;
+ const style=ttsStyleSelect.value;
+ const locale=onlineChoice[language];
+ if(!onlineLanguagesByCode.has(locale)){button.title='TTS: til tanlanmagan';finish();return}
+ const chunks=ttsChunks(text);
+ try{
+  for(const chunk of chunks){
+   if(generation!==ttsGeneration)return;
+   const controller=new AbortController();ttsAbort=controller;
+   button.dataset.loading='true';button.setAttribute('aria-label','AI ovozi tayyorlanmoqda');
+   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,language:locale,voice,style,delivery:ttsDeliverySelect.value,pitch:ttsPitchSelect.value,pace:ttsPaceSelect.value,custom_style:style==='custom'?ttsCustomInput.value.trim():''}),signal:controller.signal});
+   if(!response.ok)throw Error('TTS HTTP '+response.status);
+   const blob=await response.blob();
+   if(generation!==ttsGeneration)return;
+   if(!blob.size||!blob.type.startsWith('audio/'))throw Error('Audio javobi noto‘g‘ri');
+   ttsAudioUrl=URL.createObjectURL(blob);
+   ttsAudio=new Audio(ttsAudioUrl);
+   ttsAudio.playbackRate=Number(ttsRateSelect.value);
+   button.removeAttribute('data-loading');button.setAttribute('aria-label','Ovozli o‘qishni to‘xtatish');
+   const audio=ttsAudio;
+   await new Promise((resolve,reject)=>{
+    audio.onended=resolve;audio.onpause=resolve;audio.onerror=()=>reject(Error('Audio ijro xatosi'));
+    audio.play().catch(reject);
+   });
+   if(generation!==ttsGeneration)return;
+   audio.pause();audio.removeAttribute('src');audio.load();ttsAudio=null;
+   URL.revokeObjectURL(ttsAudioUrl);ttsAudioUrl=null;
+  }
+ }catch(e){
+  if(generation===ttsGeneration&&e.name!=='AbortError'){
+   console.warn('AVNIVO TTS:',e);
+   button.title='AI ovozi ishlamadi: '+e.message;
+   button.setAttribute('aria-label','AI ovozi ishlamadi: '+e.message);
+  }
+ }finally{
+  if(generation===ttsGeneration){ttsAbort=null;finish()}
+ }
 }
 function attachSpeaker(bubble,language){
  const isLeft=bubble.classList.contains('message-left');
@@ -445,7 +708,52 @@ historyToggle.addEventListener('click',()=>setHistoryOpen(!historyOpen));
 historyClose.addEventListener('click',()=>setHistoryOpen(false));
 historyOverlay.addEventListener('click',()=>setHistoryOpen(false));
 historyNew.addEventListener('click',()=>{chatFollowLatest=true;chatScrollRestore=0;stopSpeaking();clearTranslationTimers();persistDraft();currentHistoryId=null;persistActiveChat();messages.replaceChildren();loadDraft();syncComposerMode();if(!input.value){clearTimeout(timeout);timeout=0;delay(100)}setHistoryOpen(false)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(settingsOpen)setSettingsOpen(false);if(historyOpen)setHistoryOpen(false)}});
+/* Unified Android/Chrome Back: topmost transient layer closes first, then browser history exits normally. */
+const avnivoBackKey='avnivoOverlayEntry';
+const avnivoBackId='avnivo-'+Math.random().toString(36).slice(2);
+let avnivoBackPopping=false;
+let avnivoBackPending=false;
+function activeBackLayer(){
+ if(!languageSheet.hidden)return 'languages';
+ if(settingsOpen)return 'settings';
+ if(historyOpen)return 'history';
+ return null;
+}
+function syncBackNavigation(){
+ if(avnivoBackPopping)return;
+ const layer=activeBackLayer();
+ const current=window.history.state;
+ const owned=Boolean(current&&current[avnivoBackKey]===avnivoBackId);
+ if(layer){
+  if(owned){window.history.replaceState({...current,layer},'');return}
+  window.history.pushState({...current,[avnivoBackKey]:avnivoBackId,layer},'');
+  avnivoBackPending=false;
+ }else if(owned&&!avnivoBackPending){
+  avnivoBackPending=true;
+  queueMicrotask(()=>{
+   if(activeBackLayer()){avnivoBackPending=false;syncBackNavigation();return}
+   if(window.history.state?.[avnivoBackKey]===avnivoBackId)window.history.back();
+   else avnivoBackPending=false;
+  });
+ }
+}
+window.addEventListener('popstate',()=>{
+ avnivoBackPending=false;
+ avnivoBackPopping=true;
+ // Close only UI overlays; never switch online/offline mode or clear a chat.
+ if(!languageSheet.hidden)closeOnlineLanguages();
+ if(settingsOpen)setSettingsOpen(false);
+ if(historyOpen)setHistoryOpen(false);
+ avnivoBackPopping=false;
+});
+document.addEventListener('keydown',e=>{
+ if(e.key!=='Escape')return;
+ if(!activeBackLayer())return;
+ e.preventDefault();
+ if(!languageSheet.hidden)closeOnlineLanguages();
+ else if(settingsOpen)setSettingsOpen(false);
+ else if(historyOpen)setHistoryOpen(false);
+});
 // Initialize saved conversation only after microphone, brand and composer are ready.
 
 const brand=document.querySelector('.center-brand');
