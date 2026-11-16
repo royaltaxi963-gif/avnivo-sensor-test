@@ -20,7 +20,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 5,
@@ -43,7 +44,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 13,
@@ -66,7 +68,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 14,
@@ -89,7 +92,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 32,
@@ -112,7 +116,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 51,
@@ -135,7 +140,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 53,
@@ -158,7 +164,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 54,
@@ -181,7 +188,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 55,
@@ -204,7 +212,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 61,
@@ -227,7 +236,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 65,
@@ -250,7 +260,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 67,
@@ -273,7 +284,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 78,
@@ -296,7 +308,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 79,
@@ -319,7 +332,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 80,
@@ -342,7 +356,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 81,
@@ -365,7 +380,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 85,
@@ -388,7 +404,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 90,
@@ -411,7 +428,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 91,
@@ -434,7 +452,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 95,
@@ -457,7 +476,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 99,
@@ -480,7 +500,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 109,
@@ -503,7 +524,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 113,
@@ -526,7 +548,8 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  },
  {
   "order": 116,
@@ -549,6 +572,7 @@
   "stability_ok": null,
   "final_decision": "FAILED",
   "decision_reason": "api_rejected_unsupported_language",
-  "sample_translation": ""
+  "sample_translation": "",
+  "failure_cause": null
  }
 ]

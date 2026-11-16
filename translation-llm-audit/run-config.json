@@ -1,4 +1,4 @@
 {
-  "mode": "regression",
-  "max_requests": 60
+  "mode": "failed",
+  "max_requests": 120
 }

@@ -17,10 +17,18 @@
   "avg_latency_s": 0.38,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "ሰላም፣ እንዴት ነዎት?"
+  "sample_translation": "ሰላም፣ እንዴት ነዎት?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 30,
@@ -40,10 +48,18 @@
   "avg_latency_s": 0.312,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Kaixo, ondo al zaude?"
+  "sample_translation": "Kaixo, ondo al zaude?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 37,
@@ -63,10 +79,18 @@
   "avg_latency_s": 0.28,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Dia duit, an bhfuil tú go maith?"
+  "sample_translation": "Dia duit, an bhfuil tú go maith?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 40,
@@ -86,10 +110,18 @@
   "avg_latency_s": 0.304,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Sannu, kana lafiya?"
+  "sample_translation": "Sannu, kana lafiya?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 44,
@@ -109,10 +141,18 @@
   "avg_latency_s": 0.258,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Ողջույն, ինչպե՞ս եք։"
+  "sample_translation": "Ողջույն, ինչպե՞ս եք։",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 46,
@@ -132,10 +172,18 @@
   "avg_latency_s": 0.267,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Ndewo, kedu ka ị dị?"
+  "sample_translation": "Ndewo, kedu ka ị dị?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 60,
@@ -155,10 +203,18 @@
   "avg_latency_s": 0.273,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Moien, geet et Iech gutt?"
+  "sample_translation": "Moien, geet et Iech gutt?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 70,
@@ -178,10 +234,18 @@
   "avg_latency_s": 0.254,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Сайн байна уу?"
+  "sample_translation": "Сайн байна уу?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 73,
@@ -201,10 +265,18 @@
   "avg_latency_s": 0.224,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Hello, kif inti?"
+  "sample_translation": "Hello, kif inti?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 82,
@@ -224,10 +296,18 @@
   "avg_latency_s": 0.257,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "ନମସ୍କାର, ଆପଣ ଭଲ ଅଛନ୍ତି କି?"
+  "sample_translation": "ନମସ୍କାର, ଆପଣ ଭଲ ଅଛନ୍ତି କି?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 96,
@@ -247,10 +327,18 @@
   "avg_latency_s": 0.264,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Salaan, ma fiican tahay?"
+  "sample_translation": "Salaan, ma fiican tahay?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 98,
@@ -270,10 +358,18 @@
   "avg_latency_s": 0.226,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Zdravo, kako ste?"
+  "sample_translation": "Zdravo, kako ste?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  },
  {
   "order": 105,
@@ -293,9 +389,17 @@
   "avg_latency_s": 0.259,
   "quality_pass": true,
   "critical_flags": {},
-  "stability_ok": false,
+  "stability_ok": null,
   "final_decision": "EXPERIMENTAL",
   "decision_reason": "google_experimental_support",
-  "sample_translation": "Салом, хуб ҳастед?"
+  "sample_translation": "Салом, хуб ҳастед?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "experimental": {
+    "success": 6,
+    "attempted": 6,
+    "quality_flags": 1
+   }
+  }
  }
 ]

@@ -1,5 +1,59 @@
 [
  {
+  "order": 1,
+  "chirp2_code": "af-ZA",
+  "language_name": "Afrikaans (South Africa)",
+  "translation_llm_code": "af",
+  "regional_variant": "base",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.238,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "Hallo, hoe gaan dit?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
+ },
+ {
+  "order": 3,
+  "chirp2_code": "ar-EG",
+  "language_name": "Arabic (Egypt)",
+  "translation_llm_code": "ar",
+  "regional_variant": "base",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.321,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "مرحباً، كيف حالك؟",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
+ },
+ {
   "order": 6,
   "chirp2_code": "az-AZ",
   "language_name": "Azerbaijani (Azerbaijan)",
@@ -20,7 +74,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Salam, necəsiniz?"
+  "sample_translation": "Salam, necəsiniz?",
+  "failure_cause": null
  },
  {
   "order": 7,
@@ -43,7 +98,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Прывітанне, як вы?"
+  "sample_translation": "Прывітанне, як вы?",
+  "failure_cause": null
  },
  {
   "order": 8,
@@ -66,7 +122,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Здравейте, как сте?"
+  "sample_translation": "Здравейте, как сте?",
+  "failure_cause": null
  },
  {
   "order": 9,
@@ -89,7 +146,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "হ্যালো, আপনি কেমন আছেন?"
+  "sample_translation": "হ্যালো, আপনি কেমন আছেন?",
+  "failure_cause": null
  },
  {
   "order": 10,
@@ -112,7 +170,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "নমস্কার, আপনি কেমন আছেন?"
+  "sample_translation": "নমস্কার, আপনি কেমন আছেন?",
+  "failure_cause": null
  },
  {
   "order": 11,
@@ -135,7 +194,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Zdravo, kako ste?"
+  "sample_translation": "Zdravo, kako ste?",
+  "failure_cause": null
  },
  {
   "order": 12,
@@ -158,7 +218,35 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hola, com estàs?"
+  "sample_translation": "Hola, com estàs?",
+  "failure_cause": null
+ },
+ {
+  "order": 15,
+  "chirp2_code": "cmn-Hans-CN",
+  "language_name": "Chinese (Simplified, China)",
+  "translation_llm_code": "zh",
+  "regional_variant": "script",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.234,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "你好，你还好吗？",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
  },
  {
   "order": 16,
@@ -181,7 +269,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "你好，最近好嗎？"
+  "sample_translation": "你好，最近好嗎？",
+  "failure_cause": null
  },
  {
   "order": 17,
@@ -204,7 +293,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Dobrý den, jak se máte?"
+  "sample_translation": "Dobrý den, jak se máte?",
+  "failure_cause": null
  },
  {
   "order": 18,
@@ -227,7 +317,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Helo, sut ydych chi?"
+  "sample_translation": "Helo, sut ydych chi?",
+  "failure_cause": null
  },
  {
   "order": 19,
@@ -250,7 +341,35 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hej, hvordan har du det?"
+  "sample_translation": "Hej, hvordan har du det?",
+  "failure_cause": null
+ },
+ {
+  "order": 20,
+  "chirp2_code": "de-DE",
+  "language_name": "German (Germany)",
+  "translation_llm_code": "de",
+  "regional_variant": "base",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.211,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "Hallo, wie geht es Ihnen?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
  },
  {
   "order": 21,
@@ -273,7 +392,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Γεια σας, είστε καλά;"
+  "sample_translation": "Γεια σας, είστε καλά;",
+  "failure_cause": null
  },
  {
   "order": 22,
@@ -296,7 +416,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hello, how are you?"
+  "sample_translation": "Hello, how are you?",
+  "failure_cause": null
  },
  {
   "order": 23,
@@ -319,7 +440,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hello, how are you?"
+  "sample_translation": "Hello, how are you?",
+  "failure_cause": null
  },
  {
   "order": 24,
@@ -342,7 +464,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hello, how are you?"
+  "sample_translation": "Hello, how are you?",
+  "failure_cause": null
  },
  {
   "order": 25,
@@ -365,7 +488,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hello, how are you?"
+  "sample_translation": "Hello, how are you?",
+  "failure_cause": null
  },
  {
   "order": 26,
@@ -388,7 +512,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hola, ¿cómo estás?"
+  "sample_translation": "Hola, ¿cómo estás?",
+  "failure_cause": null
  },
  {
   "order": 27,
@@ -411,7 +536,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hola, ¿cómo estás?"
+  "sample_translation": "Hola, ¿cómo estás?",
+  "failure_cause": null
  },
  {
   "order": 28,
@@ -434,7 +560,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hola, ¿cómo estás?"
+  "sample_translation": "Hola, ¿cómo estás?",
+  "failure_cause": null
  },
  {
   "order": 29,
@@ -457,7 +584,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Tere, kuidas läheb?"
+  "sample_translation": "Tere, kuidas läheb?",
+  "failure_cause": null
  },
  {
   "order": 31,
@@ -480,7 +608,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "سلام، حالتان خوب است؟"
+  "sample_translation": "سلام، حالتان خوب است؟",
+  "failure_cause": null
  },
  {
   "order": 33,
@@ -503,7 +632,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hei, mitä kuuluu?"
+  "sample_translation": "Hei, mitä kuuluu?",
+  "failure_cause": null
  },
  {
   "order": 34,
@@ -526,7 +656,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Kumusta, ayos lang ba kayo?"
+  "sample_translation": "Kumusta, ayos lang ba kayo?",
+  "failure_cause": null
  },
  {
   "order": 35,
@@ -549,7 +680,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Bonjour, comment allez-vous?"
+  "sample_translation": "Bonjour, comment allez-vous?",
+  "failure_cause": null
  },
  {
   "order": 36,
@@ -572,7 +704,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Bonjour, comment allez-vous ?"
+  "sample_translation": "Bonjour, comment allez-vous ?",
+  "failure_cause": null
  },
  {
   "order": 38,
@@ -595,7 +728,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Ola, estás ben?"
+  "sample_translation": "Ola, estás ben?",
+  "failure_cause": null
  },
  {
   "order": 39,
@@ -618,7 +752,35 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "નમસ્તે, કેમ છો?"
+  "sample_translation": "નમસ્તે, કેમ છો?",
+  "failure_cause": null
+ },
+ {
+  "order": 41,
+  "chirp2_code": "hi-IN",
+  "language_name": "Hindi (India)",
+  "translation_llm_code": "hi",
+  "regional_variant": "base",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.212,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "नमस्ते, आप कैसे हैं?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
  },
  {
   "order": 42,
@@ -641,7 +803,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Pozdrav, kako ste?"
+  "sample_translation": "Pozdrav, kako ste?",
+  "failure_cause": null
  },
  {
   "order": 43,
@@ -664,7 +827,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Szia, hogy vagy?"
+  "sample_translation": "Szia, hogy vagy?",
+  "failure_cause": null
  },
  {
   "order": 45,
@@ -687,7 +851,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Halo, apa kabar?"
+  "sample_translation": "Halo, apa kabar?",
+  "failure_cause": null
  },
  {
   "order": 47,
@@ -710,7 +875,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Halló, hvernig hefurðu það?"
+  "sample_translation": "Halló, hvernig hefurðu það?",
+  "failure_cause": null
  },
  {
   "order": 48,
@@ -733,7 +899,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Salve, come sta?"
+  "sample_translation": "Salve, come sta?",
+  "failure_cause": null
  },
  {
   "order": 49,
@@ -756,7 +923,35 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "שלום, מה שלומך?"
+  "sample_translation": "שלום, מה שלומך?",
+  "failure_cause": null
+ },
+ {
+  "order": 50,
+  "chirp2_code": "ja-JP",
+  "language_name": "Japanese (Japan)",
+  "translation_llm_code": "ja",
+  "regional_variant": "base",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.234,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "こんにちは、お元気ですか？",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
  },
  {
   "order": 52,
@@ -779,7 +974,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "გამარჯობა, როგორ ხართ?"
+  "sample_translation": "გამარჯობა, როგორ ხართ?",
+  "failure_cause": null
  },
  {
   "order": 56,
@@ -802,7 +998,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "សួស្ដី តើអ្នកសុខសប្បាយជាទេ?"
+  "sample_translation": "សួស្ដី តើអ្នកសុខសប្បាយជាទេ?",
+  "failure_cause": null
  },
  {
   "order": 57,
@@ -825,7 +1022,35 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಿ?"
+  "sample_translation": "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಿ?",
+  "failure_cause": null
+ },
+ {
+  "order": 58,
+  "chirp2_code": "ko-KR",
+  "language_name": "Korean (South Korea)",
+  "translation_llm_code": "ko",
+  "regional_variant": "base",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.207,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "안녕하세요, 잘 지내시나요?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
  },
  {
   "order": 59,
@@ -848,7 +1073,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Салам, кандайсыз?"
+  "sample_translation": "Салам, кандайсыз?",
+  "failure_cause": null
  },
  {
   "order": 62,
@@ -871,7 +1097,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Mbote, ozali malamu?"
+  "sample_translation": "Mbote, ozali malamu?",
+  "failure_cause": null
  },
  {
   "order": 63,
@@ -894,7 +1121,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "ສະບາຍດີ, ສະບາຍດີບໍ່?"
+  "sample_translation": "ສະບາຍດີ, ສະບາຍດີບໍ່?",
+  "failure_cause": null
  },
  {
   "order": 64,
@@ -917,7 +1145,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Sveiki, kaip laikotės?"
+  "sample_translation": "Sveiki, kaip laikotės?",
+  "failure_cause": null
  },
  {
   "order": 66,
@@ -940,7 +1169,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Sveiki, kā jums klājas?"
+  "sample_translation": "Sveiki, kā jums klājas?",
+  "failure_cause": null
  },
  {
   "order": 68,
@@ -963,7 +1193,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Здраво, како сте?"
+  "sample_translation": "Здраво, како сте?",
+  "failure_cause": null
  },
  {
   "order": 69,
@@ -986,7 +1217,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "നമസ്കാരം, സുഖമാണോ?"
+  "sample_translation": "നമസ്കാരം, സുഖമാണോ?",
+  "failure_cause": null
  },
  {
   "order": 71,
@@ -1009,7 +1241,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "नमस्कार, कसे आहात?"
+  "sample_translation": "नमस्कार, कसे आहात?",
+  "failure_cause": null
  },
  {
   "order": 72,
@@ -1032,7 +1265,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hai, apa khabar?"
+  "sample_translation": "Hai, apa khabar?",
+  "failure_cause": null
  },
  {
   "order": 74,
@@ -1055,7 +1289,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "မင်္ဂလာပါ၊ နေကောင်းပါရဲ့လား။"
+  "sample_translation": "မင်္ဂလာပါ၊ နေကောင်းပါရဲ့လား။",
+  "failure_cause": null
  },
  {
   "order": 75,
@@ -1078,7 +1313,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "नमस्ते, आरामै हुनुहुन्छ?"
+  "sample_translation": "नमस्ते, आरामै हुनुहुन्छ?",
+  "failure_cause": null
  },
  {
   "order": 76,
@@ -1101,7 +1337,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hallo, hoe gaat het met u?"
+  "sample_translation": "Hallo, hoe gaat het met u?",
+  "failure_cause": null
  },
  {
   "order": 77,
@@ -1124,7 +1361,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hei, hvordan har du det?"
+  "sample_translation": "Hei, hvordan har du det?",
+  "failure_cause": null
  },
  {
   "order": 83,
@@ -1147,7 +1385,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਕੀ ਤੁਸੀਂ ਠੀਕ ਹੋ?"
+  "sample_translation": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਕੀ ਤੁਸੀਂ ਠੀਕ ਹੋ?",
+  "failure_cause": null
  },
  {
   "order": 84,
@@ -1170,7 +1409,35 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Cześć, jak się masz?"
+  "sample_translation": "Cześć, jak się masz?",
+  "failure_cause": null
+ },
+ {
+  "order": 86,
+  "chirp2_code": "pt-BR",
+  "language_name": "Portuguese (Brazil)",
+  "translation_llm_code": "pt-BR",
+  "regional_variant": "exact",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.209,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "Olá, tudo bem?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
  },
  {
   "order": 87,
@@ -1193,7 +1460,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Olá, está bem?"
+  "sample_translation": "Olá, está bem?",
+  "failure_cause": null
  },
  {
   "order": 88,
@@ -1216,7 +1484,35 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Bună, ce mai faci?"
+  "sample_translation": "Bună, ce mai faci?",
+  "failure_cause": null
+ },
+ {
+  "order": 89,
+  "chirp2_code": "ru-RU",
+  "language_name": "Russian (Russia)",
+  "translation_llm_code": "ru",
+  "regional_variant": "base",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.209,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "Здравствуйте, как вы?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
  },
  {
   "order": 93,
@@ -1239,7 +1535,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Ahoj, ako sa máš?"
+  "sample_translation": "Ahoj, ako sa máš?",
+  "failure_cause": null
  },
  {
   "order": 94,
@@ -1262,7 +1559,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Pozdravljeni, kako ste?"
+  "sample_translation": "Pozdravljeni, kako ste?",
+  "failure_cause": null
  },
  {
   "order": 97,
@@ -1285,7 +1583,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Përshëndetje, si jeni?"
+  "sample_translation": "Përshëndetje, si jeni?",
+  "failure_cause": null
  },
  {
   "order": 100,
@@ -1308,7 +1607,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Hej, hur mår du?"
+  "sample_translation": "Hej, hur mår du?",
+  "failure_cause": null
  },
  {
   "order": 101,
@@ -1331,7 +1631,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Habari, hujambo?"
+  "sample_translation": "Habari, hujambo?",
+  "failure_cause": null
  },
  {
   "order": 102,
@@ -1354,7 +1655,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Habari, hujambo?"
+  "sample_translation": "Habari, hujambo?",
+  "failure_cause": null
  },
  {
   "order": 103,
@@ -1377,7 +1679,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "வணக்கம், நலமாக இருக்கிறீர்களா?"
+  "sample_translation": "வணக்கம், நலமாக இருக்கிறீர்களா?",
+  "failure_cause": null
  },
  {
   "order": 104,
@@ -1400,7 +1703,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "నమస్తే, బాగున్నారా?"
+  "sample_translation": "నమస్తే, బాగున్నారా?",
+  "failure_cause": null
  },
  {
   "order": 106,
@@ -1423,7 +1727,35 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "สวัสดีครับ สบายดีไหมครับ?"
+  "sample_translation": "สวัสดีครับ สบายดีไหมครับ?",
+  "failure_cause": null
+ },
+ {
+  "order": 107,
+  "chirp2_code": "tr-TR",
+  "language_name": "Turkish (Turkey)",
+  "translation_llm_code": "tr",
+  "regional_variant": "base",
+  "official_support": true,
+  "experimental": false,
+  "documented_class": "A",
+  "api_tested": true,
+  "api_requests": 84,
+  "api_success": 84,
+  "api_unsupported": 0,
+  "api_transient_errors": 0,
+  "doc_api_conflict": false,
+  "avg_latency_s": 0.21,
+  "quality_pass": true,
+  "critical_flags": {},
+  "stability_ok": true,
+  "final_decision": "PASSED",
+  "decision_reason": "official_support_and_quality_ok",
+  "sample_translation": "Merhaba, nasılsınız?",
+  "failure_cause": null,
+  "retest_evidence": {
+   "regression": {}
+  }
  },
  {
   "order": 108,
@@ -1446,7 +1778,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Привіт, як справи?"
+  "sample_translation": "Привіт, як справи?",
+  "failure_cause": null
  },
  {
   "order": 110,
@@ -1469,7 +1802,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "سلام، آپ کیسے ہیں؟"
+  "sample_translation": "سلام، آپ کیسے ہیں؟",
+  "failure_cause": null
  },
  {
   "order": 111,
@@ -1492,7 +1826,8 @@
   "stability_ok": null,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Salom, qandaysiz?"
+  "sample_translation": "Salom, qandaysiz?",
+  "failure_cause": null
  },
  {
   "order": 112,
@@ -1515,7 +1850,8 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Xin chào, bạn có khỏe không?"
+  "sample_translation": "Xin chào, bạn có khỏe không?",
+  "failure_cause": null
  },
  {
   "order": 117,
@@ -1538,6 +1874,7 @@
   "stability_ok": true,
   "final_decision": "PASSED",
   "decision_reason": "official_support_and_quality_ok",
-  "sample_translation": "Sawubona, unjani?"
+  "sample_translation": "Sawubona, unjani?",
+  "failure_cause": null
  }
 ]

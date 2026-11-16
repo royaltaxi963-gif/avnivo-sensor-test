@@ -40,6 +40,15 @@ def load_evidence() -> dict:
     return json.loads(EVIDENCE.read_text())
 
 
+def load_diagnoses() -> dict:
+    out = {}
+    for mode in ("failed", "disputed", "experimental", "regression"):
+        p = RESULTS / f"translation-llm-diagnosis-{mode}.json"
+        if p.exists():
+            out[mode] = json.loads(p.read_text())["diagnosis"]
+    return out
+
+
 def is_degenerate(r: dict) -> bool:
     """A source equal to target (e.g. uz->uz) is a harness artefact, not a result."""
     return bool(r.get("source")) and r.get("source") == r.get("target")
@@ -57,7 +66,8 @@ def group_records(records: list[dict]) -> dict[str, list[dict]]:
 def stability_ok(records: list[dict]) -> bool | None:
     """True if repeated uz2X runs of c01 are byte-identical; None if not run."""
     reps = [r["translated"] for r in records
-            if r["item"] == "c01" and r["direction"].startswith("uz2X") and r["http"] == 200]
+            if r["item"] == "c01" and r["direction"].startswith("uz2X") and r["http"] == 200
+            and not r.get("tag")]
     if len(reps) < 2:
         return None
     return len(set(reps)) == 1
@@ -127,12 +137,30 @@ def locale_verdict(row: dict, records: list[dict]) -> dict:
 def build() -> dict:
     rows = matrix_rows()
     ev = load_evidence()
+    diags = load_diagnoses()
     by_chirp = group_records(ev["records"])
     verdicts = [locale_verdict(r, by_chirp.get(r["chirp2_code"], [])) for r in rows]
+
+    # Attach the real-API cause from the targeted diagnosis, when available.
+    cause_by_locale = {d["chirp2_code"]: d.get("cause")
+                       for d in diags.get("failed", [])}
+    retest_by_locale = {}
+    for mode in ("disputed", "experimental", "regression"):
+        for d in diags.get(mode, []):
+            retest_by_locale.setdefault(d["chirp2_code"], {})[mode] = d
+    for v in verdicts:
+        v["failure_cause"] = cause_by_locale.get(v["chirp2_code"])
+        rt = retest_by_locale.get(v["chirp2_code"])
+        if rt:
+            v["retest_evidence"] = {
+                mode: {k: d[k] for k in d if k in
+                       ("success", "attempted", "reproduced", "quality_flags")}
+                for mode, d in rt.items()}
 
     decisions = Counter(v["final_decision"] for v in verdicts)
     classes = Counter(v["documented_class"] for v in verdicts)
     ledger = ev.get("ledger", {})
+    undocumented = [v for v in verdicts if v.get("doc_api_conflict")]
 
     summary = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -153,6 +181,11 @@ def build() -> dict:
         "budget_ceiling_usd": ledger.get("budget_ceiling_usd", 30.0),
         "remaining_usd": ledger.get("remaining_usd", 30.0),
         "ledger": ledger,
+        "retest_coverage": {
+            "disputed_locales": [d["chirp2_code"] for d in diags.get("disputed", [])],
+            "experimental_locales": [d["chirp2_code"] for d in diags.get("experimental", [])],
+            "regression_locales": [d["chirp2_code"] for d in diags.get("regression", [])],
+        },
     }
     return {"verdicts": verdicts, "summary": summary}
 
@@ -162,7 +195,7 @@ def write_csv(verdicts: list[dict]) -> None:
             "regional_variant", "official_support", "experimental", "documented_class",
             "api_tested", "api_requests", "api_success", "api_unsupported",
             "api_transient_errors", "avg_latency_s", "quality_pass", "stability_ok",
-            "final_decision", "decision_reason", "sample_translation"]
+            "failure_cause", "final_decision", "decision_reason", "sample_translation"]
     with (RESULTS / "translation-llm-language-matrix.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
@@ -316,6 +349,23 @@ def write_markdown(verdicts: list[dict], summary: dict) -> None:
                        f"`{v['translation_llm_code']}` | {v['decision_reason']} |")
         return "\n".join(out)
 
+    def tbl_cause(items):
+        out = ["| Chirp 2 | Til | LLM kod | Aniqlangan sabab (haqiqiy API) |",
+               "|---------|-----|---------|------------------------------|"]
+        for v in items:
+            out.append(f"| `{v['chirp2_code']}` | {v['language_name']} | "
+                       f"`{v['translation_llm_code']}` | {v.get('failure_cause') or '—'} |")
+        return "\n".join(out)
+
+    def tbl_retest(items):
+        out = ["| Chirp 2 | Til | Rejim | Muvaffaqiyat | Takrorlandi |",
+               "|---------|-----|-------|--------------|-------------|"]
+        for v in items:
+            for mode, d in (v.get("retest_evidence") or {}).items():
+                out.append(f"| `{v['chirp2_code']}` | {v['language_name']} | {mode} | "
+                           f"{d.get('success')}/{d.get('attempted')} | {d.get('reproduced')} |")
+        return "\n".join(out)
+
     md = f"""# Google Cloud Translation LLM — 117 ta Chirp 2 tili bo'yicha yakuniy hisobot
 
 Sana: {summary['generated_at'][:10]}
@@ -369,7 +419,29 @@ lekin asosiy Online ro'yxatga avtomatik qo'shilmaydi.
 Model bu til kodini rad etdi yoki yetarli dalillar bilan jiddiy muammo aniqlandi.
 Manba koddan **hech narsa o'chirilmadi**; faqat tavsiya ro'yxati tayyorlandi.
 
+Har bir til uchun aniq sabab haqiqiy API so'rovlari bilan aniqlandi: kod **uz**
+va **en** manbalaridan ham rad etildi, ya'ni muammo til juftligida emas, balki
+til kodining o'zida.
+
 {tbl(failed) if failed else "—"}
+
+### 4b. FAILED tillarning aniq sababi
+
+{tbl_cause(failed) if failed else "—"}
+
+### 4c. Muqobil yechimlar
+
+Barcha 24 til Google'ning rasmiy Translation LLM jadvalida mavjud emas, shu
+sababli ular uchun qo'llab-quvvatlanadigan muqobil kod yoki model topilmadi.
+Hech bir til boshqa til bilan almashtirilmadi (masalan, `yue-Hant-HK` uchun
+`zh` ishlatilmadi), chunki bu ma'noni buzadi.
+
+## 4d. RETEST_REQUIRED va EXPERIMENTAL uchun qo'shimcha sinov dalillari
+
+Disputed (si-LK, xh-ZA, yo-NG), experimental va regression tillari mustaqil
+jumlalar bilan, yangi haqiqiy API so'rovlari orqali qayta sinovdan o'tkazildi.
+
+{tbl_retest(conflicts + exp + passed[:10])}
 
 ## 5. RETEST_REQUIRED ({len(retest)})
 
@@ -396,8 +468,23 @@ ammo bu holat alohida qayd etildi.
   bo'lganda beriladi; vaqtinchalik 429/5xx xatolar qo'llab-quvvatlanmaydi deb
   hisoblanmaydi.
 * Test natijalari taxminiy emas: har bir yozuv haqiqiy HTTP javobidan olingan.
+* **Tiklash (recovery):** oldingi 6,651 so'rov va ularning dalillari
+  o'zgartirilmagan holda saqlandi; qayta sinovlar mavjud checkpointdan davom etdi.
+* **Cheklov:** `si-LK`, `xh-ZA`, `yo-NG` rasmiy hujjatda yo'q, lekin API ishlaydi.
+  Ular RETEST_REQUIRED holatida qoldirildi, chunki hujjat bilan ziddiyat bor.
+* **Xarajat:** barcha qo'shimcha so'rovlar umumiy byudjetga kiritildi; $30 dan oshmadi.
 
-## 7. Online ro'yxat tavsiyasi
+## 7. Xarajat hisobi
+
+| Ko'rsatkich | Qiymat |
+|-------------|--------|
+| Umumiy haqiqiy so'rovlar | {summary['real_api_requests']} |
+| Umumiy xarajat (USD) | {summary['total_cost_usd']} |
+| Qolgan budjet (USD) | {summary['remaining_usd']} |
+| Kiruvchi belgilar | {summary['ledger'].get('input_chars')} |
+| Chiquvchi belgilar | {summary['ledger'].get('output_chars')} |
+
+## 8. Online ro'yxat tavsiyasi
 
 Asosiy Online ro'yxatga **faqat PASSED** tillarni kiritish tavsiya etiladi.
 EXPERIMENTAL tillar alohida saqlanadi. FAILED tillar ro'yxatdan chiqarish uchun

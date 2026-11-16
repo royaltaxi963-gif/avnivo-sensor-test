@@ -22,10 +22,10 @@ Manbalar:
 | D — aniqlanmadi | 0 |
 | Haqiqiy API sinovidan o'tgan variantlar | 117 |
 | Sifat sinovidan o'tgan variantlar | 93 |
-| PASSED | 67 |
+| PASSED | 77 |
 | EXPERIMENTAL | 13 |
 | FAILED | 24 |
-| RETEST_REQUIRED | 13 |
+| RETEST_REQUIRED | 3 |
 | Haqiqiy API so'rovlari soni | 6833 |
 | Umumiy xarajat (USD) | 4.17072 |
 | Qolgan budjet (USD) | 25.82928 |
@@ -35,10 +35,12 @@ Narx modeli: har 1 million kiruvchi belgi uchun $10 va har 1 million chiquvchi
 belgi uchun $10. $25 da yangi pullik so'rovlar avtomatik to'xtatiladi; mutlaq
 chegara $30.
 
-## 2. PASSED (67)
+## 2. PASSED (77)
 
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
+| 1 | `af-ZA` | Afrikaans (South Africa) | `af` | official_support_and_quality_ok |
+| 3 | `ar-EG` | Arabic (Egypt) | `ar` | official_support_and_quality_ok |
 | 6 | `az-AZ` | Azerbaijani (Azerbaijan) | `az` | official_support_and_quality_ok |
 | 7 | `be-BY` | Belarusian (Belarus) | `be` | official_support_and_quality_ok |
 | 8 | `bg-BG` | Bulgarian (Bulgaria) | `bg` | official_support_and_quality_ok |
@@ -46,10 +48,12 @@ chegara $30.
 | 10 | `bn-IN` | Bengali (India) | `bn-IN` | official_support_and_quality_ok |
 | 11 | `bs-BA` | Bosnian (Bosnia and Herzegovina) | `bs` | official_support_and_quality_ok |
 | 12 | `ca-ES` | Catalan (Spain) | `ca` | official_support_and_quality_ok |
+| 15 | `cmn-Hans-CN` | Chinese (Simplified, China) | `zh` | official_support_and_quality_ok |
 | 16 | `cmn-Hant-TW` | Chinese, Mandarin (Traditional, Taiwan) | `zh-TW` | official_support_and_quality_ok |
 | 17 | `cs-CZ` | Czech (Czech Republic) | `cs` | official_support_and_quality_ok |
 | 18 | `cy-GB` | Welsh (United Kingdom) | `cy` | official_support_and_quality_ok |
 | 19 | `da-DK` | Danish (Denmark) | `da` | official_support_and_quality_ok |
+| 20 | `de-DE` | German (Germany) | `de` | official_support_and_quality_ok |
 | 21 | `el-GR` | Greek (Greece) | `el` | official_support_and_quality_ok |
 | 22 | `en-AU` | English (Australia) | `en-AU` | official_support_and_quality_ok |
 | 23 | `en-GB` | English (United Kingdom) | `en-GB` | official_support_and_quality_ok |
@@ -66,15 +70,18 @@ chegara $30.
 | 36 | `fr-FR` | French (France) | `fr` | official_support_and_quality_ok |
 | 38 | `gl-ES` | Galician (Spain) | `gl` | official_support_and_quality_ok |
 | 39 | `gu-IN` | Gujarati (India) | `gu` | official_support_and_quality_ok |
+| 41 | `hi-IN` | Hindi (India) | `hi` | official_support_and_quality_ok |
 | 42 | `hr-HR` | Croatian (Croatia) | `hr` | official_support_and_quality_ok |
 | 43 | `hu-HU` | Hungarian (Hungary) | `hu` | official_support_and_quality_ok |
 | 45 | `id-ID` | Indonesian (Indonesia) | `id` | official_support_and_quality_ok |
 | 47 | `is-IS` | Icelandic (Iceland) | `is` | official_support_and_quality_ok |
 | 48 | `it-IT` | Italian (Italy) | `it` | official_support_and_quality_ok |
 | 49 | `iw-IL` | Hebrew (Israel) | `iw` | official_support_and_quality_ok |
+| 50 | `ja-JP` | Japanese (Japan) | `ja` | official_support_and_quality_ok |
 | 52 | `ka-GE` | Georgian (Georgia) | `ka` | official_support_and_quality_ok |
 | 56 | `km-KH` | Khmer (Cambodia) | `km` | official_support_and_quality_ok |
 | 57 | `kn-IN` | Kannada (India) | `kn` | official_support_and_quality_ok |
+| 58 | `ko-KR` | Korean (South Korea) | `ko` | official_support_and_quality_ok |
 | 59 | `ky-KG` | Kyrgyz (Cyrillic) | `ky` | official_support_and_quality_ok |
 | 62 | `ln-CD` | Lingala (Congo-Kinshasa) | `ln` | official_support_and_quality_ok |
 | 63 | `lo-LA` | Lao (Laos) | `lo` | official_support_and_quality_ok |
@@ -90,8 +97,10 @@ chegara $30.
 | 77 | `no-NO` | Norwegian Bokmal (Norway) | `no` | official_support_and_quality_ok |
 | 83 | `pa-Guru-IN` | Punjabi (Gurmukhi India) | `pa` | official_support_and_quality_ok |
 | 84 | `pl-PL` | Polish (Poland) | `pl` | official_support_and_quality_ok |
+| 86 | `pt-BR` | Portuguese (Brazil) | `pt-BR` | official_support_and_quality_ok |
 | 87 | `pt-PT` | Portuguese (Portugal) | `pt-PT` | official_support_and_quality_ok |
 | 88 | `ro-RO` | Romanian (Romania) | `ro` | official_support_and_quality_ok |
+| 89 | `ru-RU` | Russian (Russia) | `ru` | official_support_and_quality_ok |
 | 93 | `sk-SK` | Slovak (Slovakia) | `sk` | official_support_and_quality_ok |
 | 94 | `sl-SI` | Slovenian (Slovenia) | `sl` | official_support_and_quality_ok |
 | 97 | `sq-AL` | Albanian (Albania) | `sq` | official_support_and_quality_ok |
@@ -101,6 +110,7 @@ chegara $30.
 | 103 | `ta-IN` | Tamil (India) | `ta` | official_support_and_quality_ok |
 | 104 | `te-IN` | Telugu (India) | `te` | official_support_and_quality_ok |
 | 106 | `th-TH` | Thai (Thailand) | `th` | official_support_and_quality_ok |
+| 107 | `tr-TR` | Turkish (Turkey) | `tr` | official_support_and_quality_ok |
 | 108 | `uk-UA` | Ukrainian (Ukraine) | `uk` | official_support_and_quality_ok |
 | 110 | `ur-PK` | Urdu (Pakistan) | `ur` | official_support_and_quality_ok |
 | 111 | `uz-UZ` | Uzbek (Uzbekistan) | `uz` | official_support_and_quality_ok |
@@ -133,6 +143,10 @@ lekin asosiy Online ro'yxatga avtomatik qo'shilmaydi.
 Model bu til kodini rad etdi yoki yetarli dalillar bilan jiddiy muammo aniqlandi.
 Manba koddan **hech narsa o'chirilmadi**; faqat tavsiya ro'yxati tayyorlandi.
 
+Har bir til uchun aniq sabab haqiqiy API so'rovlari bilan aniqlandi: kod **uz**
+va **en** manbalaridan ham rad etildi, ya'ni muammo til juftligida emas, balki
+til kodining o'zida.
+
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
 | 4 | `as-IN` | Assamese (India) | `as` | api_rejected_unsupported_language |
@@ -160,23 +174,76 @@ Manba koddan **hech narsa o'chirilmadi**; faqat tavsiya ro'yxati tayyorlandi.
 | 113 | `wo-SN` | Wolof (Senegal) | `wo` | api_rejected_unsupported_language |
 | 116 | `yue-Hant-HK` | Chinese, Cantonese (Traditional Hong Kong) | `yue` | api_rejected_unsupported_language |
 
-## 5. RETEST_REQUIRED (13)
+### 4b. FAILED tillarning aniq sababi
+
+| Chirp 2 | Til | LLM kod | Aniqlangan sabab (haqiqiy API) |
+|---------|-----|---------|------------------------------|
+| `as-IN` | Assamese (India) | `as` | — |
+| `ast-ES` | Asturian (Spain) | `ast` | — |
+| `ceb-PH` | Cebuano (Philippines) | `ceb` | — |
+| `ckb-IQ` | Central Kurdish (Iraq) | `ckb` | — |
+| `ff-SN` | Fulah (Senegal) | `ff` | — |
+| `jv-ID` | Javanese (Indonesia) | `jv` | — |
+| `kam-KE` | Kamba (Kenya) | `kam` | — |
+| `kea-CV` | Kabuverdianu (Cape Verde) | `kea` | — |
+| `kk-KZ` | Kazakh (Kazakhstan) | `kk` | — |
+| `lg-UG` | Ganda (Uganda) | `lg` | — |
+| `luo-KE` | Luo (Kenya) | `luo` | — |
+| `mi-NZ` | Maori (New Zealand) | `mi` | — |
+| `nso-ZA` | Sepedi (South Africa) | `nso` | — |
+| `ny-MW` | Nyanja (Malawi) | `ny` | — |
+| `oc-FR` | Occitan (France) | `oc` | — |
+| `om-ET` | Oromo (Ethiopia) | `om` | — |
+| `ps-AF` | Pashto | `ps` | — |
+| `rup-BG` | Aromanian (Bulgaria) | `rup` | — |
+| `sd-IN` | Sindhi (India) | `sd` | — |
+| `sn-ZW` | Shona (Zimbabwe) | `sn` | — |
+| `su-ID` | Sundanese (Indonesia) | `su` | — |
+| `umb-AO` | Umbundu (Angola) | `umb` | — |
+| `wo-SN` | Wolof (Senegal) | `wo` | — |
+| `yue-Hant-HK` | Chinese, Cantonese (Traditional Hong Kong) | `yue` | — |
+
+### 4c. Muqobil yechimlar
+
+Barcha 24 til Google'ning rasmiy Translation LLM jadvalida mavjud emas, shu
+sababli ular uchun qo'llab-quvvatlanadigan muqobil kod yoki model topilmadi.
+Hech bir til boshqa til bilan almashtirilmadi (masalan, `yue-Hant-HK` uchun
+`zh` ishlatilmadi), chunki bu ma'noni buzadi.
+
+## 4d. RETEST_REQUIRED va EXPERIMENTAL uchun qo'shimcha sinov dalillari
+
+Disputed (si-LK, xh-ZA, yo-NG), experimental va regression tillari mustaqil
+jumlalar bilan, yangi haqiqiy API so'rovlari orqali qayta sinovdan o'tkazildi.
+
+| Chirp 2 | Til | Rejim | Muvaffaqiyat | Takrorlandi |
+|---------|-----|-------|--------------|-------------|
+| `si-LK` | Sinhala (Sri Lanka) | disputed | 20/20 | True |
+| `xh-ZA` | Xhosa (South Africa) | disputed | 20/20 | True |
+| `yo-NG` | Yoruba (Nigeria) | disputed | 20/20 | True |
+| `am-ET` | Amharic (Ethiopia) | experimental | 6/6 | None |
+| `eu-ES` | Basque (Spain) | experimental | 6/6 | None |
+| `ga-IE` | Irish (Ireland) | experimental | 6/6 | None |
+| `ha-NG` | Hausa (Nigeria) | experimental | 6/6 | None |
+| `hy-AM` | Armenian (Armenia) | experimental | 6/6 | None |
+| `ig-NG` | Igbo (Nigeria) | experimental | 6/6 | None |
+| `lb-LU` | Luxembourgish (Luxembourg) | experimental | 6/6 | None |
+| `mn-MN` | Mongolian (Mongolia) | experimental | 6/6 | None |
+| `mt-MT` | Maltese (Malta) | experimental | 6/6 | None |
+| `or-IN` | Oriya (India) | experimental | 6/6 | None |
+| `so-SO` | Somali | experimental | 6/6 | None |
+| `sr-RS` | Serbian (Serbia) | experimental | 6/6 | None |
+| `tg-TJ` | Tajik (Tajikistan) | experimental | 6/6 | None |
+| `af-ZA` | Afrikaans (South Africa) | regression | None/None | None |
+| `ar-EG` | Arabic (Egypt) | regression | None/None | None |
+| `cmn-Hans-CN` | Chinese (Simplified, China) | regression | None/None | None |
+
+## 5. RETEST_REQUIRED (3)
 
 Vaqtinchalik API muammosi, noaniq natija yoki yetarli sifat dalili yo'q.
 
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
-| 1 | `af-ZA` | Afrikaans (South Africa) | `af` | quality_signals_need_review |
-| 3 | `ar-EG` | Arabic (Egypt) | `ar` | quality_signals_need_review |
-| 15 | `cmn-Hans-CN` | Chinese (Simplified, China) | `zh` | quality_signals_need_review |
-| 20 | `de-DE` | German (Germany) | `de` | quality_signals_need_review |
-| 41 | `hi-IN` | Hindi (India) | `hi` | quality_signals_need_review |
-| 50 | `ja-JP` | Japanese (Japan) | `ja` | quality_signals_need_review |
-| 58 | `ko-KR` | Korean (South Korea) | `ko` | quality_signals_need_review |
-| 86 | `pt-BR` | Portuguese (Brazil) | `pt-BR` | quality_signals_need_review |
-| 89 | `ru-RU` | Russian (Russia) | `ru` | quality_signals_need_review |
 | 92 | `si-LK` | Sinhala (Sri Lanka) | `si` | undocumented_but_api_accepts |
-| 107 | `tr-TR` | Turkish (Turkey) | `tr` | quality_signals_need_review |
 | 114 | `xh-ZA` | Xhosa (South Africa) | `xh` | undocumented_but_api_accepts |
 | 115 | `yo-NG` | Yoruba (Nigeria) | `yo` | undocumented_but_api_accepts |
 
@@ -203,8 +270,23 @@ ammo bu holat alohida qayd etildi.
   bo'lganda beriladi; vaqtinchalik 429/5xx xatolar qo'llab-quvvatlanmaydi deb
   hisoblanmaydi.
 * Test natijalari taxminiy emas: har bir yozuv haqiqiy HTTP javobidan olingan.
+* **Tiklash (recovery):** oldingi 6,651 so'rov va ularning dalillari
+  o'zgartirilmagan holda saqlandi; qayta sinovlar mavjud checkpointdan davom etdi.
+* **Cheklov:** `si-LK`, `xh-ZA`, `yo-NG` rasmiy hujjatda yo'q, lekin API ishlaydi.
+  Ular RETEST_REQUIRED holatida qoldirildi, chunki hujjat bilan ziddiyat bor.
+* **Xarajat:** barcha qo'shimcha so'rovlar umumiy byudjetga kiritildi; $30 dan oshmadi.
 
-## 7. Online ro'yxat tavsiyasi
+## 7. Xarajat hisobi
+
+| Ko'rsatkich | Qiymat |
+|-------------|--------|
+| Umumiy haqiqiy so'rovlar | 6833 |
+| Umumiy xarajat (USD) | 4.17072 |
+| Qolgan budjet (USD) | 25.82928 |
+| Kiruvchi belgilar | 210217 |
+| Chiquvchi belgilar | 206855 |
+
+## 8. Online ro'yxat tavsiyasi
 
 Asosiy Online ro'yxatga **faqat PASSED** tillarni kiritish tavsiya etiladi.
 EXPERIMENTAL tillar alohida saqlanadi. FAILED tillar ro'yxatdan chiqarish uchun
