@@ -1,0 +1,71 @@
+name: Integration inspect Cloud Run (read-only)
+
+# Temporary, read-only inventory used by the Translation LLM integration task to
+# determine the real production topology before any deploy. It never deploys,
+# never shifts traffic and never writes to Google Cloud.
+on:
+  push:
+    branches:
+      - feat/translation-llm-integration
+    paths:
+      - '.github/workflows/integration-inspect-cloudrun.yml'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: List Cloud Run services and traffic
+        run: |
+          set -euo pipefail
+          PROJECT=project-6bcf7fe6-cb55-49b7-9f4
+          for REGION in europe-west1 us-central1; do
+            echo "### region=$REGION"
+            gcloud run services list --project="$PROJECT" --region="$REGION" \
+              --format='table(metadata.name,status.url,spec.template.spec.containers[0].image,status.traffic)' || true
+          done
+      - name: Describe candidate services
+        run: |
+          set -euo pipefail
+          PROJECT=project-6bcf7fe6-cb55-49b7-9f4
+          for SVC in avnivo-sensor-test avnivo-translation-test; do
+            echo "### $SVC"
+            gcloud run services describe "$SVC" --project="$PROJECT" --region=europe-west1 \
+              --format='value(metadata.name,status.url,status.traffic)' || true
+            gcloud run revisions list --service="$SVC" --project="$PROJECT" \
+              --region=europe-west1 --limit=5 \
+              --format='table(metadata.name,status.conditions[0].status,metadata.creationTimestamp)' || true
+          done
+      - name: Dump non-secret service configuration (env names only)
+        run: |
+          set -euo pipefail
+          PROJECT=project-6bcf7fe6-cb55-49b7-9f4
+          gcloud run services describe avnivo-translation-test \
+            --project="$PROJECT" --region=europe-west1 --format=json > /tmp/svc.json
+          python3 - <<'PY'
+          import json
+          d = json.load(open("/tmp/svc.json"))
+          spec = d["spec"]["template"]["spec"]
+          c = spec["containers"][0]
+          print("image:", c.get("image"))
+          print("serviceAccountName:", spec.get("serviceAccountName"))
+          print("timeoutSeconds:", spec.get("timeoutSeconds"))
+          print("scaling:", d["spec"]["template"]["metadata"].get("annotations"))
+          print("resources:", c.get("resources"))
+          print("ports:", c.get("ports"))
+          print("env names:", sorted(e["name"] for e in c.get("env", [])))
+          md = d["metadata"].get("annotations", {})
+          print("ingress:", md.get("run.googleapis.com/ingress"))
+          print("launchStage:", md.get("run.googleapis.com/launch-stage"))
+          PY
+          echo "iam:"; gcloud run services get-iam-policy avnivo-translation-test \
+            --project="$PROJECT" --region=europe-west1 --format=json || true

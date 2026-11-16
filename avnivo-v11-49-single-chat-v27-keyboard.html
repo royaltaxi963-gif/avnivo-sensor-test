@@ -1188,6 +1188,24 @@ window.CHIRP2_MATRIX=[
  document.body.append(modal);
  let editingSelect=null;
  const closePicker=()=>{modal.hidden=true;editingSelect=null;modal.querySelector('.avnivo-language-search-toolbar').classList.remove('is-open');};
+ // Translation capability is owned by the backend (/api/translation-languages),
+ // proven by the independent Translation LLM audit. A language can be offered
+ // for speech recognition yet not translatable; the picker must say so instead
+ // of silently failing or substituting another language.
+ window.AVNIVO_TRANSLATION_STATUS=window.AVNIVO_TRANSLATION_STATUS||{};
+ const TRANSLATION_API='https://avnivo-translation-test-792624108019.europe-west1.run.app';
+ function translationSuffix(code){
+   const entry=window.AVNIVO_TRANSLATION_STATUS[code];
+   if(!entry)return '';
+   if(entry.status==='unsupported')return ' · tarjima yo‘q';
+   if(entry.status==='experimental')return ' · tajriba';
+   if(entry.status==='retest')return ' · tasdiqlanmagan';
+   return '';
+ }
+ fetch(TRANSLATION_API+'/api/translation-languages',{cache:'no-store'})
+   .then(r=>r.ok?r.json():null)
+   .then(d=>{if(d&&d.languages)window.AVNIVO_TRANSLATION_STATUS=d.languages;})
+   .catch(()=>{});
  function openPicker(select){
    editingSelect=select;
    const search=modal.querySelector('.avnivo-language-search');
@@ -1200,7 +1218,7 @@ window.CHIRP2_MATRIX=[
    for(const code of supported){
      if(query && !(native[code]+' '+code).toLocaleLowerCase().includes(query))continue;
      const button=document.createElement('button');
-     button.type='button';button.textContent=native[code]+' · '+code;
+     button.type='button';button.textContent=native[code]+' · '+code+translationSuffix(code);
      button.setAttribute('aria-pressed',String(select.value===code));
      button.addEventListener('click',()=>{
        if(editingSelect){
@@ -1215,7 +1233,7 @@ window.CHIRP2_MATRIX=[
  }
  modal.querySelector('.avnivo-language-search').addEventListener('input',()=>{if(editingSelect)openPickerResults(editingSelect)});
  modal.querySelector('.avnivo-language-search-toggle').addEventListener('click',()=>{const search=modal.querySelector('.avnivo-language-search');const toolbar=modal.querySelector('.avnivo-language-search-toolbar');if(!toolbar.classList.contains('is-open')){toolbar.classList.add('is-open');search.tabIndex=0;modal.querySelector('.avnivo-language-search-toggle').setAttribute('aria-expanded','true');setTimeout(()=>{if(!modal.hidden&&toolbar.classList.contains('is-open'))search.focus();},790);}else{search.focus();}});
- function openPickerResults(select){const options=modal.querySelector('.avnivo-language-options');options.replaceChildren();const query=modal.querySelector('.avnivo-language-search').value.trim().toLocaleLowerCase();for(const code of supported){if(query&&!(native[code]+' '+code).toLocaleLowerCase().includes(query))continue;const button=document.createElement('button');button.type='button';button.textContent=native[code]+' · '+code;button.setAttribute('aria-pressed',String(select.value===code));button.addEventListener('click',()=>{select.value=code;select.dispatchEvent(new Event('change',{bubbles:true}));closePicker()});options.append(button)}}
+ function openPickerResults(select){const options=modal.querySelector('.avnivo-language-options');options.replaceChildren();const query=modal.querySelector('.avnivo-language-search').value.trim().toLocaleLowerCase();for(const code of supported){if(query&&!(native[code]+' '+code).toLocaleLowerCase().includes(query))continue;const button=document.createElement('button');button.type='button';button.textContent=native[code]+' · '+code+translationSuffix(code);button.setAttribute('aria-pressed',String(select.value===code));button.addEventListener('click',()=>{select.value=code;select.dispatchEvent(new Event('change',{bubbles:true}));closePicker()});options.append(button)}}
  modal.addEventListener('click',e=>{if(e.target===modal||e.target.closest('[data-close]'))closePicker()});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closePicker()});
  // Capture the tap before card/editor handlers can consume it.
@@ -1395,7 +1413,7 @@ window.CHIRP2_MATRIX=[
      const data=await response.json().catch(()=>({}));
      if(token!==typingToken)return;
      if(!response.ok||typeof data.text!=='string'||!data.text.trim()){
-       throw new Error(response.status===429?'So‘rovlar chegarasi oshdi':response.status===503?'Tarjima xizmati sozlanmagan':('HTTP '+response.status));
+       throw new Error(response.status===400?'Bu til juftligi tarjimani qo‘llab-quvvatlamaydi':response.status===429?'So‘rovlar chegarasi oshdi':response.status===503?'Tarjima xizmati sozlanmagan':('HTTP '+response.status));
      }
      target.body.textContent=data.text;
      window.dispatchEvent(new CustomEvent('avnivo:history-translation',{detail:{at:avnivoTurn.at,translation:data.text}}));
@@ -2094,7 +2112,7 @@ app.querySelectorAll('.translation-line').forEach(decorate);
       body:JSON.stringify({text,source:sourceLang,target:targetLang}),signal:controller.signal
      });
      const data=await response.json().catch(()=>({}));
-     if(!response.ok||typeof data.text!=='string'||!data.text.trim())throw Error('Tarjima xatosi: HTTP '+response.status);
+     if(!response.ok||typeof data.text!=='string'||!data.text.trim())throw Error(response.status===400?'Bu til juftligi qo‘llab-quvvatlanmaydi':'Tarjima xatosi: HTTP '+response.status);
      translation.textContent=data.text;
     }finally{clearTimeout(timeout);}
    }
