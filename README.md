@@ -34,3 +34,12 @@ Yangi o‘zgarishlar `main:index.html` asosida ishlab chiqiladi. GitHub Actions 
 8. Hozircha Online/Offline tugmalari vizual rejimni almashtiradi; real tarmoq/offline tarjima dvigatellari integratsiya qilingan deb da’vo qilmang.
 
 **Kelgusi ish:** foydalanuvchi Online rejimi uchun yangi o‘zgarishlar so‘rashini bildirgan. Biroq har bir yangi topshiriqda rejim ko‘rsatilmagan bo‘lsa, baribir so‘rash kerak.
+
+## Online Chirp 2 STT integratsiyasi (2026-11-16)
+
+- `main/index.html` Online mikrofonini Google Chirp 2 candidate serveriga ulaydi: `https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app/api/transcribe-google`.
+- Online rejimida mikrofonni bir marta bosib yozishni boshlang, qayta bosib tugating; tanilgan matn yozish maydoniga tushadi. So‘rovda `audio/webm` va tanlangan til `uz-UZ` yoki `ru-RU` yuboriladi.
+- Google API kaliti HTML ichida saqlanmaydi; Cloud Run xizmat akkaunti ishlatiladi. Har bir yozuv pullik STT so‘rovi bo‘lishi mumkin. API 429, 400, 503 va ulanish xatolari foydalanuvchiga bildiriladi.
+- Offline rejimining avvalgi `SpeechRecognition` kodi saqlangan; Online rejimining yangi recorder/API chaqiruvlari Offline rejimida ishlamaydi.
+- **Cheklovlar:** Chirp 2 backend 117 locale uchun sinovdan o‘tgan, lekin hozirgi asosiy HTML til tanlagichi faqat UZ/RU. 117 locale UI bilan hali ulanmagan. Candidate endpoint amalda Android Chrome’dan tekshirilmagan; 100% kafolat berilmaydi. Production trafik almashmagan.
+- Integratsiya commit: `5d986dfb4d00708e8f7dce10483108f53861822f`.
