@@ -29,6 +29,11 @@ a separate endpoint.
 - Deployed endpoint: `https://chirp2-test---avnivo-sensor-test-5xwrf7netq-ew.a.run.app`
   (Cloud Run, region `us-central1`, model `chirp_2`). No local GCP creds;
   Google auth happens inside Cloud Run.
+- Zero-traffic candidate: `https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app`,
+  deployed by `.github/workflows/cloud-run-candidate.yml` when
+  `.github/candidate-deploy-request` changes. Use it to verify code changes
+  without shifting production traffic. Promotion (traffic shift) is a separate
+  deliberate step.
 
 ## Constraints (product owner)
 
@@ -48,13 +53,26 @@ list. Never create paid resources without explicit approval.
 - `run_campaign.py` — sends samples to the endpoint, enforces a hard budget,
   resumes from `evidence.jsonl`.
 - `reliability.py` — edge cases (bad locale, wrong content type, oversized,
-  CORS, silent/garbage audio).
+  CORS, silent/garbage/low-energy audio, repeated recognition, rate-limit
+  burst). The rate-limit probe must send **valid** audio; empty audio is
+  rejected by the size check before the limiter runs.
 - `consistency.py` — asserts UI matrix == backend registry == live endpoint.
-- `report.py` — writes `report.html` / `report.csv` / `report.json`.
+- `report.py` — writes `report.html` / `report.csv` / `report.json`; excludes
+  invalidated rows and merges `weak_locales.jsonl`.
 - `watch_recovery.py` — polls the STT route until it recovers.
 
 Cost: Speech-to-Text V2 Standard is $0.016/min (first 500k min/month). A full
-117-locale × 3-sample run costs ~$1.10.
+117-locale × 3-sample run costs ~$1.10. Spend so far: $1.1456 of $30.
+
+## Campaign status
+
+- Phases 1–3 complete: 117/117 locales tested with real audio, 373 samples,
+  all PASS (93 EXCELLENT / 14 GOOD / 5 FAIR / 5 POOR by mean CER).
+- Phase 4 complete: retries, error mapping and the near-silence gate are
+  implemented and verified live on the zero-traffic candidate.
+- Open item: promote the candidate to production (traffic shift) — deliberate,
+  not yet done. Until then the production revision still hallucinates `avnivo`
+  for silence.
 
 ## Gotchas
 
