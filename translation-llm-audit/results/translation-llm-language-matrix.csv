@@ -90,7 +90,7 @@ order,chirp2_code,language_name,translation_llm_code,regional_variant,official_s
 89,ru-RU,Russian (Russia),ru,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,"Здравствуйте, как вы?"
 90,rup-BG,Aromanian (Bulgaria),rup,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
 91,sd-IN,Sindhi (India),sd,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
-92,si-LK,Sinhala (Sri Lanka),si,base,False,False,C,True,1,1,0,0,0.175,True,,RETEST_REQUIRED,translated_despite_absent_from_doc,"ආයුබෝවන්, සුවෙන් ඉන්නවාද?"
+92,si-LK,Sinhala (Sri Lanka),si,base,False,False,C,True,82,82,0,0,0.247,True,True,RETEST_REQUIRED,translated_despite_absent_from_doc,"ආයුබෝවන්, සුවෙන් ඉන්නවාද?"
 93,sk-SK,Slovak (Slovakia),sk,base,True,False,A,True,82,82,0,0,0.204,True,True,PASSED,official_support_and_quality_ok,"Ahoj, ako sa máš?"
 94,sl-SI,Slovenian (Slovenia),sl,base,True,False,A,True,82,82,0,0,0.218,True,True,PASSED,official_support_and_quality_ok,"Pozdravljeni, kako ste?"
 95,sn-ZW,Shona (Zimbabwe),sn,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
@@ -112,7 +112,7 @@ order,chirp2_code,language_name,translation_llm_code,regional_variant,official_s
 111,uz-UZ,Uzbek (Uzbekistan),uz,base,True,False,A,True,40,40,0,0,0.209,True,,PASSED,official_support_and_quality_ok,"Salom, qandaysiz?"
 112,vi-VN,Vietnamese (Vietnam),vi,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"Xin chào, bạn có khỏe không?"
 113,wo-SN,Wolof (Senegal),wo,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
-114,xh-ZA,Xhosa (South Africa),xh,base,False,False,C,True,1,1,0,0,0.254,True,,RETEST_REQUIRED,translated_despite_absent_from_doc,"Molo, unjani?"
-115,yo-NG,Yoruba (Nigeria),yo,base,False,False,C,True,1,1,0,0,0.202,True,,RETEST_REQUIRED,translated_despite_absent_from_doc,"Ẹ kú ààrọ̀, ṣé dáadáa ni?"
+114,xh-ZA,Xhosa (South Africa),xh,base,False,False,C,True,82,82,0,0,0.213,True,True,RETEST_REQUIRED,translated_despite_absent_from_doc,"Molo, unjani?"
+115,yo-NG,Yoruba (Nigeria),yo,base,False,False,C,True,82,82,0,0,0.233,True,True,RETEST_REQUIRED,translated_despite_absent_from_doc,"Ẹ kú ààrọ̀, ṣé dáadáa ni?"
 116,yue-Hant-HK,"Chinese, Cantonese (Traditional Hong Kong)",yue,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
 117,zu-ZA,Zulu (South Africa),zu,base,True,False,A,True,82,82,0,0,0.205,True,True,PASSED,official_support_and_quality_ok,"Sawubona, unjani?"
