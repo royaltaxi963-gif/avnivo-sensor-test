@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Request
 from google.auth import default as google_auth_default
 from google.auth.transport.requests import Request as GoogleRequest
 from google.cloud import storage
+from whisper_model_catalog import WHISPER_MODELS, ready_model_files
 
 router = APIRouter()
 BUCKET = os.getenv("AVNIVO_MODEL_BUCKET", "avnivo-offline-models-792624108019")
@@ -26,8 +27,13 @@ def download_ticket(model_id: str, request: Request):
 
     This endpoint intentionally does NOT claim installation or activation.
     """
-    if model_id not in OBJECTS:
+    if model_id not in OBJECTS and model_id not in WHISPER_MODELS:
         raise HTTPException(404, "Unknown offline model")
+    model_files = OBJECTS.get(model_id)
+    if model_files is None:
+        model_files = ready_model_files(model_id)
+        if model_files is None:
+            raise HTTPException(503, "Model not uploaded and verified")
     ip = request.client.host if request.client else "unknown"
     now = time.monotonic()
     hits = _requests[ip]
@@ -46,7 +52,7 @@ def download_ticket(model_id: str, request: Request):
         client = storage.Client(credentials=credentials)
         bucket = client.bucket(BUCKET)
         files = []
-        for item in OBJECTS[model_id]:
+        for item in model_files:
             blob = bucket.blob(item["object"])
             url = blob.generate_signed_url(
                 version="v4", expiration=timedelta(minutes=15), method="GET",
