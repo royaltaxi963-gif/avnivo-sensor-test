@@ -87,6 +87,40 @@ jobs:
             --project="$PROJECT_ID" --limit=40 --freshness=6h \
             --format='value(timestamp,protoPayload.methodName,protoPayload.authenticationInfo.principalEmail)' || true
 
+      - name: Runtime SA IAM policy and impersonated recognize
+        shell: bash
+        run: |
+          set -uo pipefail
+          RUNTIME_SA="avnivo-speech-translator@$PROJECT_ID.iam.gserviceaccount.com"
+          echo "## SA-level IAM policy for $RUNTIME_SA"
+          gcloud iam service-accounts get-iam-policy "$RUNTIME_SA" --project="$PROJECT_ID" --format=json || true
+          echo "## List service accounts (spot deletions)"
+          gcloud iam service-accounts list --project="$PROJECT_ID" \
+            --format='table(email,disabled)' || true
+          echo "## Recognize AS the runtime SA (impersonation)"
+          B64="$(base64 -w0 verification/chirp2_campaign/fixtures/en-US-5s.wav)"
+          cat > /tmp/req.json <<JSON
+          {"config":{"autoDecodingConfig":{},"languageCodes":["en-US"],"model":"chirp_2"},"content":"$B64"}
+          JSON
+          if TOKEN="$(gcloud auth print-access-token --impersonate-service-account="$RUNTIME_SA" 2>/tmp/imp.err)"; then
+            curl -s -w '\nHTTP_CODE=%{http_code}\n' \
+              -X POST \
+              "https://us-central1-speech.googleapis.com/v2/projects/$PROJECT_ID/locations/us-central1/recognizers/_:recognize" \
+              -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+              --data @/tmp/req.json | sed 's/\("transcript": *"\)[^"]*/\1<redacted>/'
+          else
+            echo "Impersonation failed (no Service Account Token Creator):"
+            cat /tmp/imp.err
+          fi
+
+      - name: App container error logs (all severities, last 3h)
+        shell: bash
+        run: |
+          gcloud logging read \
+            'resource.type="cloud_run_revision" AND resource.labels.service_name="avnivo-sensor-test" AND resource.labels.revision_name="avnivo-sensor-test-00014-qf9"' \
+            --project="$PROJECT_ID" --limit=60 --freshness=3h \
+            --format='value(timestamp,severity,textPayload)' || true
+
       - name: Direct Google Speech-to-Text V2 recognize probe
         shell: bash
         run: |
