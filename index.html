@@ -246,7 +246,7 @@ function onlineLanguageName(locale){
  try{return languageDisplay?.of(base)||base}catch(e){return base}
 }
 function updateOnlineLanguageLabels(){
- if(document.documentElement.dataset.avnivoMode!=='online'||session!==onlineSession)return;
+ if(document.documentElement.dataset.avnivoMode!=='online')return;
  for(const [side,button] of [['left',leftLanguage],['right',rightLanguage]]){
   const locale=onlineChoice[side],name=onlineLanguageName(locale);
   button.querySelector('.language-name').textContent=name;
