@@ -54,6 +54,9 @@ jobs:
         working-directory: android
         run: ./gradlew :app:testDebugUnitTest --no-daemon --console=plain
 
+      - name: Run WebView polyfill test (executes the bundled asset)
+        run: node android/app/src/test/js/polyfill.test.mjs
+
       - name: Build debug APK
         working-directory: android
         run: ./gradlew :app:assembleDebug --no-daemon --console=plain

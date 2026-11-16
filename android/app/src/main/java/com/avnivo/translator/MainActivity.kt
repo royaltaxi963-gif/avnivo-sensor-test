@@ -3,6 +3,7 @@ package com.avnivo.translator
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
@@ -14,6 +15,8 @@ import android.webkit.WebViewClient
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.webkit.WebViewAssetLoader
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 
 /**
  * Single-activity shell that renders the bundled AVNIVO web app inside a WebView.
@@ -27,6 +30,8 @@ class MainActivity : Activity() {
 
     private lateinit var webView: WebView
     private var pendingMicRequest: PermissionRequest? = null
+    private var documentStartScriptSupported = false
+    private var polyfill = ""
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
@@ -56,11 +61,37 @@ class MainActivity : Activity() {
         }
         WebView.setWebContentsDebuggingEnabled(false)
 
+        // The bundled UI uses Element.replaceChildren (Chrome 86+). Older WebViews
+        // would throw on first render, so polyfill it. Prefer document-start injection
+        // (WebView 84+); on older WebViews fall back to injecting as the page starts.
+        val polyfillSource = readAsset(POLYFILL_ASSET)
+        polyfill = polyfillSource
+        if (polyfillSource.isNotEmpty() &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
+        ) {
+            WebViewCompat.addDocumentStartJavaScript(
+                view,
+                polyfillSource,
+                setOf(OriginPolicy.LOCAL_ORIGIN)
+            )
+            documentStartScriptSupported = true
+        } else {
+            documentStartScriptSupported = false
+        }
+
         val loader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
 
         view.webViewClient = object : WebViewClient() {
+            override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
+                if (!documentStartScriptSupported && polyfill.isNotEmpty() &&
+                    OriginPolicy.isLocalNavigation(url ?: "")
+                ) {
+                    view.evaluateJavascript(polyfill, null)
+                }
+            }
+
             override fun shouldInterceptRequest(
                 view: WebView,
                 request: WebResourceRequest
@@ -123,6 +154,12 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun readAsset(name: String): String = try {
+        assets.open(name).bufferedReader().use { it.readText() }
+    } catch (e: Exception) {
+        ""
+    }
+
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
         if (webView.canGoBack()) webView.goBack() else super.onBackPressed()
@@ -143,5 +180,6 @@ class MainActivity : Activity() {
     companion object {
         private const val MICROPHONE_REQUEST_CODE = 41
         private const val START_URL = OriginPolicy.START_URL
+        private const val POLYFILL_ASSET = "polyfill-replace-children.js"
     }
 }
