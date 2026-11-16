@@ -1,4 +1,7 @@
 fastapi==0.115.12
 uvicorn==0.34.2
+httpx==0.28.1
 python-multipart==0.0.20
-google-cloud-speech==2.33.0
+groq==0.33.0
+google-auth>=2.35,<3
+requests>=2.31,<3
