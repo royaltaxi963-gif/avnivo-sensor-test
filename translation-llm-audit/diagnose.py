@@ -53,12 +53,21 @@ def load_done() -> dict:
     if not EVIDENCE.exists():
         return {}
     d = json.loads(EVIDENCE.read_text())
-    return {f"{r['chirp']}|{r['direction']}|{r['item']}": r for r in d["records"]}
+    out = {}
+    for r in d["records"]:
+        tag = r.get("tag")
+        key = (f"{r['chirp']}|{r['direction']}@{tag}|{r['item']}" if tag
+               else f"{r['chirp']}|{r['direction']}|{r['item']}")
+        out[key] = r
+    return out
 
 
 def record(client, token, ledger, done, chirp, llm, cls, item, cat, direction,
-           source_code, target_code, text, is_target) -> dict:
-    key = f"{chirp}|{direction}|{item}"
+           source_code, target_code, text, is_target, tag) -> dict:
+    # ``tag`` namespaces the key per run mode. Without it a retest would reuse a
+    # key from an earlier run and be served from cache instead of being sent,
+    # which would silently turn a retest into a replay of the original result.
+    key = f"{chirp}|{direction}@{tag}|{item}"
     if key in done:
         return done[key]
     res = translate(client, token, text, source_code, target_code)
@@ -69,7 +78,7 @@ def record(client, token, ledger, done, chirp, llm, cls, item, cat, direction,
     q = score(item, text, out, llm, source_code, target_code, is_target)
     rec = {
         "chirp": chirp, "llm": llm, "class": cls, "item": item, "category": cat,
-        "direction": direction, "source": source_code, "target": target_code,
+        "direction": direction, "tag": tag, "source": source_code, "target": target_code,
         "source_text": text, "translated": out, "http": res.get("http"),
         "error": res.get("error"), "latency_s": res.get("latency_s"), "quality": q,
     }
@@ -111,7 +120,7 @@ def main() -> None:
                     if executed >= args.max_requests or ledger.cost >= harness.BUDGET_HARD_STOP:
                         break
                     r = record(client, token, ledger, done, chirp, llm, row["documented_class"],
-                               item, "diagnosis", direction, sc, tc, text, is_target)
+                               item, "diagnosis", direction, sc, tc, text, is_target, "diag-failed")
                     executed += 1
                     outcome[direction] = {"http": r["http"],
                                           "msg": _short(r.get("error")),
@@ -144,7 +153,7 @@ def main() -> None:
                         if executed >= args.max_requests or ledger.cost >= harness.BUDGET_HARD_STOP:
                             break
                         r = record(client, token, ledger, done, chirp, llm, row["documented_class"],
-                                   item, "disputed_retest", direction, src, tgt, text, is_target)
+                                   item, "disputed_retest", direction, src, tgt, text, is_target, "diag-disputed")
                         executed += 1
                         per_item.append({"item": item, "direction": direction, "http": r["http"],
                                          "out": r["translated"], "flags": r["quality"]["flags"]})
@@ -170,7 +179,7 @@ def main() -> None:
                         if executed >= args.max_requests or ledger.cost >= harness.BUDGET_HARD_STOP:
                             break
                         r = record(client, token, ledger, done, chirp, llm, "B",
-                                   item, "experimental_retest", direction, src, tgt, text, is_target)
+                                   item, "experimental_retest", direction, src, tgt, text, is_target, "diag-experimental")
                         executed += 1
                         per_item.append({"item": item, "direction": direction, "http": r["http"],
                                          "out": r["translated"], "flags": r["quality"]["flags"]})
@@ -199,7 +208,7 @@ def main() -> None:
                     if executed >= args.max_requests or ledger.cost >= harness.BUDGET_HARD_STOP:
                         break
                     r = record(client, token, ledger, done, chirp, llm, row["documented_class"],
-                               item, "regression", direction, src, tgt, text, is_target)
+                               item, "regression", direction, src, tgt, text, is_target, "diag-regression")
                     executed += 1
                     per.append({"direction": direction, "http": r["http"],
                                 "out": r["translated"], "flags": r["quality"]["flags"]})

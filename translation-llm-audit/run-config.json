@@ -1,4 +1,4 @@
 {
-  "mode": "regression",
-  "max_requests": 60
+  "mode": "disputed",
+  "max_requests": 120
 }
