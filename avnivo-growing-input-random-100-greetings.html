@@ -25,18 +25,34 @@ const greetings=[["uz","Assalomu alaykum"],["ar","السلام عليكم"],["fa
 const input=document.querySelector('.writing-area'),label=document.querySelector('.animated-greeting'),shell=document.querySelector('.writing-shell'),app=document.querySelector('.app');
 const segment=text=>typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(text)].map(x=>x.segment):Array.from(text);
 let index=0,position=0,erasing=false,timeout=0;
+let previousLast=-1;
+function shuffleRound(){
+ const order=Array.from({length:greetings.length},(_,i)=>i);
+ for(let i=order.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [order[i],order[j]]=[order[j],order[i]];
+ }
+ // Do not repeat the last language immediately across round boundaries.
+ if(order.length>1&&order[0]===previousLast){
+  const swapWith=1+Math.floor(Math.random()*(order.length-1));
+  [order[0],order[swapWith]]=[order[swapWith],order[0]];
+ }
+ previousLast=order[order.length-1];
+ return order;
+}
+let order=shuffleRound();
 const delay=ms=>{clearTimeout(timeout);timeout=setTimeout(tick,ms)};
 function tick(){
  if(input.value.length){label.hidden=true;return}
  label.hidden=false;
- const [lang,word]=greetings[index];const letters=segment(word);
+ const [lang,word]=greetings[order[index]];const letters=segment(word);
  label.lang=lang;label.dir=/^(ar|fa|ur|ps|ug|sd|dv|ku|yi|he)$/.test(lang)?'rtl':'auto';
  if(!erasing){
   position=Math.min(position+1,letters.length);label.textContent=letters.slice(0,position).join('');
   if(position===letters.length){erasing=true;delay(1000)}else delay(85);
  }else{
   position=Math.max(0,position-1);label.textContent=letters.slice(0,position).join('');
-  if(position===0){erasing=false;index=(index+1)%greetings.length;delay(240)}else delay(45);
+  if(position===0){erasing=false;index++;if(index===order.length){index=0;order=shuffleRound()}delay(240)}else delay(45);
  }
 }
 function layout(){
