@@ -116,15 +116,28 @@ html[data-avnivo-mode=offline] .settings-description{display:none}
 .avnivo-online-tts-settings{padding:0 15px 24px}
 html[data-avnivo-mode=offline] .avnivo-online-tts-settings{display:none}
 html[data-avnivo-mode=online] .offline-modules{display:none}
+.interface-language{padding:0 15px 6px}
+.interface-language-label{display:block;color:#ffe7b9;font:14px system-ui;margin:8px 0 0}
+.interface-language-select{width:100%;max-width:280px;margin:8px 0 0;padding:10px;border-radius:10px;background:#241b15;color:#ffe7b9;border:1px solid #b58a52;font:15px system-ui}
+html[data-avnivo-mode=offline] .interface-language-label{color:#cde9ff}
+html[data-avnivo-mode=offline] .interface-language-select{background:#0d2336;color:#dff2ff;border-color:#3f7fa6}
+.interface-language-note{font:11.5px/1.5 system-ui;color:#c9b89e;margin:7px 0 0}
+html[data-avnivo-mode=offline] .interface-language-note{color:#9dbdd3}
 </style>
 </head>
 <body>
-<main class="app" aria-label="AVNIVO fon">
-<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p><section class="offline-settings-top" aria-label="Offline sozlamalar"><h2 class="offline-settings-top-title">Offline sozlamalar</h2><p class="offline-settings-top-note">Qo‘shimcha sozlamalar shu yerda, modullar ro‘yxatidan yuqorida joylashadi.</p></section><section class="offline-modules" aria-label="Offline modullar" id="offline-modules"><h2 class="offline-modules-title">Offline modullar</h2><p class="offline-modules-subtitle">Modullarni oldindan yuklab oling va internetsiz ham foydalaning. Ayrim imkoniyatlar Online rejimdan farq qilishi mumkin.</p><div class="offline-modules-list"></div><p class="offline-module-notice" role="status" aria-live="polite"></p></section></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="online-language-sheet" hidden role="dialog" aria-modal="true" aria-label="Online tillar"><div class="online-language-panel"><div class="online-language-head"><strong>Online tillar · 93</strong><button class="online-language-close" type="button" aria-label="Yopish">×</button></div><input class="online-language-search" type="search" placeholder="Til nomi yoki kodini qidiring" aria-label="Til qidirish"><div class="online-language-results"></div><p class="online-language-help">77 tasdiqlangan · 13 tajribaviy · 3 qayta sinov talab qiladi</p></div></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
+<main class="app" aria-label="AVNIVO fon" data-i18n-aria-label="app.background">
+<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi" data-i18n-aria-label="mode.group"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" data-i18n-aria-label="mode.online" data-i18n-title="mode.online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" data-i18n-aria-label="mode.offline" data-i18n-title="mode.offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" data-i18n-aria-label="history.toggle" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" data-i18n-aria-label="settings.toggle" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" data-i18n-aria-label="settings.title" aria-hidden="true" inert><div class="settings-header"><span data-i18n="settings.title">Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish" data-i18n-aria-label="settings.close">×</button></div><p class="settings-description" data-i18n="settings.description">Sozlamalar bo‘limi</p><section class="interface-language" aria-label="Interfeys tili" data-i18n-aria-label="language.settings.title"><label class="interface-language-label"><span data-i18n="language.settings.title">Interfeys tili</span><select class="interface-language-select" aria-label="Interfeys tilini tanlash" data-i18n-aria-label="language.settings.aria"></select></label><p class="interface-language-note" data-i18n="language.settings.note">Interfeys tili boshqa tillarga tarjima qilinadi; ovoz modellari qayta yuklanmaydi.</p></section><section class="offline-settings-top" aria-label="Offline sozlamalar" data-i18n-aria-label="offline.settings.title"><h2 class="offline-settings-top-title" data-i18n="offline.settings.title">Offline sozlamalar</h2><p class="offline-settings-top-note" data-i18n="offline.settings.note">Qo‘shimcha sozlamalar shu yerda, modullar ro‘yxatidan yuqorida joylashadi.</p></section><section class="offline-modules" aria-label="Offline modullar" id="offline-modules" data-i18n-aria-label="offline.modules.label"><h2 class="offline-modules-title" data-i18n="offline.modules.title">Offline modullar</h2><p class="offline-modules-subtitle" data-i18n="offline.modules.subtitle">Modullarni oldindan yuklab oling va internetsiz ham foydalaning. Ayrim imkoniyatlar Online rejimdan farq qilishi mumkin.</p><div class="offline-modules-list"></div><p class="offline-module-notice" role="status" aria-live="polite"></p></section></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" data-i18n-aria-label="history.title" aria-hidden="true" inert><div class="history-header"><span data-i18n="history.title">Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish" data-i18n-aria-label="history.close">×</button></div><button type="button" class="history-new" data-i18n="history.new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon" data-i18n-aria-label="brand.label"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar" data-i18n-aria-label="messages.label"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari" data-i18n-aria-label="languages.label"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" data-i18n-aria-label="languages.source" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" data-i18n-aria-label="languages.target" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="online-language-sheet" hidden role="dialog" aria-modal="true" aria-label="Online tillar" data-i18n-aria-label="online.languages.label"><div class="online-language-panel"><div class="online-language-head"><strong data-i18n="online.languages.title" data-i18n-vars='{"count":93}'>Online tillar · 93</strong><button class="online-language-close" type="button" aria-label="Yopish" data-i18n-aria-label="online.languages.close">×</button></div><input class="online-language-search" type="search" placeholder="Til nomi yoki kodini qidiring" aria-label="Til qidirish" data-i18n-placeholder="online.languages.search" data-i18n-aria-label="online.languages.searchLabel"><div class="online-language-results"></div><p class="online-language-help" data-i18n="online.languages.help" data-i18n-vars='{"official":77,"experimental":13,"retest":3}'>77 tasdiqlangan · 13 tajribaviy · 3 qayta sinov talab qiladi</p></div></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" data-i18n-aria-label="composer.placeholder" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" data-i18n-aria-label="mic.label.on" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
 </main>
 <script src="offline-uzbek-download.js"></script>
+<script src="i18n/avnivo-i18n.js"></script>
 <script>
 (()=>{'use strict';
+const i18n=window.AVNIVO_I18N;
+const tr=(key,vars)=>i18n&&i18n.t?i18n.t(key,vars):key;
+const localizedNodes=[];
+function bindLocalized(node,prop,key,vars){if(!node||!i18n)return;let item=localizedNodes.find(x=>x.node===node&&x.prop===prop);if(item){item.key=key;item.vars=vars}else{item={node,prop,key,vars};localizedNodes.push(item)}const value=tr(key,vars);if(prop==='text')node.textContent=value;else node.setAttribute(prop,value)}
+function refreshLocalizedNodes(){for(const item of localizedNodes){const value=tr(item.key,item.vars);if(item.prop==='text')item.node.textContent=value;else item.node.setAttribute(item.prop,value)}}
 const greetings=[["uz","Assalomu alaykum"],["ar","السلام عليكم"],["fa","السلام علیکم"],["ur","السلام علیکم"],["ps","السلام علیکم"],["tg","Ассалому алайкум"],["ky","Ассалому алейкум"],["kk","Ассалаумағалейкум"],["tk","Essalawmaleýkim"],["az","Əssəlamu əleykum"],["tr","Selamünaleyküm"],["ug","ئەسسالامۇ ئەلەيكۇم"],["sd","السلام عليڪم"],["ku","سڵاو"],["ms","Assalamualaikum"],["id","Assalamualaikum"],["bn","আসসালামু আলাইকুম"],["so","Asalaamu calaykum"],["sw","As-salaam alaikum"],["ha","Assalamu alaikum"],["dv","އައްސަލާމު އަލައިކުމް"],["bs","Esselamu alejkum"],["sq","Es-selamu alejkum"],["ff","Assalaamu alaikum"],["wo","Salaam aleekum"],["mn","Сайн байна уу"],["ru","Привет"],["en","Hello"],["fr","Bonjour"],["de","Hallo"],["es","Hola"],["it","Ciao"],["pt","Olá"],["nl","Hallo"],["sv","Hej"],["no","Hei"],["da","Hej"],["fi","Hei"],["is","Halló"],["et","Tere"],["lv","Sveiki"],["lt","Labas"],["pl","Cześć"],["cs","Ahoj"],["sk","Ahoj"],["sl","Živjo"],["hr","Bok"],["sr","Здраво"],["mk","Здраво"],["bg","Здравей"],["ro","Salut"],["hu","Szia"],["el","Γεια σου"],["hy","Բարև"],["ka","გამარჯობა"],["he","שלום"],["hi","नमस्ते"],["ne","नमस्ते"],["mr","नमस्कार"],["gu","નમસ્તે"],["pa","ਸਤ ਸ੍ਰੀ ਅਕਾਲ"],["ta","வணக்கம்"],["te","నమస్కారం"],["kn","ನಮಸ್ಕಾರ"],["ml","നമസ്കാരം"],["si","ආයුබෝවන්"],["th","สวัสดี"],["lo","ສະບາຍດີ"],["km","សួស្តី"],["my","မင်္ဂလာပါ"],["vi","Xin chào"],["zh","你好"],["ja","こんにちは"],["ko","안녕하세요"],["bo","བཀྲ་ཤིས་བདེ་ལེགས"],["am","ሰላም"],["ti","ሰላም"],["om","Akkam"],["zu","Sawubona"],["xh","Molo"],["af","Hallo"],["ny","Moni"],["sn","Mhoro"],["rw","Muraho"],["lg","Oli otya"],["yo","Ẹ n lẹ"],["ig","Ndewo"],["ak","Maakye"],["ee","Ŋdi"],["ln","Mbote"],["mg","Salama"],["ht","Bonjou"],["eo","Saluton"],["la","Salve"],["ga","Dia dhuit"],["cy","Helo"],["gd","Halò"],["eu","Kaixo"],["ca","Hola"],["gl","Ola"]];
 const input=document.querySelector('.writing-area'),label=document.querySelector('.animated-greeting'),shell=document.querySelector('.writing-shell'),app=document.querySelector('.app');
 const segment=text=>typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(text)].map(x=>x.segment):Array.from(text);
@@ -305,7 +318,7 @@ function renderOnlineLanguages(){
   if(q&&!((name+' '+locale+' '+translationCode).toLocaleLowerCase().includes(q)))continue;
   const item=document.createElement('button');item.type='button';item.className='online-language-item';
   const title=document.createElement('span');title.textContent=name+' · '+locale;
-  const note=document.createElement('small');note.textContent=status==='official'?'Tasdiqlangan':status==='experimental'?'Tajribaviy':'Qayta sinov';
+  const note=document.createElement('small');note.textContent=tr('online.status.'+status);
   item.append(title,note);item.setAttribute('aria-selected',String(onlineChoice[longPressSide]===locale));
   item.addEventListener('click',()=>{
    if(!onlineLanguagesByCode.has(locale))return;
@@ -366,10 +379,10 @@ settingsOverlay.addEventListener('click',()=>setSettingsOpen(false));
 
 /* Offline module UI: only installer-verified states may show success. */
 const offlineModuleCatalog=[
- {id:'uz-stt',serverModelId:'uzbek-stt',name:'O‘zbekcha ovoz tanish',desc:'O‘zbekcha nutqni tushunib, aytilgan so‘zlarni matnga aylantiradi.',icon:'mic',bytes:591649160,sizeNote:'Model fayli: 591,6 MB · qo‘shimcha fayllar alohida'},
- {id:'multilingual-stt',name:'Ko‘p tilli ovoz tanish',desc:'Turli tillardagi nutqni matnga aylantiradi. 99 til sifati hali tasdiqlanmagan.',icon:'languages',bytes:251875316,sizeNote:'Model: 251,9 MB · qo‘shimcha runtime alohida'},
- {id:'offline-translate',name:'Internetsiz tarjima',desc:'Matnlarni internetga ulanmasdan boshqa tilga tarjima qilishga yordam beradi.',icon:'translate',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'},
- {id:'offline-tts',name:'Matnni ovozli o‘qish',desc:'Yozilgan matn va tarjimalarni internetsiz ovoz chiqarib o‘qiydi.',icon:'speaker',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'}
+ {id:'uz-stt',serverModelId:'uzbek-stt',key:'offline.module.uz-stt',icon:'mic',bytes:591649160},
+ {id:'multilingual-stt',key:'offline.module.multilingual-stt',icon:'languages',bytes:251875316},
+ {id:'offline-translate',key:'offline.module.offline-translate',icon:'translate',bytes:null},
+ {id:'offline-tts',key:'offline.module.offline-tts',icon:'speaker',bytes:null}
 ];
 const offlineModuleIcons={
  mic:'<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/>',
@@ -398,8 +411,8 @@ function updateOfflineModule(id,state,progress){
  btn.classList.toggle('is-downloading',state==='downloading'||state==='verifying');
  btn.disabled=state==='downloading'||state==='verifying';
  btn.innerHTML=offlineSvg(ready?'check':'download');
- btn.setAttribute('aria-label',ready?'Modul faol':module.name+' — yuklab olish');
- status.textContent=({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state];
+ bindLocalized(btn,'aria-label',ready?'offline.module.action.ready':'offline.module.action.download',ready?undefined:{name:module.key+'.name'});
+ bindLocalized(status,'text','offline.state.'+state);
  const hasProgress=progress&&Number.isFinite(progress.downloadedBytes)&&Number.isFinite(progress.totalBytes)&&progress.totalBytes>0&&progress.downloadedBytes>=0;
  progressEl.hidden=!(state==='downloading'||state==='verifying')||!hasProgress;
  if(hasProgress){
@@ -415,31 +428,32 @@ for(const module of offlineModuleCatalog){
  const row=document.createElement('article');row.className='offline-module-card';row.dataset.moduleId=module.id;
  const mark=document.createElement('span');mark.className='offline-module-mark';mark.innerHTML=offlineSvg(module.icon);
  const copy=document.createElement('div');copy.className='offline-module-copy';
- const name=document.createElement('h3');name.className='offline-module-name';name.textContent=module.name;
- const desc=document.createElement('p');desc.className='offline-module-desc';desc.textContent=module.desc;
- const size=document.createElement('p');size.className='offline-module-size';size.textContent=module.bytes?'Hajmi: '+offlineMb(module.bytes):'Hajmi: aniqlanmoqda';size.title=module.sizeNote;
- const status=document.createElement('p');status.className='offline-module-state';status.textContent='Yuklanmagan';
+ const name=document.createElement('h3');name.className='offline-module-name';bindLocalized(name,'text',module.key+'.name');
+ const desc=document.createElement('p');desc.className='offline-module-desc';bindLocalized(desc,'text',module.key+'.desc');
+ const size=document.createElement('p');size.className='offline-module-size';bindLocalized(size,'text',module.bytes?'offline.module.size':'offline.module.sizePending',module.bytes?{size:offlineMb(module.bytes)}:undefined);bindLocalized(size,'title',module.key+'.sizeNote');
+ const status=document.createElement('p');status.className='offline-module-state';bindLocalized(status,'text','offline.state.not_installed');
  const meta=document.createElement('div');meta.className='offline-module-meta';meta.append(size,status);copy.append(name,desc,meta);
- const btn=document.createElement('button');btn.type='button';btn.className='offline-module-action';btn.innerHTML=offlineSvg('download');btn.setAttribute('aria-label',module.name+' — yuklab olish');
+ const btn=document.createElement('button');btn.type='button';btn.className='offline-module-action';btn.innerHTML=offlineSvg('download');bindLocalized(btn,'aria-label','offline.module.action.download',{name:module.key+'.name'});
  const progress=document.createElement('div');progress.className='offline-module-progress';progress.hidden=true;
- progress.innerHTML='<div class="offline-module-progress-label"><span class="offline-module-percent">0%</span><span class="offline-module-mb">0 MB</span></div><div class="offline-module-track" role="progressbar" aria-label="Yuklash jarayoni" aria-valuemin="0" aria-valuemax="100"><div class="offline-module-fill"></div></div>';
+ progress.innerHTML='<div class="offline-module-progress-label"><span class="offline-module-percent">0%</span><span class="offline-module-mb">0 MB</span></div><div class="offline-module-track" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="offline-module-fill"></div></div>';
+ const track=progress.querySelector('[role="progressbar"]');bindLocalized(track,'aria-label','offline.progress.label');
  btn.addEventListener('click',()=>{
   if(document.documentElement.dataset.avnivoMode!=='offline'||offlineState.get(module.id)==='ready')return;
   btn.classList.remove('is-tapped');void btn.offsetWidth;btn.classList.add('is-tapped');
   if(module.serverModelId){
    const downloader=window.avnivoVerifiedUzbekDownload;
-   if(!downloader){offlineNotice.textContent='Yuklash moduli ochilmadi. Sahifani yangilang.';return}
+   if(!downloader){offlineNotice.textContent=tr('offline.notice.moduleMissing');return}
    btn.disabled=true;
-   offlineNotice.textContent='Haqiqiy yuklash boshlanmoqda. Internet uzilsa qayta bosib davom ettiring.';
+   offlineNotice.textContent=tr('offline.notice.starting');
    downloader.run(
     (done,total)=>updateOfflineModule(module.id,'downloading',{downloadedBytes:done,totalBytes:total}),
     text=>{offlineNotice.textContent=text;if(text.startsWith('SHA-256'))updateOfflineModule(module.id,'verifying',{downloadedBytes:module.bytes,totalBytes:module.bytes})}
-   ).then(()=>{updateOfflineModule(module.id,'not_installed');status.textContent='Yuklangan va tekshirilgan · dvigatel ulanmagan';offlineNotice.textContent='Fayllar saqlandi va SHA-256 tasdiqlandi. Sherpa-ONNX ijro mexanizmi ulanmaguncha faol emas.'})
-    .catch(err=>{updateOfflineModule(module.id,'error');offlineNotice.textContent='Yuklash to‘xtadi: '+err.message+'. Qayta bosilsa saqlangan bo‘laklardan davom etadi.'})
+   ).then(()=>{updateOfflineModule(module.id,'not_installed');bindLocalized(status,'text','offline.status.verifiedInactive');offlineNotice.textContent=tr('offline.notice.saved')})
+    .catch(err=>{updateOfflineModule(module.id,'error');offlineNotice.textContent=tr('offline.notice.failed',{message:err.message})})
     .finally(()=>{btn.disabled=false});
    return;
   }
-  offlineNotice.textContent=module.name+': yuklash manbasi hali ulanmagan. Yuklash boshlanmadi.';
+  offlineNotice.textContent=tr('offline.notice.noSource',{name:tr(module.key+'.name')});
  });
  btn.addEventListener('animationend',()=>btn.classList.remove('is-tapped'));
  row.append(mark,copy,btn,progress);offlineList.append(row);offlineState.set(module.id,'not_installed');
@@ -466,14 +480,14 @@ function loadHistory(){
   if(activeId&&historySessions.some(x=>x.id===activeId))currentHistoryId=activeId;
  }catch(e){console.warn('Tarixni o‘qib bo‘lmadi',e)}
 }
-function historyDate(iso){const d=new Date(iso);return Number.isNaN(d.getTime())?'':new Intl.DateTimeFormat('uz-UZ',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric',hour12:false}).format(d)}
+function historyDate(iso){const d=new Date(iso);return Number.isNaN(d.getTime())?'':i18n.formatDate(d,{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric',hour12:false})}
 function renderHistory(){
  historyItems.replaceChildren();
- if(!historySessions.length){const empty=document.createElement('div');empty.className='history-empty';empty.textContent='Hozircha saqlangan chatlar yo‘q. Yangi xabar yuborilganda shu yerda sana bilan paydo bo‘ladi.';historyItems.append(empty);return}
+ if(!historySessions.length){const empty=document.createElement('div');empty.className='history-empty';bindLocalized(empty,'text','history.empty');historyItems.append(empty);return}
  for(const session of historySessions){
   const button=document.createElement('button');button.type='button';button.className='history-entry'+(session.id===currentHistoryId?' current':'');
-  const title=document.createElement('span');title.className='history-entry-title';title.textContent='O‘zbek tili = русский язык';
-  const date=document.createElement('span');date.className='history-entry-date';date.textContent='Saqlangan: '+historyDate(session.updatedAt||session.createdAt);
+  const title=document.createElement('span');title.className='history-entry-title';bindLocalized(title,'text','history.entry.title');
+  const date=document.createElement('span');date.className='history-entry-date';bindLocalized(date,'text','history.saved',{date:historyDate(session.updatedAt||session.createdAt)});
   button.append(title,date);button.addEventListener('click',()=>{persistDraft();currentHistoryId=session.id;persistActiveChat();restoreHistory(session);loadDraft();renderHistory();setHistoryOpen(false)});
   historyItems.append(button);
  }
@@ -508,73 +522,72 @@ function messageData(entry,firstLanguage){
 }
 const onlineTtsSettings=document.createElement('section');
 onlineTtsSettings.className='avnivo-online-tts-settings';
-onlineTtsSettings.setAttribute('aria-label','Online ovoz sozlamalari');
+onlineTtsSettings.setAttribute('aria-label','Online ovoz sozlamalari');bindLocalized(onlineTtsSettings,'aria-label','tts.voice.label');
 document.querySelector('.settings-drawer')?.append(onlineTtsSettings);
 // Existing Gemini Cloud TTS is used only in Online mode. Offline keeps device speech.
 const AVNIVO_TTS_URL='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts';
 const AVNIVO_TTS_VOICES=["Zephyr","Puck","Charon","Kore","Fenrir","Leda","Orus","Aoede","Callirrhoe","Autonoe","Enceladus","Iapetus","Umbriel","Algieba","Despina","Erinome","Algenib","Rasalgethi","Laomedeia","Achernar","Alnilam","Schedar","Gacrux","Pulcherrima","Achird","Zubenelgenubi","Vindemiatrix","Sadachbia","Sadaltager","Sulafat"];
 const ttsVoiceSelect=document.createElement('select');
-ttsVoiceSelect.setAttribute('aria-label','AI ovoz turini tanlash');
+ttsVoiceSelect.setAttribute('aria-label','AI ovoz turini tanlash');bindLocalized(ttsVoiceSelect,'aria-label','tts.voice.aria');
 ttsVoiceSelect.style.cssText='width:100%;max-width:280px;margin:10px 0;padding:10px;border-radius:10px;background:#241b15;color:#ffe7b9;border:1px solid #b58a52;font:15px system-ui';
 for(const voice of AVNIVO_TTS_VOICES){const option=document.createElement('option');option.value=voice;option.textContent=voice;ttsVoiceSelect.append(option)}
 try{const saved=localStorage.getItem('avnivoTtsVoice');if(AVNIVO_TTS_VOICES.includes(saved))ttsVoiceSelect.value=saved}catch(e){}
 ttsVoiceSelect.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsVoice',ttsVoiceSelect.value)}catch(e){}});
 const ttsVoiceLabel=document.createElement('label');
-ttsVoiceLabel.textContent='AI ovozi (Online)';
 ttsVoiceLabel.style.cssText='display:block;margin:14px 0 0;color:#ffe7b9;font:14px system-ui';
-ttsVoiceLabel.append(ttsVoiceSelect);
+const ttsVoiceText=document.createElement('span');bindLocalized(ttsVoiceText,'text','tts.voice.label');
+ttsVoiceLabel.append(ttsVoiceText,ttsVoiceSelect);
 onlineTtsSettings.append(ttsVoiceLabel);
 
 const ttsStyleSelect=document.createElement('select');
-ttsStyleSelect.setAttribute('aria-label','Ovoz ohangini tanlash');
+ttsStyleSelect.setAttribute('aria-label','Ovoz ohangini tanlash');bindLocalized(ttsStyleSelect,'aria-label','tts.style.aria');
 ttsStyleSelect.style.cssText=ttsVoiceSelect.style.cssText;
-const AVNIVO_TTS_STYLES=[['auto','Avtomatik'],['calm','Xotirjam'],['happy','Quvnoq'],['sad','Qayg‘uli'],['excited','Hayajonli'],['concerned','Xavotirli'],["friendly","Do‘stona"],["professional","Professional"],["narrator","Audiokitob"],["documentary","Hujjatli film"],["news","Yangiliklar"],["storytelling","Hikoyachi"],["dramatic","Dramatik"],["mysterious","Sirli"],["serious","Jiddiy"],["confident","Ishonchli"],["gentle","Muloyim"],["empathetic","Hamdard"],["curious","Qiziquvchan"],["surprised","Hayratlangan"],["nervous","Asabiy"],["fearful","Qo‘rqqan"],["angry","G‘azablangan"],["frustrated","Jahli chiqqan"],["sarcastic","Kinoyali"],["ironic","Istehzo"],["bored","Zerikkan"],["tired","Charchagan"],["whisper","Pichirlash"],["mutter","Pichirlab ming‘irlash"],["breathy","Nafasli ovoz"],["robotic","Robotdek"],["monotone","Bir maromda"],["playful","O‘ynoqi"],["energetic","G‘ayratli"],["thoughtful","O‘ychan"],["persuasive","Ishontiruvchi"],["teacher","O‘qituvchi"],["poetic","She’riy"],["slow","Sekin nutq"],["fast","Tez nutq"],["custom","O‘zim belgilayman"]];
-for(const [value,label] of AVNIVO_TTS_STYLES){const option=document.createElement('option');option.value=value;option.textContent=label;ttsStyleSelect.append(option)}
-try{const saved=localStorage.getItem('avnivoTtsStyle');if(AVNIVO_TTS_STYLES.some(item=>item[0]===saved))ttsStyleSelect.value=saved}catch(e){}
+const AVNIVO_TTS_STYLES=['auto','calm','happy','sad','excited','concerned','friendly','professional','narrator','documentary','news','storytelling','dramatic','mysterious','serious','confident','gentle','empathetic','curious','surprised','nervous','fearful','angry','frustrated','sarcastic','ironic','bored','tired','whisper','mutter','breathy','robotic','monotone','playful','energetic','thoughtful','persuasive','teacher','poetic','slow','fast','custom'];
+for(const value of AVNIVO_TTS_STYLES){const option=document.createElement('option');option.value=value;bindLocalized(option,'text','tts.style.'+value);ttsStyleSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsStyle');if(AVNIVO_TTS_STYLES.includes(saved))ttsStyleSelect.value=saved}catch(e){}
 ttsStyleSelect.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsStyle',ttsStyleSelect.value)}catch(e){}});
 const ttsStyleLabel=document.createElement('label');
-ttsStyleLabel.textContent='O‘qish ohangi (Online)';
 ttsStyleLabel.style.cssText=ttsVoiceLabel.style.cssText;
-ttsStyleLabel.append(ttsStyleSelect);
+const ttsStyleText=document.createElement('span');bindLocalized(ttsStyleText,'text','tts.style.label');
+ttsStyleLabel.append(ttsStyleText,ttsStyleSelect);
 onlineTtsSettings.append(ttsStyleLabel);
 const ttsRateSelect=document.createElement('select');
-ttsRateSelect.setAttribute('aria-label','Ovozli o‘qish tezligi');
+ttsRateSelect.setAttribute('aria-label','Ovozli o‘qish tezligi');bindLocalized(ttsRateSelect,'aria-label','tts.rate.aria');
 ttsRateSelect.style.cssText=ttsVoiceSelect.style.cssText;
-for(const rate of [0.5,0.65,0.75,0.85,1,1.15,1.25,1.5,1.75,2]){const option=document.createElement('option');option.value=String(rate);option.textContent=rate===1?'1× — Oddiy':rate<1?rate+'× — Sekin':rate+'× — Tez';ttsRateSelect.append(option)}
+for(const rate of [0.5,0.65,0.75,0.85,1,1.15,1.25,1.5,1.75,2]){const option=document.createElement('option');option.value=String(rate);bindLocalized(option,'text',rate===1?'tts.rate.normal':rate<1?'tts.rate.slow':'tts.rate.fast',rate===1?undefined:{rate});ttsRateSelect.append(option)}
 try{const saved=localStorage.getItem('avnivoTtsRate');if([...ttsRateSelect.options].some(option=>option.value===saved))ttsRateSelect.value=saved}catch(e){ }
 ttsRateSelect.addEventListener('change',()=>{if(ttsAudio)ttsAudio.playbackRate=Number(ttsRateSelect.value);try{localStorage.setItem('avnivoTtsRate',ttsRateSelect.value)}catch(e){}});
 const ttsRateLabel=document.createElement('label');
-ttsRateLabel.textContent='O‘qish tezligi (Online va Offline)';
 ttsRateLabel.style.cssText=ttsVoiceLabel.style.cssText;
-ttsRateLabel.append(ttsRateSelect);
+const ttsRateText=document.createElement('span');bindLocalized(ttsRateText,'text','tts.rate.label');
+ttsRateLabel.append(ttsRateText,ttsRateSelect);
 onlineTtsSettings.append(ttsRateLabel);
 
-function addTtsSetting(labelText,storageKey,items){
- const select=document.createElement('select');select.setAttribute('aria-label',labelText);select.style.cssText=ttsVoiceSelect.style.cssText;
- for(const [value,title] of items){const option=document.createElement('option');option.value=value;option.textContent=title;select.append(option)}
- try{const saved=localStorage.getItem(storageKey);if(items.some(x=>x[0]===saved))select.value=saved}catch(e){}
+function addTtsSetting(labelKey,storageKey,itemKeys){
+ const select=document.createElement('select');select.style.cssText=ttsVoiceSelect.style.cssText;bindLocalized(select,'aria-label',labelKey);
+ for(const key of itemKeys){const option=document.createElement('option');option.value=key;bindLocalized(option,'text',labelKey.replace(/label$/,'')+key);select.append(option)}
+ try{const saved=localStorage.getItem(storageKey);if(itemKeys.includes(saved))select.value=saved}catch(e){}
  select.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem(storageKey,select.value)}catch(e){}});
- const label=document.createElement('label');label.textContent=labelText;label.style.cssText=ttsVoiceLabel.style.cssText;label.append(select);
+ const label=document.createElement('label');label.style.cssText=ttsVoiceLabel.style.cssText;
+ const text=document.createElement('span');bindLocalized(text,'text',labelKey);
+ label.append(text,select);
  onlineTtsSettings.append(label);return select;
 }
-const ttsDeliverySelect=addTtsSetting('Ovoz chiqarish usuli','avnivoTtsDelivery',[
- ['normal','Oddiy'],['whisper','Pichirlash'],['breathy','Nafasli'],['clear','Ravshan talaffuz'],['soft','Past ovoz'],['projected','Baland va aniq']]);
-const ttsPitchSelect=addTtsSetting('Ovoz baland-pastligi','avnivoTtsPitch',[
- ['normal','Tabiiy'],['low','Pastroq'],['high','Yuqoriroq'],['flat','Bir tekis'],['expressive','Ifodali']]);
-const ttsPaceSelect=addTtsSetting('AI nutq maromi','avnivoTtsPace',[
- ['normal','Tabiiy'],['slow','Sekin'],['fast','Tez'],['deliberate','Tanaffusli']]);
+const ttsDeliverySelect=addTtsSetting('tts.delivery.label','avnivoTtsDelivery',['normal','whisper','breathy','clear','soft','projected']);
+const ttsPitchSelect=addTtsSetting('tts.pitch.label','avnivoTtsPitch',['normal','low','high','flat','expressive']);
+const ttsPaceSelect=addTtsSetting('tts.pace.label','avnivoTtsPace',['normal','slow','fast','deliberate']);
 const ttsCustomLabel=document.createElement('label');
-ttsCustomLabel.textContent='Maxsus ohang tavsifi (240 belgigacha)';
 ttsCustomLabel.style.cssText=ttsVoiceLabel.style.cssText;
+const ttsCustomText=document.createElement('span');bindLocalized(ttsCustomText,'text','tts.custom.label');
 const ttsCustomInput=document.createElement('textarea');
-ttsCustomInput.maxLength=240;ttsCustomInput.rows=2;ttsCustomInput.placeholder='Masalan: Speak warmly with gentle pauses.';
+ttsCustomInput.maxLength=240;ttsCustomInput.rows=2;ttsCustomInput.placeholder='Masalan: Speak warmly with gentle pauses.';bindLocalized(ttsCustomInput,'placeholder','tts.custom.placeholder');
 ttsCustomInput.style.cssText=ttsVoiceSelect.style.cssText+';resize:vertical;display:block;';
 try{ttsCustomInput.value=localStorage.getItem('avnivoTtsCustomStyle')||''}catch(e){}
 ttsCustomInput.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsCustomStyle',ttsCustomInput.value)}catch(e){}});
-ttsCustomLabel.append(ttsCustomInput);
+ttsCustomLabel.append(ttsCustomText,ttsCustomInput);
 onlineTtsSettings.append(ttsCustomLabel);
 const ttsTagNote=document.createElement('p');
-ttsTagNote.textContent='Matnda maxsus ovoz belgilari: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. Bu belgilar faqat yozilgan joyda qo‘llanadi; natija modelga bog‘liq.';
+bindLocalized(ttsTagNote,'text','tts.tags.note');
 ttsTagNote.style.cssText='font:12px/1.5 system-ui;color:#d6b68c;margin:10px 0;';
 onlineTtsSettings.append(ttsTagNote);
 
@@ -629,7 +642,7 @@ async function playMessage(button,bubble,language){
   for(const chunk of chunks){
    if(generation!==ttsGeneration)return;
    const controller=new AbortController();ttsAbort=controller;
-   button.dataset.loading='true';button.setAttribute('aria-label','AI ovozi tayyorlanmoqda');
+   button.dataset.loading='true';button.setAttribute('aria-label',tr('speak.loading'));
    const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,language:locale,voice,style,delivery:ttsDeliverySelect.value,pitch:ttsPitchSelect.value,pace:ttsPaceSelect.value,custom_style:style==='custom'?ttsCustomInput.value.trim():''}),signal:controller.signal});
    if(!response.ok)throw Error('TTS HTTP '+response.status);
    const blob=await response.blob();
@@ -638,7 +651,7 @@ async function playMessage(button,bubble,language){
    ttsAudioUrl=URL.createObjectURL(blob);
    ttsAudio=new Audio(ttsAudioUrl);
    ttsAudio.playbackRate=Number(ttsRateSelect.value);
-   button.removeAttribute('data-loading');button.setAttribute('aria-label','Ovozli o‘qishni to‘xtatish');
+   button.removeAttribute('data-loading');button.setAttribute('aria-label',tr('speak.stop'));
    const audio=ttsAudio;
    await new Promise((resolve,reject)=>{
     audio.onended=resolve;audio.onpause=resolve;audio.onerror=()=>reject(Error('Audio ijro xatosi'));
@@ -651,8 +664,8 @@ async function playMessage(button,bubble,language){
  }catch(e){
   if(generation===ttsGeneration&&e.name!=='AbortError'){
    console.warn('AVNIVO TTS:',e);
-   button.title='AI ovozi ishlamadi: '+e.message;
-   button.setAttribute('aria-label','AI ovozi ishlamadi: '+e.message);
+   button.title=tr('speak.error',{message:e.message});
+   button.setAttribute('aria-label',tr('speak.error',{message:e.message}));
   }
  }finally{
   if(generation===ttsGeneration){ttsAbort=null;finish()}
@@ -664,7 +677,7 @@ function attachSpeaker(bubble,language){
  line.className='message-line '+(isLeft?'line-left':'line-right');
  const button=document.createElement('button');
  button.type='button';button.className='speak-message';
- button.setAttribute('aria-label','Xabarni ovoz chiqarib o‘qish');
+ button.setAttribute('aria-label',tr('speak.label'));
  button.setAttribute('aria-pressed','false');
  button.innerHTML='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="speaker-core" d="M5 12h5l6-5v18l-6-5H5z"/><path class="sound-bars" d="M20 11q5 5 0 10M23 7q9 9 0 18"/></svg>';
  button.addEventListener('click',()=>playMessage(button,bubble,language));
@@ -699,7 +712,7 @@ function restoreHistory(session){
 }
 function saveChatMessage(message,language,translation){
  let session=historySessions.find(x=>x.id===currentHistoryId);
- if(!session){session={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,8),title:'O‘zbek tili = русский язык',firstLanguage:language,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),messages:[]};historySessions.unshift(session);historyDrafts[session.id]=historyDrafts.new||'';delete historyDrafts.new;currentHistoryId=session.id;persistActiveChat()}
+ if(!session){session={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,8),title:tr('history.entry.title'),firstLanguage:language,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),messages:[]};historySessions.unshift(session);historyDrafts[session.id]=historyDrafts.new||'';delete historyDrafts.new;currentHistoryId=session.id;persistActiveChat()}
  if(!session.firstLanguage)session.firstLanguage=language;
  session.messages.push({text:message,language,translation});session.messages=session.messages.slice(-200);session.updatedAt=new Date().toISOString();
  historySessions.sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt));historySessions=historySessions.slice(0,100);persistHistory();
@@ -794,7 +807,7 @@ translationTimer=setTimeout(translationTick,500);
 function syncComposerMode(){
  const typing=input.value.length>0;
  shell.classList.toggle('text-mode',typing&&!active);
- mic.setAttribute('aria-label',typing&&!active?'Matnni yuborish':'Mikrofonni yoqish');
+ mic.setAttribute('aria-label',tr(typing&&!active?'mic.label.send':'mic.label.on'));
  mic.setAttribute('aria-pressed',String(active));
  mic.disabled=typing&&!active&&!input.value.trim();
  updateBrandVisibility();
@@ -804,7 +817,7 @@ const ONLINE_TRANSLATION_ENDPOINT='https://avnivo-translation-test-792624108019.
 async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,historyId){
  const source=onlineLanguagesByCode.get(sourceLocale),target=onlineLanguagesByCode.get(targetLocale);
  if(!source||!target||source[1]===target[1]){
-  bubble.textContent='Tarjima uchun boshqa tilni tanlang';return;
+  bubble.textContent=tr('translation.selectOther');return;
  }
  const controller=new AbortController(),timeoutId=setTimeout(()=>controller.abort(),30000);
  try{
@@ -813,7 +826,7 @@ async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,h
    body:JSON.stringify({text,source:sourceLocale,target:targetLocale}),signal:controller.signal
   });
   if(!response.ok){
-   const msg=response.status===400?'Til juftligi serverda hali qo‘llab-quvvatlanmaydi':response.status===429?'Tarjima limiti tugadi':'Tarjima serveri xatosi ('+response.status+')';
+   const msg=response.status===400?tr('translation.error.pair'):response.status===429?tr('translation.error.limit'):tr('translation.error.server',{status:response.status});
    throw Error(msg);
   }
   const data=await response.json();
@@ -823,7 +836,7 @@ async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,h
   if(entry){entry.translation=data.text;persistHistory()}
  }catch(error){
   if(!bubble.isConnected)return;
-  bubble.textContent=error.name==='AbortError'?'Tarjima vaqti tugadi':error instanceof TypeError?'Tarjima serveriga ulanib bo‘lmadi':error.message;
+  bubble.textContent=error.name==='AbortError'?tr('translation.error.timeout'):error instanceof TypeError?tr('translation.error.network'):error.message;
   bubble.classList.remove('typing');
  }finally{clearTimeout(timeoutId)}
 }
@@ -846,7 +859,7 @@ function sendMessage(){
  translationBubble.classList.add('translation-preview');
  messages.appendChild(attachSpeaker(translationBubble,oppositeLanguage(language)));
  if(online){
-  translationBubble.textContent='Tarjima qilinmoqda…';
+  translationBubble.textContent=tr('translation.pending');
   translateOnlineText(message,sourceLocale,targetLocale,translationBubble,entry,currentHistoryId);
  }else typeTranslation(translationBubble,PREVIEW_TRANSLATION);
  while(messages.children.length>60)messages.firstElementChild.remove();
@@ -887,7 +900,7 @@ function draw(){
 }
 async function stopVoice(){
  requestToken++;active=false;cancelAnimationFrame(frame);
- shell.classList.remove('voice-active');mic.setAttribute('aria-pressed','false');mic.setAttribute('aria-label','Mikrofonni yoqish');syncComposerMode();
+ shell.classList.remove('voice-active');mic.setAttribute('aria-pressed','false');mic.setAttribute('aria-label',tr('mic.label.on'));syncComposerMode();
  if(onlineRecorder&&onlineRecorder.state==='recording'){onlineState('loading');try{onlineRecorder.stop()}catch(e){onlineState('error')}}
  if(mediaStream){mediaStream.getTracks().forEach(track=>track.stop());mediaStream=null}
  if(audioContext){const context=audioContext;audioContext=null;await context.close().catch(()=>{})}
@@ -911,11 +924,11 @@ async function startVoice(){
    if(!beginOnlineRecording(stream)){await stopVoice();return}
   }
   clearTimeout(timeout);timeout=0;label.hidden=true;
-  mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label','Mikrofonni o‘chirish');
+  mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label',tr('mic.label.off'));
   shell.classList.add('voice-active');shell.classList.remove('text-mode');updateBrandVisibility();
   frame=requestAnimationFrame(draw);
   stream.getAudioTracks()[0]?.addEventListener('ended',()=>{if(active)stopVoice()},{once:true});
- }catch(error){if(token===requestToken){mic.setAttribute('aria-label','Mikrofonga ruxsat berilmadi');console.warn('Microphone unavailable',error)}}
+ }catch(error){if(token===requestToken){mic.setAttribute('aria-label',tr('mic.label.denied'));console.warn('Microphone unavailable',error)}}
 }
 
 const voiceHint=document.querySelector('.voice-hint');
@@ -974,7 +987,7 @@ async function sendOnlineAudio(blob,locale,session){
  try{
   const response=await fetch(CHIRP2_CANDIDATE+'/api/transcribe-google',{method:'POST',body:form,signal:ctrl.signal});
   if(!response.ok){
-   const message=response.status===429?'So‘rov limiti tugadi':response.status===400?'Audio yoki til formati xato':response.status===503?'Server vaqtincha ishlamayapti':'Server xatosi: '+response.status;
+   const message=response.status===429?tr('stt.error.limit'):response.status===400?tr('stt.error.format'):response.status===503?tr('stt.error.unavailable'):tr('stt.error.server',{status:response.status});
    throw Error(message);
   }
   const result=await response.json();
@@ -1035,7 +1048,7 @@ async function startHoldWave(session){
    holdWaveFrame=requestAnimationFrame(animate);
   }
   animate();
- }catch(e){if(session===holdSession&&holdStarted)hint('Mikrofon ruxsatini tekshiring')}
+ }catch(e){if(session===holdSession&&holdStarted)hint(tr('voice.hint.micPermission'))}
 }
 function finishHold(){
  if(!holdStarted)return;
@@ -1054,11 +1067,11 @@ function beginHold(){
  holdStarted=true;holdSession++;
  holdBase=input.value;holdTranscript='';holdFinal='';
  shell.classList.add('hold-voice');shell.classList.remove('text-mode');
- mic.setAttribute('aria-label','Barmoqni uzib ovoz yozishni tugatish');
+ mic.setAttribute('aria-label',tr('mic.label.hold'));
  clearTimeout(timeout);timeout=0;label.hidden=true;
- hint('Gapiring · tugatish uchun qo‘yib yuboring');
+ hint(tr('voice.hint.release'));
  const session=holdSession;
- if(!SpeechAPI){hint('Bu Chrome’da ovozni matnga aylantirish mavjud emas');return}
+ if(!SpeechAPI){hint(tr('voice.hint.noSpeech'));return}
  try{
   const recognition=new SpeechAPI();holdRecognizer=recognition;
   recognition.lang=document.documentElement.lang||'uz-UZ';
@@ -1071,7 +1084,7 @@ function beginHold(){
    }
    holdFinal=finalText.trim();holdTranscript=(finalText+interim).trim();
   };
-  recognition.onerror=e=>{if(holdRecognizer===recognition)hint('Ovoz tanish: '+e.error)};
+  recognition.onerror=e=>{if(holdRecognizer===recognition)hint(tr('voice.hint.recognize',{error:e.error}))};
   recognition.onend=()=>{
    if(holdRecognizer!==recognition)return;
    if(holdStarted){finishHold()}
@@ -1081,7 +1094,7 @@ function beginHold(){
   };
   recognition.start();
   startHoldWave(session);
- }catch(e){hint('Ovoz tanishni ishga tushirib bo‘lmadi');finishHold()}
+ }catch(e){hint(tr('voice.hint.startFail'));finishHold()}
 }
 function clearHoldTimer(){clearTimeout(holdTimer);holdTimer=0}
 // Android IME policy: keep an already visible keyboard, but never resurrect a dismissed one.
@@ -1144,6 +1157,29 @@ mic.addEventListener('click',event=>{
 // All dependent const bindings and handlers are initialized before restoring a saved draft.
 loadHistory();if(currentHistoryId){const current=historySessions.find(x=>x.id===currentHistoryId);if(current)restoreHistory(current)}loadDraft();renderHistory();
 window.addEventListener('pagehide',()=>{stopSpeaking();cancelOnlineRecording();if(active)stopVoice()});
+
+// Interface localization: populate the selector from the registry, then load the
+// saved (or default) language bundle. Switching is asynchronous and never reloads
+// speech models or translation engines.
+const interfaceLanguageSelect=document.querySelector('.interface-language-select');
+if(i18n){
+ i18n.init().then(()=>{
+  const list=i18n.languages();
+  if(interfaceLanguageSelect){
+   interfaceLanguageSelect.replaceChildren();
+   for(const lang of list){
+    const option=document.createElement('option');option.value=lang.code;
+    option.textContent=lang.name+(lang.code!==lang.name?' ('+lang.code+')':'');
+    option.lang=lang.code;interfaceLanguageSelect.append(option);
+   }
+   interfaceLanguageSelect.value=i18n.getLanguage();
+   interfaceLanguageSelect.addEventListener('change',()=>{i18n.setLanguage(interfaceLanguageSelect.value)});
+  }
+  i18n.apply();
+  refreshLocalizedNodes();
+  i18n.onChange(code=>{refreshLocalizedNodes();if(interfaceLanguageSelect)interfaceLanguageSelect.value=code;if(document.documentElement.dataset.avnivoMode==='online')updateOnlineLanguageLabels()});
+ }).catch(err=>console.warn('Interface localization unavailable',err));
+}
 
 })();
 </script>

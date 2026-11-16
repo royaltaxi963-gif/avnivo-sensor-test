@@ -1,0 +1,42 @@
+name: AVNIVO i18n validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'i18n/**'
+      - 'index.html'
+      - 'onboarding-preview.html'
+      - '.github/workflows/avnivo-i18n.yml'
+  pull_request:
+    paths:
+      - 'i18n/**'
+      - 'index.html'
+      - 'onboarding-preview.html'
+      - '.github/workflows/avnivo-i18n.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-localization:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate 100 language dictionaries
+        run: node i18n/validate.mjs
+      - name: Run localization test suite
+        run: node i18n/tests/run-tests.mjs
+      - name: Upload validation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: i18n-validation-report
+          path: i18n/validation-report.json
+          if-no-files-found: warn
