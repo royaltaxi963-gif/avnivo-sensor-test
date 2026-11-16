@@ -307,7 +307,7 @@ def run(phase: str, only: list[str] | None, max_requests: int) -> dict:
             k = key(entry)
             if k in done:
                 continue
-            if ledger.requests >= max_requests:
+            if executed >= max_requests:
                 print(f"[harness] request cap {max_requests} reached", flush=True)
                 break
             if ledger.cost >= BUDGET_HARD_STOP:
