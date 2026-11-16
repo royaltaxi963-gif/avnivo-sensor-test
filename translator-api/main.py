@@ -1,8 +1,16 @@
-"""AVNIVO Translator — Groq Whisper Large v3 proxy."""
+"""AVNIVO Translator — Google Cloud Speech-to-Text V2 (Chirp 2) proxy.
+
+Online speech recognition runs on Google Chirp 2 (see ``chirp2_languages``).
+The legacy ``/api/transcribe`` routes below remain only for backward
+compatibility and are unused by the AVNIVO Online frontend.
+"""
 import os
+import io
 import time
+import wave
 import base64
 import asyncio
+from array import array
 from collections import defaultdict, deque
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,17 +20,31 @@ from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.auth.exceptions import DefaultCredentialsError, RefreshError
 from groq import AsyncGroq, RateLimitError, APIError
 from offline_models import router as offline_models_router
+from translation_languages import MODEL_ID as TRANSLATION_MODEL_ID, capabilities as translation_capabilities, is_translation_supported, resolve_translation_code
+
+from chirp2_languages import (
+    CHIRP2_LOCALES,
+    CHIRP2_REGIONS,
+    CHIRP2_SYNC_MAX_BYTES,
+    GOOGLE_MODEL,
+    GOOGLE_REGION,
+    adaptation_phrases,
+    is_supported_locale,
+)
 
 MODEL = "whisper-large-v3"
 GROQ_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
-# Explicit browser hosts for the AVNIVO HTML preview; never use wildcard CORS.
 ALLOWED_ORIGINS = {"https://royaltaxi963-gif.github.io", "https://raw.githack.com", "https://rawcdn.githack.com", "http://localhost:3000", "http://localhost:8080", "null"}
 GOOGLE_PROJECT = "project-6bcf7fe6-cb55-49b7-9f4"
-GOOGLE_REGION = "us-central1"
-GOOGLE_MODEL = "chirp_2"
-MAX_AUDIO = 10 * 1024 * 1024
+MAX_AUDIO = CHIRP2_SYNC_MAX_BYTES
 RATE_LIMIT = 12
 WINDOW = 60
+# Transient upstream statuses that are safe to retry (server-side faults and
+# rate limits, never client payload faults like 400). Kept small so a genuinely
+# down provider still fails fast and the client is not held for long.
+RETRY_STATUSES = {429, 500, 502, 503, 504}
+RETRY_ATTEMPTS = 3
+RETRY_BASE_DELAY = 0.5
 app = FastAPI(title="AVNIVO Translator API", docs_url=None, redoc_url=None)
 app.add_middleware(CORSMiddleware, allow_origins=sorted(ALLOWED_ORIGINS), allow_methods=["POST"], allow_headers=["Content-Type"], allow_credentials=False)
 app.include_router(offline_models_router)
@@ -30,7 +52,16 @@ recent = defaultdict(deque)
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "model": MODEL, "configured": bool(os.getenv("GROQ_API_KEY"))}
+    # Application Default Credentials are implicit on Cloud Run (K_SERVICE) and
+    # explicit locally, so this reflects real Chirp 2 recognizer availability.
+    configured = bool(os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or os.getenv("K_SERVICE"))
+    return {
+        "status": "ok",
+        "model": GOOGLE_MODEL,
+        "region": GOOGLE_REGION,
+        "languages": len(CHIRP2_LOCALES),
+        "configured": configured,
+    }
 
 @app.post("/api/transcribe")
 @app.post("/api/transcribe-groq-sdk-test")
@@ -103,23 +134,124 @@ async def transcribe(request: Request, audio: UploadFile = File(...), language: 
     return {"text": result.get("text", ""), "model": model}
 
 
-@app.post("/api/transcribe-google")
-async def transcribe_google(request: Request, audio: UploadFile = File(...), language: str = Form("uz-UZ")):
-    """Independent Google Speech-to-Text v2 endpoint; existing Groq routes are unchanged."""
-    origin = request.headers.get("origin")
-    if origin is not None and origin not in ALLOWED_ORIGINS:
-        raise HTTPException(403, "Origin not allowed")
-    # One reusable recognition pipeline for every enabled Chirp 2 locale.
-    # Extend this allowlist only after verifying model+region support and a live sample.
-    enabled_chirp2_locales = frozenset(("uz-UZ", "ru-RU", "en-US", "tr-TR"))
-    if language not in enabled_chirp2_locales:
-        raise HTTPException(400, "Unsupported Chirp 2 language")
-    if audio.content_type not in {"audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/flac", "audio/x-flac"}:
-        raise HTTPException(415, "Unsupported audio format")
-    data = await audio.read(MAX_AUDIO + 1)
-    if not data or len(data) > MAX_AUDIO:
-        raise HTTPException(413, "Invalid audio size")
-    ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown").split(",")[0].strip()
+ALLOWED_AUDIO_TYPES = frozenset((
+    "audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg",
+    "audio/wav", "audio/x-wav", "audio/flac", "audio/x-flac",
+))
+
+
+def _chirp2_config(locale: str) -> dict:
+    """Build the Chirp 2 RecognitionConfig for one registry locale."""
+    config: dict = {
+        "autoDecodingConfig": {},
+        "languageCodes": [locale],
+        "model": GOOGLE_MODEL,
+    }
+    phrases = adaptation_phrases(locale)
+    if phrases:
+        config["adaptation"] = {"phraseSets": [{"inlinePhraseSet": {"phrases": phrases}}]}
+    return config
+
+
+def _join_transcripts(payload: object) -> str:
+    """Flatten a Speech V2 Recognize response into a single transcript string."""
+    if not isinstance(payload, dict):
+        return ""
+    results = payload.get("results")
+    if not isinstance(results, list):
+        return ""
+    parts = []
+    for item in results:
+        if not isinstance(item, dict):
+            continue
+        alternatives = item.get("alternatives")
+        if not isinstance(alternatives, list) or not alternatives:
+            continue
+        first = alternatives[0]
+        if isinstance(first, dict):
+            transcript = first.get("transcript")
+            if isinstance(transcript, str) and transcript.strip():
+                parts.append(transcript.strip())
+    return " ".join(parts).strip()
+
+
+def _pcm_rms(wav_bytes: bytes) -> float | None:
+    """Return the normalised RMS of a 16-bit PCM WAV, or None if not that format.
+
+    Only uncompressed 16-bit PCM WAV is inspected: it is the format the API
+    tests and the verification campaign send, and it can be parsed with the
+    standard library. Compressed containers (webm/opus from the browser) are
+    left to Google, which decodes them itself.
+    """
+    try:
+        with wave.open(io.BytesIO(wav_bytes), "rb") as handle:
+            if handle.getsampwidth() != 2:
+                return None
+            frames = handle.readframes(handle.getnframes())
+    except (wave.Error, EOFError, ValueError):
+        return None
+    if not frames:
+        return 0.0
+    samples = array("h")
+    samples.frombytes(frames[: len(frames) - (len(frames) % 2)])
+    if not samples:
+        return 0.0
+    total = sum(sample * sample for sample in samples)
+    return (total / len(samples)) ** 0.5 / 32768.0
+
+
+def _is_near_silent(wav_bytes: bytes, threshold: float = 1e-3) -> bool:
+    """True when a 16-bit PCM WAV is effectively silent.
+
+    Silence fed to Chirp 2 is not guaranteed to return an empty transcript: the
+    ``uz-UZ`` phrase boost (``"Avnivo"`` at 20.0) turns it into a spurious
+    ``"avnivo"``. A quiet input below the threshold is answered with an empty
+    transcript locally, which avoids both the hallucination and the paid call.
+    """
+    rms = _pcm_rms(wav_bytes)
+    return rms is not None and rms < threshold
+
+
+def _google_token() -> str:
+    credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+    if not credentials.valid:
+        credentials.refresh(GoogleAuthRequest())
+    return credentials.token
+
+
+async def _recognize_with_retry(url: str, token: str, payload: dict) -> httpx.Response:
+    """POST to Google Speech, retrying only genuinely transient failures.
+
+    Client faults (400/401/403/404) and any status outside RETRY_STATUSES are
+    returned immediately: retrying them cannot help and would mask the real
+    cause. Transport errors are retried because a dropped connection is
+    transient. The final attempt's response (or the last transport error) is
+    returned/raised so the caller's existing status mapping still applies.
+    """
+    last_error: Exception | None = None
+    for attempt in range(RETRY_ATTEMPTS):
+        try:
+            async with httpx.AsyncClient(timeout=90) as client:
+                response = await client.post(
+                    url,
+                    headers={"Authorization": f"Bearer {token}"},
+                    json=payload,
+                )
+        except httpx.RequestError as error:
+            last_error = error
+            response = None
+        else:
+            if response.status_code not in RETRY_STATUSES:
+                return response
+            last_error = None
+        if attempt < RETRY_ATTEMPTS - 1:
+            await asyncio.sleep(RETRY_BASE_DELAY * (2 ** attempt))
+    if response is not None:
+        return response
+    raise last_error if last_error else httpx.RequestError("unreachable")
+
+
+def _rate_limit(ip: str) -> None:
     now = time.monotonic()
     hits = recent[ip]
     while hits and now - hits[0] > WINDOW:
@@ -128,14 +260,47 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
         raise HTTPException(429, "Too many requests")
     hits.append(now)
 
-    def get_token():
-        credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
-        if not credentials.valid:
-            credentials.refresh(GoogleAuthRequest())
-        return credentials.token
 
+@app.get("/api/chirp2-languages")
+async def chirp2_languages():
+    """Expose the registry so the frontend can never drift from the backend."""
+    return {
+        "model": GOOGLE_MODEL,
+        "region": GOOGLE_REGION,
+        "regions": sorted(CHIRP2_REGIONS),
+        "count": len(CHIRP2_LOCALES),
+        "locales": sorted(CHIRP2_LOCALES),
+    }
+
+
+@app.post("/api/transcribe-google")
+async def transcribe_google(request: Request, audio: UploadFile = File(...), language: str | None = Form(None)):
+    """Google Speech-to-Text V2 (Chirp 2) endpoint; existing Groq routes are unchanged.
+
+    One reusable recognition pipeline serves every locale in the centralized
+    registry. An unsupported or missing code is rejected outright; it never
+    silently substitutes another language such as uz-UZ.
+    """
+    origin = request.headers.get("origin")
+    if origin is not None and origin not in ALLOWED_ORIGINS:
+        raise HTTPException(403, "Origin not allowed")
+    # A missing field must not default to a specific language: reject it.
+    if not is_supported_locale(language):
+        raise HTTPException(400, "Unsupported Chirp 2 language")
+    if audio.content_type not in ALLOWED_AUDIO_TYPES:
+        raise HTTPException(415, "Unsupported audio format")
+    data = await audio.read(MAX_AUDIO + 1)
+    if not data or len(data) > MAX_AUDIO:
+        raise HTTPException(413, "Invalid audio size")
+    ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown").split(",")[0].strip()
+    _rate_limit(ip)
+    # Silence is answered locally: Chirp 2 can emit a spurious boosted phrase
+    # for near-silent input, and there is nothing to recognise anyway. This runs
+    # after the rate limiter so silent requests still count toward the window.
+    if _is_near_silent(data):
+        return {"text": "", "model": GOOGLE_MODEL, "language": language}
     try:
-        token = await asyncio.to_thread(get_token)
+        token = await asyncio.to_thread(_google_token)
     except (DefaultCredentialsError, RefreshError):
         raise HTTPException(503, "Google Cloud credentials are not configured")
     url = (
@@ -143,50 +308,100 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
         f"/locations/{GOOGLE_REGION}/recognizers/_:recognize"
     )
     payload = {
-        "config": {
-            "autoDecodingConfig": {},
-            "languageCodes": [language],
-            "model": GOOGLE_MODEL,
-            **({"adaptation": {
-                "phraseSets": [{
-                    "inlinePhraseSet": {
-                        "phrases": [
-                            {"value": "Avnivo", "boost": 20.0},
-                            {"value": "ovoz tanish", "boost": 15.0},
-                            {"value": "sinovi", "boost": 10.0}
-                        ]
-                    }
-                }]
-            }} if language == "uz-UZ" else {})
-        },
-        "content": base64.b64encode(data).decode("ascii")
+        "config": _chirp2_config(language),
+        "content": base64.b64encode(data).decode("ascii"),
     }
     try:
-        async with httpx.AsyncClient(timeout=90) as client:
-            response = await client.post(
-                url,
-                headers={"Authorization": f"Bearer {token}"},
-                json=payload,
-            )
+        response = await _recognize_with_retry(url, token, payload)
     except httpx.RequestError:
         raise HTTPException(502, "Google Speech service unreachable")
     if response.status_code == 429:
         raise HTTPException(429, "Google Speech quota exceeded")
     if response.status_code in (401, 403):
+        # The upstream body names the exact permission, which is the only way to
+        # tell an IAM regression from a disabled API in Cloud Run logs.
+        print(f"chirp2 upstream {response.status_code}: {response.text[:300]}", flush=True)
         raise HTTPException(503, "Google Speech access denied; check IAM and API")
+    if response.status_code == 400:
+        # Chirp 2 rejects audio it cannot auto-decode (e.g. 32-bit float WAV or
+        # headerless PCM) with INVALID_ARGUMENT. That is a client payload fault,
+        # so it must not be reported as a 5xx provider outage.
+        print(f"chirp2 upstream 400: {response.text[:300]}", flush=True)
+        raise HTTPException(400, "Google Speech rejected the audio; use 16-bit PCM WAV or a webm/ogg/mp3 container")
     if response.status_code != 200:
+        print(f"chirp2 upstream {response.status_code}: {response.text[:300]}", flush=True)
         raise HTTPException(502, "Google Speech transcription failed")
-    results = response.json().get("results", [])
-    text = " ".join(
-        item["alternatives"][0].get("transcript", "").strip()
-        for item in results if item.get("alternatives")
-    ).strip()
-    return {"text": text, "model": GOOGLE_MODEL, "language": language}
+    return {"text": _join_transcripts(response.json()), "model": GOOGLE_MODEL, "language": language}
+
+
+@app.get("/api/translation-languages")
+async def translation_languages():
+    """Expose Translation LLM capability per Chirp 2 locale.
+
+    The frontend uses this to enable only verified languages and to label
+    experimental/undocumented ones. A catalog entry here is a capability
+    statement proven by the audit, never a licence to call the model blindly.
+    """
+    return {
+        "model": TRANSLATION_MODEL_ID,
+        "count": len(translation_capabilities()),
+        "languages": translation_capabilities(),
+    }
+
+
+def _translation_token() -> str:
+    credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+    if not credentials.valid:
+        credentials.refresh(GoogleAuthRequest())
+    return credentials.token
+
+
+async def _call_translation_llm(project: str, region: str, text: str, source: str, target: str) -> str:
+    """Call Translation LLM once; map upstream faults to precise HTTP errors."""
+    try:
+        token = await asyncio.to_thread(_translation_token)
+    except (DefaultCredentialsError, RefreshError):
+        raise HTTPException(503, "Translation credentials unavailable")
+    url = f"https://translation.googleapis.com/v3/projects/{project}/locations/{region}:translateText"
+    payload = {
+        "contents": [text],
+        "mimeType": "text/plain",
+        "sourceLanguageCode": source,
+        "targetLanguageCode": target,
+        "model": f"projects/{project}/locations/{region}/models/{TRANSLATION_MODEL_ID}",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.post(url, headers={"Authorization": f"Bearer {token}"}, json=payload)
+    except httpx.RequestError:
+        raise HTTPException(502, "Translation provider unreachable")
+    if response.status_code == 429:
+        raise HTTPException(429, "Translation quota exceeded")
+    if response.status_code in (401, 403):
+        raise HTTPException(503, "Translation access denied")
+    if response.status_code != 200:
+        # A 400 here means the model rejected this language pair. Surface it as a
+        # client-visible rejection instead of a generic provider outage.
+        if response.status_code == 400:
+            raise HTTPException(400, "Translation language pair not supported")
+        raise HTTPException(502, "Translation provider error")
+    try:
+        translated = response.json()["translations"][0]["translatedText"]
+        if not isinstance(translated, str):
+            raise ValueError()
+    except (KeyError, IndexError, TypeError, ValueError):
+        raise HTTPException(502, "Unexpected translation response")
+    return translated
 
 
 @app.post("/api/translate")
 async def translate_public(request: Request):
-    """Browser translation route using the Cloud Run service identity."""
+    """Browser translation route using the Cloud Run service identity.
+
+    Accepts either a Chirp 2 locale (``uz-UZ``, ``en-US`` ...) or a legacy short
+    code (``uz``, ``ru``, ``en``, ``tr``). The mapping to a Translation LLM code
+    is explicit and audited; a rejected locale is refused, never substituted.
+    """
     origin = request.headers.get("origin")
     if origin is not None and origin not in ALLOWED_ORIGINS:
         raise HTTPException(403, "Origin not allowed")
@@ -204,47 +419,19 @@ async def translate_public(request: Request):
     target = body.get("target")
     if not isinstance(text, str) or not text.strip() or len(text) > 500:
         raise HTTPException(400, "Text must contain 1-500 characters")
-    if source not in {"uz", "ru", "en", "tr"} or target not in {"uz", "ru", "en", "tr"} or source == target:
-        raise HTTPException(400, "Unsupported language pair")
+    if not is_translation_supported(source) or not is_translation_supported(target):
+        raise HTTPException(400, "Translation language pair not supported")
+    source_code = resolve_translation_code(source)
+    target_code = resolve_translation_code(target)
+    if source_code == target_code:
+        raise HTTPException(400, "Source and target languages must differ")
     project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
     region = os.getenv("AVNIVO_TRANSLATION_REGION", "us-central1")
     if region not in {"us-central1", "global"}:
         raise HTTPException(503, "Invalid translation region")
-    def get_token():
-        credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
-        if not credentials.valid:
-            credentials.refresh(GoogleAuthRequest())
-        return credentials.token
-    try:
-        token = await asyncio.to_thread(get_token)
-    except (DefaultCredentialsError, RefreshError):
-        raise HTTPException(503, "Translation credentials unavailable")
-    url = f"https://translation.googleapis.com/v3/projects/{project}/locations/{region}:translateText"
-    payload = {
-        "contents": [text],
-        "mimeType": "text/plain",
-        "sourceLanguageCode": source,
-        "targetLanguageCode": target,
-        "model": f"projects/{project}/locations/{region}/models/general/translation-llm",
-    }
-    try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.post(url, headers={"Authorization": f"Bearer {token}"}, json=payload)
-    except httpx.RequestError:
-        raise HTTPException(502, "Translation provider unreachable")
-    if response.status_code == 429:
-        raise HTTPException(429, "Translation quota exceeded")
-    if response.status_code in (401, 403):
-        raise HTTPException(503, "Translation access denied")
-    if response.status_code != 200:
-        raise HTTPException(502, "Translation provider error")
-    try:
-        translated = response.json()["translations"][0]["translatedText"]
-        if not isinstance(translated, str):
-            raise ValueError()
-    except (KeyError, IndexError, TypeError, ValueError):
-        raise HTTPException(502, "Unexpected translation response")
-    return {"text": translated, "model": "general/translation-llm", "source": source, "target": target}
+    translated = await _call_translation_llm(project, region, text, source_code, target_code)
+    return {"text": translated, "model": TRANSLATION_MODEL_ID,
+            "source": source_code, "target": target_code}
 
 
 @app.post("/api/translate-llm-test")
