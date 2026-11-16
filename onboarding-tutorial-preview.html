@@ -150,7 +150,7 @@ html[data-avnivo-mode=online] .offline-modules{display:none}
 #avnivo-tutorial-dim.active{visibility:visible;opacity:1;pointer-events:auto}
 #avnivo-tutorial-spot{position:fixed;z-index:2001;display:none;pointer-events:none;border-radius:14px;box-shadow:0 0 0 2px #ffdc9d,0 0 18px 7px #e7b85bba,0 0 48px 15px #d79e4777;animation:avnivo-spot-glow 2.2s ease-in-out infinite alternate;transition:left .5s ease,top .5s ease,opacity .4s ease}
 #avnivo-tutorial-spot.active{display:grid;place-items:center}#avnivo-tutorial-spot{opacity:0;transition:opacity .7s ease}#avnivo-tutorial-spot.illuminated{opacity:1}
-#avnivo-tutorial-spot svg{width:23px;height:23px}
+#avnivo-tutorial-spot svg{width:23px!important;height:23px!important;display:block!important;visibility:visible!important;opacity:1!important;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}#avnivo-tutorial-spot svg circle[fill]{fill:currentColor;stroke:none}#avnivo-tutorial-spot.illuminated{color:#ffe3a5!important;background:linear-gradient(135deg,#644521,#251a10)!important;border-color:#ffe0a2!important}#avnivo-tutorial-spot.illuminated svg{filter:drop-shadow(0 0 5px #ffe1a9)}
 @keyframes avnivo-spot-glow{to{box-shadow:0 0 0 2px #ffe9bc,0 0 26px 11px #f5cb7bdc,0 0 60px 20px #d79e4788}}
 #avnivo-tutorial-label{position:fixed;z-index:2002;left:50%;top:54%;transform:translate(-50%,-50%);width:min(87vw,390px);text-align:center;display:block;visibility:hidden;opacity:0;transition:opacity .7s ease,visibility .7s;pointer-events:none;color:#fff}
 #avnivo-tutorial-label.active{visibility:visible;opacity:1;pointer-events:auto}
@@ -1222,6 +1222,8 @@ function choose(){
  // The intro brand fades out with the existing screen-darkening animation.
  // The original centered chat brand stays in its normal position.
  pill.classList.add('selected');
+ // Lock the entire application, including text fields, before the intro departs.
+ const app=document.querySelector('main.app');if(app)app.inert=true;
  setTimeout(()=>root.classList.add('departing'),300);
  setTimeout(()=>{
    root.classList.add('finished');
@@ -1237,10 +1239,11 @@ function spotlight(selector){
  const rect=source.getBoundingClientRect(),style=getComputedStyle(source);
  spot.style.left=rect.left+'px';spot.style.top=rect.top+'px';
  spot.style.width=rect.width+'px';spot.style.height=rect.height+'px';
- spot.style.background=style.background;spot.style.color=style.color;
+ spot.style.background=style.background;spot.style.color='#ffe3a5';
  spot.style.border=style.border;
  const svg=selector==='.mic-icon'?source.querySelector('.mic-symbol'):source.querySelector('svg');
  spot.innerHTML=svg?.outerHTML||'';
+ const icon=spot.querySelector('svg');if(icon){icon.removeAttribute('class');icon.style.display='block';icon.style.opacity='1';icon.style.visibility='visible';icon.style.stroke='currentColor';icon.style.fill='none';}
  spot.classList.add('active');
 }
 const tutorialSteps=[
@@ -1263,6 +1266,7 @@ function finishTutorial(){
  tutorialStage=-1;
  dim.classList.remove('active');
  document.body.classList.remove('avnivo-tutorial');
+ const app=document.querySelector('main.app');if(app)app.inert=false;
  setTimeout(()=>{spot.classList.remove('active');label.classList.remove('active');tutorialTransitioning=false},1150);
  try{localStorage.setItem('avnivo-first-launch-v1-complete','yes')}catch(e){}
 }
