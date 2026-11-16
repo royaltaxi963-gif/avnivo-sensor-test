@@ -13,12 +13,13 @@
   "api_success": 82,
   "api_unsupported": 0,
   "api_transient_errors": 0,
+  "doc_api_conflict": true,
   "avg_latency_s": 0.247,
   "quality_pass": true,
   "critical_flags": {},
   "stability_ok": true,
   "final_decision": "RETEST_REQUIRED",
-  "decision_reason": "translated_despite_absent_from_doc",
+  "decision_reason": "undocumented_but_api_accepts",
   "sample_translation": "ආයුබෝවන්, සුවෙන් ඉන්නවාද?"
  },
  {
@@ -35,12 +36,13 @@
   "api_success": 82,
   "api_unsupported": 0,
   "api_transient_errors": 0,
+  "doc_api_conflict": true,
   "avg_latency_s": 0.213,
   "quality_pass": true,
   "critical_flags": {},
   "stability_ok": true,
   "final_decision": "RETEST_REQUIRED",
-  "decision_reason": "translated_despite_absent_from_doc",
+  "decision_reason": "undocumented_but_api_accepts",
   "sample_translation": "Molo, unjani?"
  },
  {
@@ -57,12 +59,13 @@
   "api_success": 82,
   "api_unsupported": 0,
   "api_transient_errors": 0,
+  "doc_api_conflict": true,
   "avg_latency_s": 0.233,
   "quality_pass": true,
   "critical_flags": {},
   "stability_ok": true,
   "final_decision": "RETEST_REQUIRED",
-  "decision_reason": "translated_despite_absent_from_doc",
+  "decision_reason": "undocumented_but_api_accepts",
   "sample_translation": "Ẹ kú ààrọ̀, ṣé dáadáa ni?"
  }
 ]

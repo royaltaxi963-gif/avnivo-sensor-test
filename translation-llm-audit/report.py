@@ -95,7 +95,10 @@ def locale_verdict(row: dict, records: list[dict]) -> dict:
         elif cls == "B":
             decision, reason = "EXPERIMENTAL", "google_experimental_support"
         else:
-            decision, reason = "RETEST_REQUIRED", "translated_despite_absent_from_doc"
+            # Absent from the official table yet the API translated it: the
+            # documentation and the live API disagree, so the language is not
+            # auto-promoted to the Online list.
+            decision, reason = "RETEST_REQUIRED", "undocumented_but_api_accepts"
     elif unsupported and not ok:
         decision, reason = "FAILED", "api_rejected_unsupported_language"
     elif ok and unsupported:
@@ -110,6 +113,7 @@ def locale_verdict(row: dict, records: list[dict]) -> dict:
         "api_success": len(ok),
         "api_unsupported": len(unsupported),
         "api_transient_errors": len(transient),
+        "doc_api_conflict": bool(ok and cls == "C"),
         "avg_latency_s": avg_lat,
         "quality_pass": quality_pass,
         "critical_flags": critical,
@@ -141,6 +145,7 @@ def build() -> dict:
         "decisions": dict(decisions),
         "api_tested_locales": sum(1 for v in verdicts if v["api_tested"]),
         "coverage_percent": round(100 * sum(1 for v in verdicts if v["api_tested"]) / len(verdicts), 1),
+        "documentation_api_conflicts": sum(1 for v in verdicts if v.get("doc_api_conflict")),
         "real_api_requests": ledger.get("requests", 0),
         "total_cost_usd": ledger.get("cost_usd", 0.0),
         "budget_ceiling_usd": ledger.get("budget_ceiling_usd", 30.0),
@@ -292,6 +297,7 @@ def write_markdown(verdicts: list[dict], summary: dict) -> None:
     failed = [v for v in verdicts if v["final_decision"] == "FAILED"]
     retest = [v for v in verdicts if v["final_decision"] == "RETEST_REQUIRED"]
     exp = [v for v in verdicts if v["final_decision"] == "EXPERIMENTAL"]
+    conflicts = [v for v in verdicts if v.get("doc_api_conflict")]
 
     def tbl(items):
         out = ["| # | Chirp 2 | Til | LLM kod | Sabab |",
@@ -360,6 +366,15 @@ Manba koddan **hech narsa o'chirilmadi**; faqat tavsiya ro'yxati tayyorlandi.
 Vaqtinchalik API muammosi, noaniq natija yoki yetarli sifat dalili yo'q.
 
 {tbl(retest) if retest else "—"}
+
+## 5b. Hujjat va API o'rtasidagi ziddiyat ({len(conflicts)})
+
+Quyidagi tillar Google'ning rasmiy Translation LLM jadvalida **yo'q**, lekin
+haqiqiy API ularni qabul qildi va to'g'ri yozuv tizimida tarjima qildi. Shuning
+uchun ular avtomatik ravishda Online ro'yxatga qo'shilmaydi (RETEST_REQUIRED),
+ammo bu holat alohida qayd etildi.
+
+{tbl(conflicts) if conflicts else "—"}
 
 ## 6. Metodologiya va cheklovlar
 

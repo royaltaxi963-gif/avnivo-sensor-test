@@ -175,9 +175,22 @@ Vaqtinchalik API muammosi, noaniq natija yoki yetarli sifat dalili yo'q.
 
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
-| 92 | `si-LK` | Sinhala (Sri Lanka) | `si` | translated_despite_absent_from_doc |
-| 114 | `xh-ZA` | Xhosa (South Africa) | `xh` | translated_despite_absent_from_doc |
-| 115 | `yo-NG` | Yoruba (Nigeria) | `yo` | translated_despite_absent_from_doc |
+| 92 | `si-LK` | Sinhala (Sri Lanka) | `si` | undocumented_but_api_accepts |
+| 114 | `xh-ZA` | Xhosa (South Africa) | `xh` | undocumented_but_api_accepts |
+| 115 | `yo-NG` | Yoruba (Nigeria) | `yo` | undocumented_but_api_accepts |
+
+## 5b. Hujjat va API o'rtasidagi ziddiyat (3)
+
+Quyidagi tillar Google'ning rasmiy Translation LLM jadvalida **yo'q**, lekin
+haqiqiy API ularni qabul qildi va to'g'ri yozuv tizimida tarjima qildi. Shuning
+uchun ular avtomatik ravishda Online ro'yxatga qo'shilmaydi (RETEST_REQUIRED),
+ammo bu holat alohida qayd etildi.
+
+| # | Chirp 2 | Til | LLM kod | Sabab |
+|---|---------|-----|---------|-------|
+| 92 | `si-LK` | Sinhala (Sri Lanka) | `si` | undocumented_but_api_accepts |
+| 114 | `xh-ZA` | Xhosa (South Africa) | `xh` | undocumented_but_api_accepts |
+| 115 | `yo-NG` | Yoruba (Nigeria) | `yo` | undocumented_but_api_accepts |
 
 ## 6. Metodologiya va cheklovlar
 
