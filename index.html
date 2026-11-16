@@ -161,8 +161,8 @@ function applyMode(mode){
  document.querySelector('meta[name="theme-color"]').content=chosen==='offline'?'#080f19':'#17120d';
  try{localStorage.setItem('avnivo.ui.mode.v1',chosen)}catch(e){}
 }
-modeOnline.addEventListener('click',()=>applyMode('online'));
-modeOffline.addEventListener('click',()=>applyMode('offline'));
+modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();applyMode('online')});
+modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();if(active)stopVoice()}applyMode('offline')});
 try{applyMode(localStorage.getItem('avnivo.ui.mode.v1'))}catch(e){applyMode('online')}
 const mic=shell.querySelector('.mic-icon');
 const trace=shell.querySelector('.voice-trace-glow');
@@ -441,6 +441,7 @@ function draw(){
 async function stopVoice(){
  requestToken++;active=false;cancelAnimationFrame(frame);
  shell.classList.remove('voice-active');mic.setAttribute('aria-pressed','false');mic.setAttribute('aria-label','Mikrofonni yoqish');syncComposerMode();
+ if(onlineRecorder&&onlineRecorder.state==='recording'){try{onlineRecorder.stop()}catch(e){}}
  if(mediaStream){mediaStream.getTracks().forEach(track=>track.stop());mediaStream=null}
  if(audioContext){const context=audioContext;audioContext=null;await context.close().catch(()=>{})}
  analyser=null;samples=null;level=0;idleWave();
@@ -459,6 +460,9 @@ async function startVoice(){
   const source=ctx.createMediaStreamSource(stream),a=ctx.createAnalyser();
   a.fftSize=1024;a.smoothingTimeConstant=.22;source.connect(a);
   mediaStream=stream;audioContext=ctx;analyser=a;samples=new Uint8Array(a.fftSize);active=true;
+  if(document.documentElement.dataset.avnivoMode==='online'){
+   if(!beginOnlineRecording(stream)){await stopVoice();return}
+  }
   clearTimeout(timeout);timeout=0;label.hidden=true;
   mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label','Mikrofonni o‘chirish');
   shell.classList.add('voice-active');shell.classList.remove('text-mode');updateBrandVisibility();
@@ -469,6 +473,66 @@ async function startVoice(){
 
 const voiceHint=document.querySelector('.voice-hint');
 const SpeechAPI=window.SpeechRecognition||window.webkitSpeechRecognition;
+// Online-only Google Chirp 2 STT. No API key is embedded in the browser.
+const CHIRP2_CANDIDATE='https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app';
+let onlineRecorder=null,onlineChunks=[],onlineSession=0,onlineAbort=null;
+function onlineLocale(){return languageRow.dataset.selected==='right'?'ru-RU':'uz-UZ'}
+function beginOnlineRecording(stream){
+ if(!window.MediaRecorder){hint('Chrome audio yozishni qo‘llamaydi');return false}
+ const mime=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'].find(t=>MediaRecorder.isTypeSupported(t));
+ if(!mime){hint('Audio formati qo‘llanmaydi');return false}
+ try{
+  const recorder=new MediaRecorder(stream,{mimeType:mime,audioBitsPerSecond:48000});
+  const session=++onlineSession,locale=onlineLocale();
+  onlineChunks=[];onlineRecorder=recorder;
+  recorder.ondataavailable=e=>{if(e.data.size)onlineChunks.push(e.data)};
+  recorder.onerror=()=>{if(session===onlineSession)hint('Audio yozishda xato')};
+  recorder.onstop=()=>{
+   const parts=onlineChunks.splice(0);
+   if(onlineRecorder===recorder)onlineRecorder=null;
+   if(session!==onlineSession)return;
+   const blob=new Blob(parts,{type:recorder.mimeType.split(';')[0]});
+   if(blob.size<500){hint('Ovoz yozilmadi');return}
+   sendOnlineAudio(blob,locale,session);
+  };
+  recorder.start();
+  hint('Chirp 2 · gapiring, tugatish uchun mikrofonni bosing');
+  return true;
+ }catch(e){hint('Audio yozishni boshlashda xato');return false}
+}
+async function sendOnlineAudio(blob,locale,session){
+ if(document.documentElement.dataset.avnivoMode!=='online')return;
+ if(onlineAbort)onlineAbort.abort();
+ const ctrl=new AbortController();onlineAbort=ctrl;
+ const form=new FormData();form.append('audio',blob,'speech.webm');form.append('language',locale);
+ hint('Chirp 2 · ovoz aniqlanmoqda…');
+ const timer=setTimeout(()=>ctrl.abort(),45000);
+ try{
+  const response=await fetch(CHIRP2_CANDIDATE+'/api/transcribe-google',{method:'POST',body:form,signal:ctrl.signal});
+  if(!response.ok){
+   const message=response.status===429?'So‘rov limiti tugadi':response.status===400?'Audio yoki til formati xato':response.status===503?'Server vaqtincha ishlamayapti':'Server xatosi: '+response.status;
+   throw Error(message);
+  }
+  const result=await response.json();
+  if(session!==onlineSession||document.documentElement.dataset.avnivoMode!=='online')return;
+  if(result.language!==locale||result.model!=='chirp_2')throw Error('Server noto‘g‘ri til yoki model qaytardi');
+  const recognized=typeof result.text==='string'?result.text.trim():'';
+  if(recognized){
+   input.value=appendTranscript(input.value,recognized);
+   persistDraft();resize();syncComposerMode();hint('Chirp 2 · ovoz tanildi');
+  }else hint('Ovoz aniqlanmadi');
+ }catch(e){
+  if(session!==onlineSession||document.documentElement.dataset.avnivoMode!=='online')return;
+  hint(e.name==='AbortError'?'Ulanish vaqti tugadi':e instanceof TypeError?'Chirp 2 serveriga ulanib bo‘lmadi':e.message);
+ }finally{clearTimeout(timer);if(onlineAbort===ctrl)onlineAbort=null}
+}
+function cancelOnlineRecording(){
+ onlineSession++;
+ if(onlineAbort){onlineAbort.abort();onlineAbort=null}
+ if(onlineRecorder){const recorder=onlineRecorder;onlineRecorder=null;try{if(recorder.state==='recording')recorder.stop()}catch(e){}}
+ onlineChunks=[];hint('');
+}
+
 let holdTimer=0,holdStarted=false,holdPointer=null,holdSuppressClick=false,holdRecognizer=null,holdBase='',holdTranscript='',holdFinal='',holdSession=0,holdWaveStream=null,holdWaveContext=null,holdWaveFrame=0,holdWaveAnalyser=null;
 function hint(message){voiceHint.textContent=message;voiceHint.hidden=!message}
 function appendTranscript(base,transcript){
@@ -520,6 +584,7 @@ function finishHold(){
  syncComposerMode();
 }
 function beginHold(){
+ if(document.documentElement.dataset.avnivoMode==='online'){if(!active)startVoice();return}
  if(!input.value.trim()||active||holdStarted)return;
  holdStarted=true;holdSession++;
  holdBase=input.value;holdTranscript='';holdFinal='';
@@ -591,7 +656,7 @@ function preserveKeyboardOnMicPress(event){
 mic.addEventListener('pointerdown',event=>{
  // Preserve textarea focus and Android keyboard while pressing the action button.
  preserveKeyboardOnMicPress(event);
- if(event.button!==0||!input.value.trim()||active)return;
+ if(event.button!==0||active||(document.documentElement.dataset.avnivoMode!=='online'&&!input.value.trim()))return;
  holdPointer=event.pointerId;holdSuppressClick=false;
  try{mic.setPointerCapture(event.pointerId)}catch(e){}
  clearHoldTimer();holdTimer=setTimeout(()=>{holdTimer=0;holdSuppressClick=true;beginHold()},1050);
@@ -613,7 +678,7 @@ mic.addEventListener('click',event=>{
 
 // All dependent const bindings and handlers are initialized before restoring a saved draft.
 loadHistory();if(currentHistoryId){const current=historySessions.find(x=>x.id===currentHistoryId);if(current)restoreHistory(current)}loadDraft();renderHistory();
-window.addEventListener('pagehide',()=>{stopSpeaking();if(active)stopVoice()});
+window.addEventListener('pagehide',()=>{stopSpeaking();cancelOnlineRecording();if(active)stopVoice()});
 
 })();
 </script>
