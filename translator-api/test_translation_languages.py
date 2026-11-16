@@ -76,3 +76,14 @@ def test_status_is_explicit_for_every_locale():
     assert len(caps) == 117
     assert {v["status"] for v in caps.values()} <= {
         "official", "experimental", "retest", "unsupported"}
+
+
+def test_all_93_frontend_locales_map_exactly_to_audited_translation_codes():
+    """Prevent a silent mismatch between the working HTML picker and Translation LLM."""
+    import re
+    html = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+    selected = re.findall(r'\\["([A-Za-z0-9-]+)","([^"]+)","(?:official|experimental|retest)"\\]', html)
+    assert len(selected) == len({locale for locale, _ in selected}) == 93
+    for locale, translation_code in selected:
+        assert registry.resolve_translation_code(locale) == translation_code, locale
+        assert registry.status_for(locale) != "unsupported", locale
