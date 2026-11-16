@@ -133839,17 +133839,122 @@
     "length_ratio": 0.895
    },
    "model": "general/translation-llm"
+  },
+  {
+   "chirp": "ja-JP",
+   "llm": "ja",
+   "class": "A",
+   "item": "c10",
+   "category": "commands_requests",
+   "direction": "en2X",
+   "source": "en",
+   "target": "ja",
+   "http": 200,
+   "error": null,
+   "source_text": "Please close the door.",
+   "translated": "ドアを閉めてください。",
+   "latency_s": 0.292,
+   "detected": null,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.5
+   },
+   "model": "general/translation-llm"
+  },
+  {
+   "chirp": "ja-JP",
+   "llm": "ja",
+   "class": "A",
+   "item": "c10",
+   "category": "commands_requests",
+   "direction": "X2en",
+   "source": "ja",
+   "target": "en",
+   "http": 200,
+   "error": null,
+   "source_text": "ドアを閉めてください。",
+   "translated": "Please close the door.",
+   "latency_s": 0.285,
+   "detected": null,
+   "quality": {
+    "flags": [],
+    "length_ratio": 2.0
+   },
+   "model": "general/translation-llm"
+  },
+  {
+   "chirp": "ro-RO",
+   "llm": "ro",
+   "class": "A",
+   "item": "c03",
+   "category": "question_answer",
+   "direction": "uz2X",
+   "source": "uz",
+   "target": "ro",
+   "http": 200,
+   "error": null,
+   "source_text": "Siz qayerda yashaysiz?",
+   "translated": "Unde locuiți?",
+   "latency_s": 0.189,
+   "detected": null,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.591
+   },
+   "model": "general/translation-llm"
+  },
+  {
+   "chirp": "ro-RO",
+   "llm": "ro",
+   "class": "A",
+   "item": "c03",
+   "category": "question_answer",
+   "direction": "X2uz",
+   "source": "ro",
+   "target": "uz",
+   "http": 200,
+   "error": null,
+   "source_text": "Unde locuiți?",
+   "translated": "Qayerda yashaysiz?",
+   "latency_s": 0.305,
+   "detected": null,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.385
+   },
+   "model": "general/translation-llm"
+  },
+  {
+   "chirp": "th-TH",
+   "llm": "th",
+   "class": "A",
+   "item": "c20",
+   "category": "stability_repeat",
+   "direction": "X2uz",
+   "source": "th",
+   "target": "uz",
+   "http": 200,
+   "error": null,
+   "source_text": "ขอบคุณค่ะ ขอให้เป็นวันที่ดีนะคะ",
+   "translated": "Rahmat. Kuningiz xayrli o‘tsin.",
+   "latency_s": 0.206,
+   "detected": null,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   },
+   "model": "general/translation-llm"
   }
  ],
  "ledger": {
-  "requests": 6403,
+  "requests": 6408,
   "errors": 69,
-  "input_chars": 193984,
-  "output_chars": 191610,
-  "cost_usd": 3.85594,
+  "input_chars": 194083,
+  "output_chars": 191705,
+  "cost_usd": 3.85788,
   "budget_ceiling_usd": 30.0,
   "hard_stop_usd": 25.0,
-  "remaining_usd": 26.14406,
+  "remaining_usd": 26.14212,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  }
 }
