@@ -1,0 +1,58 @@
+name: Deploy AVNIVO translation service (manual, isolated)
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_service:
+        description: 'Type avnivo-translation-test to authorize this specific service'
+        required: true
+        type: string
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: avnivo-translation-test-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: ${{ github.ref == 'refs/heads/main' && inputs.confirm_service == 'avnivo-translation-test' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify deployment source and existing offline checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r translator-api/requirements.txt 'pytest>=8,<9'
+          python -m compileall -q translator-api
+          python -m pytest -q translator-api/test_translation_llm.py translator-api/test_translation_languages.py translator-api/test_translate_endpoint.py
+          docker build --tag avnivo-translation-deploy:local ./translator-api
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Verify target service exists and record current revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=project-6bcf7fe6-cb55-49b7-9f4
+          SERVICE=avnivo-translation-test
+          REGION=europe-west1
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(metadata.name)' | grep -Fx "$SERVICE"
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.traffic)' >> "$GITHUB_STEP_SUMMARY"
+      - name: Deploy translation API to existing isolated service without shifting traffic
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run deploy avnivo-translation-test \
+            --source=translator-api \
+            --project=project-6bcf7fe6-cb55-49b7-9f4 \
+            --region=europe-west1 \
+            --no-traffic \
+            --quiet
+          echo 'New translation revision deployed with no traffic shift. Existing active revision remains at 100% until a separate explicit promotion.' >> "$GITHUB_STEP_SUMMARY"
+          gcloud run services describe avnivo-translation-test --project=project-6bcf7fe6-cb55-49b7-9f4 --region=europe-west1 --format='value(status.latestCreatedRevisionName,status.latestReadyRevisionName)' >> "$GITHUB_STEP_SUMMARY"
