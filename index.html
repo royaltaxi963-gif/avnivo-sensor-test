@@ -36,11 +36,25 @@ html[data-avnivo-mode=offline] .brand-translator{color:#a6e5ff}
 html[data-avnivo-mode=offline] .mic-symbol{animation-name:offlineMicBreathe}
 @keyframes offlineMicBreathe{0%,100%{filter:drop-shadow(0 0 1px #4fbaff);transform:scale(1)}50%{filter:drop-shadow(0 0 9px #65cfff);transform:scale(1.09)}}
 @media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .mic-symbol{animation:none}}
+/* Online-only STT status icon inside the composer, never overlapping the text. */
+html[data-avnivo-mode=online] .writing-area{padding-left:48px}
+html[data-avnivo-mode=online] .animated-greeting{left:48px}
+.online-stt-status{display:none;position:absolute;z-index:3;left:12px;top:50%;transform:translateY(-50%) scale(.75);width:25px;height:25px;align-items:center;justify-content:center;pointer-events:none;color:#ffd493;opacity:0}
+html[data-avnivo-mode=online] .online-stt-status[data-state=recording],html[data-avnivo-mode=online] .online-stt-status[data-state=loading],html[data-avnivo-mode=online] .online-stt-status[data-state=error]{display:flex;opacity:1;transform:translateY(-50%) scale(1)}
+.online-stt-status svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.online-stt-status[data-state=recording]{animation:avnivo-record-pulse 1.15s ease-in-out infinite}
+.online-stt-status[data-state=loading]{animation:avnivo-record-blink .7s ease-in-out infinite}
+.online-stt-status[data-state=error]{color:#ff515c;animation:none}
+.online-stt-status.is-leaving{animation:avnivo-record-leave .27s ease-in forwards!important}
+@keyframes avnivo-record-pulse{0%,100%{opacity:.6;filter:drop-shadow(0 0 1px #f8bc63)}50%{opacity:1;filter:drop-shadow(0 0 8px #ffce79)}}
+@keyframes avnivo-record-blink{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes avnivo-record-leave{from{opacity:1;transform:translateY(-50%) scale(1)}to{opacity:0;transform:translateY(-50%) scale(.12)}}
+@media(prefers-reduced-motion:reduce){.online-stt-status[data-state=recording],.online-stt-status[data-state=loading]{animation:none}}
 </style>
 </head>
 <body>
 <main class="app" aria-label="AVNIVO fon">
-<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="writing-shell"><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
+<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
 </main>
 <script>
 (()=>{'use strict';
@@ -161,7 +175,7 @@ function applyMode(mode){
  document.querySelector('meta[name="theme-color"]').content=chosen==='offline'?'#080f19':'#17120d';
  try{localStorage.setItem('avnivo.ui.mode.v1',chosen)}catch(e){}
 }
-modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();applyMode('online')});
+modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online')});
 modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();if(active)stopVoice()}applyMode('offline')});
 try{applyMode(localStorage.getItem('avnivo.ui.mode.v1'))}catch(e){applyMode('online')}
 const mic=shell.querySelector('.mic-icon');
@@ -441,7 +455,7 @@ function draw(){
 async function stopVoice(){
  requestToken++;active=false;cancelAnimationFrame(frame);
  shell.classList.remove('voice-active');mic.setAttribute('aria-pressed','false');mic.setAttribute('aria-label','Mikrofonni yoqish');syncComposerMode();
- if(onlineRecorder&&onlineRecorder.state==='recording'){try{onlineRecorder.stop()}catch(e){}}
+ if(onlineRecorder&&onlineRecorder.state==='recording'){onlineState('loading');try{onlineRecorder.stop()}catch(e){onlineState('error')}}
  if(mediaStream){mediaStream.getTracks().forEach(track=>track.stop());mediaStream=null}
  if(audioContext){const context=audioContext;audioContext=null;await context.close().catch(()=>{})}
  analyser=null;samples=null;level=0;idleWave();
@@ -475,37 +489,49 @@ const voiceHint=document.querySelector('.voice-hint');
 const SpeechAPI=window.SpeechRecognition||window.webkitSpeechRecognition;
 // Online-only Google Chirp 2 STT. No API key is embedded in the browser.
 const CHIRP2_CANDIDATE='https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app';
-let onlineRecorder=null,onlineChunks=[],onlineSession=0,onlineAbort=null;
+let onlineRecorder=null,onlineChunks=[],onlineSession=0,onlineAbort=null,onlineStatusTimer=0;
+const onlineStatus=document.querySelector('.online-stt-status');
+function onlineState(state){
+ clearTimeout(onlineStatusTimer);onlineStatus.classList.remove('is-leaving');
+ onlineStatus.dataset.state=state;
+ if(state==='error')onlineStatusTimer=setTimeout(()=>onlineState('done'),2000);
+ if(state==='done'){
+  onlineStatus.dataset.state='loading';
+  onlineStatus.classList.add('is-leaving');
+  onlineStatusTimer=setTimeout(()=>{onlineStatus.classList.remove('is-leaving');onlineStatus.dataset.state='idle'},270);
+ }
+}
+
 function onlineLocale(){return languageRow.dataset.selected==='right'?'ru-RU':'uz-UZ'}
 function beginOnlineRecording(stream){
- if(!window.MediaRecorder){hint('Chrome audio yozishni qo‘llamaydi');return false}
+ if(!window.MediaRecorder){onlineState('error');return false}
  const mime=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'].find(t=>MediaRecorder.isTypeSupported(t));
- if(!mime){hint('Audio formati qo‘llanmaydi');return false}
+ if(!mime){onlineState('error');return false}
  try{
   const recorder=new MediaRecorder(stream,{mimeType:mime,audioBitsPerSecond:48000});
   const session=++onlineSession,locale=onlineLocale();
   onlineChunks=[];onlineRecorder=recorder;
   recorder.ondataavailable=e=>{if(e.data.size)onlineChunks.push(e.data)};
-  recorder.onerror=()=>{if(session===onlineSession)hint('Audio yozishda xato')};
+  recorder.onerror=()=>{if(session===onlineSession)onlineState('error')};
   recorder.onstop=()=>{
    const parts=onlineChunks.splice(0);
    if(onlineRecorder===recorder)onlineRecorder=null;
    if(session!==onlineSession)return;
    const blob=new Blob(parts,{type:recorder.mimeType.split(';')[0]});
-   if(blob.size<500){hint('Ovoz yozilmadi');return}
+   if(blob.size<500){onlineState('error');return}
    sendOnlineAudio(blob,locale,session);
   };
   recorder.start();
-  hint('Chirp 2 · gapiring, tugatish uchun mikrofonni bosing');
+  onlineState('recording');
   return true;
- }catch(e){hint('Audio yozishni boshlashda xato');return false}
+ }catch(e){onlineState('error');return false}
 }
 async function sendOnlineAudio(blob,locale,session){
  if(document.documentElement.dataset.avnivoMode!=='online')return;
  if(onlineAbort)onlineAbort.abort();
  const ctrl=new AbortController();onlineAbort=ctrl;
  const form=new FormData();form.append('audio',blob,'speech.webm');form.append('language',locale);
- hint('Chirp 2 · ovoz aniqlanmoqda…');
+ onlineState('loading');
  const timer=setTimeout(()=>ctrl.abort(),45000);
  try{
   const response=await fetch(CHIRP2_CANDIDATE+'/api/transcribe-google',{method:'POST',body:form,signal:ctrl.signal});
@@ -519,22 +545,22 @@ async function sendOnlineAudio(blob,locale,session){
   const recognized=typeof result.text==='string'?result.text.trim():'';
   if(recognized){
    input.value=appendTranscript(input.value,recognized);
-   persistDraft();resize();syncComposerMode();hint('Chirp 2 · ovoz tanildi');
-  }else hint('Ovoz aniqlanmadi');
+   persistDraft();resize();syncComposerMode();onlineState('done');
+  }else onlineState('error');
  }catch(e){
   if(session!==onlineSession||document.documentElement.dataset.avnivoMode!=='online')return;
-  hint(e.name==='AbortError'?'Ulanish vaqti tugadi':e instanceof TypeError?'Chirp 2 serveriga ulanib bo‘lmadi':e.message);
+  console.warn('Chirp 2 recognition failed:',e);onlineState('error');
  }finally{clearTimeout(timer);if(onlineAbort===ctrl)onlineAbort=null}
 }
 function cancelOnlineRecording(){
  onlineSession++;
  if(onlineAbort){onlineAbort.abort();onlineAbort=null}
  if(onlineRecorder){const recorder=onlineRecorder;onlineRecorder=null;try{if(recorder.state==='recording')recorder.stop()}catch(e){}}
- onlineChunks=[];hint('');
+ onlineChunks=[];onlineState('done');
 }
 
 let holdTimer=0,holdStarted=false,holdPointer=null,holdSuppressClick=false,holdRecognizer=null,holdBase='',holdTranscript='',holdFinal='',holdSession=0,holdWaveStream=null,holdWaveContext=null,holdWaveFrame=0,holdWaveAnalyser=null;
-function hint(message){voiceHint.textContent=message;voiceHint.hidden=!message}
+function hint(message){if(document.documentElement.dataset.avnivoMode==='online'){voiceHint.hidden=true;return}voiceHint.textContent=message;voiceHint.hidden=!message}
 function appendTranscript(base,transcript){
  const spoken=transcript.trim();
  if(!spoken)return base;
