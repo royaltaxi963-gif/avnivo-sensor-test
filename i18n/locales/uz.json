@@ -174,5 +174,16 @@
   "accessibility.download": "Yuklab olish",
   "language.settings.title": "Interfeys tili",
   "language.settings.aria": "Interfeys tilini tanlang",
-  "language.settings.note": "Interfeys tili boshqa tillarga tarjima qilingan; nutq modellari qayta yuklanmaydi."
+  "language.settings.note": "Interfeys tili boshqa tillarga tarjima qilingan; nutq modellari qayta yuklanmaydi.",
+  "tutorial.history.title": "Chatlar tarixi",
+  "tutorial.history.body": "Bu — tarjima suhbatlaringiz tarixi. AVNIVO bilan oldin yozishgan xabarlaringiz va tarjima chatlaringiz shu bo‘limda saqlanadi. Kerakli suhbatni topib, avvalgi xabarlarni qayta ko‘rishingiz, tarjimalarni tekshirishingiz yoki o‘sha suhbatni davom ettirishingiz mumkin. Yangi suhbat boshlash uchun ham tarix bo‘limidagi tegishli tugmadan foydalanasiz.",
+  "tutorial.settings.title": "Sozlamalar",
+  "tutorial.settings.body": "Sozlamalar bo‘limida tarjimonning ishlash usulini o‘zingizga moslashtirasiz. Online rejimda ovoz chiqarib o‘qish, mavjud ovozlar, o‘qish ohangi va uslubi kabi imkoniyatlarni boshqarish mumkin. Offline rejimda esa qurilmaga yuklanadigan ovoz tanish, tarjima va ovozli o‘qish modullarini hamda ularning holatini ko‘rishingiz mumkin. Ayrim imkoniyatlar tanlangan rejim va o‘rnatilgan modullarga bog‘liq.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Mikrofon tugmasi orqali gapirib tarjima qilishni boshlaysiz. Avval kerakli tillarni tanlang, so‘ng mikrofonni bosing va odatdagidek gapiring. Ilova tanlangan rejim imkoniyatlariga qarab nutqni taniydi va tarjima qilishga yordam beradi. Mikrofon uchun brauzer ruxsati talab qilinishi mumkin.",
+  "tutorial.online.title": "Online rejim",
+  "tutorial.online.body": "Bu tugma internet orqali ishlaydigan tarjimon rejimini tanlaydi. Online rejimda mavjud bulutli ovoz tanish va tarjima xizmatlaridan foydalanish mumkin. Internet aloqasi va tegishli xizmatlarning mavjudligi zarur. Hozir ilova Online rejimida ochilgan.",
+  "tutorial.offline.title": "Offline rejim",
+  "tutorial.offline.body": "Bu tugma internetsiz ishlash uchun mo‘ljallangan rejimni tanlaydi. Offline imkoniyatlardan foydalanish uchun kerakli til va ovoz modullari qurilmaga oldindan yuklangan bo‘lishi lozim. Qo‘llab-quvvatlanadigan tillar va funksiyalar o‘rnatilgan modullarga bog‘liq. Tushunarli tugmasini bossangiz, tanishtirish yakunlanadi va ilova ishlashga tayyor bo‘ladi.",
+  "tutorial.next": "Tushunarli"
 }

@@ -166,5 +166,16 @@
   "accessibility.download": "Download",
   "language.settings.title": "Interface language",
   "language.settings.aria": "Select interface language",
-  "language.settings.note": "The interface language is translated into other languages; speech models are not reloaded."
+  "language.settings.note": "The interface language is translated into other languages; speech models are not reloaded.",
+  "tutorial.history.title": "Chat history",
+  "tutorial.history.body": "This is your translation chat history. Previous AVNIVO conversations and translations are saved here. You can reopen and review earlier conversations or start a new one.",
+  "tutorial.settings.title": "Settings",
+  "tutorial.settings.body": "Customize how the translator works here. Online settings include speech playback, voices, tones and styles. Offline settings show downloadable speech recognition, translation and speech playback modules and their status. Features depend on the selected mode and installed modules.",
+  "tutorial.microphone.title": "Microphone",
+  "tutorial.microphone.body": "Use the microphone to translate speech. Choose your languages, tap the microphone and speak normally. Speech recognition depends on the selected mode. Browser microphone permission may be required.",
+  "tutorial.online.title": "Online mode",
+  "tutorial.online.body": "This button selects internet-powered translation. Online mode can use available cloud speech recognition and translation services. An internet connection and access to the services are required. The app currently opens in Online mode.",
+  "tutorial.offline.title": "Offline mode",
+  "tutorial.offline.body": "This button selects the mode intended for use without internet. Download the required language and speech modules in advance. Available languages and features depend on installed modules. Tap Understood to finish the introduction and unlock the app.",
+  "tutorial.next": "Understood"
 }
