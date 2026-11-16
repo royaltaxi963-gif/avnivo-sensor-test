@@ -37,6 +37,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+          accept-android-sdk-licenses: true
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -45,15 +48,15 @@ jobs:
 
       - name: Install Android platform 35 and build-tools
         run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Run JVM unit tests (WebView origin policy)
         working-directory: android
-        run: gradle :app:testDebugUnitTest --no-daemon --console=plain
+        run: ./gradlew :app:testDebugUnitTest --no-daemon --console=plain
 
       - name: Build debug APK
         working-directory: android
-        run: gradle :app:assembleDebug --no-daemon --console=plain
+        run: ./gradlew :app:assembleDebug --no-daemon --console=plain
 
       - name: Verify APK identity, permissions and bundled assets
         working-directory: android
