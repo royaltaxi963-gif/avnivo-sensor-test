@@ -142,7 +142,7 @@ html[data-avnivo-mode=online] .offline-modules{display:none}
 #avnivo-first-launch.departing #avnivo-language-menu{display:none}
 #avnivo-first-launch.departing{transition:none}
 /* After the selected language pill has fully left, return the brand to the chat center. */
-#avnivo-first-launch.brand-to-chat .intro-brand{top:var(--brand-center,50%);transform:translate(-50%,-50%) scale(var(--target-scale,1));transition:top 1.95s cubic-bezier(.22,.72,.16,1),transform 1.95s cubic-bezier(.22,.72,.16,1)}
+#avnivo-first-launch.departing .intro-brand{opacity:0;transition:opacity .95s ease}
 #avnivo-first-launch.brand-to-chat .intro-brand-name{font-size:clamp(39px,11vw,64px)}
 #avnivo-first-launch.brand-to-chat .intro-colors{opacity:0}#avnivo-first-launch .intro-brand{z-index:4}#avnivo-first-launch .lang-pill{z-index:3}
 
@@ -1216,45 +1216,13 @@ function choose(){
  document.documentElement.dataset.avnivoMode='online';
  document.getElementById('mode-online').setAttribute('aria-pressed','true');
  document.getElementById('mode-offline').setAttribute('aria-pressed','false');
- const chatBrand=document.querySelector('.center-brand');
- const introBrand=root.querySelector('.intro-brand');
- const introName=introBrand?.querySelector('.intro-brand-name');
- const chatName=chatBrand?.querySelector('.brand-name');
- if(chatBrand&&introBrand&&introName&&chatName){
-   const target=chatBrand.getBoundingClientRect();
-   const targetName=chatName.getBoundingClientRect();
-   const introNameBox=introName.getBoundingClientRect();
-   const scale=targetName.width/Math.max(introNameBox.width,1);
-   introBrand.style.setProperty('--brand-center',(target.top+target.height/2)+'px');
-   introBrand.style.setProperty('--target-scale',String(scale));
-   // Keep the original chat brand invisible until the tutorial dim is opaque.
-   chatBrand.style.opacity='0';
-   chatBrand.dataset.onboardingHidden='true';
- }
+ // The intro brand fades out with the existing screen-darkening animation.
+ // The original centered chat brand stays in its normal position.
  pill.classList.add('selected');
- setTimeout(()=>{
-   root.classList.add('departing');
-   root.classList.add('brand-to-chat');
- },300);
- // The pill exits first; the screen stays black throughout both movements.
+ setTimeout(()=>root.classList.add('departing'),300);
  setTimeout(()=>{
    root.classList.add('finished');
-   // Slowly reveal the actual Online chat.
    setTimeout(()=>{
-     const clone=introBrand.cloneNode(true);
-     clone.id='avnivo-transition-brand';
-     clone.style.position='fixed';
-     clone.style.zIndex='1500';
-     clone.style.pointerEvents='none';
-     clone.style.opacity='1';
-     clone.style.transition='opacity .4s ease';
-     const rect=introBrand.getBoundingClientRect();
-     clone.style.top=(rect.top+rect.height/2)+'px';
-     clone.style.left=(rect.left+rect.width/2)+'px';
-     clone.style.transform='translate(-50%,-50%) scale(1)';
-     clone.style.width=rect.width+'px';
-     clone.style.margin='0';
-     document.body.appendChild(clone);
      root.remove();
      setTimeout(startTutorial,850);
    },2300);
@@ -1281,7 +1249,7 @@ function startTutorial(){
  document.body.classList.add('avnivo-tutorial');
  dim.classList.add('active');
  // Wait for the screen to finish darkening before highlighting the history icon.
- setTimeout(()=>{const original=document.querySelector('.center-brand');const transition=document.getElementById('avnivo-transition-brand');if(original&&original.dataset.onboardingHidden){original.style.opacity='';delete original.dataset.onboardingHidden}if(transition)transition.remove();showTutorialStage(0)},1250);
+ setTimeout(()=>showTutorialStage(0),1250);
 }
 next.addEventListener('click',()=>{
  if(tutorialTransitioning||tutorialStage!==0)return;
