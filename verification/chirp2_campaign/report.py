@@ -20,6 +20,7 @@ sys.path.insert(0, str(REPO / "translator-api"))
 import chirp2_languages as registry
 
 EVIDENCE = HERE / "evidence.jsonl"
+WEAK_EVIDENCE = HERE / "weak_locales.jsonl"
 RELIABILITY = HERE / "reliability.json"
 PRICE_PER_SECOND = 0.016 / 60.0
 HARD_CAP_USD = 30.0
@@ -27,11 +28,15 @@ HARD_CAP_USD = 30.0
 
 def load_rows():
     rows = []
-    if EVIDENCE.exists():
-        for line in EVIDENCE.read_text(encoding="utf-8").splitlines():
+    for path in (EVIDENCE, WEAK_EVIDENCE):
+        if not path.exists():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 rows.append(json.loads(line))
-    return rows
+    # Rows explicitly invalidated (e.g. a sample that turned out to be the
+    # wrong language) are kept in the file for audit but excluded from scoring.
+    return [r for r in rows if not r.get("invalidated")]
 
 
 def p95(values):

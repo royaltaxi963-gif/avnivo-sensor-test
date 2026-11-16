@@ -7,14 +7,14 @@ ast-ES,Asturian (Spain),3,3,0,22.86,0.1061,0.0429,0.8939,0.0,1.0,3.504,4.016,PAS
 az-AZ,Azerbaijani (Azerbaijan),3,3,0,49.44,0.0624,0.0148,0.9376,0.3333,1.0,5.175,6.187,PASS,google/fleurs
 be-BY,Belarusian (Belarus),3,3,0,56.82,0.0404,0.0107,0.9596,0.6667,1.0,5.644,6.854,PASS,google/fleurs
 bg-BG,Bulgarian (Bulgaria),3,3,0,29.1,0.112,0.0244,0.888,0.0,1.0,3.829,4.165,PASS,google/fleurs
-bn-BD,Bengali (Bangladesh),3,3,0,4.02,1.6667,0.5667,-0.6667,0.0,1.0,1.938,2.122,PASS,wikimedia-commons
+bn-BD,Bengali (Bangladesh),5,5,0,6.47,1.2,0.4543,-0.2,0.2,1.0,1.994,2.161,PASS,wikimedia-commons
 bn-IN,Bengali (India),3,3,0,50.64,0.1777,0.0356,0.8223,0.0,1.0,5.268,6.007,PASS,google/fleurs
 bs-BA,Bosnian (Bosnia and Herzegovina),3,3,0,32.76,0.1652,0.027,0.8348,0.0,1.0,4.082,4.189,PASS,google/fleurs
 ca-ES,Catalan (Spain),3,3,0,22.62,0.0556,0.0155,0.9444,0.3333,1.0,3.158,3.312,PASS,google/fleurs
 ceb-PH,Cebuano (Philippines),3,3,0,49.86,0.1837,0.0402,0.8163,0.0,1.0,4.717,7.084,PASS,google/fleurs
 ckb-IQ,Central Kurdish (Iraq),3,3,0,34.08,0.1508,0.0318,0.8492,0.0,1.0,4.302,4.983,PASS,google/fleurs
 cmn-Hans-CN,"Chinese (Simplified, China)",3,3,0,42.54,0.1769,0.1769,0.8231,0.3333,1.0,4.076,4.47,PASS,google/fleurs
-cmn-Hant-TW,"Chinese, Mandarin (Traditional, Taiwan)",3,3,0,3.02,1.0,1.0,0.0,0.0,1.0,2.054,2.237,PASS,tatoeba
+cmn-Hant-TW,"Chinese, Mandarin (Traditional, Taiwan)",5,5,0,4.97,1.0,1.0,0.0,0.2,1.0,2.079,2.287,PASS,tatoeba
 cs-CZ,Czech (Czech Republic),3,3,0,37.56,0.0145,0.003,0.9855,0.6667,1.0,4.332,4.584,PASS,google/fleurs
 cy-GB,Welsh (United Kingdom),3,3,0,52.98,0.2881,0.0731,0.7119,0.0,1.0,5.249,5.571,PASS,google/fleurs
 da-DK,Danish (Denmark),3,3,0,25.86,0.0544,0.0124,0.9456,0.3333,1.0,3.512,4.702,PASS,google/fleurs
@@ -30,12 +30,12 @@ es-US,Spanish (United States),3,3,0,3.65,0.3333,0.2,0.6667,0.6667,1.0,2.04,2.113
 et-EE,Estonian (Estonia),3,3,0,37.26,0.1027,0.0103,0.8973,0.0,1.0,4.05,4.523,PASS,google/fleurs
 eu-ES,Basque (Spain),3,3,0,3.31,0.0,0.0,1.0,1.0,1.0,2.026,2.044,PASS,wikimedia-commons
 fa-IR,Persian (Iran),3,3,0,52.56,0.1361,0.0955,0.8639,0.3333,1.0,4.898,5.541,PASS,google/fleurs
-ff-SN,Fulah (Senegal),3,3,0,34.5,0.7423,0.2839,0.2577,0.0,1.0,3.857,4.308,PASS,google/fleurs
+ff-SN,Fulah (Senegal),5,5,0,68.83,0.7788,0.3018,0.2212,0.0,1.0,4.311,5.518,PASS,google/fleurs
 fi-FI,Finnish (Finland),3,3,0,39.54,0.0,0.0,1.0,1.0,1.0,4.279,4.823,PASS,google/fleurs
 fil-PH,Filipino (Philippines),3,3,0,62.7,0.086,0.0494,0.914,0.0,1.0,5.762,6.462,PASS,google/fleurs
 fr-CA,French (Canada),3,3,0,4.2,0.6667,0.0648,0.3333,0.3333,1.0,1.862,2.113,PASS,tatoeba
 fr-FR,French (France),3,3,0,25.68,0.0351,0.0056,0.9649,0.6667,1.0,3.214,3.81,PASS,google/fleurs
-ga-IE,Irish (Ireland),3,3,0,58.44,0.6289,0.3621,0.3711,0.0,1.0,5.498,6.624,PASS,google/fleurs
+ga-IE,Irish (Ireland),5,5,0,80.77,0.6607,0.3657,0.3393,0.0,1.0,4.923,6.624,PASS,google/fleurs
 gl-ES,Galician (Spain),3,3,0,32.28,0.0871,0.0191,0.9129,0.3333,1.0,3.774,4.27,PASS,google/fleurs
 gu-IN,Gujarati (India),3,3,0,29.94,0.1227,0.0247,0.8773,0.3333,1.0,4.083,4.46,PASS,google/fleurs
 ha-NG,Hausa (Nigeria),3,3,0,46.08,0.1741,0.0569,0.8259,0.0,1.0,4.688,6.293,PASS,google/fleurs
@@ -44,7 +44,7 @@ hr-HR,Croatian (Croatia),3,3,0,27.96,0.0556,0.0253,0.9444,0.6667,1.0,3.592,4.45,
 hu-HU,Hungarian (Hungary),3,3,0,32.16,0.0747,0.0403,0.9253,0.3333,1.0,3.924,4.226,PASS,google/fleurs
 hy-AM,Armenian (Armenia),3,3,0,32.34,0.0684,0.0117,0.9316,0.3333,1.0,4.4,5.616,PASS,google/fleurs
 id-ID,Indonesian (Indonesia),3,3,0,23.46,0.0,0.0,1.0,1.0,1.0,3.171,3.571,PASS,google/fleurs
-ig-NG,Igbo (Nigeria),3,3,0,53.52,0.7472,0.4689,0.2528,0.0,1.0,5.052,7.192,PASS,google/fleurs
+ig-NG,Igbo (Nigeria),5,5,0,98.22,0.633,0.328,0.367,0.0,1.0,5.407,8.088,PASS,google/fleurs
 is-IS,Icelandic (Iceland),3,3,0,36.0,0.1439,0.0241,0.8561,0.0,1.0,4.179,4.276,PASS,google/fleurs
 it-IT,Italian (Italy),3,3,0,37.5,0.0,0.0,1.0,1.0,1.0,4.196,5.136,PASS,google/fleurs
 iw-IL,Hebrew (Israel),3,3,0,26.82,0.0833,0.0274,0.9167,0.3333,1.0,3.846,4.852,PASS,google/fleurs
@@ -88,16 +88,16 @@ pt-BR,Portuguese (Brazil),3,3,0,49.32,0.031,0.0343,0.969,0.3333,1.0,4.816,5.816,
 pt-PT,Portuguese (Portugal),3,3,0,4.09,0.3333,0.0556,0.6667,0.6667,1.0,2.053,2.117,PASS,tatoeba
 ro-RO,Romanian (Romania),3,3,0,36.78,0.0478,0.0155,0.9522,0.3333,1.0,4.009,5.172,PASS,google/fleurs
 ru-RU,Russian (Russia),3,3,0,21.48,0.0606,0.0189,0.9394,0.6667,1.0,3.136,3.191,PASS,google/fleurs
-rup-BG,Aromanian (Bulgaria),3,3,0,4.25,1.3333,1.0476,-0.3333,0.0,1.0,2.166,2.264,PASS,tatoeba
+rup-BG,Aromanian (Bulgaria),5,5,0,5.18,1.2,1.0556,-0.2,0.0,1.0,2.02,2.07,PASS,wikimedia-commons
 sd-IN,Sindhi (India),3,3,0,28.44,0.4554,0.1843,0.5446,0.0,1.0,3.717,4.936,PASS,google/fleurs
 si-LK,Sinhala (Sri Lanka),3,3,0,4.6,0.6667,0.1587,0.3333,0.3333,1.0,2.034,2.303,PASS,wikimedia-commons
 sk-SK,Slovak (Slovakia),3,3,0,32.52,0.0303,0.0068,0.9697,0.6667,1.0,3.859,4.354,PASS,google/fleurs
 sl-SI,Slovenian (Slovenia),3,3,0,23.16,0.1025,0.0238,0.8975,0.3333,1.0,2.915,3.137,PASS,google/fleurs
 sn-ZW,Shona (Zimbabwe),3,3,0,29.04,0.1971,0.0548,0.8029,0.0,1.0,3.57,4.133,PASS,google/fleurs
 so-SO,Somali,3,3,0,41.7,0.3236,0.144,0.6764,0.0,1.0,4.481,5.687,PASS,google/fleurs
-sq-AL,Albanian (Albania),3,3,0,3.0,1.0,0.3,0.0,0.0,1.0,2.027,2.095,PASS,wikimedia-commons
+sq-AL,Albanian (Albania),5,5,0,4.99,0.8,0.305,0.2,0.2,1.0,2.005,2.095,PASS,wikimedia-commons
 sr-RS,Serbian (Serbia),3,3,0,36.44,0.0128,0.0058,0.9872,0.6667,1.0,4.159,4.676,PASS,google/fleurs
-su-ID,Sundanese (Indonesia),3,3,0,3.07,1.3333,0.5423,-0.3333,0.0,1.0,1.994,2.039,PASS,wikimedia-commons
+su-ID,Sundanese (Indonesia),5,5,0,5.55,1.2,0.4521,-0.2,0.0,1.0,2.029,2.09,PASS,wikimedia-commons
 sv-SE,Swedish (Sweden),3,3,0,37.08,0.1139,0.0418,0.8861,0.0,1.0,4.368,5.864,PASS,google/fleurs
 sw,Swahili,3,3,0,41.34,0.1343,0.0781,0.8657,0.3333,1.0,4.495,4.8,PASS,google/fleurs
 sw-KE,Swahili (Kenya),3,3,0,41.34,0.1343,0.0781,0.8657,0.3333,1.0,4.102,4.276,PASS,google/fleurs
@@ -111,8 +111,8 @@ umb-AO,Umbundu (Angola),3,3,0,72.48,0.4167,0.0987,0.5833,0.0,1.0,5.93,8.588,PASS
 ur-PK,Urdu (Pakistan),3,3,0,37.74,0.1026,0.0429,0.8974,0.0,1.0,4.132,4.306,PASS,google/fleurs
 uz-UZ,Uzbek (Uzbekistan),3,3,0,42.12,0.0964,0.0163,0.9036,0.0,1.0,4.758,4.952,PASS,google/fleurs
 vi-VN,Vietnamese (Vietnam),3,3,0,33.54,0.0,0.0,1.0,1.0,1.0,3.845,4.584,PASS,google/fleurs
-wo-SN,Wolof (Senegal),3,3,0,56.34,0.4537,0.2251,0.5463,0.0,1.0,5.032,5.365,PASS,google/fleurs
+wo-SN,Wolof (Senegal),5,5,0,104.89,0.4048,0.1719,0.5952,0.0,1.0,5.421,7.584,PASS,google/fleurs
 xh-ZA,Xhosa (South Africa),3,3,0,52.38,0.3174,0.0628,0.6826,0.0,1.0,5.21,5.486,PASS,google/fleurs
-yo-NG,Yoruba (Nigeria),3,3,0,51.48,0.6095,0.2627,0.3905,0.0,1.0,5.037,5.221,PASS,google/fleurs
-yue-Hant-HK,"Chinese, Cantonese (Traditional Hong Kong)",3,3,0,39.84,0.2814,0.2814,0.7186,0.0,1.0,4.152,4.426,PASS,google/fleurs
+yo-NG,Yoruba (Nigeria),5,5,0,78.91,0.6164,0.2573,0.3836,0.0,1.0,5.003,5.221,PASS,google/fleurs
+yue-Hant-HK,"Chinese, Cantonese (Traditional Hong Kong)",5,5,0,56.77,0.2069,0.2069,0.7931,0.0,1.0,3.852,4.426,PASS,google/fleurs
 zu-ZA,Zulu (South Africa),3,3,0,35.7,0.3977,0.0837,0.6023,0.0,1.0,4.4,6.077,PASS,google/fleurs
