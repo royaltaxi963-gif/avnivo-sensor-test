@@ -51,6 +51,15 @@ html[data-avnivo-mode=online] .online-stt-status[data-state=recording],html[data
 @keyframes avnivo-record-leave{from{opacity:1;transform:translateY(-50%) scale(1)}to{opacity:0;transform:translateY(-50%) scale(.12)}}
 @media(prefers-reduced-motion:reduce){.online-stt-status[data-state=recording],.online-stt-status[data-state=loading]{animation:none}}
 html[data-avnivo-mode=online] .voice-trace{left:40px;right:55px}
+/* Offline: same left recording indicator layout, blue theme; no Chirp 2/API integration. */
+html[data-avnivo-mode=offline] .writing-area{padding-left:41px}
+html[data-avnivo-mode=offline] .animated-greeting{left:41px}
+html[data-avnivo-mode=offline] .voice-trace{left:40px;right:55px}
+html[data-avnivo-mode=offline] .online-stt-status{color:#7cd5ff}
+html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,
+html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{display:flex;opacity:1;transform:translateY(-50%) scale(1);animation:avnivo-offline-record-pulse 1.15s ease-in-out infinite}
+@keyframes avnivo-offline-record-pulse{0%,100%{opacity:.58;filter:drop-shadow(0 0 1px #4ab9f4)}50%{opacity:1;filter:drop-shadow(0 0 8px #75d9ff)}}
+@media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{animation:none}}
 </style>
 </head>
 <body>
