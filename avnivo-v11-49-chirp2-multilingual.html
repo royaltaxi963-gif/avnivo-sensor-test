@@ -1329,8 +1329,9 @@ window.CHIRP2_MATRIX=[
  voiceNotice.id='avnivoVoiceNotice';
  voiceNotice.setAttribute('role','status');
  voiceNotice.setAttribute('aria-live','polite');
- voiceNotice.style.cssText='position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);width:max-content;max-width:calc(100vw - 32px);padding:12px 16px;border:1px solid #d5a95f;border-radius:14px;background:#30251b;color:#ffe4aa;font:600 14px/1.4 system-ui;overflow-wrap:anywhere;box-shadow:0 8px 28px #0009;z-index:2147483645;pointer-events:none;display:none;text-align:center';
- document.body.append(voiceNotice);
+ voiceNotice.style.cssText='position:absolute;left:50%;bottom:calc(2px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);width:max-content;max-width:calc(100% - 150px);padding:0;border:0;background:transparent;color:#ffe4aa;font:500 10px/1.25 system-ui;overflow-wrap:anywhere;box-shadow:none;z-index:3;pointer-events:none;display:none;text-align:center';
+ const nav=document.querySelector('.nav');
+ if(nav){nav.style.position='relative';nav.append(voiceNotice)}else document.body.append(voiceNotice);
  let noticeTimer=0;
  function status(text,kind='info'){
    speechStatus.textContent=text||'';
@@ -1346,6 +1347,8 @@ window.CHIRP2_MATRIX=[
  const swap=document.getElementById('swap');
  const app=document.getElementById('app');
  if(!mic||!swap||!app)return;
+ mic.style.position='relative';
+ mic.style.top='-13px';
  let recorder=null,stream=null,chunks=[],busy=false,recording=false,requestId=0,startedAt=0;
  function message(t){if(t){console.warn('AVNIVO voice:',t);status(t,'error')}}
  function clean(){recording=false;mic.classList.remove('active');mic.setAttribute('aria-pressed','false');stream?.getTracks().forEach(t=>t.stop());stream=null;recorder=null;app.querySelectorAll('.speaker').forEach(s=>s.classList.remove('voice-listening'))}
@@ -1375,7 +1378,7 @@ window.CHIRP2_MATRIX=[
    const diagnosticStart=performance.now();
    let responseAt=null;
    busy=true;
-   status('Google Chirp 2 taniyapti...');
+   status('Ovoz aniqlanmoqda...');
    try{
      const form=new FormData();
      const extension=blob.type.includes('mp4')?'mp4':blob.type.includes('ogg')?'ogg':blob.type.includes('wav')?'wav':blob.type.includes('flac')?'flac':'webm';
@@ -1398,7 +1401,7 @@ window.CHIRP2_MATRIX=[
      field.dispatchEvent(new Event('input',{bubbles:true}));
      const total=((performance.now()-diagnosticStart)/1000).toFixed(1);
      const network=((responseAt-diagnosticStart)/1000).toFixed(1);
-     status('Google Chirp 2 — tayyor ('+locale+'). Server javobi: '+network+' s; jami: '+total+' s','success');
+     status('Ovoz tanish ishlayapti','success');
    }catch(err){if(id===requestId){const seconds=((performance.now()-diagnosticStart)/1000).toFixed(1);message('Ovoz tanilmadi ('+seconds+' s): '+(err.name==='AbortError'?'Server javobi kechikdi':err instanceof TypeError?'Server bilan aloqa uzildi yoki CORS ruxsati yo‘q':err.message))}}
    finally{busy=false}
  }
@@ -1441,7 +1444,7 @@ window.CHIRP2_MATRIX=[
      };
      recorder.start();
      startedAt=Date.now();recording=true;
-     status('Ovoz yozilmoqda... ('+locale+')');
+     status('Ovoz yozilmoqda...');
      mic.classList.add('active');mic.setAttribute('aria-pressed','true');
 
    }catch(err){clean();message('Mikrofon ishga tushmadi: '+err.message)}
