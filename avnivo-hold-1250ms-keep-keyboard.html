@@ -141,7 +141,7 @@ function sendMessage(){
  messages.appendChild(bubble);
  while(messages.children.length>30)messages.firstElementChild.remove();
  messages.scrollTop=messages.scrollHeight;
- input.value='';input.blur();clearTimeout(timeout);timeout=0;resize();syncComposerMode();delay(300);
+ input.value='';clearTimeout(timeout);timeout=0;resize();syncComposerMode();delay(300);
 }
 input.addEventListener('focus',syncComposerMode);
 input.addEventListener('blur',()=>requestAnimationFrame(syncComposerMode));
@@ -292,10 +292,12 @@ function beginHold(){
 }
 function clearHoldTimer(){clearTimeout(holdTimer);holdTimer=0}
 mic.addEventListener('pointerdown',event=>{
+ // Preserve textarea focus and Android keyboard while pressing the action button.
+ if(input===document.activeElement)event.preventDefault();
  if(event.button!==0||!input.value.trim()||active)return;
  holdPointer=event.pointerId;holdSuppressClick=false;
  try{mic.setPointerCapture(event.pointerId)}catch(e){}
- clearHoldTimer();holdTimer=setTimeout(()=>{holdTimer=0;holdSuppressClick=true;beginHold()},3000);
+ clearHoldTimer();holdTimer=setTimeout(()=>{holdTimer=0;holdSuppressClick=true;beginHold()},1250);
 });
 function releaseHold(event){
  if(holdPointer===null||event.pointerId!==holdPointer)return;
@@ -303,6 +305,7 @@ function releaseHold(event){
  if(wasHold){holdSuppressClick=true;finishHold()}
 }
 mic.addEventListener('pointerup',releaseHold);
+mic.addEventListener('mousedown',event=>{if(input===document.activeElement)event.preventDefault()});
 mic.addEventListener('pointercancel',releaseHold);
 mic.addEventListener('lostpointercapture',event=>{if(holdPointer===event.pointerId)releaseHold(event)});
 mic.addEventListener('contextmenu',event=>{if(holdTimer||holdStarted)event.preventDefault()});
