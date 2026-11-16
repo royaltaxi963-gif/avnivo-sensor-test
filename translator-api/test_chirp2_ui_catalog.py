@@ -11,7 +11,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-HTML = ROOT / "avnivo-v11-49-chirp2-multilingual.html"
+HTML = ROOT / "tests/fixtures/chirp2-multilingual-legacy.html"
 REGISTRY = ROOT / "translator-api" / "chirp2_languages.py"
 
 
