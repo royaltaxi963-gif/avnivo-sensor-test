@@ -4,24 +4,24 @@ name: Translation LLM language audit (real API, budget-guarded)
 # against the 117 Chirp 2 locales AVNIVO exposes. It never touches the AVNIVO
 # application, HTML interface, offline model or Chirp 2 recognition engine.
 #
+# This workflow lives only on the dedicated audit branch and is triggered by a
+# push to that branch (workflow_dispatch requires the file on the default
+# branch, which this audit deliberately does not modify). The run parameters
+# come from translation-llm-audit/run-config.json.
+#
 # Authentication reuses the repository's existing Workload Identity Federation
 # secrets (GCP_WORKLOAD_IDENTITY_PROVIDER / GCP_SERVICE_ACCOUNT). No long-lived
-# key is stored anywhere. Results are committed back to this dedicated branch.
+# key is stored anywhere.
 on:
-  workflow_dispatch:
-    inputs:
-      phase:
-        description: "pilot or full"
-        required: true
-        default: "pilot"
-      only:
-        description: "Optional comma-separated Chirp 2 locales (e.g. uz-UZ,ru-RU)"
-        required: false
-        default: ""
-      max_requests:
-        description: "Hard cap on new paid requests for this run"
-        required: true
-        default: "500"
+  push:
+    branches:
+      - audit/translation-llm-117
+    paths:
+      - 'translation-llm-audit/harness.py'
+      - 'translation-llm-audit/corpus.py'
+      - 'translation-llm-audit/language_matrix.py'
+      - 'translation-llm-audit/run-config.json'
+      - '.github/workflows/translation-llm-audit.yml'
 
 permissions:
   contents: write
@@ -56,15 +56,26 @@ jobs:
       - name: Language matrix self-check
         run: python translation-llm-audit/language_matrix.py
 
+      - name: Read run configuration
+        id: cfg
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          c = json.load(open("translation-llm-audit/run-config.json"))
+          print("phase=" + str(c.get("phase", "pilot")))
+          print("only=" + str(c.get("only", "")))
+          print("max_requests=" + str(c.get("max_requests", 120)))
+          PY
+
       - name: Run audit against the real Translation LLM API
         env:
           AVNIVO_TRANSLATION_PROJECT: project-6bcf7fe6-cb55-49b7-9f4
           AVNIVO_TRANSLATION_REGION: us-central1
         run: |
           python translation-llm-audit/harness.py \
-            --phase "${{ inputs.phase }}" \
-            --only "${{ inputs.only }}" \
-            --max-requests "${{ inputs.max_requests }}"
+            --phase "${{ steps.cfg.outputs.phase }}" \
+            --only "${{ steps.cfg.outputs.only }}" \
+            --max-requests "${{ steps.cfg.outputs.max_requests }}"
 
       - name: Commit results back to the audit branch
         run: |
@@ -74,6 +85,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No new results to commit."
           else
-            git commit -m "audit: translation-llm ${{ inputs.phase }} run (${{ inputs.only }})"
+            git commit -m "audit: results (${{ steps.cfg.outputs.phase }}) [skip ci]"
             git push
           fi
