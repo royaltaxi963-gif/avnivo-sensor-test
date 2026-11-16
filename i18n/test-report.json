@@ -1,0 +1,134 @@
+{
+  "generatedAt": "2026-11-16T20:10:54.670Z",
+  "node": "v24.22.2",
+  "passed": 25,
+  "failed": 0,
+  "skipped": 0,
+  "tests": [
+    {
+      "name": "registry has exactly 100 languages",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "all 100 packages are valid JSON with complete keys",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "placeholders preserved in every package",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "engine loads exactly one active bundle",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "selected language persists in localStorage",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "unknown language falls back to English",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "missing key never renders a raw key",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "interpolation substitutes variables",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "RTL languages set document direction",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "Latin-script Kurdish stays LTR",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "bundles load from local files with no network",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "1000 language switches complete without error",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "locale-aware number and date formatting",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "index.html preserves AVNIVO contracts",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "onboarding animation preserved and wired",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "no duplicate keys in any raw package",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "bundle cache stays bounded (memory discipline)",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "long translated strings stay intact",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "Online and Offline settings remain separate",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: every package has all 11 tutorial keys",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: English and Uzbek are preserved",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: no package left in English",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: language codes unchanged (100 unique)",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: engine resolves tutorial keys in target language",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: metadata never upgraded to reviewed",
+      "status": "passed",
+      "error": null
+    }
+  ]
+}

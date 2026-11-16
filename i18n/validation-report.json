@@ -1,0 +1,1093 @@
+{
+  "languages": 100,
+  "sourceKeys": 179,
+  "results": [
+    {
+      "name": "exactly-100-languages",
+      "passed": true,
+      "detail": "count=100"
+    },
+    {
+      "name": "unique-language-codes",
+      "passed": true,
+      "detail": "unique=100"
+    },
+    {
+      "name": "native-names-present",
+      "passed": true,
+      "detail": "all native names non-empty"
+    },
+    {
+      "name": "rtl-flags",
+      "passed": true,
+      "detail": "rtl set matches engine"
+    },
+    {
+      "name": "one-package-per-language",
+      "passed": true,
+      "detail": "files=100"
+    },
+    {
+      "name": "no-missing-keys",
+      "passed": true,
+      "detail": "missing=0"
+    },
+    {
+      "name": "no-duplicate-keys",
+      "passed": true,
+      "detail": "no duplicate keys"
+    },
+    {
+      "name": "no-empty-values",
+      "passed": true,
+      "detail": "empty=0"
+    },
+    {
+      "name": "placeholder-integrity",
+      "passed": true,
+      "detail": "breaks=0"
+    },
+    {
+      "name": "voice-tag-integrity",
+      "passed": true,
+      "detail": "breaks=0"
+    },
+    {
+      "name": "identifiers-not-translated",
+      "passed": true,
+      "detail": "translated=0"
+    },
+    {
+      "name": "json-valid",
+      "passed": true,
+      "detail": "invalid=0"
+    },
+    {
+      "name": "machine-translation-marked",
+      "passed": true,
+      "detail": "all non-English packages marked machineTranslated"
+    },
+    {
+      "name": "rtl-flag-matches-script",
+      "passed": true,
+      "detail": "mismatches=0"
+    },
+    {
+      "name": "tutorial-keys-complete",
+      "passed": true,
+      "detail": "keys=11 languages=100 missing=0"
+    },
+    {
+      "name": "tutorial-not-english-placeholder",
+      "passed": true,
+      "detail": "english-left=0"
+    },
+    {
+      "name": "tutorial-script-consistency",
+      "passed": true,
+      "detail": "mismatches=0"
+    }
+  ],
+  "perLanguage": [
+    {
+      "code": "uz",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "ar",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "fa",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ur",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ps",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "tg",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ky",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 7,
+      "machine": true
+    },
+    {
+      "code": "kk",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "tk",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 2,
+      "machine": true
+    },
+    {
+      "code": "az",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "tr",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "ug",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 5,
+      "machine": true
+    },
+    {
+      "code": "sd",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ku",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 15,
+      "machine": true
+    },
+    {
+      "code": "ms",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "id",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "bn",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "so",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 4,
+      "machine": true
+    },
+    {
+      "code": "sw",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 2,
+      "machine": true
+    },
+    {
+      "code": "ha",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 3,
+      "machine": true
+    },
+    {
+      "code": "dv",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "bs",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 4,
+      "machine": true
+    },
+    {
+      "code": "sq",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "ff",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "wo",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "mn",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ru",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "en",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": false
+    },
+    {
+      "code": "fr",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "de",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 3,
+      "machine": true
+    },
+    {
+      "code": "es",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 4,
+      "machine": true
+    },
+    {
+      "code": "it",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "pt",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 5,
+      "machine": true
+    },
+    {
+      "code": "nl",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "sv",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "no",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 3,
+      "machine": true
+    },
+    {
+      "code": "da",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 3,
+      "machine": true
+    },
+    {
+      "code": "fi",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "is",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "et",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "lv",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "lt",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "pl",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "cs",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "sk",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "sl",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "hr",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "sr",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "mk",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "bg",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ro",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 13,
+      "machine": true
+    },
+    {
+      "code": "hu",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "el",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "hy",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ka",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "he",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "hi",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ne",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "mr",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "gu",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "pa",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ta",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "te",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "kn",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ml",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "si",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "th",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "lo",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "km",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "my",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "vi",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "zh",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ja",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ko",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "bo",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "am",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ti",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "om",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "zu",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "xh",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "af",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ny",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 3,
+      "machine": true
+    },
+    {
+      "code": "sn",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 40,
+      "machine": true
+    },
+    {
+      "code": "rw",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 4,
+      "machine": true
+    },
+    {
+      "code": "lg",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "yo",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 2,
+      "machine": true
+    },
+    {
+      "code": "ig",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 2,
+      "machine": true
+    },
+    {
+      "code": "ak",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ee",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ln",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "mg",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 8,
+      "machine": true
+    },
+    {
+      "code": "ht",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 5,
+      "machine": true
+    },
+    {
+      "code": "eo",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "la",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 28,
+      "machine": true
+    },
+    {
+      "code": "ga",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 1,
+      "machine": true
+    },
+    {
+      "code": "cy",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "gd",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 7,
+      "machine": true
+    },
+    {
+      "code": "eu",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 0,
+      "machine": true
+    },
+    {
+      "code": "ca",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 5,
+      "machine": true
+    },
+    {
+      "code": "gl",
+      "dupes": 0,
+      "missing": 0,
+      "empty": 0,
+      "placeholders": 0,
+      "tags": 0,
+      "identical": 4,
+      "machine": true
+    }
+  ]
+}
