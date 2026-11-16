@@ -34,7 +34,7 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 150
     steps:
       - name: Check out the audit branch
         uses: actions/checkout@v4

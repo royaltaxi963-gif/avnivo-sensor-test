@@ -1,1 +1,5 @@
-{"phase":"pilot","only":"","max_requests":120}
+{
+  "phase": "full",
+  "only": "",
+  "max_requests": 6500
+}
