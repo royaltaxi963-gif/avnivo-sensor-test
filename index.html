@@ -199,8 +199,8 @@ function applyMode(mode){
  document.querySelector('meta[name="theme-color"]').content=chosen==='offline'?'#080f19':'#17120d';
  try{localStorage.setItem('avnivo.ui.mode.v1',chosen)}catch(e){}
 }
-modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online');updateOnlineLanguageLabels()});
-modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){requestToken++;cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
+modeOnline.addEventListener('click',()=>{stopSpeaking();if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online');updateOnlineLanguageLabels()});
+modeOffline.addEventListener('click',()=>{stopSpeaking();if(document.documentElement.dataset.avnivoMode==='online'){requestToken++;cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
 try{applyMode(localStorage.getItem('avnivo.ui.mode.v1'))}catch(e){applyMode('online')}
 const mic=shell.querySelector('.mic-icon');
 const trace=shell.querySelector('.voice-trace-glow');
@@ -208,6 +208,7 @@ const languageRow=document.querySelector('.language-row');
 const leftLanguage=languageRow.querySelector('.source-language'),rightLanguage=languageRow.querySelector('.target-language');
 let languageTransitionTimer=0;
 function selectLanguage(side){
+ stopSpeaking();
  if(languageRow.dataset.selected===side)return;
  if(document.documentElement.dataset.avnivoMode==='online'){
   requestToken++;cancelOnlineRecording();if(active)stopVoice();
@@ -267,7 +268,7 @@ function renderOnlineLanguages(){
   item.addEventListener('click',()=>{
    if(!onlineLanguagesByCode.has(locale))return;
    if(onlineChoice[longPressSide]!==locale){requestToken++;cancelOnlineRecording();if(active)stopVoice()}
-    onlineChoice[longPressSide]=locale;
+    onlineChoice[longPressSide]=locale;stopSpeaking();
    updateOnlineLanguageLabels();closeOnlineLanguages();
   });
   languageResults.append(item);
@@ -411,7 +412,7 @@ function ttsChunks(text){
   if(sentence>=130)cut=sentence+1;
   else {const space=section.lastIndexOf(' ',350);if(space>=130)cut=space}
   // Do not split a UTF-16 surrogate pair.
-  if(cut<rest.length&&cut>0&&/[\\uD800-\\uDBFF]/.test(rest[cut-1])&&/[\\uDC00-\\uDFFF]/.test(rest[cut]))cut--;
+  if(cut<rest.length&&cut>0){const prev=rest.charCodeAt(cut-1),next=rest.charCodeAt(cut);if(prev>=0xD800&&prev<=0xDBFF&&next>=0xDC00&&next<=0xDFFF)cut--;}
   result.push(rest.slice(0,cut).trim());rest=rest.slice(cut).trim();
  }
  return result.filter(Boolean);
@@ -451,7 +452,7 @@ async function playMessage(button,bubble,language){
    button.removeAttribute('data-loading');button.setAttribute('aria-label','Ovozli o‘qishni to‘xtatish');
    const audio=ttsAudio;
    await new Promise((resolve,reject)=>{
-    audio.onended=resolve;audio.onerror=()=>reject(Error('Audio ijro xatosi'));
+    audio.onended=resolve;audio.onpause=resolve;audio.onerror=()=>reject(Error('Audio ijro xatosi'));
     audio.play().catch(reject);
    });
    if(generation!==ttsGeneration)return;
