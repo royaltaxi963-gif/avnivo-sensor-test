@@ -121,6 +121,14 @@ jobs:
             --project="$PROJECT_ID" --limit=60 --freshness=3h \
             --format='value(timestamp,severity,textPayload)' || true
 
+      - name: App container ERROR logs raw JSON (last 3h)
+        shell: bash
+        run: |
+          gcloud logging read \
+            'resource.type="cloud_run_revision" AND resource.labels.service_name="avnivo-sensor-test" AND severity>=ERROR' \
+            --project="$PROJECT_ID" --limit=10 --freshness=3h --format=json \
+            | jq -r '.[] | {ts:.timestamp, msg:(.textPayload // .jsonPayload.message // .jsonPayload.detail), labels:.labels}' 2>/dev/null || true
+
       - name: Deployed revision image and labels
         shell: bash
         run: |
@@ -150,6 +158,13 @@ jobs:
         shell: bash
         run: |
           gcloud billing projects describe "$PROJECT_ID" --format=json || true
+
+      - name: Speech API audit log raw (last 4h)
+        shell: bash
+        run: |
+          gcloud logging read 'logName:"speech.googleapis.com"' \
+            --project="$PROJECT_ID" --limit=15 --freshness=4h --format=json \
+            | jq -r '.[] | {ts:.timestamp, method:.protoPayload.methodName, principal:.protoPayload.authenticationInfo.principalEmail, status:.protoPayload.status}' 2>/dev/null || true
 
       - name: Direct Google Speech-to-Text V2 recognize probe
         shell: bash
