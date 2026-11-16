@@ -4,6 +4,10 @@ name: Diagnose Chirp 2 STT 502 (read-only)
 # keyless WIF auth as the deploy workflows. Performs no writes and no deploys.
 on:
   workflow_dispatch:
+  # Path-scoped push trigger so the diagnostic can run from a feature branch
+  # (workflow_dispatch requires the file to exist on the default branch).
+  push:
+    paths: ['.github/diagnose-502-request']
 
 permissions:
   contents: read
