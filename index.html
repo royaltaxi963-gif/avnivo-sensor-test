@@ -380,7 +380,7 @@ function messageData(entry,firstLanguage){
 }
 // Existing Gemini Cloud TTS is used only in Online mode. Offline keeps device speech.
 const AVNIVO_TTS_URL='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts';
-const AVNIVO_TTS_VOICES=['Kore','Aoede','Leda','Zephyr','Achernar','Puck','Charon','Orus','Achird','Iapetus'];
+const AVNIVO_TTS_VOICES=["Zephyr","Puck","Charon","Kore","Fenrir","Leda","Orus","Aoede","Callirrhoe","Autonoe","Enceladus","Iapetus","Umbriel","Algieba","Despina","Erinome","Algenib","Rasalgethi","Laomedeia","Achernar","Alnilam","Schedar","Gacrux","Pulcherrima","Achird","Zubenelgenubi","Vindemiatrix","Sadachbia","Sadaltager","Sulafat"];
 const ttsVoiceSelect=document.createElement('select');
 ttsVoiceSelect.setAttribute('aria-label','AI ovoz turini tanlash');
 ttsVoiceSelect.style.cssText='width:100%;max-width:280px;margin:10px 0;padding:10px;border-radius:10px;background:#241b15;color:#ffe7b9;border:1px solid #b58a52;font:15px system-ui';
@@ -392,6 +392,31 @@ ttsVoiceLabel.textContent='AI ovozi (Online)';
 ttsVoiceLabel.style.cssText='display:block;margin:14px 0 0;color:#ffe7b9;font:14px system-ui';
 ttsVoiceLabel.append(ttsVoiceSelect);
 document.querySelector('.settings-drawer')?.append(ttsVoiceLabel);
+
+const ttsStyleSelect=document.createElement('select');
+ttsStyleSelect.setAttribute('aria-label','Ovoz ohangini tanlash');
+ttsStyleSelect.style.cssText=ttsVoiceSelect.style.cssText;
+const AVNIVO_TTS_STYLES=[['auto','Avtomatik'],['calm','Xotirjam'],['happy','Quvnoq'],['sad','Qayg‘uli'],['excited','Hayajonli'],['concerned','Xavotirli']];
+for(const [value,label] of AVNIVO_TTS_STYLES){const option=document.createElement('option');option.value=value;option.textContent=label;ttsStyleSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsStyle');if(AVNIVO_TTS_STYLES.some(item=>item[0]===saved))ttsStyleSelect.value=saved}catch(e){}
+ttsStyleSelect.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsStyle',ttsStyleSelect.value)}catch(e){}});
+const ttsStyleLabel=document.createElement('label');
+ttsStyleLabel.textContent='O‘qish ohangi (Online)';
+ttsStyleLabel.style.cssText=ttsVoiceLabel.style.cssText;
+ttsStyleLabel.append(ttsStyleSelect);
+document.querySelector('.settings-drawer')?.append(ttsStyleLabel);
+const ttsRateSelect=document.createElement('select');
+ttsRateSelect.setAttribute('aria-label','Ovozli o‘qish tezligi');
+ttsRateSelect.style.cssText=ttsVoiceSelect.style.cssText;
+for(const rate of [0.5,0.65,0.75,0.85,1,1.15,1.25,1.5,1.75,2]){const option=document.createElement('option');option.value=String(rate);option.textContent=rate===1?'1× — Oddiy':rate<1?rate+'× — Sekin':rate+'× — Tez';ttsRateSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsRate');if([...ttsRateSelect.options].some(option=>option.value===saved))ttsRateSelect.value=saved}catch(e){ }
+ttsRateSelect.addEventListener('change',()=>{if(ttsAudio)ttsAudio.playbackRate=Number(ttsRateSelect.value);try{localStorage.setItem('avnivoTtsRate',ttsRateSelect.value)}catch(e){}});
+const ttsRateLabel=document.createElement('label');
+ttsRateLabel.textContent='O‘qish tezligi (Online va Offline)';
+ttsRateLabel.style.cssText=ttsVoiceLabel.style.cssText;
+ttsRateLabel.append(ttsRateSelect);
+document.querySelector('.settings-drawer')?.append(ttsRateLabel);
+
 let speakingButton=null,ttsAudio=null,ttsAudioUrl=null,ttsAbort=null,ttsGeneration=0;
 function stopSpeaking(){
  ttsGeneration++;
@@ -428,12 +453,13 @@ async function playMessage(button,bubble,language){
  if(document.documentElement.dataset.avnivoMode!=='online'){
   if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){finish();return}
   const utterance=new SpeechSynthesisUtterance(text);
-  utterance.lang=language==='right'?'ru-RU':'uz-UZ';utterance.rate=.95;
+  utterance.lang=language==='right'?'ru-RU':'uz-UZ';utterance.rate=Number(ttsRateSelect.value);
   utterance.onend=finish;utterance.onerror=finish;
   try{speechSynthesis.speak(utterance)}catch(e){finish()}
   return;
  }
  const voice=ttsVoiceSelect.value;
+ const style=ttsStyleSelect.value;
  const locale=onlineChoice[language];
  if(!onlineLanguagesByCode.has(locale)){button.title='TTS: til tanlanmagan';finish();return}
  const chunks=ttsChunks(text);
@@ -442,13 +468,14 @@ async function playMessage(button,bubble,language){
    if(generation!==ttsGeneration)return;
    const controller=new AbortController();ttsAbort=controller;
    button.dataset.loading='true';button.setAttribute('aria-label','AI ovozi tayyorlanmoqda');
-   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,language:locale,voice}),signal:controller.signal});
+   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,language:locale,voice,style}),signal:controller.signal});
    if(!response.ok)throw Error('TTS HTTP '+response.status);
    const blob=await response.blob();
    if(generation!==ttsGeneration)return;
    if(!blob.size||!blob.type.startsWith('audio/'))throw Error('Audio javobi noto‘g‘ri');
    ttsAudioUrl=URL.createObjectURL(blob);
    ttsAudio=new Audio(ttsAudioUrl);
+   ttsAudio.playbackRate=Number(ttsRateSelect.value);
    button.removeAttribute('data-loading');button.setAttribute('aria-label','Ovozli o‘qishni to‘xtatish');
    const audio=ttsAudio;
    await new Promise((resolve,reject)=>{
