@@ -11,16 +11,19 @@ records what the deployed service actually did with real speech in every locale.
 
 ## 1. Method
 
-Each locale was exercised with **3 real speech samples** (351 samples total, none
-synthetic), sent as `multipart/form-data` to the deployed endpoint with the
-locale in the `language` field. Every response was recorded verbatim
-(`verification/chirp2_campaign/evidence.jsonl`).
+Each locale was exercised with real speech samples (373 samples total across
+the campaign and the weak-locale re-test, none synthetic), sent as
+`multipart/form-data` to the deployed endpoint with the locale in the
+`language` field. Every response was recorded verbatim
+(`verification/chirp2_campaign/evidence.jsonl`, plus the weak-locale re-test in
+`verification/chirp2_campaign/weak_locales.jsonl`; three invalidated `rup-BG`
+rows are excluded from the totals but preserved in the log).
 
 | Source | Samples | Kind |
 |---|---|---|
-| `google/fleurs` | 309 | Real human read speech (CC-BY-4.0) |
-| `tatoeba` | 27 | Real human speech (CC-BY 2.0 FR) |
-| `wikimedia-commons` | 15 | Real human pronunciation clips (CC-BY-SA-4.0) |
+| `google/fleurs` | 321 | Real human read speech (CC-BY-4.0) |
+| `tatoeba` | 26 | Real human speech (CC-BY 2.0 FR) |
+| `wikimedia-commons` | 26 | Real human pronunciation clips (CC-BY-SA-4.0) |
 
 Accuracy is reported two ways. **Execution status** says whether the API
 transcribed the audio at all. **Accuracy** grades *how well*, using mean CER,
@@ -29,21 +32,21 @@ which is robust across scripts and short clips:
 | Accuracy | Mean CER | Locales |
 |---|---|---|
 | EXCELLENT | < 0.10 | 93 |
-| GOOD | < 0.20 | 13 |
+| GOOD | < 0.20 | 14 |
 | FAIR | < 0.35 | 5 |
-| POOR | ≥ 0.35 | 6 |
+| POOR | ≥ 0.35 | 5 |
 
 ## 2. Result summary
 
 | Metric | Value |
 |---|---|
 | Locales tested | **117 / 117** |
-| Samples (all real human speech) | 351 |
+| Samples (all real human speech) | 373 |
 | Execution: PASS / FAIL / NOT TESTED | **117 / 0 / 0** |
-| Mean WER (word-level) | 0.2154 |
-| Mean CER (character-level) | 0.0898 |
-| Exact-match rate | 27.6 % |
-| Spend | **$1.0912** of $30.00 |
+| Mean WER (word-level) | 0.2060 |
+| Mean CER (character-level) | 0.0860 |
+| Exact-match rate | 28.2 % |
+| Spend | **$1.1456** of $30.00 |
 
 Every locale returned HTTP 200 with a non-empty transcript. A locale is only
 marked PASS here because a real sample was transcribed; "117 supported" is not
@@ -66,22 +69,23 @@ inferred from the code list.
 
 | Locale | Accuracy | Mean WER | Mean CER | Sample source |
 |---|---|---|---|---|
+| `rup-BG` | POOR | 1.20 | 1.06 | Commons single words (Aromanian) |
 | `cmn-Hant-TW` | POOR | 1.00 | 1.00 | Tatoeba single-word clips |
-| `rup-BG` | POOR | 1.33 | 1.05 | Tatoeba (Aromanian) |
-| `bn-BD` | POOR | 1.67 | 0.57 | Commons single words |
-| `su-ID` | POOR | 1.33 | 0.54 | Commons single words |
-| `ig-NG` | POOR | 0.75 | 0.47 | FLEURS |
-| `ga-IE` | POOR | 0.63 | 0.36 | FLEURS |
-| `sq-AL` | FAIR | 1.00 | 0.30 | Commons single words |
-| `ff-SN` | FAIR | 0.74 | 0.28 | FLEURS |
-| `yue-Hant-HK` | FAIR | 0.28 | 0.28 | FLEURS |
-| `yo-NG` | FAIR | 0.61 | 0.26 | FLEURS |
-| `wo-SN` | FAIR | 0.45 | 0.23 | FLEURS |
+| `bn-BD` | POOR | 1.20 | 0.45 | Commons single words |
+| `su-ID` | POOR | 1.20 | 0.45 | Commons single words |
+| `ga-IE` | POOR | 0.66 | 0.37 | FLEURS |
+| `ig-NG` | FAIR | 0.63 | 0.33 | FLEURS |
+| `sq-AL` | FAIR | 0.80 | 0.31 | Commons single words |
+| `ff-SN` | FAIR | 0.78 | 0.30 | FLEURS |
+| `yo-NG` | FAIR | 0.62 | 0.26 | FLEURS |
+| `yue-Hant-HK` | FAIR | 0.21 | 0.21 | FLEURS |
 
-The three POOR locales whose samples are single words (`cmn-Hant-TW`, `bn-BD`,
+The POOR locales whose samples are single words (`cmn-Hant-TW`, `bn-BD`,
 `su-ID`) are dominated by the measurement artifact above and should be
 re-tested with full sentences before any conclusion is drawn about the model.
-`rup-BG`, `ig-NG`, `ga-IE` are the clearest genuine weak spots.
+`rup-BG` (Aromanian, a low-resource variety) and `ga-IE` (Irish) are the
+clearest genuine weak spots; the weak-locale re-test confirmed `rup-BG` at
+WER 1.20 rather than improving it.
 
 ## 3. Configuration consistency
 
@@ -211,7 +215,21 @@ against the current contract (`CHIRP2_MATRIX`, `CHIRP2_BASE_TO_LOCALE`,
 `chirp2LocaleFor`, `avnivo-language-options`,
 `avnivoOnlineLanguageForSpeaker`) and now runs in the suite.
 
-## 6. Reproduce
+## 6. Deployment status
+
+The fixes above (retry, error mapping, near-silence gate) were verified against
+a **zero-traffic candidate revision** of the Cloud Run service, deployed by
+`.github/workflows/cloud-run-candidate.yml` and reachable at
+`https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app`. No production
+traffic was shifted to it. Full probe results are in `reliability.json` with the
+candidate base URL recorded.
+
+Promoting the candidate to the production tag (traffic shift) is a separate,
+deliberate step and has **not** been performed. Until it is, the `chirp2-test`
+production revision still runs the older code, so silence may still hallucinate
+`"avnivo"` in production.
+
+## 7. Reproduce
 
 ```bash
 cd verification/chirp2_campaign
@@ -225,7 +243,7 @@ python report.py                              # report.html / report.csv / repor
 Artifacts: `evidence.jsonl` (every request/response), `report.csv`,
 `report.html`, `report.json`, `reliability.json`, `consistency.json`.
 
-## 7. Scope limits
+## 8. Scope limits
 
 - Three samples per locale is a smoke test, not a benchmark. Accuracy grades
   indicate direction, not a production SLA.
