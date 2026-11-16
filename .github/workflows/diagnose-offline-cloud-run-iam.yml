@@ -38,6 +38,29 @@ jobs:
             fi
             echo "::endgroup::"
           }
+          echo "::group::Effective principal and IAM bindings"
+          PRINCIPAL="$(gcloud auth list --filter=status:ACTIVE --format='value(account)')"
+          echo "Active principal: $PRINCIPAL"
+          echo "### Effective principal IAM roles" >> "$GITHUB_STEP_SUMMARY"
+          if gcloud projects get-iam-policy "$PROJECT" --format=json > /tmp/avnivo-iam.json 2>/tmp/avnivo-iam-error; then
+            python - "$PRINCIPAL" <<'PY'
+import json,sys,os
+principal=sys.argv[1]
+bindings=json.load(open('/tmp/avnivo-iam.json')).get('bindings',[])
+roles=[b['role'] + (' (conditional)' if b.get('condition') else '') for b in bindings if 'serviceAccount:'+principal in b.get('members',[])]
+print('Direct project IAM roles:')
+print('\\n'.join(roles) if roles else '(none found; check inherited IAM)')
+with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+    f.write('\\n'.join('- '+role for role in roles) if roles else 'No direct project IAM binding found; inherited roles not checked')
+    f.write('\\n')
+PY
+          else
+            echo "Cannot read project IAM policy:"; cat /tmp/avnivo-iam-error
+            echo "Project IAM policy not readable; inspect in Cloud Console." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "::endgroup::"
+          probe "Cloud Run API status" gcloud services list --project="$PROJECT" --enabled --filter='config.name:run.googleapis.com' --format='value(config.name)'
+          probe "Runtime service account describe" gcloud iam service-accounts describe "792624108019-compute@developer.gserviceaccount.com" --project="$PROJECT" --format='value(email)'
           probe "Project describe" gcloud projects describe "$PROJECT" --format='value(projectId)'
           probe "Cloud Run services list" gcloud run services list --project="$PROJECT" --region="$REGION" --format='table(metadata.name)'
           probe "Staging service describe" gcloud run services describe avnivo-offline-model-api-staging --project="$PROJECT" --region="$REGION" --format='yaml(metadata.name,spec.template.spec.serviceAccountName)'
