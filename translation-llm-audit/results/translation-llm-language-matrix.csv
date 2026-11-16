@@ -1,6 +1,6 @@
 order,chirp2_code,language_name,translation_llm_code,regional_variant,official_support,experimental,documented_class,api_tested,api_requests,api_success,api_unsupported,api_transient_errors,avg_latency_s,quality_pass,stability_ok,final_decision,decision_reason,sample_translation
 1,af-ZA,Afrikaans (South Africa),af,base,True,False,A,True,82,82,0,0,0.238,True,True,PASSED,official_support_and_quality_ok,"Hallo, hoe gaan dit?"
-2,am-ET,Amharic (Ethiopia),am,base,False,True,B,True,8,8,0,0,0.363,True,,EXPERIMENTAL,google_experimental_support,ሰላም፣ እንዴት ነዎት?
+2,am-ET,Amharic (Ethiopia),am,base,False,True,B,True,14,14,0,0,0.38,True,False,EXPERIMENTAL,google_experimental_support,ሰላም፣ እንዴት ነዎት?
 3,ar-EG,Arabic (Egypt),ar,base,True,False,A,True,82,82,0,0,0.324,True,True,PASSED,official_support_and_quality_ok,مرحباً، كيف حالك؟
 4,as-IN,Assamese (India),as,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
 5,ast-ES,Asturian (Spain),ast,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
@@ -28,23 +28,23 @@ order,chirp2_code,language_name,translation_llm_code,regional_variant,official_s
 27,es-ES,Spanish (Spain),es-ES,exact,True,False,A,True,82,82,0,0,0.204,True,True,PASSED,official_support_and_quality_ok,"Hola, ¿cómo estás?"
 28,es-US,Spanish (United States),es-US,exact,True,False,A,True,82,82,0,0,0.214,True,True,PASSED,official_support_and_quality_ok,"Hola, ¿cómo estás?"
 29,et-EE,Estonian (Estonia),et,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"Tere, kuidas läheb?"
-30,eu-ES,Basque (Spain),eu,base,False,True,B,True,8,8,0,0,0.236,True,,EXPERIMENTAL,google_experimental_support,"Kaixo, ondo al zaude?"
+30,eu-ES,Basque (Spain),eu,base,False,True,B,True,14,14,0,0,0.312,True,False,EXPERIMENTAL,google_experimental_support,"Kaixo, ondo al zaude?"
 31,fa-IR,Persian (Iran),fa,base,True,False,A,True,82,82,0,0,0.217,True,True,PASSED,official_support_and_quality_ok,سلام، حالتان خوب است؟
 32,ff-SN,Fulah (Senegal),ff,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
 33,fi-FI,Finnish (Finland),fi,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"Hei, mitä kuuluu?"
 34,fil-PH,Filipino (Philippines),fil,base,True,False,A,True,82,82,0,0,0.227,True,True,PASSED,official_support_and_quality_ok,"Kumusta, ayos lang ba kayo?"
 35,fr-CA,French (Canada),fr-CA,exact,True,False,A,True,82,82,0,0,0.206,True,True,PASSED,official_support_and_quality_ok,"Bonjour, comment allez-vous?"
 36,fr-FR,French (France),fr,base,True,False,A,True,82,82,0,0,0.213,True,True,PASSED,official_support_and_quality_ok,"Bonjour, comment allez-vous ?"
-37,ga-IE,Irish (Ireland),ga,base,False,True,B,True,8,8,0,0,0.199,True,,EXPERIMENTAL,google_experimental_support,"Dia duit, an bhfuil tú go maith?"
+37,ga-IE,Irish (Ireland),ga,base,False,True,B,True,14,14,0,0,0.28,True,False,EXPERIMENTAL,google_experimental_support,"Dia duit, an bhfuil tú go maith?"
 38,gl-ES,Galician (Spain),gl,base,True,False,A,True,82,82,0,0,0.213,True,True,PASSED,official_support_and_quality_ok,"Ola, estás ben?"
 39,gu-IN,Gujarati (India),gu,base,True,False,A,True,82,82,0,0,0.235,True,True,PASSED,official_support_and_quality_ok,"નમસ્તે, કેમ છો?"
-40,ha-NG,Hausa (Nigeria),ha,base,False,True,B,True,8,8,0,0,0.231,True,,EXPERIMENTAL,google_experimental_support,"Sannu, kana lafiya?"
+40,ha-NG,Hausa (Nigeria),ha,base,False,True,B,True,14,14,0,0,0.304,True,False,EXPERIMENTAL,google_experimental_support,"Sannu, kana lafiya?"
 41,hi-IN,Hindi (India),hi,base,True,False,A,True,82,82,0,0,0.21,True,True,PASSED,official_support_and_quality_ok,"नमस्ते, आप कैसे हैं?"
 42,hr-HR,Croatian (Croatia),hr,base,True,False,A,True,82,82,0,0,0.209,True,True,PASSED,official_support_and_quality_ok,"Pozdrav, kako ste?"
 43,hu-HU,Hungarian (Hungary),hu,base,True,False,A,True,82,82,0,0,0.218,True,True,PASSED,official_support_and_quality_ok,"Szia, hogy vagy?"
-44,hy-AM,Armenian (Armenia),hy,base,False,True,B,True,8,8,0,0,0.226,True,,EXPERIMENTAL,google_experimental_support,"Ողջույն, ինչպե՞ս եք։"
+44,hy-AM,Armenian (Armenia),hy,base,False,True,B,True,14,14,0,0,0.258,True,False,EXPERIMENTAL,google_experimental_support,"Ողջույն, ինչպե՞ս եք։"
 45,id-ID,Indonesian (Indonesia),id,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,"Halo, apa kabar?"
-46,ig-NG,Igbo (Nigeria),ig,base,False,True,B,True,8,8,0,0,0.218,True,,EXPERIMENTAL,google_experimental_support,"Ndewo, kedu ka ị dị?"
+46,ig-NG,Igbo (Nigeria),ig,base,False,True,B,True,14,14,0,0,0.267,True,False,EXPERIMENTAL,google_experimental_support,"Ndewo, kedu ka ị dị?"
 47,is-IS,Icelandic (Iceland),is,base,True,False,A,True,82,82,0,0,0.22,True,True,PASSED,official_support_and_quality_ok,"Halló, hvernig hefurðu það?"
 48,it-IT,Italian (Italy),it,base,True,False,A,True,82,82,0,0,0.218,True,True,PASSED,official_support_and_quality_ok,"Salve, come sta?"
 49,iw-IL,Hebrew (Israel),iw,exact,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,"שלום, מה שלומך?"
@@ -58,7 +58,7 @@ order,chirp2_code,language_name,translation_llm_code,regional_variant,official_s
 57,kn-IN,Kannada (India),kn,base,True,False,A,True,82,82,0,0,0.21,True,True,PASSED,official_support_and_quality_ok,"ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಿ?"
 58,ko-KR,Korean (South Korea),ko,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,"안녕하세요, 잘 지내시나요?"
 59,ky-KG,Kyrgyz (Cyrillic),ky,base,True,False,A,True,82,82,0,0,0.205,True,True,PASSED,official_support_and_quality_ok,"Салам, кандайсыз?"
-60,lb-LU,Luxembourgish (Luxembourg),lb,base,False,True,B,True,8,8,0,0,0.228,True,,EXPERIMENTAL,google_experimental_support,"Moien, geet et Iech gutt?"
+60,lb-LU,Luxembourgish (Luxembourg),lb,base,False,True,B,True,14,14,0,0,0.273,True,False,EXPERIMENTAL,google_experimental_support,"Moien, geet et Iech gutt?"
 61,lg-UG,Ganda (Uganda),lg,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
 62,ln-CD,Lingala (Congo-Kinshasa),ln,base,True,False,A,True,82,82,0,0,0.237,True,True,PASSED,official_support_and_quality_ok,"Mbote, ozali malamu?"
 63,lo-LA,Lao (Laos),lo,base,True,False,A,True,82,82,0,0,0.203,True,True,PASSED,official_support_and_quality_ok,"ສະບາຍດີ, ສະບາຍດີບໍ່?"
@@ -68,10 +68,10 @@ order,chirp2_code,language_name,translation_llm_code,regional_variant,official_s
 67,mi-NZ,Maori (New Zealand),mi,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
 68,mk-MK,Macedonian (North Macedonia),mk,base,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,"Здраво, како сте?"
 69,ml-IN,Malayalam (India),ml,base,True,False,A,True,82,82,0,0,0.225,True,True,PASSED,official_support_and_quality_ok,"നമസ്കാരം, സുഖമാണോ?"
-70,mn-MN,Mongolian (Mongolia),mn,base,False,True,B,True,8,8,0,0,0.182,True,,EXPERIMENTAL,google_experimental_support,Сайн байна уу?
+70,mn-MN,Mongolian (Mongolia),mn,base,False,True,B,True,14,14,0,0,0.254,True,False,EXPERIMENTAL,google_experimental_support,Сайн байна уу?
 71,mr-IN,Marathi (India),mr,base,True,False,A,True,82,82,0,0,0.206,True,True,PASSED,official_support_and_quality_ok,"नमस्कार, कसे आहात?"
 72,ms-MY,Malay (Malaysia),ms,base,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,"Hai, apa khabar?"
-73,mt-MT,Maltese (Malta),mt,base,False,True,B,True,8,8,0,0,0.191,True,,EXPERIMENTAL,google_experimental_support,"Hello, kif inti?"
+73,mt-MT,Maltese (Malta),mt,base,False,True,B,True,14,14,0,0,0.224,True,False,EXPERIMENTAL,google_experimental_support,"Hello, kif inti?"
 74,my-MM,Burmese (Myanmar),my,base,True,False,A,True,82,82,0,0,0.221,True,True,PASSED,official_support_and_quality_ok,မင်္ဂလာပါ၊ နေကောင်းပါရဲ့လား။
 75,ne-NP,Nepali (Nepal),ne,base,True,False,A,True,82,82,0,0,0.215,True,True,PASSED,official_support_and_quality_ok,"नमस्ते, आरामै हुनुहुन्छ?"
 76,nl-NL,Dutch (Netherlands),nl,base,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,"Hallo, hoe gaat het met u?"
@@ -80,7 +80,7 @@ order,chirp2_code,language_name,translation_llm_code,regional_variant,official_s
 79,ny-MW,Nyanja (Malawi),ny,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
 80,oc-FR,Occitan (France),oc,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
 81,om-ET,Oromo (Ethiopia),om,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
-82,or-IN,Oriya (India),or,base,False,True,B,True,8,8,0,0,0.242,True,,EXPERIMENTAL,google_experimental_support,"ନମସ୍କାର, ଆପଣ ଭଲ ଅଛନ୍ତି କି?"
+82,or-IN,Oriya (India),or,base,False,True,B,True,14,14,0,0,0.257,True,False,EXPERIMENTAL,google_experimental_support,"ନମସ୍କାର, ଆପଣ ଭଲ ଅଛନ୍ତି କି?"
 83,pa-Guru-IN,Punjabi (Gurmukhi India),pa,base,True,False,A,True,82,82,0,0,0.217,True,True,PASSED,official_support_and_quality_ok,"ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਕੀ ਤੁਸੀਂ ਠੀਕ ਹੋ?"
 84,pl-PL,Polish (Poland),pl,base,True,False,A,True,82,82,0,0,0.195,True,True,PASSED,official_support_and_quality_ok,"Cześć, jak się masz?"
 85,ps-AF,Pashto,ps,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
@@ -94,16 +94,16 @@ order,chirp2_code,language_name,translation_llm_code,regional_variant,official_s
 93,sk-SK,Slovak (Slovakia),sk,base,True,False,A,True,82,82,0,0,0.204,True,True,PASSED,official_support_and_quality_ok,"Ahoj, ako sa máš?"
 94,sl-SI,Slovenian (Slovenia),sl,base,True,False,A,True,82,82,0,0,0.218,True,True,PASSED,official_support_and_quality_ok,"Pozdravljeni, kako ste?"
 95,sn-ZW,Shona (Zimbabwe),sn,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
-96,so-SO,Somali,so,base,False,True,B,True,8,8,0,0,0.208,True,,EXPERIMENTAL,google_experimental_support,"Salaan, ma fiican tahay?"
+96,so-SO,Somali,so,base,False,True,B,True,14,14,0,0,0.264,True,False,EXPERIMENTAL,google_experimental_support,"Salaan, ma fiican tahay?"
 97,sq-AL,Albanian (Albania),sq,base,True,False,A,True,82,82,0,0,0.219,True,True,PASSED,official_support_and_quality_ok,"Përshëndetje, si jeni?"
-98,sr-RS,Serbian (Serbia),sr,base,False,True,B,True,8,8,0,0,0.194,True,,EXPERIMENTAL,google_experimental_support,"Zdravo, kako ste?"
+98,sr-RS,Serbian (Serbia),sr,base,False,True,B,True,14,14,0,0,0.226,True,False,EXPERIMENTAL,google_experimental_support,"Zdravo, kako ste?"
 99,su-ID,Sundanese (Indonesia),su,base,False,False,C,True,2,0,2,0,,False,,FAILED,api_rejected_unsupported_language,
 100,sv-SE,Swedish (Sweden),sv,base,True,False,A,True,82,82,0,0,0.202,True,True,PASSED,official_support_and_quality_ok,"Hej, hur mår du?"
 101,sw,Swahili,sw,base,True,False,A,True,82,82,0,0,0.216,True,True,PASSED,official_support_and_quality_ok,"Habari, hujambo?"
 102,sw-KE,Swahili (Kenya),sw,base,True,False,A,True,82,82,0,0,0.216,True,True,PASSED,official_support_and_quality_ok,"Habari, hujambo?"
 103,ta-IN,Tamil (India),ta,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"வணக்கம், நலமாக இருக்கிறீர்களா?"
 104,te-IN,Telugu (India),te,base,True,False,A,True,82,82,0,0,0.206,True,True,PASSED,official_support_and_quality_ok,"నమస్తే, బాగున్నారా?"
-105,tg-TJ,Tajik (Tajikistan),tg,base,False,True,B,True,8,8,0,0,0.244,True,,EXPERIMENTAL,google_experimental_support,"Салом, хуб ҳастед?"
+105,tg-TJ,Tajik (Tajikistan),tg,base,False,True,B,True,14,14,0,0,0.259,True,False,EXPERIMENTAL,google_experimental_support,"Салом, хуб ҳастед?"
 106,th-TH,Thai (Thailand),th,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,สวัสดีครับ สบายดีไหมครับ?
 107,tr-TR,Turkish (Turkey),tr,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,"Merhaba, nasılsınız?"
 108,uk-UA,Ukrainian (Ukraine),uk,base,True,False,A,True,82,82,0,0,0.209,True,True,PASSED,official_support_and_quality_ok,"Привіт, як справи?"

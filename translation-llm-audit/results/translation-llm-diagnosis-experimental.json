@@ -1,0 +1,707 @@
+{
+ "mode": "experimental",
+ "diagnosis": [
+  {
+   "chirp2_code": "am-ET",
+   "llm_code": "am",
+   "language_name": "Amharic (Ethiopia)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "እንደምን አደሩ፣ ዛሬ ሥራዎ እንዴት ነው?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "ከታሽከንት የመጣሁ ሲሆን በአዲስ ፕሮጀክት ላይ እሰራለሁ።",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "ይቅርታ፣ በጣም ቅርብ የሆነው ማቆሚያ የት ነው የሚገኘው?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "eu-ES",
+   "llm_code": "eu",
+   "language_name": "Basque (Spain)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Egun on, ondo doaz zure gauzak gaur?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Tashkentetik natorr eta proiektu berri batean egiten dut lan.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Barkatu, non dago gertueneko geltokia?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "ga-IE",
+   "llm_code": "ga",
+   "language_name": "Irish (Ireland)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Maidin mhaith, an bhfuil cúrsaí go maith agat inniu?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Is as Tashkent mé agus táim ag obair ar thionscadal nua.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Gabh mo leithscéal, cá bhfuil an stad is gaire?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "ha-NG",
+   "llm_code": "ha",
+   "language_name": "Hausa (Nigeria)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Barka da safiya, yau harkokinku suna tafiya yadda ya kamata?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Na fito daga Tashkent kuma ina aiki a kan wani sabon shiri.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Yi haƙuri, ina tashar da ta fi kusa take?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "hy-AM",
+   "llm_code": "hy",
+   "language_name": "Armenian (Armenia)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Բարի լույս, այսօր գործերդ լա՞վ են։",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Ես Տաշքենդից եմ եկել և աշխատում եմ նոր նախագծի վրա։",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Ներողություն, որտե՞ղ է գտնվում ամենամոտ կանգառը։",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "ig-NG",
+   "llm_code": "ig",
+   "language_name": "Igbo (Nigeria)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Ụtụtụ ọma, ihe gị ọ̀ na-aga nke ọma taa?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Abụ m onye si Tashkent, ana m arụkwa ọrụ n'ọrụ ọhụrụ.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Biko, ebee ka ọdụ kacha nso dị?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "lb-LU",
+   "llm_code": "lb",
+   "language_name": "Luxembourgish (Luxembourg)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Gudde Moien, leeft haut alles gutt bei Iech?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Ech kommen aus Taschkent an schaffen un engem neie Projet.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Entschëllegt, wou ass déi noost Statioun?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "mn-MN",
+   "llm_code": "mn",
+   "language_name": "Mongolian (Mongolia)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Өглөөний мэнд, өнөөдөр ажил төрөл тань сайн уу?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Би Ташкентээс ирсэн бөгөөд шинэ төсөл дээр ажиллаж байна.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Уучлаарай, хамгийн ойрын буудал хаана байрладаг вэ?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "mt-MT",
+   "llm_code": "mt",
+   "language_name": "Maltese (Malta)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "L-għodwa t-tajba, kif inhuma l-affarijiet tiegħek illum?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Jien ġejt minn Tashkent u qed naħdem fuq proġett ġdid.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Skużani, fejn tinsab l-eqreb waqfa?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "or-IN",
+   "llm_code": "or",
+   "language_name": "Oriya (India)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "ଶୁଭ ସକାଳ, ଆଜି ଆପଣଙ୍କ କାମ ଭଲ ଚାଲିଛି କି?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "ମୁଁ ତାସକେଣ୍ଟରୁ ଆସିଛି ଏବଂ ଏକ ନୂତନ ପ୍ରକଳ୍ପରେ କାମ କରୁଛି।",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "କ୍ଷମା କରିବେ, ସବୁଠାରୁ ନିକଟତମ ଷ୍ଟେସନ୍ କେଉଁଠାରେ ଅଛି?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "so-SO",
+   "llm_code": "so",
+   "language_name": "Somali",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Subax wanaagsan, maanta shaqadaadu sidee tahay?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Waxaan ka imid Tashkent, waxaanan ka shaqeeyaa mashruuc cusub.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Waan ka xumahay, xaggee ku yaallaa saldhigga ugu dhow?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "sr-RS",
+   "llm_code": "sr",
+   "language_name": "Serbian (Serbia)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Dobro jutro, kako vam danas idu poslovi?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Дошао сам из Ташкента и радим на новом пројекту.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Izvinite, gde se nalazi najbliža stanica?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  },
+  {
+   "chirp2_code": "tg-TJ",
+   "llm_code": "tg",
+   "language_name": "Tajik (Tajikistan)",
+   "success": 6,
+   "attempted": 6,
+   "quality_flags": 1,
+   "results": [
+    {
+     "item": "c01",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Субҳ ба хайр, имрӯз корҳоятон хуб аст?",
+     "flags": []
+    },
+    {
+     "item": "c01",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Ман аз Тошкент омадаам ва дар лоиҳаи нав кор мекунам.",
+     "flags": []
+    },
+    {
+     "item": "c02",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "uz2X",
+     "http": 200,
+     "out": "Бубахшед, наздиктарин истгоҳ дар куҷо ҷойгир аст?",
+     "flags": []
+    },
+    {
+     "item": "c03",
+     "direction": "X2uz",
+     "http": 200,
+     "out": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+     "flags": [
+      "identical_to_source"
+     ]
+    }
+   ]
+  }
+ ]
+}

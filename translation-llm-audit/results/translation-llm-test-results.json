@@ -140777,17 +140777,1603 @@
     "flags": [],
     "length_ratio": 0.83
    }
+  },
+  {
+   "chirp": "am-ET",
+   "llm": "am",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "am",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "እንደምን አደሩ፣ ዛሬ ሥራዎ እንዴት ነው?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.429,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.65
+   }
+  },
+  {
+   "chirp": "am-ET",
+   "llm": "am",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "am",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.439,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "am-ET",
+   "llm": "am",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "am",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "ከታሽከንት የመጣሁ ሲሆን በአዲስ ፕሮጀክት ላይ እሰራለሁ።",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.473,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.667
+   }
+  },
+  {
+   "chirp": "am-ET",
+   "llm": "am",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "am",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.238,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "am-ET",
+   "llm": "am",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "am",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "ይቅርታ፣ በጣም ቅርብ የሆነው ማቆሚያ የት ነው የሚገኘው?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.47,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.766
+   }
+  },
+  {
+   "chirp": "am-ET",
+   "llm": "am",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "am",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.365,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "eu-ES",
+   "llm": "eu",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "eu",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Egun on, ondo doaz zure gauzak gaur?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.374,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.9
+   }
+  },
+  {
+   "chirp": "eu-ES",
+   "llm": "eu",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "eu",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.457,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "eu-ES",
+   "llm": "eu",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "eu",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Tashkentetik natorr eta proiektu berri batean egiten dut lan.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.369,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.13
+   }
+  },
+  {
+   "chirp": "eu-ES",
+   "llm": "eu",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "eu",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.377,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "eu-ES",
+   "llm": "eu",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "eu",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Barkatu, non dago gertueneko geltokia?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.435,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.809
+   }
+  },
+  {
+   "chirp": "eu-ES",
+   "llm": "eu",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "eu",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.467,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ga-IE",
+   "llm": "ga",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "ga",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Maidin mhaith, an bhfuil cúrsaí go maith agat inniu?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.338,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.3
+   }
+  },
+  {
+   "chirp": "ga-IE",
+   "llm": "ga",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "ga",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.422,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ga-IE",
+   "llm": "ga",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "ga",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Is as Tashkent mé agus táim ag obair ar thionscadal nua.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.341,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "ga-IE",
+   "llm": "ga",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "ga",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.315,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "ga-IE",
+   "llm": "ga",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "ga",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Gabh mo leithscéal, cá bhfuil an stad is gaire?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.481,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ga-IE",
+   "llm": "ga",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "ga",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.432,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ha-NG",
+   "llm": "ha",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "ha",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Barka da safiya, yau harkokinku suna tafiya yadda ya kamata?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.505,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.5
+   }
+  },
+  {
+   "chirp": "ha-NG",
+   "llm": "ha",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "ha",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.447,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ha-NG",
+   "llm": "ha",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "ha",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Na fito daga Tashkent kuma ina aiki a kan wani sabon shiri.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.35,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.093
+   }
+  },
+  {
+   "chirp": "ha-NG",
+   "llm": "ha",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "ha",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.429,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "ha-NG",
+   "llm": "ha",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "ha",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Yi haƙuri, ina tashar da ta fi kusa take?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.333,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.872
+   }
+  },
+  {
+   "chirp": "ha-NG",
+   "llm": "ha",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "ha",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.351,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "hy-AM",
+   "llm": "hy",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "hy",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Բարի լույս, այսօր գործերդ լա՞վ են։",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.303,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.85
+   }
+  },
+  {
+   "chirp": "hy-AM",
+   "llm": "hy",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "hy",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.312,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "hy-AM",
+   "llm": "hy",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "hy",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Ես Տաշքենդից եմ եկել և աշխատում եմ նոր նախագծի վրա։",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.245,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.944
+   }
+  },
+  {
+   "chirp": "hy-AM",
+   "llm": "hy",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "hy",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.325,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "hy-AM",
+   "llm": "hy",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "hy",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Ներողություն, որտե՞ղ է գտնվում ամենամոտ կանգառը։",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.273,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.021
+   }
+  },
+  {
+   "chirp": "hy-AM",
+   "llm": "hy",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "hy",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.342,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ig-NG",
+   "llm": "ig",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "ig",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Ụtụtụ ọma, ihe gị ọ̀ na-aga nke ọma taa?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.443,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ig-NG",
+   "llm": "ig",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "ig",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.317,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "ig-NG",
+   "llm": "ig",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "ig",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Abụ m onye si Tashkent, ana m arụkwa ọrụ n'ọrụ ọhụrụ.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.469,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.981
+   }
+  },
+  {
+   "chirp": "ig-NG",
+   "llm": "ig",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "ig",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.318,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "ig-NG",
+   "llm": "ig",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "ig",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Biko, ebee ka ọdụ kacha nso dị?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.217,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.66
+   }
+  },
+  {
+   "chirp": "ig-NG",
+   "llm": "ig",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "ig",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.228,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "lb-LU",
+   "llm": "lb",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "lb",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Gudde Moien, leeft haut alles gutt bei Iech?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.329,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.1
+   }
+  },
+  {
+   "chirp": "lb-LU",
+   "llm": "lb",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "lb",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.283,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "lb-LU",
+   "llm": "lb",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "lb",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Ech kommen aus Taschkent an schaffen un engem neie Projet.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.449,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.074
+   }
+  },
+  {
+   "chirp": "lb-LU",
+   "llm": "lb",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "lb",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.316,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "lb-LU",
+   "llm": "lb",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "lb",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Entschëllegt, wou ass déi noost Statioun?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.2,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.872
+   }
+  },
+  {
+   "chirp": "lb-LU",
+   "llm": "lb",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "lb",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.42,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "mn-MN",
+   "llm": "mn",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "mn",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Өглөөний мэнд, өнөөдөр ажил төрөл тань сайн уу?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.373,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.175
+   }
+  },
+  {
+   "chirp": "mn-MN",
+   "llm": "mn",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "mn",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.425,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "mn-MN",
+   "llm": "mn",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "mn",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Би Ташкентээс ирсэн бөгөөд шинэ төсөл дээр ажиллаж байна.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.336,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.056
+   }
+  },
+  {
+   "chirp": "mn-MN",
+   "llm": "mn",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "mn",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.336,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "mn-MN",
+   "llm": "mn",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "mn",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Уучлаарай, хамгийн ойрын буудал хаана байрладаг вэ?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.331,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.085
+   }
+  },
+  {
+   "chirp": "mn-MN",
+   "llm": "mn",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "mn",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.301,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "mt-MT",
+   "llm": "mt",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "mt",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "L-għodwa t-tajba, kif inhuma l-affarijiet tiegħek illum?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.204,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.4
+   }
+  },
+  {
+   "chirp": "mt-MT",
+   "llm": "mt",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "mt",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.189,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "mt-MT",
+   "llm": "mt",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "mt",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Jien ġejt minn Tashkent u qed naħdem fuq proġett ġdid.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.224,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "mt-MT",
+   "llm": "mt",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "mt",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.328,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "mt-MT",
+   "llm": "mt",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "mt",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Skużani, fejn tinsab l-eqreb waqfa?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.321,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.745
+   }
+  },
+  {
+   "chirp": "mt-MT",
+   "llm": "mt",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "mt",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.346,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "or-IN",
+   "llm": "or",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "or",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "ଶୁଭ ସକାଳ, ଆଜି ଆପଣଙ୍କ କାମ ଭଲ ଚାଲିଛି କି?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.347,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.95
+   }
+  },
+  {
+   "chirp": "or-IN",
+   "llm": "or",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "or",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.283,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "or-IN",
+   "llm": "or",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "or",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "ମୁଁ ତାସକେଣ୍ଟରୁ ଆସିଛି ଏବଂ ଏକ ନୂତନ ପ୍ରକଳ୍ପରେ କାମ କରୁଛି।",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.266,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.981
+   }
+  },
+  {
+   "chirp": "or-IN",
+   "llm": "or",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "or",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.312,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "or-IN",
+   "llm": "or",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "or",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "କ୍ଷମା କରିବେ, ସବୁଠାରୁ ନିକଟତମ ଷ୍ଟେସନ୍ କେଉଁଠାରେ ଅଛି?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.237,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.043
+   }
+  },
+  {
+   "chirp": "or-IN",
+   "llm": "or",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "or",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.219,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "so-SO",
+   "llm": "so",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "so",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Subax wanaagsan, maanta shaqadaadu sidee tahay?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.313,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.175
+   }
+  },
+  {
+   "chirp": "so-SO",
+   "llm": "so",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "so",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.429,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "so-SO",
+   "llm": "so",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "so",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Waxaan ka imid Tashkent, waxaanan ka shaqeeyaa mashruuc cusub.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.34,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.148
+   }
+  },
+  {
+   "chirp": "so-SO",
+   "llm": "so",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "so",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.422,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "so-SO",
+   "llm": "so",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "so",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Waan ka xumahay, xaggee ku yaallaa saldhigga ugu dhow?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.233,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.149
+   }
+  },
+  {
+   "chirp": "so-SO",
+   "llm": "so",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "so",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.296,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "sr-RS",
+   "llm": "sr",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "sr",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Dobro jutro, kako vam danas idu poslovi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.199,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "sr-RS",
+   "llm": "sr",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "sr",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.31,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "sr-RS",
+   "llm": "sr",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "sr",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Дошао сам из Ташкента и радим на новом пројекту.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.3,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.889
+   }
+  },
+  {
+   "chirp": "sr-RS",
+   "llm": "sr",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "sr",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.19,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "sr-RS",
+   "llm": "sr",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "sr",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Izvinite, gde se nalazi najbliža stanica?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.404,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.872
+   }
+  },
+  {
+   "chirp": "sr-RS",
+   "llm": "sr",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "sr",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.208,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "tg-TJ",
+   "llm": "tg",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "tg",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Субҳ ба хайр, имрӯз корҳоятон хуб аст?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.309,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.95
+   }
+  },
+  {
+   "chirp": "tg-TJ",
+   "llm": "tg",
+   "class": "B",
+   "item": "c01",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "tg",
+   "target": "uz",
+   "source_text": "Yaxshi tong, bugun ishlaringiz yaxshimi?",
+   "translated": "Xayrli tong, bugun ishlaringiz yaxshimi?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.325,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.0
+   }
+  },
+  {
+   "chirp": "tg-TJ",
+   "llm": "tg",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "tg",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Ман аз Тошкент омадаам ва дар лоиҳаи нав кор мекунам.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.186,
+   "quality": {
+    "flags": [],
+    "length_ratio": 0.981
+   }
+  },
+  {
+   "chirp": "tg-TJ",
+   "llm": "tg",
+   "class": "B",
+   "item": "c02",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "tg",
+   "target": "uz",
+   "source_text": "Men Toshkentdan kelganman va yangi loyihada ishlayman.",
+   "translated": "Men Toshkentdan kelganman va yangi loyihada ishlayapman.",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.314,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.037
+   }
+  },
+  {
+   "chirp": "tg-TJ",
+   "llm": "tg",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "uz2X",
+   "tag": "diag-experimental",
+   "source": "uz",
+   "target": "tg",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Бубахшед, наздиктарин истгоҳ дар куҷо ҷойгир аст?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.218,
+   "quality": {
+    "flags": [],
+    "length_ratio": 1.043
+   }
+  },
+  {
+   "chirp": "tg-TJ",
+   "llm": "tg",
+   "class": "B",
+   "item": "c03",
+   "category": "experimental_retest",
+   "direction": "X2uz",
+   "tag": "diag-experimental",
+   "source": "tg",
+   "target": "uz",
+   "source_text": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "translated": "Kechirasiz, eng yaqin bekat qayerda joylashgan?",
+   "http": 200,
+   "error": null,
+   "latency_s": 0.323,
+   "quality": {
+    "flags": [
+     "identical_to_source"
+    ],
+    "length_ratio": 1.0
+   }
   }
  ],
  "ledger": {
-  "requests": 6735,
+  "requests": 6813,
   "errors": 93,
-  "input_chars": 205751,
-  "output_chars": 202424,
-  "cost_usd": 4.08175,
+  "input_chars": 209417,
+  "output_chars": 206103,
+  "cost_usd": 4.1552,
   "budget_ceiling_usd": 30.0,
   "hard_stop_usd": 25.0,
-  "remaining_usd": 25.91825,
+  "remaining_usd": 25.8448,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  }
 }
