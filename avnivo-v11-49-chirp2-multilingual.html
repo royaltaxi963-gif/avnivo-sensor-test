@@ -746,7 +746,7 @@ window.CHIRP2_MATRIX=[
  modal.setAttribute('role','dialog');
  modal.setAttribute('aria-modal','true');
  modal.setAttribute('aria-label','Online tarjima tilini tanlash');
- modal.innerHTML='<div class="avnivo-language-card"><div class="avnivo-language-head"><strong>Tarjima tilini tanlash</strong><button type="button" data-close aria-label="Yopish">✕</button></div><div class="avnivo-language-options"></div></div>';
+ modal.innerHTML='<div class="avnivo-language-card"><div class="avnivo-language-head"><strong>Ovoz tanish tili · 117 til</strong><button type="button" data-close aria-label="Yopish">✕</button></div><input type="search" class="avnivo-language-search" placeholder="Til nomi yoki kodi bo‘yicha qidirish" aria-label="Til qidirish" autocomplete="off"><div class="avnivo-language-options"></div></div>';
  const css=document.createElement('style');
  css.textContent=`
  #avnivoOnlineLanguageDialog[hidden]{display:none!important}
@@ -754,7 +754,7 @@ window.CHIRP2_MATRIX=[
  #avnivoOnlineLanguageDialog .avnivo-language-card{width:min(420px,100%);max-height:80dvh;overflow:auto;border:1px solid #c79b58;border-radius:20px;background:#30251b;color:#ffe4aa;padding:18px;box-sizing:border-box}
  .avnivo-language-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
  .avnivo-language-head button{background:transparent;border:0;color:inherit;font-size:24px;padding:8px}
- .avnivo-language-options{display:grid;gap:8px}
+ .avnivo-language-search{display:block;width:100%;padding:12px;margin-bottom:12px;border:1px solid #a47a46;border-radius:12px;background:#211910;color:#fff4dc;font:15px system-ui;box-sizing:border-box}\n .avnivo-language-options{display:grid;gap:8px;max-height:58dvh;overflow-y:auto}
  .avnivo-language-options button{display:block;width:100%;padding:14px;text-align:left;font:600 17px system-ui;color:#ffe4aa;background:#473426;border:1px solid #a47a46;border-radius:12px}
  .avnivo-language-options button[aria-pressed=true]{border-color:#ffdc84;background:#684b27}
  .speaker .speaker-language-title select{pointer-events:none!important}
@@ -766,11 +766,14 @@ window.CHIRP2_MATRIX=[
  const closePicker=()=>{modal.hidden=true;editingSelect=null};
  function openPicker(select){
    editingSelect=select;
+   modal.querySelector('.avnivo-language-search').value='';
    const options=modal.querySelector('.avnivo-language-options');
    options.replaceChildren();
+   const query=modal.querySelector('.avnivo-language-search').value.trim().toLocaleLowerCase();
    for(const code of supported){
+     if(query && !(native[code]+' '+code).toLocaleLowerCase().includes(query))continue;
      const button=document.createElement('button');
-     button.type='button';button.textContent=native[code];
+     button.type='button';button.textContent=native[code]+' · '+code;
      button.setAttribute('aria-pressed',String(select.value===code));
      button.addEventListener('click',()=>{
        if(editingSelect){
@@ -782,7 +785,10 @@ window.CHIRP2_MATRIX=[
      options.append(button);
    }
    modal.hidden=false;
+   modal.querySelector('.avnivo-language-search').focus();
  }
+ modal.querySelector('.avnivo-language-search').addEventListener('input',()=>{if(editingSelect)openPickerResults(editingSelect)});
+ function openPickerResults(select){const options=modal.querySelector('.avnivo-language-options');options.replaceChildren();const query=modal.querySelector('.avnivo-language-search').value.trim().toLocaleLowerCase();for(const code of supported){if(query&&!(native[code]+' '+code).toLocaleLowerCase().includes(query))continue;const button=document.createElement('button');button.type='button';button.textContent=native[code]+' · '+code;button.setAttribute('aria-pressed',String(select.value===code));button.addEventListener('click',()=>{select.value=code;select.dispatchEvent(new Event('change',{bubbles:true}));closePicker()});options.append(button)}}
  modal.addEventListener('click',e=>{if(e.target===modal||e.target.closest('[data-close]'))closePicker()});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closePicker()});
  // Capture the tap before card/editor handlers can consume it.
@@ -1320,7 +1326,7 @@ window.CHIRP2_MATRIX=[
  // Returns null when the language has no verified Chirp 2 support, so the
  // caller can report it instead of silently substituting another language.
  function chirp2LocaleFor(baseCode){
-   const locale=CHIRP2_BASE_TO_LOCALE[baseCode];
+   const locale=Object.hasOwn(CHIRP2_LOCALE_NAMES,baseCode)?baseCode:CHIRP2_BASE_TO_LOCALE[baseCode];
    return locale&&Object.hasOwn(CHIRP2_LOCALE_NAMES,locale)?locale:null;
  }
  // Best-effort registry drift check against the backend; never blocks recognition.
