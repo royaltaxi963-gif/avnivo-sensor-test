@@ -77,7 +77,7 @@ function resize(){
  input.style.height=Math.min(Math.max(60,input.scrollHeight),max)+'px';
  input.style.overflowY=input.scrollHeight>max?'auto':'hidden';
  label.hidden=Boolean(input.value)||shell.classList.contains("voice-active");
- if(typeof updateBrandVisibility==='function')updateBrandVisibility();
+
  if(!input.value&&!timeout&&!shell.classList.contains("voice-active"))delay(180);
 }
 input.addEventListener('input',()=>{clearTimeout(timeout);timeout=0;resize()});
