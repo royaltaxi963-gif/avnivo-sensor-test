@@ -91,7 +91,7 @@ FALLBACK = {
     "eu-ES": {"tatoeba": None, "commons": "eus", "espeak": "eu"},
     "fr-CA": {"tatoeba": "fra", "espeak": "fr"},
     "pt-PT": {"tatoeba": "por", "espeak": "pt"},
-    "rup-BG": {"tatoeba": "rup", "espeak": "ro"},
+    "rup-BG": {"tatoeba": None, "commons": "rup", "espeak": "ro"},
     "si-LK": {"tatoeba": None, "commons": "sin", "commons_sinhala": True, "espeak": "si"},
     "sq-AL": {"tatoeba": None, "commons": "sqi", "espeak": "sq"},
     "su-ID": {"tatoeba": None, "commons": "sun", "espeak": "id"},

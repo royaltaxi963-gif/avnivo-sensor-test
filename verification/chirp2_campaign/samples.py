@@ -158,6 +158,11 @@ def tatoeba_samples(iso639_3: str, locale: str, count: int = 3) -> list[dict]:
     for row in payload.get("results", []):
         if len(manifest) >= count:
             break
+        # Tatoeba ignores an unknown `from` and falls back to whatever it has
+        # (e.g. `from=rup` returns Ido and Klingon). Trust only the row's own
+        # language tag, or a wrong-language clip is scored as a recognition miss.
+        if row.get("lang") != iso639_3:
+            continue
         audios = row.get("audios") or []
         if not audios:
             continue
@@ -273,6 +278,11 @@ def commons_samples(iso639_3: str, locale: str, count: int = 3, sinhala: bool = 
             # LL-Q<id> (<lang>)-<speaker>-<word>.<ext>: the word is the last field.
             word = (match.group(1) if sinhala else match.group(3)).strip()
         if not word:
+            continue
+        # Some Lingua Libre uploads append the language code to the word field
+        # (e.g. `...-Bolt Escargot-Cristi-rup.wav` -> "Cristi-rup"), which is a
+        # filename artifact, not spoken text.
+        if word.lower().endswith(f"-{iso639_3.lower()}"):
             continue
         url = _commons_url(title)
         if not url:
