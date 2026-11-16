@@ -1,0 +1,57 @@
+name: AVNIVO Android APK build
+on:
+  push:
+    branches:
+      - feat/android-webview-apk-shell-20261116
+    paths:
+      - 'android/**'
+      - 'index.html'
+      - 'offline-uzbek-download.js'
+      - 'i18n/**'
+      - '.github/workflows/avnivo-android-apk.yml'
+  pull_request:
+    paths:
+      - 'android/**'
+      - 'index.html'
+      - 'offline-uzbek-download.js'
+      - 'i18n/**'
+      - '.github/workflows/avnivo-android-apk.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Check HTML asset and onboarding contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text()
+          assert 'avnivo-first-launch-v1-complete' in s
+          assert "localStorage.getItem(STORAGE)==='yes'" in s
+          assert s.count("selector:'.history-toggle'")==1
+          assert s.count("selector:'#mode-offline'")==1
+          assert Path('offline-uzbek-download.js').is_file()
+          print('Onboarding, offline downloader and local assets: present')
+          PY
+      - name: Build debug APK
+        working-directory: android
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Upload installable debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-android-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
