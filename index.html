@@ -246,7 +246,7 @@ function onlineLanguageName(locale){
  try{return languageDisplay?.of(base)||base}catch(e){return base}
 }
 function updateOnlineLanguageLabels(){
- if(document.documentElement.dataset.avnivoMode!=='online')return;
+ if(document.documentElement.dataset.avnivoMode!=='online'||session!==onlineSession)return;
  for(const [side,button] of [['left',leftLanguage],['right',rightLanguage]]){
   const locale=onlineChoice[side],name=onlineLanguageName(locale);
   button.querySelector('.language-name').textContent=name;
@@ -266,7 +266,7 @@ function renderOnlineLanguages(){
   item.append(title,note);item.setAttribute('aria-selected',String(onlineChoice[longPressSide]===locale));
   item.addEventListener('click',()=>{
    if(!onlineLanguagesByCode.has(locale))return;
-   if(onlineChoice[longPressSide]!==locale){cancelOnlineRecording();if(active)stopVoice()}
+   if(onlineChoice[longPressSide]!==locale){requestToken++;cancelOnlineRecording();if(active)stopVoice()}
     onlineChoice[longPressSide]=locale;
    updateOnlineLanguageLabels();closeOnlineLanguages();
   });
@@ -635,6 +635,7 @@ function beginOnlineRecording(stream){
  try{
   const recorder=new MediaRecorder(stream,{mimeType:mime,audioBitsPerSecond:48000});
   const session=++onlineSession,locale=onlineLocale();
+   if(!onlineLanguagesByCode.has(locale))throw Error('Unsupported Chirp 2 locale');
   onlineChunks=[];onlineRecorder=recorder;
    const maxRecording=setTimeout(()=>{if(session===onlineSession&&recorder.state==='recording')stopVoice()},30000);
   recorder.ondataavailable=e=>{if(e.data.size)onlineChunks.push(e.data)};
@@ -671,6 +672,7 @@ async function sendOnlineAudio(blob,locale,session){
   const result=await response.json();
   if(session!==onlineSession||document.documentElement.dataset.avnivoMode!=='online')return;
   if(result.language!==locale||result.model!=='chirp_2')throw Error('Server noto‘g‘ri til yoki model qaytardi');
+   if(locale!==onlineLocale())return;
   const recognized=typeof result.text==='string'?result.text.trim():'';
   if(recognized){
    input.value=appendTranscript(input.value,recognized);
