@@ -493,7 +493,7 @@ function syncComposerMode(){
  label.hidden=typing||messages.children.length>0||active||shell.classList.contains('hold-voice');
 }
 const ONLINE_TRANSLATION_ENDPOINT='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate';
-async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry){
+async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,historyId){
  const source=onlineLanguagesByCode.get(sourceLocale),target=onlineLanguagesByCode.get(targetLocale);
  if(!source||!target||source[1]===target[1]){
   bubble.textContent='Tarjima uchun boshqa tilni tanlang';return;
@@ -539,7 +539,7 @@ function sendMessage(){
  messages.appendChild(attachSpeaker(translationBubble,oppositeLanguage(language)));
  if(online){
   translationBubble.textContent='Tarjima qilinmoqda…';
-  translateOnlineText(message,sourceLocale,targetLocale,translationBubble,entry);
+  translateOnlineText(message,sourceLocale,targetLocale,translationBubble,entry,currentHistoryId);
  }else typeTranslation(translationBubble,PREVIEW_TRANSLATION);
  while(messages.children.length>60)messages.firstElementChild.remove();
  scrollChatToLatest();
