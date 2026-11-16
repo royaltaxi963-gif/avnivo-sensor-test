@@ -74,11 +74,32 @@ html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{disp
 .online-language-item small{color:#d5ac75;font-size:12px;white-space:nowrap}
 .online-language-item:active,.online-language-item[aria-selected=true]{background:#76512c}
 .online-language-help{font-size:12px;color:#d4b78e;margin:7px 0 0}
+
+/* AVNIVO Offline module catalogue — presentation only until verified installers exist. */
+.offline-modules{display:none;padding:4px 16px 22px;color:#e4f5ff}
+html[data-avnivo-mode=offline] .offline-modules{display:block}
+html[data-avnivo-mode=offline] .settings-description{display:none}
+.offline-modules-title{font:700 16px/1.4 system-ui;margin:9px 0 4px}
+.offline-modules-subtitle{font:12px/1.55 system-ui;color:#a8c6da;margin:0 0 16px}
+.offline-module-card{display:flex;align-items:flex-start;gap:12px;padding:15px 12px;margin:0 0 11px;border:1px solid #386783;border-radius:17px;background:linear-gradient(135deg,#17374b,#102432);box-shadow:0 5px 18px #0003}
+.offline-module-mark{width:40px;height:40px;flex:0 0 40px;border-radius:13px;background:#285470;display:grid;place-items:center;color:#bde7ff}
+.offline-module-mark svg,.offline-module-action svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.offline-module-copy{flex:1;min-width:0}
+.offline-module-name{font:700 13px/1.35 system-ui;color:#f1fbff;margin:0 0 5px}
+.offline-module-desc{font:11.5px/1.55 system-ui;color:#a9c9dd;margin:0}
+.offline-module-state{font:11px/1.4 system-ui;color:#91b8d1;margin:8px 0 0}
+.offline-module-action{border:1px solid #5b91ae;border-radius:50%;width:38px;height:38px;flex:0 0 38px;background:#1c455f;color:#c2eaff;display:grid;place-items:center;cursor:pointer;transition:background .2s}
+.offline-module-action:focus-visible{outline:2px solid #a8e4ff;outline-offset:3px}
+.offline-module-action[disabled]{opacity:.65;cursor:wait}
+.offline-module-action.is-ready{background:#137d55;border-color:#3bd79d;color:white}
+.offline-module-action.is-ready svg{stroke-width:2.5}
+.offline-module-notice{font:12px/1.5 system-ui;color:#ffdba4;margin:9px 0 0;min-height:18px}
+
 </style>
 </head>
 <body>
 <main class="app" aria-label="AVNIVO fon">
-<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="online-language-sheet" hidden role="dialog" aria-modal="true" aria-label="Online tillar"><div class="online-language-panel"><div class="online-language-head"><strong>Online tillar · 93</strong><button class="online-language-close" type="button" aria-label="Yopish">×</button></div><input class="online-language-search" type="search" placeholder="Til nomi yoki kodini qidiring" aria-label="Til qidirish"><div class="online-language-results"></div><p class="online-language-help">77 tasdiqlangan · 13 tajribaviy · 3 qayta sinov talab qiladi</p></div></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
+<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p><section class="offline-modules" aria-label="Offline modullar" id="offline-modules"><h2 class="offline-modules-title">Offline modullar</h2><p class="offline-modules-subtitle">Har bir modulni alohida o‘rnatasiz. Yuklash manbalari ulangach, muvaffaqiyatli o‘rnatilgan modul avtomatik faollashadi va yashil belgi bilan ko‘rsatiladi.</p><div class="offline-modules-list"></div><p class="offline-module-notice" role="status" aria-live="polite"></p></section></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="online-language-sheet" hidden role="dialog" aria-modal="true" aria-label="Online tillar"><div class="online-language-panel"><div class="online-language-head"><strong>Online tillar · 93</strong><button class="online-language-close" type="button" aria-label="Yopish">×</button></div><input class="online-language-search" type="search" placeholder="Til nomi yoki kodini qidiring" aria-label="Til qidirish"><div class="online-language-results"></div><p class="online-language-help">77 tasdiqlangan · 13 tajribaviy · 3 qayta sinov talab qiladi</p></div></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
 </main>
 <script>
 (()=>{'use strict';
@@ -319,6 +340,59 @@ function setSettingsOpen(open){
 settingsToggle.addEventListener('click',()=>{if(historyOpen)setHistoryOpen(false);setSettingsOpen(!settingsOpen)});
 settingsClose.addEventListener('click',()=>setSettingsOpen(false));
 settingsOverlay.addEventListener('click',()=>setSettingsOpen(false));
+
+/* Offline catalogue: no model is marked ready until a verified installer reports readiness. */
+const offlineModuleCatalog=[
+ {id:'uz-stt',name:'O‘zbekcha ovoz tanish',desc:'O‘zbekcha nutqni chuqurroq tushunishga va aytilgan so‘zlarni aniq matnga aylantirishga yordam beradi.',icon:'mic'},
+ {id:'multilingual-stt',name:'Ko‘p tilli ovoz tanish',desc:'Turli tillardagi nutqni eshitib, so‘zlarni yozma matnga aylantiradi. 99 til qamrovi hozircha tasdiqlanmagan.',icon:'languages'},
+ {id:'offline-translate',name:'Internetsiz tarjima',desc:'Yuklab olingan tillar o‘rtasida matnlarni internetga ulanmasdan tarjima qilish imkonini beradi.',icon:'translate'},
+ {id:'offline-tts',name:'Matnni ovozli o‘qish',desc:'Tarjima va yozilgan matnlarni qurilmaning o‘zida tabiiy ovoz bilan o‘qib beradi.',icon:'speaker'}
+];
+const offlineModuleIcons={
+ mic:'<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/>',
+ languages:'<path d="M3 5h12M9 3v2m4 0c-.5 6-4 10-9 12M5 9c2 4 5 6 9 8M15 13l4-9 4 9m-7-3h6"/>',
+ translate:'<path d="M4 5h11M9 3v2m4 0c-.5 5-3 8-8 11M5 9c1 3 4 6 8 8M15 21l4-10 4 10m-7-4h6"/>',
+ speaker:'<path d="M4 10h4l5-4v12l-5-4H4zM17 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/>',
+ download:'<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
+ check:'<path d="m5 12 4 4L19 6"/>'
+};
+const offlineSvg=name=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+offlineModuleIcons[name]+'</svg>';
+const offlineList=document.querySelector('.offline-modules-list');
+const offlineNotice=document.querySelector('.offline-module-notice');
+const offlineState=new Map();
+function updateOfflineModule(id,state){
+ if(!offlineModuleCatalog.some(m=>m.id===id))return false;
+ if(!['not_installed','downloading','verifying','ready','error'].includes(state))return false;
+ offlineState.set(id,state);
+ const row=offlineList.querySelector('[data-module-id="'+id+'"]');if(!row)return false;
+ const btn=row.querySelector('.offline-module-action'),status=row.querySelector('.offline-module-state');
+ const ready=state==='ready';
+ btn.classList.toggle('is-ready',ready);btn.disabled=state==='downloading'||state==='verifying';
+ btn.innerHTML=offlineSvg(ready?'check':'download');
+ btn.setAttribute('aria-label',ready?'Modul faol':row.dataset.moduleName+' — yuklab olish');
+ status.textContent=({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state];
+ return true;
+}
+for(const module of offlineModuleCatalog){
+ const row=document.createElement('article');row.className='offline-module-card';row.dataset.moduleId=module.id;row.dataset.moduleName=module.name;
+ const mark=document.createElement('span');mark.className='offline-module-mark';mark.innerHTML=offlineSvg(module.icon);
+ const copy=document.createElement('div');copy.className='offline-module-copy';
+ const name=document.createElement('h3');name.className='offline-module-name';name.textContent=module.name;
+ const desc=document.createElement('p');desc.className='offline-module-desc';desc.textContent=module.desc;
+ const status=document.createElement('p');status.className='offline-module-state';status.textContent='Yuklanmagan';
+ copy.append(name,desc,status);
+ const btn=document.createElement('button');btn.type='button';btn.className='offline-module-action';btn.innerHTML=offlineSvg('download');btn.setAttribute('aria-label',module.name+' — yuklab olish');
+ btn.addEventListener('click',()=>{
+  if(document.documentElement.dataset.avnivoMode!=='offline')return;
+  if(offlineState.get(module.id)==='ready')return;
+  offlineNotice.textContent=module.name+': model ombori va xavfsiz o‘rnatish mexanizmi hali ulanmagan. Yuklash boshlanmadi.';
+ });
+ row.append(mark,copy,btn);offlineList.append(row);offlineState.set(module.id,'not_installed');
+}
+// Future integration must call this ONLY after checking the installed files and initializing the runtime.
+// It is intentionally not wired to a simulated download, localStorage flag or an unverified model.
+window.avnivoOfflineModuleUi={setVerifiedState:updateOfflineModule};
+
 const historyStorageKey='avnivo.preview.chat-history.v1';
 const activeHistoryKey='avnivo.preview.active-chat.v1';
 const draftHistoryKey='avnivo.preview.chat-drafts.v1';
