@@ -68,6 +68,11 @@
       "detail": "all non-English packages marked machineTranslated"
     },
     {
+      "name": "rtl-flag-matches-script",
+      "passed": true,
+      "detail": "mismatches=0"
+    },
+    {
       "name": "tutorial-keys-complete",
       "passed": true,
       "detail": "keys=11 languages=100 missing=0"

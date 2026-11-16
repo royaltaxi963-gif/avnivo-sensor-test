@@ -126,6 +126,16 @@ await test('RTL languages set document direction', async () => {
   assert(host.window.document.documentElement.getAttribute('dir') === 'ltr', 'dir not reset to ltr');
 });
 
+await test('Latin-script Kurdish stays LTR', async () => {
+  // The Kurdish package is Latin-script Kurmanji, so forcing RTL would mirror
+  // the whole interface. It must render left-to-right.
+  await i18n.setLanguage('ku');
+  assert(!i18n.isRTL(), 'ku wrongly detected as RTL');
+  assert(host.window.document.documentElement.getAttribute('dir') === 'ltr',
+    'ku set document dir to rtl');
+  await i18n.setLanguage('uz');
+});
+
 /* 8. offline resource loading */
 await test('bundles load from local files with no network', async () => {
   const host4 = createHost();

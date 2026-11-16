@@ -16,7 +16,9 @@
   var DEFAULT_LANG = 'uz';
   var FALLBACK_LANG = 'en';
   var CACHE_LIMIT = 3;
-  var RTL_LANGS = { ar: 1, fa: 1, ur: 1, ps: 1, ug: 1, sd: 1, ku: 1, dv: 1, he: 1 };
+  // Right-to-left scripts. Kurdish ("ku") is intentionally absent: its package
+  // is Latin-script Kurmanji (native name "Kurdî"), so its UI must stay LTR.
+  var RTL_LANGS = { ar: 1, fa: 1, ur: 1, ps: 1, ug: 1, sd: 1, dv: 1, he: 1 };
 
   var state = {
     language: DEFAULT_LANG,

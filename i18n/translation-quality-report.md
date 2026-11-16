@@ -14,9 +14,9 @@ guarantee.
 
 ## Review priority
 
-- High (RTL scripts — check text direction and shaping): ar, fa, ur, ps, ug, sd, ku, dv, he
+- High (RTL scripts — check text direction and shaping): ar, fa, ur, ps, ug, sd, dv, he
 - Medium (lower-resource languages — check fluency and terminology): uz, tg, ky, kk, tk, so, sw, ha, bs, sq, mn, is, lv, lt, sk, sl, ka, ne, mr, gu, pa, ta, te, kn, ml, si, km, my, vi, am, zu, xh, ny, sn, lg, yo, ig, ak, ee, mg, ht, eo, la, gd, eu, gl
-- Standard (widely supported languages — spot check): az, tr, ms, id, bn, ff, wo, ru, fr, de, es, it, pt, nl, sv, no, da, fi, et, pl, cs, hr, sr, mk, bg, ro, hu, el, hy, hi, th, lo, zh, ja, ko, bo, ti, om, af, rw, ln, ga, cy, ca
+- Standard (widely supported languages — spot check): az, tr, ku, ms, id, bn, ff, wo, ru, fr, de, es, it, pt, nl, sv, no, da, fi, et, pl, cs, hr, sr, mk, bg, ro, hu, el, hy, hi, th, lo, zh, ja, ko, bo, ti, om, af, rw, ln, ga, cy, ca
 
 ## Per-language detail
 
@@ -35,7 +35,7 @@ guarantee.
 | Türkçe | tr | no | standard | 179 | 0 | 2 |
 | ئۇيغۇرچە | ug | yes | high | 179 | 0 | 5 |
 | سنڌي | sd | yes | high | 179 | 0 | 0 |
-| Kurdî | ku | yes | high | 179 | 0 | 15 |
+| Kurdî | ku | no | standard | 179 | 0 | 15 |
 | Bahasa Melayu | ms | no | standard | 179 | 0 | 0 |
 | Bahasa Indonesia | id | no | standard | 179 | 0 | 1 |
 | বাংলা | bn | no | standard | 179 | 0 | 0 |

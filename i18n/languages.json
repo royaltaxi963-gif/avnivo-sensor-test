@@ -12,7 +12,7 @@
   {"code": "tr", "name": "Türkçe", "english": "Turkish", "rtl": false},
   {"code": "ug", "name": "ئۇيغۇرچە", "english": "Uyghur", "rtl": true},
   {"code": "sd", "name": "سنڌي", "english": "Sindhi", "rtl": true},
-  {"code": "ku", "name": "Kurdî", "english": "Kurdish", "rtl": true},
+  {"code": "ku", "name": "Kurdî", "english": "Kurdish", "rtl": false},
   {"code": "ms", "name": "Bahasa Melayu", "english": "Malay", "rtl": false},
   {"code": "id", "name": "Bahasa Indonesia", "english": "Indonesian", "rtl": false},
   {"code": "bn", "name": "বাংলা", "english": "Bengali", "rtl": false},

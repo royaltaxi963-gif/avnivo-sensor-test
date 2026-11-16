@@ -46,7 +46,7 @@ check('unique-language-codes', new Set(languages.map((l) => l.code)).size === 10
 check('native-names-present', languages.every((l) => l.name && l.name.trim().length > 0),
   'all native names non-empty');
 check('rtl-flags', languages.filter((l) => l.rtl).map((l) => l.code).join(',') ===
-  'ar,fa,ur,ps,ug,sd,ku,dv,he', 'rtl set matches engine');
+  'ar,fa,ur,ps,ug,sd,dv,he', 'rtl set matches engine');
 
 const sourceKeys = Object.keys(source);
 const localeFiles = readdirSync(join(root, 'locales')).filter((f) => f.endsWith('.json'));
@@ -166,6 +166,25 @@ function scriptsIn(text) {
   }
   return set;
 }
+
+// --- RTL flag must match the package's actual script --------------------
+// A language flagged right-to-left must actually be written in a right-to-left
+// script. Without this, a Latin-script package flagged RTL renders its whole
+// interface mirrored (this caught Kurdish, whose package is Latin Kurmanji).
+const RTL_SCRIPTS = new Set(['arabic', 'hebrew']);
+const rtlMismatch = [];
+for (const lang of languages) {
+  const data = JSON.parse(readFileSync(join(root, 'locales', `${lang.code}.json`), 'utf8'));
+  const scripts = new Set();
+  for (const key of Object.keys(data)) {
+    if (key.startsWith('_')) continue;
+    for (const s of scriptsIn(data[key])) if (s !== 'latin') scripts.add(s);
+  }
+  const isRtlScript = [...scripts].some((s) => RTL_SCRIPTS.has(s));
+  if (lang.rtl && !isRtlScript) rtlMismatch.push(`${lang.code} flagged rtl but scripts=[${[...scripts]}]`);
+  if (!lang.rtl && isRtlScript) rtlMismatch.push(`${lang.code} not flagged rtl but scripts=[${[...scripts]}]`);
+}
+check('rtl-flag-matches-script', rtlMismatch.length === 0, `mismatches=${rtlMismatch.length}`);
 
 for (const lang of languages) {
   const data = JSON.parse(readFileSync(join(root, 'locales', `${lang.code}.json`), 'utf8'));
