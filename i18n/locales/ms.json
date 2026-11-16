@@ -174,5 +174,16 @@
   "accessibility.download": "Muat turun",
   "language.settings.title": "Bahasa antara muka",
   "language.settings.aria": "Pilih bahasa antara muka",
-  "language.settings.note": "Bahasa antara muka diterjemahkan ke dalam bahasa lain; model pertuturan tidak dimuatkan semula."
+  "language.settings.note": "Bahasa antara muka diterjemahkan ke dalam bahasa lain; model pertuturan tidak dimuatkan semula.",
+  "tutorial.history.title": "Sejarah sembang",
+  "tutorial.history.body": "Ini ialah sejarah sembang terjemahan anda. Perbualan dan terjemahan AVNIVO sebelumnya disimpan di sini. Anda boleh membuka semula dan menyemak perbualan terdahulu atau memulakan perbualan baharu.",
+  "tutorial.settings.title": "tetapan",
+  "tutorial.settings.body": "Sesuaikan cara penterjemah berfungsi di sini. Tetapan dalam talian termasuk main balik pertuturan, suara, nada dan gaya. Tetapan luar talian menunjukkan modul pengecaman pertuturan, terjemahan dan main balik pertuturan yang boleh dimuat turun serta statusnya. Ciri bergantung pada mod yang dipilih dan modul yang dipasang.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Gunakan mikrofon untuk menterjemah pertuturan. Pilih bahasa anda, ketik mikrofon dan bercakap seperti biasa. Pengecaman pertuturan bergantung pada mod yang dipilih. Kebenaran mikrofon penyemak imbas mungkin diperlukan.",
+  "tutorial.online.title": "Mod dalam talian",
+  "tutorial.online.body": "Butang ini memilih terjemahan berkuasa internet. Mod dalam talian boleh menggunakan pengecaman pertuturan awan dan perkhidmatan terjemahan yang tersedia. Sambungan internet dan akses kepada perkhidmatan diperlukan. Apl dibuka dalam mod Dalam talian pada masa ini.",
+  "tutorial.offline.title": "Mod luar talian",
+  "tutorial.offline.body": "Butang ini memilih mod yang dimaksudkan untuk digunakan tanpa internet. Muat turun modul bahasa dan pertuturan yang diperlukan terlebih dahulu. Bahasa dan ciri yang tersedia bergantung pada modul yang dipasang. Ketik Difahami untuk menyelesaikan pengenalan dan membuka kunci apl.",
+  "tutorial.next": "Difahamkan"
 }

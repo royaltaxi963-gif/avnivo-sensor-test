@@ -174,5 +174,16 @@
   "accessibility.download": "Download",
   "language.settings.title": "Luqadda Interface",
   "language.settings.aria": "Dooro luqadda isdhexgalka",
-  "language.settings.note": "Luqada interneedka waxaa loo turjumay luqado kale; moodooyinka hadalka dib looma raro"
+  "language.settings.note": "Luqada interneedka waxaa loo turjumay luqado kale; moodooyinka hadalka dib looma raro",
+  "tutorial.history.title": "Taariikhda sheekada",
+  "tutorial.history.body": "Tani waa sheekadaada turjumaada taariikhda Sheekooyinkii hore ee AVNIVO iyo tarjumaadaha ayaa halkan lagu keydiyay. Dib ayaad u furi kartaa oo dib u eegi kartaa sheekadii hore ama mid cusub ayaad bilaabi kartaa.",
+  "tutorial.settings.title": "Dejinta",
+  "tutorial.settings.body": "Halkan ku habayso sida uu turjumaanku u shaqeeyo. Dejinta intarneedka waxa ka mid ah dib u ciyaarista hadalka, codadka, codadka iyo qaababka. Dejinta khadka tooska ah ayaa muujinaya aqoonsiga hadalka la soo dejin karo, tarjumaada iyo qaybaha dib u ciyaarida hadalka iyo xaaladdooda. Tilmaamuhu waxay ku xiran yihiin qaabka la doortay iyo cutubyada rakibay.",
+  "tutorial.microphone.title": "Makarafoon",
+  "tutorial.microphone.body": "Isticmaal makarafoonka si aad hadalka u turjunto. Dooro luqadahaaga, taabo makarafoonka oo si caadi ah u hadal. Aqoonsiga hadalka wuxuu ku xiran yahay qaabka la doortay. Oggolaanshaha makarafoonka browserka ayaa laga yaabaa in loo baahdo.",
+  "tutorial.online.title": "Habka khadka tooska ah",
+  "tutorial.online.body": "Badhankan ayaa dooranaya turjumaada ku shaqeeya internetka. Habka khadka tooska ah wuxuu isticmaali karaa aqoonsiga hadalka daruuriga ah iyo adeegyada turjumaada. Isku xirka internetka iyo gelitaanka adeegyada ayaa loo baahan yahay. Abka hadda waxa uu ku furmay qaabka khadka tooska ah",
+  "tutorial.offline.title": "Qaabka khadka tooska ah",
+  "tutorial.offline.body": "Badhankan ayaa dooranaya qaabka loogu talagalay isticmaalka internet la'aan. Horay u soo deji qaybaha luqadda iyo hadalka loo baahan yahay. Luqadaha iyo sifooyinka la heli karo waxay ku xiran yihiin qaybaha la rakibay. Taabo Fahamka si aad u dhamaystirto hordhaca oo aad u furto abka.",
+  "tutorial.next": "La fahmay"
 }

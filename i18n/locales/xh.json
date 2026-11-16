@@ -174,5 +174,16 @@
   "accessibility.download": "Khuphela",
   "language.settings.title": "Ulwimi lwesinxibelelanisi",
   "language.settings.aria": "Khetha ulwimi lojongano",
-  "language.settings.note": "Ulwimi olusetyenziswayo luguqulelwa kwezinye iilwimi; imifuziselo yentetho ayilayishwa kwakhona."
+  "language.settings.note": "Ulwimi olusetyenziswayo luguqulelwa kwezinye iilwimi; imifuziselo yentetho ayilayishwa kwakhona.",
+  "tutorial.history.title": "Ncokola imbali",
+  "tutorial.history.body": "Le yimbali yakho yengxoxo yoguqulelo. Iincoko zangaphambili ze-AVNIVO kunye neenguqulelo zigcinwe apha. Ungaphinda uvule kwaye ujonge iincoko zangaphambili okanye uqale entsha.",
+  "tutorial.settings.title": "Iisetingi",
+  "tutorial.settings.body": "Lungiselela indlela umguquli asebenza ngayo apha. Useto lwe-Intanethi lubandakanya ukudlala kwakhona kwentetho, amazwi, iithowuni kunye nezimbo. Iisetingi ezingaxhunyiwe kwi-intanethi zibonisa ukukhutshelwa ukuqondwa kwentetho, ukuguqulelwa kunye neemodyuli zokudlala intetho kunye nobume bazo. Iimpawu zixhomekeke kwindlela ekhethiweyo kunye neemodyuli ezifakiwe.",
+  "tutorial.microphone.title": "Imayikrofoni",
+  "tutorial.microphone.body": "Sebenzisa i-microphone ukuguqulela intetho. Khetha iilwimi zakho, cofa imakrofoni kwaye uthethe ngokwesiqhelo. Ukuqondwa kwentetho kuxhomekeke kwindlela ekhethiweyo. Imvume yebhrawuza yemakrofoni ingafuneka.",
+  "tutorial.online.title": "Imowudi ye-intanethi",
+  "tutorial.online.body": "Eli qhosha likhetha uguqulo oluqhutywa yi-intanethi. Imowudi ye-Intanethi inokusebenzisa ukuqondwa kwentetho yelifu kunye neenkonzo zoguqulo. Uqhagamshelo lwe-intanethi kunye nokufikelela kwiinkonzo kuyafuneka. Usetyenziso ngoku luvula kwimowudi ye-Intanethi.",
+  "tutorial.offline.title": "Imo engasebenziyo",
+  "tutorial.offline.body": "Eli qhosha likhetha indlela eyenzelwe ukusetyenziswa ngaphandle kweintanethi. Khuphela kwangaphambili iimodyuli zolwimi kunye nentetho efunekayo. Iilwimi ezikhoyo kunye neempawu zixhomekeke kwiimodyuli ezifakiweyo. Cofa ku-Understod ukugqiba ukwazisa kunye nokuvula i-app.",
+  "tutorial.next": "Kuyaqondwa"
 }

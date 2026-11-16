@@ -174,5 +174,16 @@
   "accessibility.download": "Letöltés",
   "language.settings.title": "Interfész nyelve",
   "language.settings.aria": "Válassza ki a felület nyelvét",
-  "language.settings.note": "Az interfész nyelve le van fordítva más nyelvekre; beszédmodellek nem töltődnek be újra."
+  "language.settings.note": "Az interfész nyelve le van fordítva más nyelvekre; beszédmodellek nem töltődnek be újra.",
+  "tutorial.history.title": "Csevegés előzményei",
+  "tutorial.history.body": "Ez az Ön fordítási csevegési előzménye. A korábbi AVNIVO beszélgetések és fordítások mentésre kerülnek. Újra megnyithatja és áttekintheti a korábbi beszélgetéseket, vagy újat indíthat.",
+  "tutorial.settings.title": "Beállítások elemre",
+  "tutorial.settings.body": "Itt testreszabhatja a fordító működését. Az online beállítások közé tartozik a beszédlejátszás, a hangok, a hangok és a stílusok. Az offline beállítások a letölthető beszédfelismerő, fordítási és beszédlejátszási modulokat és azok állapotát mutatják. A funkciók a kiválasztott módtól és a telepített moduloktól függenek.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Használja a mikrofont a beszéd fordításához. Válassza ki a nyelvet, koppintson a mikrofonra, és beszéljen normálisan. A beszédfelismerés a kiválasztott módtól függ. Előfordulhat, hogy a böngésző mikrofon engedélyére lesz szükség.",
+  "tutorial.online.title": "Online mód",
+  "tutorial.online.body": "Ezzel a gombbal választhatja ki az internetes fordítást. Az online mód használhatja az elérhető felhőalapú beszédfelismerési és fordítási szolgáltatásokat. Internet kapcsolatra és a szolgáltatásokhoz való hozzáférésre van szükség. Az alkalmazás jelenleg Online módban nyílik meg.",
+  "tutorial.offline.title": "Offline mód",
+  "tutorial.offline.body": "Ez a gomb az internet nélküli használatra szánt módot választja ki. Előzetesen töltse le a szükséges nyelvi és beszédmodulokat. Az elérhető nyelvek és szolgáltatások a telepített moduloktól függenek. Érintse meg a Megértett elemet a bevezetés befejezéséhez és az alkalmazás zárolásának feloldásához.",
+  "tutorial.next": "Megértve"
 }

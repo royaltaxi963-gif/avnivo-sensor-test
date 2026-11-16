@@ -174,5 +174,16 @@
   "accessibility.download": "Tải xuống",
   "language.settings.title": "Ngôn ngữ giao diện",
   "language.settings.aria": "Chọn ngôn ngữ giao diện",
-  "language.settings.note": "Ngôn ngữ giao diện được dịch sang các ngôn ngữ khác; mô hình giọng nói không được tải lại."
+  "language.settings.note": "Ngôn ngữ giao diện được dịch sang các ngôn ngữ khác; mô hình giọng nói không được tải lại.",
+  "tutorial.history.title": "Lịch sử trò chuyện",
+  "tutorial.history.body": "Đây là lịch sử trò chuyện dịch của bạn. Các cuộc hội thoại và bản dịch ANIVO trước đây được lưu ở đây. Bạn có thể mở lại và xem lại các cuộc trò chuyện trước đó hoặc bắt đầu một cuộc trò chuyện mới.",
+  "tutorial.settings.title": "Cài đặt",
+  "tutorial.settings.body": "Tùy chỉnh cách thức hoạt động của người dịch ở đây. Cài đặt trực tuyến bao gồm phát lại giọng nói, giọng nói, âm sắc và kiểu. Cài đặt ngoại tuyến hiển thị các mô-đun nhận dạng giọng nói, dịch thuật và phát lại giọng nói có thể tải xuống cũng như trạng thái của chúng. Các tính năng phụ thuộc vào chế độ đã chọn và các mô-đun được cài đặt.",
+  "tutorial.microphone.title": "Micrô",
+  "tutorial.microphone.body": "Sử dụng micrô để dịch lời nói. Chọn ngôn ngữ của bạn, nhấn vào micrô và nói chuyện bình thường. Nhận dạng giọng nói phụ thuộc vào chế độ đã chọn. Có thể cần phải có quyền sử dụng micrô của trình duyệt.",
+  "tutorial.online.title": "Chế độ trực tuyến",
+  "tutorial.online.body": "Nút này chọn bản dịch được hỗ trợ bởi internet. Chế độ trực tuyến có thể sử dụng các dịch vụ dịch thuật và nhận dạng giọng nói có sẵn trên đám mây. Cần có kết nối internet và truy cập vào các dịch vụ. Ứng dụng hiện đang mở ở chế độ Trực tuyến.",
+  "tutorial.offline.title": "Chế độ ngoại tuyến",
+  "tutorial.offline.body": "Nút này chọn chế độ dự định sử dụng mà không cần internet. Tải xuống trước các mô-đun ngôn ngữ và giọng nói cần thiết. Ngôn ngữ và tính năng có sẵn tùy thuộc vào các mô-đun được cài đặt. Nhấn vào Đã hiểu để hoàn tất phần giới thiệu và mở khóa ứng dụng.",
+  "tutorial.next": "đã hiểu"
 }

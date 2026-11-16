@@ -174,5 +174,16 @@
   "accessibility.download": "Hoosugo do internaati",
   "language.settings.title": "Ɗemngal jokkorgal",
   "language.settings.aria": "Suɓo ɗemngal jokkorgal",
-  "language.settings.note": "Ɗemngal jokkorgal ngal ina firtee e ɗemɗe goɗɗe ; moodeluuji haala ɗii njuɓɓinaaka."
+  "language.settings.note": "Ɗemngal jokkorgal ngal ina firtee e ɗemɗe goɗɗe ; moodeluuji haala ɗii njuɓɓinaaka.",
+  "tutorial.history.title": "Daartol yeewtere",
+  "tutorial.history.body": "Ko ɗum daartol yeewtere firo maa. Jeewte e firooji AVNIVO ɓennuɗi ina keɓee ɗoo. Aɗa waawi udditaade e ƴeewtaade jeewte ɓennuɗe walla fuɗɗoraade keso.",
+  "tutorial.settings.title": "Dottaaɗe",
+  "tutorial.settings.body": "Moƴƴin no firoore ndee gollortoo ɗoo. Dottaaɗe e internet ina mbaɗi ƴeewndo haala, daande, tonngooɗe e mbaadiiji. Cuɓe ɗe ngonaa e laylaytol ina kollita moodeluuji anndinde haala, firo e ƴeewndo haala ƴetteteeɗi e ngonka mum en. Feereeji ina fawii e mbaadi cuɓaandi e moodule joɗɗinaaɗe.",
+  "tutorial.microphone.title": "Mikrofoon",
+  "tutorial.microphone.body": "Huutoro mikroo ngam firtude haala. Suɓo ɗemɗe maa, tappu mikroo oo, kaaldu no haanirta nii. Anndinde haala fawii ko e mbaadi cuɓaandi. Ina waawi ɗaɓɓude yamiroore mikroo feerorde.",
+  "tutorial.online.title": "Mode internet",
+  "tutorial.online.body": "Oo butoŋ suɓotoo ko firo baawɗo huutoreede e internet. Mode online ina waawi huutoraade sarwisaaji anndinde haala e firo ruulde. Jokkondiral internet e jokkondire e sarwisaaji ina ɗaɓɓi. App oo ina uddita jooni e mbaadi Online.",
+  "tutorial.offline.title": "Mode mo alaa e laylaytol",
+  "tutorial.offline.body": "Oo butoŋ suɓotoo ko mbaadi ndi njiɗ-ɗaa huutoraade tawa internet alaa. Sokkit module ɗemngal e haala potɗe waɗeede ko adii. Ɗemɗe e mbaadiiji keɓaaɗi ina fawii e moodeluuji ndarnaaɗi. Tappu Faamde ngam timminde naatgol ngol e udditde app oo.",
+  "tutorial.next": "Fammi"
 }

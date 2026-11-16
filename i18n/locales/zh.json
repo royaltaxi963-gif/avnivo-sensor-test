@@ -174,5 +174,16 @@
   "accessibility.download": "下载",
   "language.settings.title": "界面语言",
   "language.settings.aria": "选择界面语言",
-  "language.settings.note": "界面语言被翻译成其他语言；语音模型不会重新加载。"
+  "language.settings.note": "界面语言被翻译成其他语言；语音模型不会重新加载。",
+  "tutorial.history.title": "聊天记录",
+  "tutorial.history.body": "这是您的翻译聊天记录。以前的 AVNIVO 对话和翻译保存在此处。您可以重新打开并查看之前的对话或开始新的对话。",
+  "tutorial.settings.title": "设置",
+  "tutorial.settings.body": "自定义翻译器在此处的工作方式。在线设置包括语音播放、声音、语气和风格。离线设置显示可下载的语音识别、翻译和语音播放模块及其状态。功能取决于所选模式和安装的模块。",
+  "tutorial.microphone.title": "麦克风",
+  "tutorial.microphone.body": "使用麦克风翻译语音。选择您的语言，点击麦克风并正常说话。语音识别取决于所选模式。可能需要浏览器麦克风权限。",
+  "tutorial.online.title": "在线模式",
+  "tutorial.online.body": "此按钮选择互联网支持的翻译。在线模式可以使用可用的云语音识别和翻译服务。需要互联网连接和访问服务。该应用程序当前以在线模式打开。",
+  "tutorial.offline.title": "离线模式",
+  "tutorial.offline.body": "此按钮选择无需互联网即可使用的模式。提前下载所需的语言和语音模块。可用的语言和功能取决于安装的模块。点击已了解以完成介绍并解锁应用程序。",
+  "tutorial.next": "明白了"
 }

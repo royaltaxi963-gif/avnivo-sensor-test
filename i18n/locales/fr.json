@@ -174,5 +174,16 @@
   "accessibility.download": "Télécharger",
   "language.settings.title": "Langue de l'interface",
   "language.settings.aria": "Sélectionnez la langue de l'interface",
-  "language.settings.note": "La langue de l'interface est traduite dans d'autres langues ; les modèles vocaux ne sont pas rechargés."
+  "language.settings.note": "La langue de l'interface est traduite dans d'autres langues ; les modèles vocaux ne sont pas rechargés.",
+  "tutorial.history.title": "Historique des discussions",
+  "tutorial.history.body": "Il s'agit de l'historique de vos discussions de traduction. Les conversations et traductions AVNIVO précédentes sont enregistrées ici. Vous pouvez rouvrir et revoir des conversations antérieures ou en démarrer une nouvelle.",
+  "tutorial.settings.title": "Paramètres",
+  "tutorial.settings.body": "Personnalisez ici le fonctionnement du traducteur. Les paramètres en ligne incluent la lecture vocale, les voix, les tonalités et les styles. Les paramètres hors ligne affichent les modules téléchargeables de reconnaissance vocale, de traduction et de lecture vocale ainsi que leur état. Les fonctionnalités dépendent du mode sélectionné et des modules installés.",
+  "tutorial.microphone.title": "Le micro",
+  "tutorial.microphone.body": "Utilisez le microphone pour traduire le discours. Choisissez vos langues, appuyez sur le microphone et parlez normalement. La reconnaissance vocale dépend du mode sélectionné. L’autorisation du microphone du navigateur peut être requise.",
+  "tutorial.online.title": "Mode en ligne",
+  "tutorial.online.body": "Ce bouton sélectionne la traduction via Internet. Le mode en ligne peut utiliser les services de reconnaissance vocale et de traduction disponibles dans le cloud. Une connexion internet et un accès aux services sont requis. L'application s'ouvre actuellement en mode en ligne.",
+  "tutorial.offline.title": "Mode hors ligne",
+  "tutorial.offline.body": "Ce bouton sélectionne le mode destiné à une utilisation sans Internet. Téléchargez à l'avance les modules de langue et de parole requis. Les langues et fonctionnalités disponibles dépendent des modules installés. Appuyez sur Compris pour terminer l'introduction et déverrouiller l'application.",
+  "tutorial.next": "Compris"
 }

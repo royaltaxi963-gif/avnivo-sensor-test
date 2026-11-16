@@ -174,5 +174,16 @@
   "accessibility.download": "Okufuna",
   "language.settings.title": "Olulimi lw’okukwatagana",
   "language.settings.aria": "Londa olulimi lw'okukwatagana",
-  "language.settings.note": "Olulimi olukwatagana luvvuunulwa mu nnimi endala; ebikozesebwa mu kwogera tebiddamu kutikkibwa."
+  "language.settings.note": "Olulimi olukwatagana luvvuunulwa mu nnimi endala; ebikozesebwa mu kwogera tebiddamu kutikkibwa.",
+  "tutorial.history.title": "Ebyafaayo by'okukubaganya ebirowoozo",
+  "tutorial.history.body": "Bino bye byafaayo byo eby'okukubaganya ebirowoozo mu kuvvuunula. Emboozi za AVNIVO ezaaliwo emabega n'okuvvuunula biterekeddwa wano. Osobola okuddamu okuggulawo n’okuddamu okwetegereza emboozi ezasooka oba okutandika empya.",
+  "tutorial.settings.title": "Enteekateeka",
+  "tutorial.settings.body": "Customize engeri omuvvuunuzi gy'akola wano. Enteekateeka z’oku yintaneeti mulimu okuzannya okwogera, amaloboozi, amaloboozi n’emisono. Ensengeka ezitali ku mutimbagano ziraga modulo z’okutegeera okwogera, okuvvuunula n’okuzannya okwogera eziyinza okuwanulibwa n’embeera yazo. Ebintu bisinziira ku mode erongooseddwa ne modules eziteekeddwamu.",
+  "tutorial.microphone.title": "Akazindaalo",
+  "tutorial.microphone.body": "Kozesa akazindaalo okuvvuunula okwogera. Londa ennimi zo, kwata ku mayirofooni era oyogere mu ngeri eya bulijjo. Okutegeera okwogera kisinziira ku mode erongooseddwa. Olukusa lw’akazindaalo ka browser luyinza okwetaagisa.",
+  "tutorial.online.title": "Omutindo gwa yintaneeti",
+  "tutorial.online.body": "Butaamu eno elonda enkyusa ekola ku yintaneeti. Enkola ya yintaneeti esobola okukozesa empeereza z’okutegeera okwogera mu kire n’okuvvuunula eziriwo. Omukutu gwa yintaneeti n’okuyingira mu mpeereza zino byetaagibwa. Mu kiseera kino app eno eggulwawo mu mbeera ya Online.",
+  "tutorial.offline.title": "Omutindo ogutali ku mutimbagano",
+  "tutorial.offline.body": "Button eno elonda mode egendereddwamu okukozesebwa nga tewali internet. Wano wefunire modulo z’olulimi n’okwogera ezeetaagisa nga bukyali. Ennimi n'ebintu ebiriwo bisinziira ku modulo eziteekeddwamu. Koona ku Understood okumaliriza ennyanjula n’okusumulula app.",
+  "tutorial.next": "Tegeera"
 }

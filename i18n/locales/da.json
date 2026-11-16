@@ -174,5 +174,16 @@
   "accessibility.download": "Download",
   "language.settings.title": "Interface sprog",
   "language.settings.aria": "Vælg grænsefladesprog",
-  "language.settings.note": "Grænsefladesproget er oversat til andre sprog; talemodeller genindlæses ikke."
+  "language.settings.note": "Grænsefladesproget er oversat til andre sprog; talemodeller genindlæses ikke.",
+  "tutorial.history.title": "Chat historie",
+  "tutorial.history.body": "Dette er din oversættelses chathistorik. Tidligere AVNIVO-samtaler og oversættelser gemmes her. Du kan genåbne og gennemgå tidligere samtaler eller starte en ny.",
+  "tutorial.settings.title": "Indstillinger",
+  "tutorial.settings.body": "Tilpas, hvordan oversætteren fungerer her. Onlineindstillinger inkluderer taleafspilning, stemmer, toner og stilarter. Offline-indstillinger viser moduler til talegenkendelse, oversættelse og taleafspilning, der kan downloades, og deres status. Funktioner afhænger af den valgte tilstand og installerede moduler.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Brug mikrofonen til at oversætte tale. Vælg dine sprog, tryk på mikrofonen og tal normalt. Talegenkendelse afhænger af den valgte tilstand. Der kræves muligvis tilladelse til browsermikrofon.",
+  "tutorial.online.title": "Online tilstand",
+  "tutorial.online.body": "Denne knap vælger internetdrevet oversættelse. Online-tilstand kan bruge tilgængelige cloud-talegenkendelse og oversættelsestjenester. En internetforbindelse og adgang til tjenesterne er påkrævet. Appen åbner i øjeblikket i onlinetilstand.",
+  "tutorial.offline.title": "Offline tilstand",
+  "tutorial.offline.body": "Denne knap vælger den tilstand, der er beregnet til brug uden internet. Download de nødvendige sprog- og talemoduler på forhånd. Tilgængelige sprog og funktioner afhænger af installerede moduler. Tryk på Forstået for at afslutte introduktionen og låse appen op.",
+  "tutorial.next": "Forstået"
 }

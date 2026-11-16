@@ -174,5 +174,16 @@
   "accessibility.download": "Göçürip al",
   "language.settings.title": "Interfeýs dili",
   "language.settings.aria": "Interfeýs dilini saýlaň",
-  "language.settings.note": "Interfeýs dili başga dillere terjime edilýär; gürleýiş modelleri täzeden ýüklenmeýär."
+  "language.settings.note": "Interfeýs dili başga dillere terjime edilýär; gürleýiş modelleri täzeden ýüklenmeýär.",
+  "tutorial.history.title": "Söhbet taryhy",
+  "tutorial.history.body": "Bu siziň terjime söhbet taryhyňyz. Öňki AVNIVO gepleşikleri we terjimeleri şu ýerde saklanýar. Öňki gepleşikleri açyp we gözden geçirip ýa-da täzesini başlap bilersiňiz.",
+  "tutorial.settings.title": "Sazlamalar",
+  "tutorial.settings.body": "Terjimeçiniň bu ýerde nähili işleýändigini düzüň. Onlaýn sazlamalarda çykyş oýnamak, sesler, äheňler we stiller bar. Oflayn sazlamalar göçürip alyp bolýan gürleýiş tanamak, terjime we sözleýiş modullaryny we ýagdaýlaryny görkezýär. Aýratynlyklar saýlanan re modeime we gurnalan modullara baglydyr.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Gepleşigi terjime etmek üçin mikrofony ulanyň. Dilleriňizi saýlaň, mikrofona basyň we adaty gürläň. Gepleýiş tanamak, saýlanan tertibe baglydyr. Brauzer mikrofonynyň rugsady talap edilip bilner.",
+  "tutorial.online.title": "Onlaýn re modeim",
+  "tutorial.online.body": "Bu düwme internet bilen işleýän terjimesini saýlaýar. Onlaýn re modeim, bulut sözleýiş tanamak we terjime hyzmatlaryny ulanyp biler. Internet birikmesi we hyzmatlara girmek hökmanydyr. Programma häzirki wagtda onlaýn re inimde açylýar.",
+  "tutorial.offline.title": "Oflayn re modeim",
+  "tutorial.offline.body": "Bu düwme, internetsiz ulanmak üçin niýetlenen tertibi saýlaýar. Gerekli dil we söz modullaryny öňünden göçürip alyň. Elýeterli diller we aýratynlyklar gurlan modullara baglydyr. Girişiň gutarmagy we programmanyň gulpuny açmak üçin \"Düşün\" düwmesine basyň.",
+  "tutorial.next": "Düşündim"
 }

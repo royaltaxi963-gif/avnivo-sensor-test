@@ -174,5 +174,16 @@
   "accessibility.download": "Telechaje",
   "language.settings.title": "Lang koòdone",
   "language.settings.aria": "Chwazi lang koòdone",
-  "language.settings.note": "Lang koòdone a tradui nan lòt lang; modèl lapawòl yo pa rechaje."
+  "language.settings.note": "Lang koòdone a tradui nan lòt lang; modèl lapawòl yo pa rechaje.",
+  "tutorial.history.title": "Istwa chat",
+  "tutorial.history.body": "Sa a se istwa tradiksyon chat ou a. Konvèsasyon AVNIVO ak tradiksyon anvan yo sove isit la. Ou ka relouvri epi revize konvèsasyon anvan yo oswa kòmanse yon nouvo.",
+  "tutorial.settings.title": "Anviwònman",
+  "tutorial.settings.body": "Pèsonalize kijan tradiktè a ap travay isit la. Anviwònman sou entènèt yo enkli lèktur lapawòl, vwa, ton ak estil. Anviwònman offline yo montre modil ki ka telechaje rekonesans lapawòl, tradiksyon ak lèktur lapawòl ak estati yo. Karakteristik depann sou mòd nan chwazi ak modil enstale.",
+  "tutorial.microphone.title": "Mikwofòn",
+  "tutorial.microphone.body": "Sèvi ak mikwofòn la pou tradui diskou. Chwazi lang ou yo, tape mikwofòn la epi pale nòmalman. Rekonesans lapawòl depann sou mòd chwazi a. Yo ka mande pèmisyon mikwofòn navigatè a.",
+  "tutorial.online.title": "Mòd sou entènèt",
+  "tutorial.online.body": "Bouton sa a chwazi tradiksyon sou entènèt. Mòd sou entènèt ka itilize rekonesans lapawòl ak sèvis tradiksyon nwaj ki disponib. Yon koneksyon entènèt ak aksè nan sèvis yo obligatwa. Aplikasyon an ap louvri kounye a nan mòd Online.",
+  "tutorial.offline.title": "Offline mòd",
+  "tutorial.offline.body": "Bouton sa a chwazi mòd ki fèt pou itilize san entènèt. Telechaje modil lang ak lapawòl ki nesesè yo davans. Lang ak karakteristik ki disponib depann sou modil enstale. Tape Konprann pou fini entwodiksyon an epi debloke aplikasyon an.",
+  "tutorial.next": "Konprann"
 }

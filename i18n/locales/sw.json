@@ -174,5 +174,16 @@
   "accessibility.download": "Pakua",
   "language.settings.title": "Lugha ya kiolesura",
   "language.settings.aria": "Chagua lugha ya kiolesura",
-  "language.settings.note": "Lugha ya kiolesura hutafsiriwa katika lugha nyingine; miundo ya hotuba haijapakiwa upya."
+  "language.settings.note": "Lugha ya kiolesura hutafsiriwa katika lugha nyingine; miundo ya hotuba haijapakiwa upya.",
+  "tutorial.history.title": "Historia ya gumzo",
+  "tutorial.history.body": "Hii ni historia yako ya mazungumzo ya tafsiri. Mazungumzo na tafsiri za awali za AVNIVO zimehifadhiwa hapa. Unaweza kufungua tena na kukagua mazungumzo ya awali au uanzishe mazungumzo mapya.",
+  "tutorial.settings.title": "Mipangilio",
+  "tutorial.settings.body": "Geuza jinsi mfasiri anavyofanya kazi hapa kukufaa. Mipangilio ya mtandaoni inajumuisha uchezaji wa matamshi, sauti, toni na mitindo. Mipangilio ya nje ya mtandao inaonyesha utambuzi wa usemi unaopakuliwa, utafsiri na moduli za uchezaji wa usemi na hali yake. Vipengele hutegemea hali iliyochaguliwa na moduli zilizowekwa.",
+  "tutorial.microphone.title": "Maikrofoni",
+  "tutorial.microphone.body": "Tumia maikrofoni kutafsiri hotuba. Chagua lugha zako, gusa maikrofoni na uzungumze kama kawaida. Utambuzi wa usemi unategemea hali iliyochaguliwa. Ruhusa ya maikrofoni ya kivinjari inaweza kuhitajika.",
+  "tutorial.online.title": "Hali ya mtandaoni",
+  "tutorial.online.body": "Kitufe hiki huchagua tafsiri inayotumia mtandao. Hali ya mtandaoni inaweza kutumia utambuzi wa usemi wa wingu na huduma za tafsiri. Muunganisho wa intaneti na ufikiaji wa huduma unahitajika. Programu inafunguliwa kwa sasa katika hali ya Mtandao.",
+  "tutorial.offline.title": "Hali ya nje ya mtandao",
+  "tutorial.offline.body": "Kitufe hiki huchagua hali iliyokusudiwa kutumiwa bila mtandao. Pakua moduli za lugha na hotuba zinazohitajika mapema. Lugha na vipengele vinavyopatikana hutegemea moduli zilizosakinishwa. Gusa Inaeleweka ili umalize utangulizi na ufungue programu.",
+  "tutorial.next": "Kueleweka"
 }

@@ -174,5 +174,16 @@
   "accessibility.download": "Budata",
   "language.settings.title": "Asụsụ interface",
   "language.settings.aria": "Họrọ asụsụ interface",
-  "language.settings.note": "A na-atụgharị asụsụ interface n'asụsụ ndị ọzọ; anaghị ebugharị ụdị okwu."
+  "language.settings.note": "A na-atụgharị asụsụ interface n'asụsụ ndị ọzọ; anaghị ebugharị ụdị okwu.",
+  "tutorial.history.title": "Akụkọ nkata",
+  "tutorial.history.body": "Nke a bụ akụkọ nkata ntụgharị asụsụ gị. A na-echekwa mkparịta ụka na ntụgharị AVNIVO gara aga ebe a. Ị nwere ike mepee ọzọ wee nyochaa mkparịta ụka mbụ ma ọ bụ malite nke ọhụrụ.",
+  "tutorial.settings.title": "Ntọala",
+  "tutorial.settings.body": "Hazie ka onye ntụgharị si arụ ọrụ ebe a. Ntọala ịntanetị gụnyere ịkpọghachi okwu, olu, ụda na ụdị. Ntọala ndị na-adịghị n'ịntanetị na-egosi njirimara okwu enwere ike ibudata, nsụgharị na modul ịkpọghachi okwu na ọkwa ha. Atụmatụ dabere na ọnọdụ ahọpụtara yana modul arụnyere.",
+  "tutorial.microphone.title": "Igwe okwu",
+  "tutorial.microphone.body": "Jiri igwe okwu iji tụgharịa asụsụ okwu. Họrọ asụsụ gị, kpatụ igwe okwu wee na-ekwu okwu nke ọma. Nchọpụta okwu dabere na ọnọdụ ahọpụtara. Enwere ike ịchọrọ ikike igwe okwu ihe nchọgharị.",
+  "tutorial.online.title": "Ụdị n'ịntanetị",
+  "tutorial.online.body": "Bọtịnụ a na-ahọpụta ntụgharị asụsụ sitere na ịntanetị. Ụdị ịntanetị nwere ike iji njirimara okwu igwe ojii na ọrụ ntụgharị asụsụ dị. Achọrọ njikọ ịntanetị na ịnweta ọrụ ndị a. Ngwa na-emepe ugbu a na ọnọdụ ọnlaịnụ.",
+  "tutorial.offline.title": "Ụdị na-anọghị n'ịntanetị",
+  "tutorial.offline.body": "Bọtịnụ a na-ahọrọ ọnọdụ echere maka ojiji na-enweghị ịntanetị. Budata asụsụ achọrọ na modul okwu tupu oge eruo. Asụsụ na atụmatụ dịnụ dabere na modul arụnyere. Pịa aghọta ka imecha mmeghe wee kpọghee ngwa.",
+  "tutorial.next": "Aghọtara"
 }

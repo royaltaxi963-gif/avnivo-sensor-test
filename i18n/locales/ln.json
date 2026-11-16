@@ -174,5 +174,16 @@
   "accessibility.download": "Kozwa",
   "language.settings.title": "Elobeli ya interface",
   "language.settings.aria": "Pona monoko ya interface",
-  "language.settings.note": "Monoko ya interface ebongolami na minoko misusu; ba modèles ya maloba ezo recharger te."
+  "language.settings.note": "Monoko ya interface ebongolami na minoko misusu; ba modèles ya maloba ezo recharger te.",
+  "tutorial.history.title": "Histoire ya ba chat",
+  "tutorial.history.body": "Oyo ezali histoire ya chat na yo ya traduction. Masolo mpe mabongoli ya kala ya AVNIVO ebombami awa. Okoki kofungola lisusu mpe kotalela lisusu masolo oyo osololaki liboso to kobanda masolo ya sika.",
+  "tutorial.settings.title": "Ba paramètres",
+  "tutorial.settings.body": "Bobongisa ndenge oyo mobongoli asalaka awa. Ba paramètres ya internet ezali na botangi ya maloba, mingongo, ba tons mpe ba styles. Ba paramètres hors ligne elakisaka ba modules ya reconnaissance ya maloba, ya traduction na ya lecture ya maloba oyo ekoki ko télécharger mpe état na yango. Ba fonctionnalités etali mode oyo oponi na ba modules installés.",
+  "tutorial.microphone.title": "Micro oyo ezali na kati",
+  "tutorial.microphone.body": "Salelá mikro mpo na kobongola maloba. Pona minoko na yo, finá na mikro mpe lobá ndenge oyo ebongi. Koyeba elobeli etali mode oyo oponi. Ekoki kosɛnga ndingisa ya micro ya navigateur.",
+  "tutorial.online.title": "Mode en ligne",
+  "tutorial.online.body": "Bouton oyo eponaka libongoli oyo esalemi na internet. Mode en ligne ekoki kosalela ba services ya reconnaissance ya elobeli ya cloud mpe ya traduction oyo ezali. Esengeli kozala na connexion internet mpe accès na ba services. Application yango efungwamaka sikoyo na mode En ligne.",
+  "tutorial.offline.title": "Mode hors ligne",
+  "tutorial.offline.body": "Bouton oyo eponaka mode oyo ekanamaki mpo na kosalela yango kozanga internet. Télécharger liboso ba modules ya monoko mpe ya elobeli oyo esengeli. Minɔkɔ mpe makambo oyo ezali, etalelaka ba modules oyo batye. Finá na Sosoli mpo na kosilisa maloba ya ebandeli mpe kofungola programɛ yango.",
+  "tutorial.next": "Kokanga ntina"
 }

@@ -174,5 +174,16 @@
   "accessibility.download": "Hee ɖa anyi",
   "language.settings.title": "Interface gbegbɔgblɔ",
   "language.settings.aria": "Tia gbegbɔgblɔ si woatsɔ awɔ dɔe",
-  "language.settings.note": "Woɖea gbegbɔgblɔ si wozãna tsɔ doa ŋgɔe la gɔme ɖe gbe bubuwo me; womegatsɔa nuƒoƒo ƒe kpɔɖeŋuwo dea agba me o."
+  "language.settings.note": "Woɖea gbegbɔgblɔ si wozãna tsɔ doa ŋgɔe la gɔme ɖe gbe bubuwo me; womegatsɔa nuƒoƒo ƒe kpɔɖeŋuwo dea agba me o.",
+  "tutorial.history.title": "Dzeɖoɖo ŋutinya",
+  "tutorial.history.body": "Esiae nye wò gbegɔmeɖeɖe ƒe dzeɖoɖo ŋutinya. Wodzra AVNIVO ƒe dzeɖoɖo siwo va yi kple gɔmeɖeɖewo ɖo ɖe afisia. Àte ŋu aʋu dzeɖoɖo siwo nèwɔ va yi ahadzro eme alo adze yeye gɔme.",
+  "tutorial.settings.title": "Ðoɖowo",
+  "tutorial.settings.body": "Trɔ asi le alesi gbegɔmeɖela la wɔa dɔe ŋu le afisia. Internet dzi ɖoɖowo dometɔ aɖewoe nye nuƒoƒo ƒe ƒoƒo, gbewo, gbeɖiɖiwo kple atsyãwo. Ðoɖo siwo mele Internet dzi o ɖea nuƒoƒo ƒe dzesidede, gbegɔmeɖeɖe kple nuƒoƒo ƒe ƒoƒo ƒe modules siwo woate ŋu awɔ kɔpi na kple woƒe nɔnɔme fiana. Features nɔ te ɖe mode si nètia kple modules siwo woda ɖe eme dzi.",
+  "tutorial.microphone.title": "Nuƒomɔ̃",
+  "tutorial.microphone.body": "Zã nuƒomɔ̃a nàtsɔ aɖe nuƒoƒo gɔme. Tia gbe siwo nèdona, zi nuƒomɔ̃a dzi eye nàƒo nu nyuie. Nuƒoƒo ƒe dzesidede nɔ te ɖe mɔnu si nètia dzi. Ðewohĩ abia be woaɖe mɔ na nuƒomɔ̃ si wotsɔna ƒoa nuƒomɔ̃a.",
+  "tutorial.online.title": "Internet dzi nɔnɔme",
+  "tutorial.online.body": "Abɔta sia tiaa gbegɔmeɖeɖe si zãa internet. Internet dzi mɔnu ate ŋu azã alilikpo me nuƒoƒo ƒe dzesidede kple gbegɔmeɖeɖedɔwɔna siwo li. Ele be internet dzi kadodo kple mɔnukpɔkpɔ nasu ame si be wòakpɔ dɔwɔnaawo. Dɔdamɔnua ʋuna fifia le Internet dzi nɔnɔme me.",
+  "tutorial.offline.title": "Offline ƒe nɔnɔme",
+  "tutorial.offline.body": "Abɔta sia tiaa nɔnɔme si woɖo be woazã internet manɔmee. Wɔ gbegbɔgblɔ kple nuƒoƒo ƒe mɔ̃ siwo hiã la ƒe kɔpi do ŋgɔ. Gbegbɔgblɔ kple nɔnɔme siwo li la nɔ te ɖe modules siwo woda ɖe eme dzi. Zi Understood dzi be nàwu ŋgɔdonya la nu eye nàʋu dɔwɔnua.",
+  "tutorial.next": "Se egɔme"
 }

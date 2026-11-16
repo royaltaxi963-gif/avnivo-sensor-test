@@ -174,5 +174,16 @@
   "accessibility.download": "Download",
   "language.settings.title": "Interface mutauro",
   "language.settings.aria": "Sarudza mutauro wekushandisa",
-  "language.settings.note": "Mutauro weinterface unoshandurirwa mune mimwe mitauro; matauriro emhando haana kurodhazve."
+  "language.settings.note": "Mutauro weinterface unoshandurirwa mune mimwe mitauro; matauriro emhando haana kurodhazve.",
+  "tutorial.history.title": "Nhoroondo yekutaura",
+  "tutorial.history.body": "Iyi ndiyo nhoroondo yako yekutaura. Yakapfuura AVNIVO nhaurirano neshanduro dzakachengetwa pano. Unogona kuvhurazve nekudzokorora hurukuro dzekare kana kutanga imwe itsva.",
+  "tutorial.settings.title": "Zvirongwa",
+  "tutorial.settings.body": "Gadzirisa mashandiro anoita muturikiri pano. Zvirongwa zvepamhepo zvinosanganisira kutamba kwekutaura, manzwi, toni uye masitaera. Masetin'i epasina Indaneti anoratidza kudhaunirodwa matauriro, kududzira uye mamodule ekutamba ekutaura uye chimiro chawo. Zvimiro zvinoenderana neyakasarudzwa modhi uye yakaiswa modules.",
+  "tutorial.microphone.title": "Maikorofoni",
+  "tutorial.microphone.body": "Shandisa maikorofoni kushandura mutauro. Sarudza mitauro yako, baya maikorofoni uye taura zvakajairika. Kuzivikanwa kwekutaura kunoenderana nesarudzo yakasarudzwa. Bhurawuza maikorofoni mvumo inogona kudiwa.",
+  "tutorial.online.title": "Maitiro epaIndaneti",
+  "tutorial.online.body": "Bhatani iri rinosarudza shanduro ine Indaneti. Pamhepo modhi inogona kushandisa inowanikwa gore rinozivikanwa kutaura uye masevhisi ekushandura. Kubatana kweinternet uye kuwana masevhisi kunodiwa. Iyo app parizvino inovhura muOnline mode.",
+  "tutorial.offline.title": "Maitiro ekushanda usiri paIndaneti",
+  "tutorial.offline.body": "Iri bhatani rinosarudza maitiro akagadzirirwa kushandiswa pasina internet. Dhawunirodha inodiwa mutauro nemamodule ekutaura pachine nguva. Mitauro iripo uye maitiro zvinoenderana nemamodule akaiswa. Tinya Kunzwisisa kupedzisa sumo uye kuvhura iyo app.",
+  "tutorial.next": "Kunzwisisa"
 }

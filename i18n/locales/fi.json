@@ -174,5 +174,16 @@
   "accessibility.download": "Lataa",
   "language.settings.title": "Käyttöliittymän kieli",
   "language.settings.aria": "Valitse käyttöliittymän kieli",
-  "language.settings.note": "Käyttöliittymän kieli on käännetty muille kielille; puhemalleja ei ladata uudelleen."
+  "language.settings.note": "Käyttöliittymän kieli on käännetty muille kielille; puhemalleja ei ladata uudelleen.",
+  "tutorial.history.title": "Keskusteluhistoria",
+  "tutorial.history.body": "Tämä on käännöskeskusteluhistoriasi. Aiemmat AVNIVO-keskustelut ja käännökset tallennetaan tänne. Voit avata uudelleen ja tarkastella aikaisempia keskusteluja tai aloittaa uuden.",
+  "tutorial.settings.title": "Asetukset",
+  "tutorial.settings.body": "Muokkaa kääntäjän toimintaa täällä. Online-asetukset sisältävät puheen toiston, äänet, äänet ja tyylit. Offline-asetukset näyttävät ladattavat puheentunnistus-, käännös- ja puheentoistomoduulit ja niiden tilan. Ominaisuudet riippuvat valitusta tilasta ja asennetuista moduuleista.",
+  "tutorial.microphone.title": "Mikrofoni",
+  "tutorial.microphone.body": "Käytä mikrofonia puheen kääntämiseen. Valitse kielesi, napauta mikrofonia ja puhu normaalisti. Puheentunnistus riippuu valitusta tilasta. Selaimen mikrofonin käyttöoikeus voidaan vaatia.",
+  "tutorial.online.title": "Online-tila",
+  "tutorial.online.body": "Tämä painike valitsee Internet-pohjaisen käännöksen. Online-tilassa voidaan käyttää saatavilla olevia pilvipuheentunnistus- ja käännöspalveluita. Tarvitaan Internet-yhteys ja pääsy palveluihin. Sovellus avautuu tällä hetkellä online-tilassa.",
+  "tutorial.offline.title": "Offline-tila",
+  "tutorial.offline.body": "Tämä painike valitsee tilan, joka on tarkoitettu käytettäväksi ilman Internetiä. Lataa tarvittavat kieli- ja puhemoduulit etukäteen. Käytettävissä olevat kielet ja ominaisuudet riippuvat asennetuista moduuleista. Lopeta esittely ja avaa sovelluksen lukitus napauttamalla Ymmärretty.",
+  "tutorial.next": "Ymmärretty"
 }

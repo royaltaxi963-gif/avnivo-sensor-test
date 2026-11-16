@@ -174,5 +174,16 @@
   "accessibility.download": "Ladda ner",
   "language.settings.title": "Gränssnittsspråk",
   "language.settings.aria": "Välj gränssnittsspråk",
-  "language.settings.note": "Gränssnittsspråket översätts till andra språk; talmodeller laddas inte om."
+  "language.settings.note": "Gränssnittsspråket översätts till andra språk; talmodeller laddas inte om.",
+  "tutorial.history.title": "Chatthistorik",
+  "tutorial.history.body": "Det här är din översättningschatthistorik. Tidigare AVNIVO-konversationer och översättningar sparas här. Du kan öppna och granska tidigare konversationer eller starta en ny.",
+  "tutorial.settings.title": "Inställningar",
+  "tutorial.settings.body": "Anpassa hur översättaren fungerar här. Onlineinställningar inkluderar taluppspelning, röster, toner och stilar. Offlineinställningar visar nedladdningsbara taligenkännings-, översättnings- och taluppspelningsmoduler och deras status. Funktioner beror på valt läge och installerade moduler.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Använd mikrofonen för att översätta tal. Välj dina språk, tryck på mikrofonen och tala normalt. Taligenkänning beror på det valda läget. Webbläsarmikrofonbehörighet kan krävas.",
+  "tutorial.online.title": "Online-läge",
+  "tutorial.online.body": "Den här knappen väljer internetbaserad översättning. Onlineläget kan använda tillgängliga molntaligenkännings- och översättningstjänster. En internetuppkoppling och tillgång till tjänsterna krävs. Appen öppnas för närvarande i onlineläge.",
+  "tutorial.offline.title": "Offlineläge",
+  "tutorial.offline.body": "Denna knapp väljer det läge som är avsett för användning utan internet. Ladda ner nödvändiga språk- och talmoduler i förväg. Tillgängliga språk och funktioner beror på installerade moduler. Tryck på Understanded för att avsluta introduktionen och låsa upp appen.",
+  "tutorial.next": "Förstått"
 }

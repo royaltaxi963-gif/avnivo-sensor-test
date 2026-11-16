@@ -216,6 +216,66 @@ await test('Online and Offline settings remain separate', () => {
   assert(html.includes('avnivo-online-tts-settings'), 'online settings styling missing');
 });
 
+/* onboarding tutorial coverage */
+const tutorialKeys = sourceKeys.filter((k) => k.startsWith('tutorial.'));
+
+await test('tutorial: every package has all 11 tutorial keys', () => {
+  assert(tutorialKeys.length === 11, `expected 11 tutorial keys, got ${tutorialKeys.length}`);
+  for (const lang of languages) {
+    const data = JSON.parse(readFileSync(join(repoRoot, `i18n/locales/${lang.code}.json`), 'utf8'));
+    for (const key of tutorialKeys) {
+      assert(typeof data[key] === 'string' && data[key].trim() !== '',
+        `${lang.code} missing/empty ${key}`);
+    }
+  }
+});
+
+await test('tutorial: English and Uzbek are preserved', () => {
+  const en = JSON.parse(readFileSync(join(repoRoot, 'i18n/locales/en.json'), 'utf8'));
+  const uz = JSON.parse(readFileSync(join(repoRoot, 'i18n/locales/uz.json'), 'utf8'));
+  for (const key of tutorialKeys) {
+    assert(en[key] === source[key], `en ${key} drifted from source`);
+  }
+  assert(uz['tutorial.next'] === 'Tushunarli', `uz tutorial.next changed: ${uz['tutorial.next']}`);
+  assert(/tarixi/i.test(uz['tutorial.history.title']), 'uz history title changed');
+  assert(uz['tutorial.history.body'].length > 80, 'uz history body truncated');
+});
+
+await test('tutorial: no package left in English', () => {
+  for (const lang of languages) {
+    if (lang.code === 'en') continue;
+    const data = JSON.parse(readFileSync(join(repoRoot, `i18n/locales/${lang.code}.json`), 'utf8'));
+    for (const key of tutorialKeys) {
+      assert(!(data[key] === source[key] && source[key].length > 3),
+        `${lang.code} ${key} still English`);
+    }
+  }
+});
+
+await test('tutorial: language codes unchanged (100 unique)', () => {
+  const codes = languages.map((l) => l.code);
+  assert(codes.length === 100 && new Set(codes).size === 100, 'language codes changed');
+});
+
+await test('tutorial: engine resolves tutorial keys in target language', async () => {
+  const hostT = createHost();
+  const engineT = loadEngine(hostT.window);
+  await engineT.init({ language: 'de' });
+  const value = engineT.t('tutorial.next');
+  assert(value && value !== 'tutorial.next' && value !== 'Understood',
+    `de tutorial.next not localized: ${value}`);
+  await engineT.setLanguage('ar');
+  assert(engineT.t('tutorial.history.title') !== 'Chat history', 'ar tutorial not localized');
+});
+
+await test('tutorial: metadata never upgraded to reviewed', () => {
+  for (const lang of languages) {
+    const data = JSON.parse(readFileSync(join(repoRoot, `i18n/locales/${lang.code}.json`), 'utf8'));
+    assert(data._meta.reviewed === false, `${lang.code} marked reviewed`);
+    if (lang.code !== 'en') assert(data._meta.machineTranslated === true, `${lang.code} not marked machine`);
+  }
+});
+
 /* report */
 let passed = 0, failed = 0, skipped = 0;
 for (const r of results) {

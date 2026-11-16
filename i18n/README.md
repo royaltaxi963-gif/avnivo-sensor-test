@@ -24,11 +24,12 @@ feature surface the brief asks for.
 i18n/
   avnivo-i18n.js               engine (window.AVNIVO_I18N)
   languages.json               100-language registry (code, native name, RTL)
-  source/en.json               canonical English source strings (168 keys)
+  source/en.json               canonical English source strings (179 keys)
   locales/<code>.json          one UTF-8 package per language
   validate.mjs                 structural + quality validation
   quality-report.mjs           machine-translation / human-review report
   generate.py                  regeneration (machine translation, dev only)
+  generate-tutorial.py         fill the onboarding tutorial keys only
   generate-android-resources.py Android values-<locale>/strings.xml
   tests/host.mjs               minimal DOM + fetch shim (no npm dependencies)
   tests/run-tests.mjs          acceptance test suite

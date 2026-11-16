@@ -174,5 +174,16 @@
   "accessibility.download": "Gba lati ayelujara",
   "language.settings.title": "Ede atọkun",
   "language.settings.aria": "Yan ede ni wiwo",
-  "language.settings.note": "Ede wiwo ni a tumọ si awọn ede miiran; Awọn awoṣe ọrọ ko tun gbejade."
+  "language.settings.note": "Ede wiwo ni a tumọ si awọn ede miiran; Awọn awoṣe ọrọ ko tun gbejade.",
+  "tutorial.history.title": "Itan iwiregbe",
+  "tutorial.history.body": "Eyi ni itan iwiregbe itumọ rẹ. Awọn ibaraẹnisọrọ AVNIVO ti tẹlẹ ati awọn itumọ ti wa ni ipamọ nibi. O le tun ṣii ati ṣayẹwo awọn ibaraẹnisọrọ iṣaaju tabi bẹrẹ ọkan tuntun.",
+  "tutorial.settings.title": "Eto",
+  "tutorial.settings.body": "Ṣe akanṣe bi onitumọ ṣiṣẹ nibi. Eto ori ayelujara pẹlu ṣiṣiṣẹsẹhin ọrọ, awọn ohun, awọn ohun orin ati awọn ara. Awọn eto aisinipo ṣe afihan idanimọ ọrọ ti a ṣe igbasilẹ, itumọ ati awọn modulu ṣiṣiṣẹsẹhin ọrọ ati ipo wọn. Awọn ẹya da lori ipo ti o yan ati awọn modulu ti a fi sii.",
+  "tutorial.microphone.title": "Gbohungbohun",
+  "tutorial.microphone.body": "Lo gbohungbohun lati tumọ ọrọ. Yan awọn ede rẹ, tẹ gbohungbohun ki o sọ ni deede. Idanimọ ọrọ da lori ipo ti o yan. Igbanilaaye gbohungbohun aṣawakiri le nilo.",
+  "tutorial.online.title": "Ìpèǹpéjú wẹ́ẹ̀bù",
+  "tutorial.online.body": "Bọtini yii yan itumọ ti o ni agbara intanẹẹti. Ipo ori ayelujara le lo idanimọ ọrọ awọsanma ti o wa ati awọn iṣẹ itumọ. Isopọ Ayelujara ati iraye si awọn iṣẹ ni a nilo. Ohun elo naa ṣii lọwọlọwọ ni ipo ori Ayelujara.",
+  "tutorial.offline.title": "Ipo aisinipo",
+  "tutorial.offline.body": "Bọtini yii yan ipo ti a pinnu fun lilo laisi intanẹẹti. Ṣe igbasilẹ ede ti a beere ati awọn modulu ọrọ ni ilosiwaju. Awọn ede ti o wa ati awọn ẹya da lori awọn modulu fifi sori ẹrọ. Tẹ ni oye lati pari ifihan ati ṣii app naa.",
+  "tutorial.next": "Oye"
 }

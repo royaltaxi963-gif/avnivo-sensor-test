@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-11-16T19:11:27.374Z",
+  "generatedAt": "2026-11-16T20:05:07.170Z",
   "node": "v24.22.2",
-  "passed": 18,
+  "passed": 24,
   "failed": 0,
   "skipped": 0,
   "tests": [
@@ -92,6 +92,36 @@
     },
     {
       "name": "Online and Offline settings remain separate",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: every package has all 11 tutorial keys",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: English and Uzbek are preserved",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: no package left in English",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: language codes unchanged (100 unique)",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: engine resolves tutorial keys in target language",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "name": "tutorial: metadata never upgraded to reviewed",
       "status": "passed",
       "error": null
     }

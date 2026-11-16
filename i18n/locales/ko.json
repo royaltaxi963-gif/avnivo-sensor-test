@@ -174,5 +174,16 @@
   "accessibility.download": "다운로드",
   "language.settings.title": "인터페이스 언어",
   "language.settings.aria": "인터페이스 언어 선택",
-  "language.settings.note": "인터페이스 언어는 다른 언어로 번역됩니다. 음성 모델은 다시 로드되지 않습니다."
+  "language.settings.note": "인터페이스 언어는 다른 언어로 번역됩니다. 음성 모델은 다시 로드되지 않습니다.",
+  "tutorial.history.title": "채팅 기록",
+  "tutorial.history.body": "이것은 귀하의 번역 채팅 기록입니다. 이전 AVNIVO 대화 및 번역이 여기에 저장됩니다. 이전 대화를 다시 열고 검토하거나 새 대화를 시작할 수 있습니다.",
+  "tutorial.settings.title": "설정",
+  "tutorial.settings.body": "여기에서 번역기 작동 방식을 사용자 정의하세요. 온라인 설정에는 음성 재생, 음성, 톤 및 스타일이 포함됩니다. 오프라인 설정에는 다운로드 가능한 음성 인식, 번역, 음성 재생 모듈과 그 상태가 표시됩니다. 기능은 선택한 모드와 설치된 모듈에 따라 다릅니다.",
+  "tutorial.microphone.title": "마이크로폰",
+  "tutorial.microphone.body": "마이크를 사용하여 음성을 번역하세요. 언어를 선택하고 마이크를 탭한 후 정상적으로 말하세요. 음성 인식은 선택한 모드에 따라 다릅니다. 브라우저 마이크 권한이 필요할 수 있습니다.",
+  "tutorial.online.title": "온라인 모드",
+  "tutorial.online.body": "이 버튼은 인터넷 기반 번역을 선택합니다. 온라인 모드에서는 사용 가능한 클라우드 음성 인식 및 번역 서비스를 사용할 수 있습니다. 인터넷 연결과 서비스 이용이 필요합니다. 앱은 현재 온라인 모드에서 열립니다.",
+  "tutorial.offline.title": "오프라인 모드",
+  "tutorial.offline.body": "이 버튼은 인터넷 없이 사용할 모드를 선택합니다. 필요한 언어와 음성 모듈을 미리 다운로드하세요. 사용 가능한 언어와 기능은 설치된 모듈에 따라 다릅니다. 이해함을 눌러 소개를 마치고 앱을 잠금 해제하세요.",
+  "tutorial.next": "이해했다"
 }

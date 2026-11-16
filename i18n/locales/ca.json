@@ -174,5 +174,16 @@
   "accessibility.download": "Descarregar",
   "language.settings.title": "Llenguatge de la interfície",
   "language.settings.aria": "Seleccioneu l'idioma de la interfície",
-  "language.settings.note": "L'idioma de la interfície es tradueix a altres idiomes; els models de parla no es recarreguen."
+  "language.settings.note": "L'idioma de la interfície es tradueix a altres idiomes; els models de parla no es recarreguen.",
+  "tutorial.history.title": "Historial de xat",
+  "tutorial.history.body": "Aquest és el vostre historial de xat de traducció. Les converses i traduccions anteriors d'AVNIVO es guarden aquí. Pots reobrir i revisar converses anteriors o iniciar-ne una de nova.",
+  "tutorial.settings.title": "Configuració",
+  "tutorial.settings.body": "Personalitzeu aquí com funciona el traductor. La configuració en línia inclou la reproducció de veu, veus, tons i estils. La configuració fora de línia mostra els mòduls de reconeixement de veu, traducció i reproducció de veu que es poden baixar i el seu estat. Les característiques depenen del mode seleccionat i dels mòduls instal·lats.",
+  "tutorial.microphone.title": "Micròfon",
+  "tutorial.microphone.body": "Utilitzeu el micròfon per traduir la parla. Trieu els vostres idiomes, toqueu el micròfon i parleu normalment. El reconeixement de veu depèn del mode seleccionat. És possible que calgui permís del micròfon del navegador.",
+  "tutorial.online.title": "Mode en línia",
+  "tutorial.online.body": "Aquest botó selecciona la traducció basada en Internet. El mode en línia pot utilitzar els serveis de traducció i reconeixement de veu al núvol disponibles. Es requereix connexió a Internet i accés als serveis. Actualment, l'aplicació s'obre en mode en línia.",
+  "tutorial.offline.title": "Mode fora de línia",
+  "tutorial.offline.body": "Aquest botó selecciona el mode previst per al seu ús sense Internet. Baixeu els mòduls d'idioma i de parla necessaris amb antelació. Els idiomes i les funcions disponibles depenen dels mòduls instal·lats. Toqueu Compres per acabar la introducció i desbloquejar l'aplicació.",
+  "tutorial.next": "Entés"
 }

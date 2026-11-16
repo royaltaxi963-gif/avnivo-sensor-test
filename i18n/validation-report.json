@@ -1,6 +1,6 @@
 {
   "languages": 100,
-  "sourceKeys": 168,
+  "sourceKeys": 179,
   "results": [
     {
       "name": "exactly-100-languages",
@@ -66,6 +66,21 @@
       "name": "machine-translation-marked",
       "passed": true,
       "detail": "all non-English packages marked machineTranslated"
+    },
+    {
+      "name": "tutorial-keys-complete",
+      "passed": true,
+      "detail": "keys=11 languages=100 missing=0"
+    },
+    {
+      "name": "tutorial-not-english-placeholder",
+      "passed": true,
+      "detail": "english-left=0"
+    },
+    {
+      "name": "tutorial-script-consistency",
+      "passed": true,
+      "detail": "mismatches=0"
     }
   ],
   "perLanguage": [

@@ -174,5 +174,16 @@
   "accessibility.download": "Yüklə",
   "language.settings.title": "İnterfeys dili",
   "language.settings.aria": "İnterfeys dilini seçin",
-  "language.settings.note": "İnterfeys dili digər dillərə tərcümə olunur; nitq modelləri yenidən yüklənmir."
+  "language.settings.note": "İnterfeys dili digər dillərə tərcümə olunur; nitq modelləri yenidən yüklənmir.",
+  "tutorial.history.title": "Söhbət tarixçəsi",
+  "tutorial.history.body": "Bu, tərcümə söhbət tarixçənizdir. Əvvəlki AVNIVO söhbətləri və tərcümələri burada saxlanılır. Siz əvvəlki söhbətləri yenidən aça və nəzərdən keçirə və ya yenisinə başlaya bilərsiniz.",
+  "tutorial.settings.title": "Parametrlər",
+  "tutorial.settings.body": "Tərcüməçinin burada necə işlədiyini fərdiləşdirin. Onlayn parametrlərə nitqin səsləndirilməsi, səslər, tonlar və üslublar daxildir. Oflayn parametrlər endirilə bilən nitqin tanınması, tərcümə və nitqin oxudulması modullarını və onların statusunu göstərir. Xüsusiyyətlər seçilmiş rejimdən və quraşdırılmış modullardan asılıdır.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Nitqi tərcümə etmək üçün mikrofondan istifadə edin. Dillərinizi seçin, mikrofona toxunun və normal danışın. Nitqin tanınması seçilmiş rejimdən asılıdır. Brauzer mikrofon icazəsi tələb oluna bilər.",
+  "tutorial.online.title": "Onlayn rejim",
+  "tutorial.online.body": "Bu düymə internetlə işləyən tərcüməni seçir. Onlayn rejim mövcud bulud nitqinin tanınması və tərcümə xidmətlərindən istifadə edə bilər. İnternet bağlantısı və xidmətlərə giriş tələb olunur. Proqram hazırda Onlayn rejimdə açılır.",
+  "tutorial.offline.title": "Oflayn rejim",
+  "tutorial.offline.body": "Bu düymə internet olmadan istifadə üçün nəzərdə tutulan rejimi seçir. Lazım olan dil və nitq modullarını əvvəlcədən yükləyin. Mövcud dillər və xüsusiyyətlər quraşdırılmış modullardan asılıdır. Təqdimatı bitirmək və tətbiqin kilidini açmaq üçün Anlaşıldı seçiminə toxunun.",
+  "tutorial.next": "Anladım"
 }

@@ -174,5 +174,16 @@
   "accessibility.download": "Landa",
   "language.settings.title": "Ulimi lwesixhumi esibonakalayo",
   "language.settings.aria": "Khetha ulimi lwesixhumi esibonakalayo",
-  "language.settings.note": "Ulimi lwesixhumi esibonakalayo luhunyushelwa kwezinye izilimi; amamodeli enkulumo awalayishwa kabusha."
+  "language.settings.note": "Ulimi lwesixhumi esibonakalayo luhunyushelwa kwezinye izilimi; amamodeli enkulumo awalayishwa kabusha.",
+  "tutorial.history.title": "Umlando wengxoxo",
+  "tutorial.history.body": "Lona umlando wakho wengxoxo yokuhumusha. Izingxoxo zangaphambilini ze-AVNIVO nokuhumusha kulondolozwe lapha. Ungaphinda uvule futhi ubuyekeze izingxoxo zangaphambilini noma uqale entsha.",
+  "tutorial.settings.title": "Izilungiselelo",
+  "tutorial.settings.body": "Enza ngendlela oyifisayo ukuthi umhumushi usebenza kanjani lapha. Izilungiselelo eziku-inthanethi zifaka ukudlalwa kwenkulumo, amazwi, amathoni nezitayela. Izilungiselelo ezingaxhunyiwe ku-inthanethi zibonisa ukuqashelwa kwenkulumo okulandekayo, ukuhumusha kanye namamojula okudlala inkulumo kanye nesimo sawo. Izici zincike kwimodi ekhethiwe namamojula afakiwe.",
+  "tutorial.microphone.title": "Imakrofoni",
+  "tutorial.microphone.body": "Sebenzisa imakrofoni ukuhumusha inkulumo. Khetha izilimi zakho, thepha imakrofoni futhi ukhulume ngokujwayelekile. Ukuqashelwa kwenkulumo kuncike kumodi ekhethiwe. Imvume yemakrofoni yesiphequluli ingadingeka.",
+  "tutorial.online.title": "Imodi eku-inthanethi",
+  "tutorial.online.body": "Le nkinobho ikhetha ukuhumusha okune-inthanethi. Imodi eku-inthanethi ingasebenzisa ukubonwa kwenkulumo yamafu nezinsizakalo zokuhumusha. Uxhumano lwe-inthanethi nokufinyelela kumasevisi kuyadingeka. Uhlelo lokusebenza okwamanje luvula ngemodi ye-inthanethi.",
+  "tutorial.offline.title": "Imodi engaxhunyiwe ku-inthanethi",
+  "tutorial.offline.body": "Le nkinobho ikhetha imodi ehloselwe ukusetshenziswa ngaphandle kwe-inthanethi. Landa amamojula olimi nenkulumo adingekayo kusenesikhathi. Izilimi ezitholakalayo nezici zincike kumamojula afakiwe. Thepha okuthi Qonda ukuze uqedele isingeniso futhi uvule uhlelo lokusebenza.",
+  "tutorial.next": "Kuyaqondwa"
 }

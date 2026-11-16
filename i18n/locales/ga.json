@@ -174,5 +174,16 @@
   "accessibility.download": "Íosluchtaigh",
   "language.settings.title": "Teanga comhéadan",
   "language.settings.aria": "Roghnaigh teanga an chomhéadain",
-  "language.settings.note": "Aistrítear teanga an chomhéadain go teangacha eile; ní dhéantar samhlacha cainte a athlódáil."
+  "language.settings.note": "Aistrítear teanga an chomhéadain go teangacha eile; ní dhéantar samhlacha cainte a athlódáil.",
+  "tutorial.history.title": "Stair comhrá",
+  "tutorial.history.body": "Seo é do stair comhrá aistriúcháin. Déantar comhráite agus aistriúcháin AVNIVO roimhe seo a shábháil anseo. Is féidir leat comhráite níos luaithe a athoscailt agus a athbhreithniú nó ceann nua a thosú.",
+  "tutorial.settings.title": "Socruithe",
+  "tutorial.settings.body": "Saincheap conas a oibríonn an t-aistritheoir anseo. Áirítear le socruithe ar líne athsheinm cainte, guthanna, toin agus stíleanna. Léiríonn socruithe as líne modúil aitheantais cainte, aistriúcháin agus athsheinm cainte is féidir a íoslódáil agus a stádas. Braitheann gnéithe ar an modh roghnaithe agus na modúil suiteáilte.",
+  "tutorial.microphone.title": "Micreafón",
+  "tutorial.microphone.body": "Úsáid an micreafón chun cainte a aistriú. Roghnaigh do theangacha, tapáil an micreafón agus labhair de ghnáth. Braitheann aithint cainte ar an mód roghnaithe. Seans go mbeidh cead micreafón brabhsála ag teastáil.",
+  "tutorial.online.title": "Mod ar líne",
+  "tutorial.online.body": "Roghnaíonn an cnaipe seo aistriúchán faoi thiomáint an Idirlín. Is féidir le mód ar líne úsáid a bhaint as néal-aitheantas cainte agus seirbhísí aistriúcháin. Tá nasc idirlín agus rochtain ar na seirbhísí ag teastáil. Osclaíonn an aip faoi láthair i mód Ar Líne.",
+  "tutorial.offline.title": "Mód as líne",
+  "tutorial.offline.body": "Roghnaíonn an cnaipe seo an mód atá beartaithe lena úsáid gan idirlíon. Íoslódáil na modúil teanga agus urlabhra riachtanach roimh ré. Braitheann na teangacha agus na gnéithe atá ar fáil ar mhodúil suiteáilte. Tapáil Tuigtear chun an réamhrá a chríochnú agus an aip a dhíghlasáil.",
+  "tutorial.next": "Tuigeadh"
 }

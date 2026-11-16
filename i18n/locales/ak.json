@@ -174,5 +174,16 @@
   "accessibility.download": "Twe",
   "language.settings.title": "Interface kasa",
   "language.settings.aria": "Paw interface kasa",
-  "language.settings.note": "Wɔkyerɛ interface kasa no ase kɔ kasa afoforo mu; wɔmfa kasa ho nhwɛso ahorow no nsan nhyɛ mu bio."
+  "language.settings.note": "Wɔkyerɛ interface kasa no ase kɔ kasa afoforo mu; wɔmfa kasa ho nhwɛso ahorow no nsan nhyɛ mu bio.",
+  "tutorial.history.title": "Chat abakɔsɛm",
+  "tutorial.history.body": "Eyi ne wo nkyerɛase nkɔmmɔbɔ abakɔsɛm. Wɔde AVNIVO nkɔmmɔbɔ ne nkyerɛase ahorow a atwam no asie ha. Wubetumi asan abue na woasan ahwɛ nkɔmmɔ a woadi kan abɔ mu anaasɛ woafi foforo ase.",
+  "tutorial.settings.title": "Nsiesiei a Wɔde Yɛ Adwuma",
+  "tutorial.settings.body": "Yɛ sɛnea nsɛm asekyerɛfo no yɛ adwuma wɔ ha no sɛnea wopɛ. Intanɛt so nhyehyɛe ahorow no bi ne kasa a wɔbɔ, nne, ɛnne ne akwan a wɔfa so bɔ. Offline nhyehyeɛ kyerɛ kasa a wɔtumi twe, nkyerɛaseɛ ne kasa a wɔbɔ module ne wɔn tebea. Features gyina mode a wɔapaw ne module ahorow a wɔde ahyɛ mu no so.",
+  "tutorial.microphone.title": "Afiri a wɔde kasa",
+  "tutorial.microphone.body": "Fa afiri a wɔde kasa no kyerɛ kasa ase. Paw wo kasa ahorow, pia afiri a wɔde kasa no so na kasa sɛnea ɛsɛ. Ɔkasa a wobehu no gyina ɔkwan a wɔapaw no so. Ebia ɛho behia sɛ wonya Browser microphone kwan.",
+  "tutorial.online.title": "Intanɛt so mode",
+  "tutorial.online.body": "Saa bɔtn yi paw nkyerɛase a intanɛt na ɛyɛ adwuma. Online mode betumi de cloud kasa a wohu ne nkyerɛase nnwuma a ɛwɔ hɔ adi dwuma. Ɛho hia sɛ wonya intanɛt ne kwan a wɔfa so nya nnwuma no. Mprempren app no ​​bue wɔ Online mode mu.",
+  "tutorial.offline.title": "Ɔkwan a wɔfa so yɛ offline no",
+  "tutorial.offline.body": "Saa bɔtn yi paw mode a wɔahyɛ da ayɛ sɛ wɔde bedi dwuma a intanɛt nni mu. Di kan twe kasa ne ɔkasa module ahorow a wɔhwehwɛ no. Kasa ne nneɛma a ɛwɔ hɔ no gyina module ahorow a wɔde ahyɛ mu so. Kɔ Understood so na wie nnianim asɛm no na bue app no.",
+  "tutorial.next": "Ate aseɛ"
 }

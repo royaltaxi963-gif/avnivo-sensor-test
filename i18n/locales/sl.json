@@ -174,5 +174,16 @@
   "accessibility.download": "Prenos",
   "language.settings.title": "Jezik vmesnika",
   "language.settings.aria": "Izberite jezik vmesnika",
-  "language.settings.note": "Jezik vmesnika je preveden v druge jezike; govorni modeli se ne naložijo znova."
+  "language.settings.note": "Jezik vmesnika je preveden v druge jezike; govorni modeli se ne naložijo znova.",
+  "tutorial.history.title": "Zgodovina klepeta",
+  "tutorial.history.body": "To je vaša zgodovina prevajalskih klepetov. Prejšnji pogovori in prevodi AVNIVO so shranjeni tukaj. Lahko znova odprete in pregledate prejšnje pogovore ali začnete novega.",
+  "tutorial.settings.title": "nastavitve",
+  "tutorial.settings.body": "Tukaj prilagodite, kako deluje prevajalnik. Spletne nastavitve vključujejo predvajanje govora, glasove, tone in sloge. Nastavitve brez povezave prikazujejo prenosljive module za prepoznavanje govora, prevajanje in predvajanje govora ter njihov status. Funkcije so odvisne od izbranega načina in nameščenih modulov.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Uporabite mikrofon za prevajanje govora. Izberite svoje jezike, tapnite mikrofon in govorite normalno. Prepoznavanje govora je odvisno od izbranega načina. Morda bo potrebno dovoljenje za mikrofon brskalnika.",
+  "tutorial.online.title": "Spletni način",
+  "tutorial.online.body": "Ta gumb izbere internetno prevajanje. Spletni način lahko uporablja razpoložljive storitve za prepoznavanje govora in prevajanje v oblaku. Potrebna je internetna povezava in dostop do storitev. Aplikacija se trenutno odpre v spletnem načinu.",
+  "tutorial.offline.title": "Način brez povezave",
+  "tutorial.offline.body": "Ta gumb izbere način, namenjen uporabi brez interneta. Vnaprej prenesite zahtevane jezikovne in govorne module. Razpoložljivi jeziki in funkcije so odvisni od nameščenih modulov. Tapnite Razumem, da dokončate uvod in odklenete aplikacijo.",
+  "tutorial.next": "Razumem"
 }

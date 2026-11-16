@@ -1,11 +1,11 @@
 {
   "generatedFrom": "i18n/locales/*.json",
   "languages": 100,
-  "sourceKeys": 168,
-  "totalKeySlots": 16800,
+  "sourceKeys": 179,
+  "totalKeySlots": 17900,
   "missingKeys": 0,
   "coveragePercent": 100,
-  "identicalToEnglishPercent": 2.25,
+  "identicalToEnglishPercent": 2.17,
   "machineTranslatedLanguages": 99,
   "professionallyReviewedLanguages": 0,
   "requiresHumanReview": [

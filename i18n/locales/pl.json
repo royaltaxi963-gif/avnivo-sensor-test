@@ -174,5 +174,16 @@
   "accessibility.download": "Pobierać",
   "language.settings.title": "Język interfejsu",
   "language.settings.aria": "Wybierz język interfejsu",
-  "language.settings.note": "Język interfejsu jest tłumaczony na inne języki; modele mowy nie są ładowane ponownie."
+  "language.settings.note": "Język interfejsu jest tłumaczony na inne języki; modele mowy nie są ładowane ponownie.",
+  "tutorial.history.title": "Historia czatów",
+  "tutorial.history.body": "To jest historia Twoich rozmów tłumaczeniowych. Tutaj zapisywane są poprzednie rozmowy i tłumaczenia AVNIVO. Możesz ponownie otworzyć i przejrzeć wcześniejsze rozmowy lub rozpocząć nową.",
+  "tutorial.settings.title": "Ustawienia",
+  "tutorial.settings.body": "Dostosuj sposób działania tłumacza tutaj. Ustawienia online obejmują odtwarzanie mowy, głosy, dźwięki i style. Ustawienia offline pokazują możliwe do pobrania moduły rozpoznawania mowy, tłumaczenia i odtwarzania mowy oraz ich status. Funkcje zależą od wybranego trybu i zainstalowanych modułów.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Użyj mikrofonu do tłumaczenia mowy. Wybierz języki, dotknij mikrofonu i mów normalnie. Rozpoznawanie mowy zależy od wybranego trybu. Może być wymagana zgoda na korzystanie z mikrofonu w przeglądarce.",
+  "tutorial.online.title": "Tryb online",
+  "tutorial.online.body": "Ten przycisk wybiera tłumaczenie internetowe. W trybie online można korzystać z dostępnych usług rozpoznawania mowy w chmurze i tłumaczeń. Wymagane jest połączenie z Internetem i dostęp do usług. Aplikacja aktualnie otwiera się w trybie online.",
+  "tutorial.offline.title": "Tryb offline",
+  "tutorial.offline.body": "Ten przycisk wybiera tryb przeznaczony do użytku bez Internetu. Pobierz wcześniej wymagane moduły językowe i mowy. Dostępne języki i funkcje zależą od zainstalowanych modułów. Kliknij Rozumiem, aby zakończyć wprowadzenie i odblokować aplikację.",
+  "tutorial.next": "Zrozumiany"
 }

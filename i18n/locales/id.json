@@ -174,5 +174,16 @@
   "accessibility.download": "Unduh",
   "language.settings.title": "Bahasa antarmuka",
   "language.settings.aria": "Pilih bahasa antarmuka",
-  "language.settings.note": "Bahasa antarmuka diterjemahkan ke bahasa lain; model ucapan tidak dimuat ulang."
+  "language.settings.note": "Bahasa antarmuka diterjemahkan ke bahasa lain; model ucapan tidak dimuat ulang.",
+  "tutorial.history.title": "Riwayat obrolan",
+  "tutorial.history.body": "Ini adalah riwayat obrolan terjemahan Anda. Percakapan dan terjemahan AVNIVO sebelumnya disimpan di sini. Anda dapat membuka kembali dan meninjau percakapan sebelumnya atau memulai percakapan baru.",
+  "tutorial.settings.title": "Pengaturan",
+  "tutorial.settings.body": "Sesuaikan cara kerja penerjemah di sini. Pengaturan online mencakup pemutaran ucapan, suara, nada dan gaya. Pengaturan offline menunjukkan modul pengenalan ucapan, terjemahan dan pemutaran ucapan yang dapat diunduh serta statusnya. Fitur bergantung pada mode yang dipilih dan modul yang dipasang.",
+  "tutorial.microphone.title": "Mikropon",
+  "tutorial.microphone.body": "Gunakan mikrofon untuk menerjemahkan ucapan. Pilih bahasa Anda, ketuk mikrofon dan bicaralah secara normal. Pengenalan ucapan tergantung pada mode yang dipilih. Izin mikrofon browser mungkin diperlukan.",
+  "tutorial.online.title": "Modus daring",
+  "tutorial.online.body": "Tombol ini memilih terjemahan yang didukung internet. Mode online dapat menggunakan layanan pengenalan suara dan terjemahan cloud yang tersedia. Koneksi internet dan akses ke layanan diperlukan. Aplikasi saat ini terbuka dalam mode Online.",
+  "tutorial.offline.title": "Modus luring",
+  "tutorial.offline.body": "Tombol ini memilih mode yang dimaksudkan untuk digunakan tanpa internet. Unduh modul bahasa dan ucapan yang diperlukan terlebih dahulu. Bahasa dan fitur yang tersedia bergantung pada modul yang diinstal. Ketuk Dipahami untuk menyelesaikan perkenalan dan membuka kunci aplikasi.",
+  "tutorial.next": "Dipahami"
 }

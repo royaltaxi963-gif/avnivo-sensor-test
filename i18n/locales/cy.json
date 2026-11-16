@@ -174,5 +174,16 @@
   "accessibility.download": "Lawrlwythwch",
   "language.settings.title": "Iaith rhyngwyneb",
   "language.settings.aria": "Dewiswch iaith rhyngwyneb",
-  "language.settings.note": "Mae iaith y rhyngwyneb yn cael ei chyfieithu i ieithoedd eraill; nid yw modelau lleferydd yn cael eu hail-lwytho."
+  "language.settings.note": "Mae iaith y rhyngwyneb yn cael ei chyfieithu i ieithoedd eraill; nid yw modelau lleferydd yn cael eu hail-lwytho.",
+  "tutorial.history.title": "Hanes sgwrsio",
+  "tutorial.history.body": "Dyma eich hanes sgwrsio cyfieithu. Mae sgyrsiau a chyfieithiadau AVNIVO blaenorol yn cael eu cadw yma. Gallwch ailagor ac adolygu sgyrsiau cynharach neu ddechrau un newydd.",
+  "tutorial.settings.title": "Gosodiadau",
+  "tutorial.settings.body": "Addaswch sut mae'r cyfieithydd yn gweithio yma. Mae gosodiadau ar-lein yn cynnwys chwarae lleferydd, lleisiau, tonau ac arddulliau. Mae gosodiadau all-lein yn dangos modiwlau adnabod lleferydd, cyfieithu a chwarae lleferydd y gellir eu lawrlwytho a'u statws. Mae nodweddion yn dibynnu ar y modd a ddewiswyd a'r modiwlau gosod.",
+  "tutorial.microphone.title": "Meicroffon",
+  "tutorial.microphone.body": "Defnyddiwch y meicroffon i gyfieithu lleferydd. Dewiswch eich ieithoedd, tapiwch y meicroffon a siaradwch yn normal. Mae adnabod lleferydd yn dibynnu ar y modd a ddewiswyd. Efallai y bydd angen caniatâd meicroffon porwr.",
+  "tutorial.online.title": "Modd ar-lein",
+  "tutorial.online.body": "Mae'r botwm hwn yn dewis cyfieithu wedi'i bweru gan y rhyngrwyd. Gall modd ar-lein ddefnyddio gwasanaethau adnabod llais cwmwl a chyfieithu sydd ar gael. Mae angen cysylltiad rhyngrwyd a mynediad at y gwasanaethau. Mae'r ap yn agor yn y modd Ar-lein ar hyn o bryd.",
+  "tutorial.offline.title": "Modd all-lein",
+  "tutorial.offline.body": "Mae'r botwm hwn yn dewis y modd y bwriedir ei ddefnyddio heb rhyngrwyd. Lawrlwythwch y modiwlau iaith a lleferydd gofynnol ymlaen llaw. Mae'r ieithoedd a'r nodweddion sydd ar gael yn dibynnu ar fodiwlau sydd wedi'u gosod. Tap Understood i orffen y cyflwyniad a datgloi'r app.",
+  "tutorial.next": "Wedi deall"
 }

@@ -174,5 +174,16 @@
   "accessibility.download": "Laadi alla",
   "language.settings.title": "Liidese keel",
   "language.settings.aria": "Valige liidese keel",
-  "language.settings.note": "Liidese keel tõlgitakse teistesse keeltesse; kõnemudeleid ei laadita uuesti."
+  "language.settings.note": "Liidese keel tõlgitakse teistesse keeltesse; kõnemudeleid ei laadita uuesti.",
+  "tutorial.history.title": "Vestluse ajalugu",
+  "tutorial.history.body": "See on teie tõlkevestluse ajalugu. Siia salvestatakse varasemad AVNIVO vestlused ja tõlked. Saate uuesti avada ja üle vaadata varasemad vestlused või alustada uut.",
+  "tutorial.settings.title": "Seaded",
+  "tutorial.settings.body": "Kohandage siin tõlkija tööd. Võrguseaded hõlmavad kõne taasesitust, hääli, helinaid ja stiile. Võrguühenduseta seaded näitavad allalaaditavaid kõnetuvastuse, tõlke ja kõne taasesituse mooduleid ja nende olekut. Funktsioonid sõltuvad valitud režiimist ja paigaldatud moodulitest.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Kasutage kõne tõlkimiseks mikrofoni. Valige oma keeled, puudutage mikrofoni ja rääkige tavapäraselt. Kõnetuvastus sõltub valitud režiimist. Vaja võib olla brauseri mikrofoni luba.",
+  "tutorial.online.title": "Võrgurežiim",
+  "tutorial.online.body": "See nupp valib Interneti-põhise tõlke. Võrgurežiimis saab kasutada saadaolevaid pilvekõnetuvastus- ja tõlketeenuseid. Vajalik on Interneti-ühendus ja juurdepääs teenustele. Rakendus avaneb praegu võrgurežiimis.",
+  "tutorial.offline.title": "Võrguühenduseta režiim",
+  "tutorial.offline.body": "See nupp valib režiimi, mis on mõeldud kasutamiseks ilma Internetita. Laadige eelnevalt alla vajalikud keele- ja kõnemoodulid. Saadaolevad keeled ja funktsioonid sõltuvad installitud moodulitest. Sissejuhatuse lõpetamiseks ja rakenduse avamiseks puudutage Arusaadav.",
+  "tutorial.next": "Arusaadav"
 }

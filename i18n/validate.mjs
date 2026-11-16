@@ -113,6 +113,99 @@ check('machine-translation-marked',
   perLanguage.filter((l) => l.code !== 'en').every((l) => l.machine === true),
   'all non-English packages marked machineTranslated');
 
+// --- Onboarding tutorial coverage ---------------------------------------
+// Every package must carry the full five-step tutorial (11 tutorial.* keys),
+// in the language's own script, with no English left in place as if finished.
+const tutorialKeys = sourceKeys.filter((k) => k.startsWith('tutorial.'));
+const tutorialMissing = [];
+const tutorialEnglishLeft = [];
+const tutorialScriptMismatch = [];
+
+// Classify the writing systems a string uses. Shared punctuation is stripped
+// first: the danda "।" lives in the Devanagari block but is also used by
+// Bengali, Gurmukhi and others, so counting it would misclassify those scripts.
+// A language's tutorial text must share a script with the scripts its existing
+// interface strings already use, which catches a block pasted in the wrong
+// language without hardcoding per-language expectations (a language may
+// legitimately use a script its code does not imply, e.g. Kurdish in Latin).
+const SCRIPT_TESTS = [
+  ['arabic', /[\u0600-\u06FF\u0750-\u077F\u0780-\u07BF]/],
+  ['hebrew', /[\u0590-\u05FF]/],
+  ['cyrillic', /[\u0400-\u04FF\u0500-\u052F]/],
+  ['greek', /[\u0370-\u03FF\u1F00-\u1FFF]/],
+  ['armenian', /[\u0530-\u058F]/],
+  ['georgian', /[\u10A0-\u10FF]/],
+  ['devanagari', /[\u0900-\u097F]/],
+  ['bengali', /[\u0980-\u09FF]/],
+  ['gurmukhi', /[\u0A00-\u0A7F]/],
+  ['gujarati', /[\u0A80-\u0AFF]/],
+  ['tamil', /[\u0B80-\u0BFF]/],
+  ['telugu', /[\u0C00-\u0C7F]/],
+  ['kannada', /[\u0C80-\u0CFF]/],
+  ['malayalam', /[\u0D00-\u0D7F]/],
+  ['sinhala', /[\u0D80-\u0DFF]/],
+  ['thai', /[\u0E00-\u0E7F]/],
+  ['lao', /[\u0E80-\u0EFF]/],
+  ['tibetan', /[\u0F00-\u0FFF]/],
+  ['myanmar', /[\u1000-\u109F]/],
+  ['ethiopic', /[\u1200-\u137F]/],
+  ['khmer', /[\u1780-\u17FF]/],
+  ['han', /[\u4E00-\u9FFF\u3400-\u4DBF]/],
+  ['kana', /[\u3040-\u30FF]/],
+  ['hangul', /[\uAC00-\uD7AF\u1100-\u11FF]/],
+];
+const SHARED_PUNCT = /[।॥\u0964\u0965\u061F\u060C\u060D.,;:!?'"`()[\]{}\-–—…«»„“”‘’·]/g;
+function scriptsIn(text) {
+  const set = new Set();
+  for (const ch of String(text).replace(SHARED_PUNCT, '')) {
+    let matched = false;
+    for (const [name, re] of SCRIPT_TESTS) {
+      if (re.test(ch)) { set.add(name); matched = true; break; }
+    }
+    if (!matched && /[A-Za-z]/.test(ch)) set.add('latin');
+  }
+  return set;
+}
+
+for (const lang of languages) {
+  const data = JSON.parse(readFileSync(join(root, 'locales', `${lang.code}.json`), 'utf8'));
+  for (const key of tutorialKeys) {
+    if (!(key in data) || String(data[key]).trim() === '') {
+      tutorialMissing.push(`${lang.code}:${key}`);
+    }
+  }
+  // Non-English packages must not simply repeat the English source text.
+  if (lang.code !== 'en') {
+    for (const key of tutorialKeys) {
+      if (data[key] === source[key] && source[key].length > 3) {
+        tutorialEnglishLeft.push(`${lang.code}:${key}`);
+      }
+    }
+  }
+  // The tutorial text must share a script with the language's existing strings.
+  // Latin is ignored: Latin text is shared and cannot be told apart from
+  // English by script alone (English-left is already covered above).
+  const known = new Set();
+  for (const key of Object.keys(data)) {
+    if (key.startsWith('_') || key.startsWith('tutorial.')) continue;
+    for (const s of scriptsIn(data[key])) if (s !== 'latin') known.add(s);
+  }
+  if (known.size === 0) continue; // a Latin-script package
+  for (const key of tutorialKeys) {
+    const scripts = scriptsIn(data[key]);
+    const shared = [...scripts].some((s) => known.has(s));
+    if (data[key] && !shared) {
+      tutorialScriptMismatch.push(`${lang.code}:${key} scripts=[${[...scripts]}] not in [${[...known]}]`);
+    }
+  }
+}
+check('tutorial-keys-complete', tutorialMissing.length === 0,
+  `keys=${tutorialKeys.length} languages=${languages.length} missing=${tutorialMissing.length}`);
+check('tutorial-not-english-placeholder', tutorialEnglishLeft.length === 0,
+  `english-left=${tutorialEnglishLeft.length}`);
+check('tutorial-script-consistency', tutorialScriptMismatch.length === 0,
+  `mismatches=${tutorialScriptMismatch.length}`);
+
 const failed = results.filter((r) => !r.passed);
 for (const r of results) {
   console.log(`${r.passed ? 'PASS' : 'FAIL'}  ${r.name}  (${r.detail})`);

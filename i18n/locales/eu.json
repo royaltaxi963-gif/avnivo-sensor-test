@@ -174,5 +174,16 @@
   "accessibility.download": "Deskargatu",
   "language.settings.title": "Interfaze hizkuntza",
   "language.settings.aria": "Hautatu interfazearen hizkuntza",
-  "language.settings.note": "Interfaze hizkuntza beste hizkuntza batzuetara itzulita dago; hizketa-ereduak ez dira birkargatzen."
+  "language.settings.note": "Interfaze hizkuntza beste hizkuntza batzuetara itzulita dago; hizketa-ereduak ez dira birkargatzen.",
+  "tutorial.history.title": "Txat-historia",
+  "tutorial.history.body": "Hau da zure itzulpen txat historia. Aurreko AVNIVO elkarrizketak eta itzulpenak hemen gordetzen dira. Lehenagoko elkarrizketak berriro ireki eta berrikus ditzakezu edo berri bat has dezakezu.",
+  "tutorial.settings.title": "Ezarpenak",
+  "tutorial.settings.body": "Pertsonalizatu hemen itzultzaileak nola lan egiten duen. Lineako ezarpenen artean, ahots-erreprodukzioa, ahotsak, tonuak eta estiloak daude. Lineaz kanpoko ezarpenek hizketa-ezagutze-, itzulpen- eta ahots-erreproduzitzeko moduluak eta haien egoera erakusten dituzte. Ezaugarriak hautatutako moduaren eta instalatutako moduluen araberakoak dira.",
+  "tutorial.microphone.title": "Mikrofonoa",
+  "tutorial.microphone.body": "Erabili mikrofonoa hizketa itzultzeko. Aukeratu hizkuntzak, sakatu mikrofonoa eta hitz egin normal. Ahots-ezagutzea hautatutako moduaren araberakoa da. Baliteke arakatzailearen mikrofonoaren baimena behar izatea.",
+  "tutorial.online.title": "Lineako modua",
+  "tutorial.online.body": "Botoi honek Internet bidezko itzulpena hautatzen du. Lineako moduan erabilgarri dauden hodeiko hizketa-ezagutze eta itzulpen-zerbitzuak erabil ditzake. Interneteko konexioa eta zerbitzuetarako sarbidea behar dira. Une honetan aplikazioa lineako moduan irekitzen da.",
+  "tutorial.offline.title": "Lineaz kanpoko modua",
+  "tutorial.offline.body": "Botoi honek Internet gabe erabiltzeko modua hautatzen du. Deskargatu behar diren hizkuntza eta hizkera moduluak aldez aurretik. Eskuragarri dauden hizkuntzak eta eginbideak instalatutako moduluen araberakoak dira. Sakatu Ulertua aurkezpena amaitzeko eta aplikazioa desblokeatzeko.",
+  "tutorial.next": "Ulertua"
 }

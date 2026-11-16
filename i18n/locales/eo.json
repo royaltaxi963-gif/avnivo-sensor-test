@@ -174,5 +174,16 @@
   "accessibility.download": "Elŝutu",
   "language.settings.title": "Interfaco lingvo",
   "language.settings.aria": "Elektu interfaclingvon",
-  "language.settings.note": "La interfaca lingvo estas tradukita al aliaj lingvoj; parolmodeloj ne estas reŝargitaj."
+  "language.settings.note": "La interfaca lingvo estas tradukita al aliaj lingvoj; parolmodeloj ne estas reŝargitaj.",
+  "tutorial.history.title": "Babilhistorio",
+  "tutorial.history.body": "Jen via tradukbabilhistorio. Antaŭaj AVNIVO-konversacioj kaj tradukoj estas konservitaj ĉi tie. Vi povas remalfermi kaj revizii pli fruajn konversaciojn aŭ komenci novan.",
+  "tutorial.settings.title": "Agordoj",
+  "tutorial.settings.body": "Agordu kiel la tradukisto funkcias ĉi tie. Enretaj agordoj inkluzivas parolreproduktadon, voĉojn, tonojn kaj stilojn. Senretaj agordoj montras elŝuteblajn modulojn pri rekono de parolo, tradukado kaj reproduktado de paroloj kaj ilian staton. Trajtoj dependas de la elektita reĝimo kaj instalitaj moduloj.",
+  "tutorial.microphone.title": "Mikrofono",
+  "tutorial.microphone.body": "Uzu la mikrofonon por traduki parolon. Elektu viajn lingvojn, frapu la mikrofonon kaj parolu normale. Parola rekono dependas de la elektita reĝimo. Eble necesas permeso de retumila mikrofono.",
+  "tutorial.online.title": "Reĝimo interreta",
+  "tutorial.online.body": "Ĉi tiu butono elektas interretan tradukon. Enreta reĝimo povas uzi disponeblajn nubajn parolrekonon kaj tradukservojn. Interreta konekto kaj aliro al la servoj estas postulataj. La programo nuntempe malfermiĝas en Reta reĝimo.",
+  "tutorial.offline.title": "Senreta reĝimo",
+  "tutorial.offline.body": "Ĉi tiu butono elektas la reĝimon celitan por uzi sen interreto. Elŝutu la postulatajn lingvo- kaj parolmodulojn anticipe. Disponeblaj lingvoj kaj funkcioj dependas de instalitaj moduloj. Frapu Komprenita por fini la enkondukon kaj malŝlosi la apon.",
+  "tutorial.next": "Komprenita"
 }

@@ -174,5 +174,16 @@
   "accessibility.download": "Shkarkoni",
   "language.settings.title": "Gjuha e ndërfaqes",
   "language.settings.aria": "Zgjidhni gjuhën e ndërfaqes",
-  "language.settings.note": "Gjuha e ndërfaqes përkthehet në gjuhë të tjera; modelet e të folurit nuk ringarkohen."
+  "language.settings.note": "Gjuha e ndërfaqes përkthehet në gjuhë të tjera; modelet e të folurit nuk ringarkohen.",
+  "tutorial.history.title": "Historia e bisedës",
+  "tutorial.history.body": "Ky është historia juaj e bisedës së përkthimit. Bisedat dhe përkthimet e mëparshme AVNIVO ruhen këtu. Mund të rihapni dhe rishikoni bisedat e mëparshme ose të filloni një të re.",
+  "tutorial.settings.title": "Cilësimet",
+  "tutorial.settings.body": "Personalizo se si funksionon përkthyesi këtu. Cilësimet në linjë përfshijnë riprodhimin e të folurit, zërat, tonet dhe stilet. Cilësimet jashtë linje tregojnë njohjen e të folurit të shkarkueshëm, përkthimin dhe riprodhimin e të folurit dhe statusin e tyre. Veçoritë varen nga mënyra e zgjedhur dhe modulet e instaluara.",
+  "tutorial.microphone.title": "Mikrofoni",
+  "tutorial.microphone.body": "Përdorni mikrofonin për të përkthyer fjalimin. Zgjidhni gjuhët tuaja, prekni mikrofonin dhe flisni normalisht. Njohja e të folurit varet nga mënyra e zgjedhur. Mund të kërkohet leja e mikrofonit të shfletuesit.",
+  "tutorial.online.title": "Modaliteti në internet",
+  "tutorial.online.body": "Ky buton zgjedh përkthimin e mundësuar nga interneti. Modaliteti në linjë mund të përdorë shërbimet e disponueshme të njohjes së të folurit dhe përkthimit në renë kompjuterike. Kërkohet një lidhje interneti dhe akses në shërbimet. Aplikacioni aktualisht hapet në modalitetin Online.",
+  "tutorial.offline.title": "Modaliteti jashtë linje",
+  "tutorial.offline.body": "Ky buton zgjedh modalitetin e destinuar për përdorim pa internet. Shkarkoni paraprakisht modulet e kërkuara të gjuhës dhe të të folurit. Gjuhët dhe veçoritë e disponueshme varen nga modulet e instaluara. Prekni Kuptohet për të përfunduar prezantimin dhe për të zhbllokuar aplikacionin.",
+  "tutorial.next": "Kuptohet"
 }

@@ -174,5 +174,16 @@
   "accessibility.download": "Lejupielādēt",
   "language.settings.title": "Interfeisa valoda",
   "language.settings.aria": "Izvēlieties interfeisa valodu",
-  "language.settings.note": "Interfeisa valoda tiek tulkota citās valodās; runas modeļi netiek pārlādēti."
+  "language.settings.note": "Interfeisa valoda tiek tulkota citās valodās; runas modeļi netiek pārlādēti.",
+  "tutorial.history.title": "Tērzēšanas vēsture",
+  "tutorial.history.body": "Šī ir jūsu tulkošanas tērzēšanas vēsture. Šeit tiek saglabātas iepriekšējās AVNIVO sarunas un tulkojumi. Varat atkārtoti atvērt un pārskatīt iepriekšējās sarunas vai sākt jaunu.",
+  "tutorial.settings.title": "Iestatījumi",
+  "tutorial.settings.body": "Pielāgojiet tulkotāja darbu šeit. Tiešsaistes iestatījumi ietver runas atskaņošanu, balsis, signālus un stilus. Bezsaistes iestatījumos tiek rādīti lejupielādējami runas atpazīšanas, tulkošanas un runas atskaņošanas moduļi un to statuss. Funkcijas ir atkarīgas no izvēlētā režīma un instalētajiem moduļiem.",
+  "tutorial.microphone.title": "Mikrofons",
+  "tutorial.microphone.body": "Izmantojiet mikrofonu, lai tulkotu runu. Izvēlieties savas valodas, pieskarieties mikrofonam un runājiet kā parasti. Runas atpazīšana ir atkarīga no izvēlētā režīma. Var būt nepieciešama pārlūkprogrammas mikrofona atļauja.",
+  "tutorial.online.title": "Tiešsaistes režīms",
+  "tutorial.online.body": "Šī poga atlasa ar internetu nodrošināto tulkojumu. Tiešsaistes režīmā var izmantot pieejamos mākoņa runas atpazīšanas un tulkošanas pakalpojumus. Nepieciešams interneta pieslēgums un piekļuve pakalpojumiem. Programma pašlaik tiek atvērta tiešsaistes režīmā.",
+  "tutorial.offline.title": "Bezsaistes režīms",
+  "tutorial.offline.body": "Šī poga atlasa režīmu, kas paredzēts lietošanai bez interneta. Iepriekš lejupielādējiet nepieciešamos valodas un runas moduļus. Pieejamās valodas un līdzekļi ir atkarīgi no instalētajiem moduļiem. Pieskarieties Saprasts, lai pabeigtu ievadu un atbloķētu lietotni.",
+  "tutorial.next": "Saprata"
 }

@@ -174,5 +174,16 @@
   "accessibility.download": "İndirmek",
   "language.settings.title": "Arayüz dili",
   "language.settings.aria": "Arayüz dilini seçin",
-  "language.settings.note": "Arayüz dili diğer dillere çevrilmiştir; konuşma modelleri yeniden yüklenmez."
+  "language.settings.note": "Arayüz dili diğer dillere çevrilmiştir; konuşma modelleri yeniden yüklenmez.",
+  "tutorial.history.title": "Sohbet geçmişi",
+  "tutorial.history.body": "Bu sizin çeviri sohbet geçmişinizdir. Önceki AVNIVO konuşmaları ve çevirileri buraya kaydedilir. Önceki görüşmeleri yeniden açıp inceleyebilir veya yeni bir görüşme başlatabilirsiniz.",
+  "tutorial.settings.title": "Ayarlar",
+  "tutorial.settings.body": "Çevirmenin çalışma şeklini burada özelleştirin. Çevrimiçi ayarlar arasında konuşmanın oynatılması, sesler, tonlar ve stiller bulunur. Çevrimdışı ayarlar indirilebilir konuşma tanıma, çeviri ve konuşma çalma modüllerini ve bunların durumlarını gösterir. Özellikler seçilen moda ve kurulu modüllere bağlıdır.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Konuşmayı tercüme etmek için mikrofonu kullanın. Dillerinizi seçin, mikrofona dokunun ve normal şekilde konuşun. Konuşma tanıma seçilen moda bağlıdır. Tarayıcı mikrofonunun izni gerekebilir.",
+  "tutorial.online.title": "Çevrimiçi mod",
+  "tutorial.online.body": "Bu düğme internet destekli çeviriyi seçer. Çevrimiçi mod, mevcut bulut konuşma tanıma ve çeviri hizmetlerini kullanabilir. İnternet bağlantısı ve hizmetlere erişim gereklidir. Uygulama şu anda Çevrimiçi modda açılıyor.",
+  "tutorial.offline.title": "Çevrimdışı mod",
+  "tutorial.offline.body": "Bu düğme internet olmadan kullanılması amaçlanan modu seçer. Gerekli dil ve konuşma modüllerini önceden indirin. Kullanılabilir diller ve özellikler kurulu modüllere bağlıdır. Tanıtımı bitirmek ve uygulamanın kilidini açmak için Anlaşıldı'ya dokunun.",
+  "tutorial.next": "Anlaşıldı"
 }

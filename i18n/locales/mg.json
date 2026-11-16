@@ -174,5 +174,16 @@
   "accessibility.download": "DOWNLOAD",
   "language.settings.title": "Fiteny interface tsara",
   "language.settings.aria": "Safidio ny fiteny interface",
-  "language.settings.note": "Ny fiteny interface dia adika amin'ny fiteny hafa; tsy averina alefa ny maodely kabary."
+  "language.settings.note": "Ny fiteny interface dia adika amin'ny fiteny hafa; tsy averina alefa ny maodely kabary.",
+  "tutorial.history.title": "Tantaran'ny chat",
+  "tutorial.history.body": "Ity ny tantaran'ny chat fandikana anao. Tehirizina eto ny resaka sy ny dikanteny AVNIVO teo aloha. Azonao atao ny manokatra sy mamerina mijery resaka taloha na manomboka resaka vaovao.",
+  "tutorial.settings.title": "Fikirana",
+  "tutorial.settings.body": "Amboary ny fomba fiasan'ny mpandika teny eto. Ny fandrindrana an-tserasera dia ahitana ny famerenana ny kabary, ny feo, ny tonony ary ny fomba. Ny kira an-tserasera dia mampiseho ny faneken'ny kabary azo alaina, ny dikanteny ary ny maody famerenan'ny kabary ary ny satany. Ny endri-javatra dia miankina amin'ny fomba voafantina sy ny maody napetraka.",
+  "tutorial.microphone.title": "mikrô",
+  "tutorial.microphone.body": "Ampiasao ny mikrô handika teny. Fidio ny fiteninao, tsindrio ny mikrô ary miteny ara-dalàna. Miankina amin'ny fomba nofantenana ny fanekena kabary. Mety ilaina ny fahazoan-dàlana mikrofon'ny navigateur.",
+  "tutorial.online.title": "Fomba an-tserasera",
+  "tutorial.online.body": "Ity bokotra ity dia mifidy dikanteny mandeha amin'ny Internet. Ny maodely an-tserasera dia afaka mampiasa serivisy famantarana sy fandikan-teny rahona misy. Ilaina ny fifandraisana Internet sy ny fidirana amin'ny serivisy. Misokatra amin'ny fomba an-tserasera amin'izao fotoana izao ny fampiharana.",
+  "tutorial.offline.title": "Fomba an-tserasera",
+  "tutorial.offline.body": "Ity bokotra ity dia misafidy ny fomba ampiasaina tsy misy Internet. Ampidino mialoha ny maody fiteny sy fiteny ilaina. Ny fiteny sy ny endri-javatra misy dia miankina amin'ny maody napetraka. Tsindrio ny Understood hamita ny fampidirana sy hamaha ny fampiharana.",
+  "tutorial.next": "nahatakatra"
 }

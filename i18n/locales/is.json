@@ -174,5 +174,16 @@
   "accessibility.download": "Sækja",
   "language.settings.title": "Tungumál viðmóts",
   "language.settings.aria": "Veldu tungumál viðmóts",
-  "language.settings.note": "Viðmótsmálið er þýtt á önnur tungumál; tallíkön eru ekki endurhlaðin."
+  "language.settings.note": "Viðmótsmálið er þýtt á önnur tungumál; tallíkön eru ekki endurhlaðin.",
+  "tutorial.history.title": "Spjallferill",
+  "tutorial.history.body": "Þetta er þýðingarspjallferillinn þinn. Fyrri AVNIVO samtöl og þýðingar eru vistaðar hér. Þú getur opnað aftur og farið yfir fyrri samtöl eða byrjað nýtt.",
+  "tutorial.settings.title": "Stillingar",
+  "tutorial.settings.body": "Sérsníddu hvernig þýðandinn virkar hér. Stillingar á netinu innihalda talspilun, raddir, tóna og stíl. Ótengdar stillingar sýna talgreiningar-, þýðingar- og talspilunareiningar sem hægt er að hlaða niður og stöðu þeirra. Eiginleikar eru háðir völdum ham og uppsettum einingum.",
+  "tutorial.microphone.title": "Hljóðnemi",
+  "tutorial.microphone.body": "Notaðu hljóðnemann til að þýða tal. Veldu tungumál, bankaðu á hljóðnemann og talaðu venjulega. Talgreining fer eftir valinni stillingu. Leyfi fyrir hljóðnema vafra gæti þurft.",
+  "tutorial.online.title": "Online háttur",
+  "tutorial.online.body": "Þessi hnappur velur netknúna þýðingu. Netstilling getur notað tiltæka talgreiningar- og þýðingarþjónustu í skýinu. Nauðsynlegt er að hafa nettengingu og aðgang að þjónustunni. Forritið opnast sem stendur í netham.",
+  "tutorial.offline.title": "Ótengdur háttur",
+  "tutorial.offline.body": "Þessi hnappur velur þann hátt sem ætlaður er til notkunar án internets. Hladdu niður nauðsynlegum tungumála- og taleiningum fyrirfram. Tiltæk tungumál og eiginleikar ráðast af uppsettum einingum. Bankaðu á Skilið til að klára kynninguna og opna forritið.",
+  "tutorial.next": "Skildi"
 }

@@ -174,5 +174,16 @@
   "accessibility.download": "Descargar",
   "language.settings.title": "Idioma de la interfaz",
   "language.settings.aria": "Seleccionar idioma de interfaz",
-  "language.settings.note": "El idioma de la interfaz se traduce a otros idiomas; Los modelos de voz no se recargan."
+  "language.settings.note": "El idioma de la interfaz se traduce a otros idiomas; Los modelos de voz no se recargan.",
+  "tutorial.history.title": "Historial de chat",
+  "tutorial.history.body": "Este es tu historial de chat de traducción. Las conversaciones y traducciones anteriores de AVNIVO se guardan aquí. Puede reabrir y revisar conversaciones anteriores o iniciar una nueva.",
+  "tutorial.settings.title": "Ajustes",
+  "tutorial.settings.body": "Personaliza cómo funciona el traductor aquí. La configuración en línea incluye reproducción de voz, voces, tonos y estilos. La configuración sin conexión muestra los módulos descargables de reconocimiento de voz, traducción y reproducción de voz y su estado. Las características dependen del modo seleccionado y de los módulos instalados.",
+  "tutorial.microphone.title": "Micrófono",
+  "tutorial.microphone.body": "Utilice el micrófono para traducir el habla. Elige tus idiomas, toca el micrófono y habla normalmente. El reconocimiento de voz depende del modo seleccionado. Es posible que se requiera permiso del micrófono del navegador.",
+  "tutorial.online.title": "Modo en línea",
+  "tutorial.online.body": "Este botón selecciona la traducción basada en Internet. El modo en línea puede utilizar los servicios de traducción y reconocimiento de voz disponibles en la nube. Se requiere conexión a Internet y acceso a los servicios. La aplicación actualmente se abre en modo en línea.",
+  "tutorial.offline.title": "Modo sin conexión",
+  "tutorial.offline.body": "Este botón selecciona el modo previsto para su uso sin Internet. Descargue los módulos de lenguaje y habla requeridos con anticipación. Los idiomas y funciones disponibles dependen de los módulos instalados. Toque Entendido para finalizar la introducción y desbloquear la aplicación.",
+  "tutorial.next": "Comprendido"
 }

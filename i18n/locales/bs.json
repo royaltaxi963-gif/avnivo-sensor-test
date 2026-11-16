@@ -174,5 +174,16 @@
   "accessibility.download": "Preuzmi",
   "language.settings.title": "Jezik interfejsa",
   "language.settings.aria": "Odaberite jezik interfejsa",
-  "language.settings.note": "Jezik interfejsa je preveden na druge jezike; govorni modeli se ne učitavaju ponovo."
+  "language.settings.note": "Jezik interfejsa je preveden na druge jezike; govorni modeli se ne učitavaju ponovo.",
+  "tutorial.history.title": "Istorija ćaskanja",
+  "tutorial.history.body": "Ovo je vaša historija razgovora o prijevodu. Ovdje se čuvaju prethodni AVNIVO razgovori i prijevodi. Možete ponovo otvoriti i pregledati ranije razgovore ili započeti novi.",
+  "tutorial.settings.title": "Postavke",
+  "tutorial.settings.body": "Ovdje prilagodite način na koji prevodilac radi. Postavke na mreži uključuju reprodukciju govora, glasove, tonove i stilove. Postavke van mreže prikazuju module za prepoznavanje govora, prijevod i reprodukciju govora koji se mogu preuzeti i njihov status. Karakteristike zavise od odabranog načina rada i instaliranih modula.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Koristite mikrofon za prevođenje govora. Odaberite jezike, dodirnite mikrofon i govorite normalno. Prepoznavanje govora ovisi o odabranom načinu rada. Možda će biti potrebna dozvola za mikrofon pretraživača.",
+  "tutorial.online.title": "Online mod",
+  "tutorial.online.body": "Ovo dugme odabire prevod na Internetu. Online način rada može koristiti dostupne usluge za prepoznavanje govora i prevođenje u oblaku. Potrebna je internetska veza i pristup uslugama. Aplikacija se trenutno otvara u Online modu.",
+  "tutorial.offline.title": "Offline način rada",
+  "tutorial.offline.body": "Ovo dugme odabire način rada koji je namijenjen za korištenje bez interneta. Unaprijed preuzmite potrebne jezičke i govorne module. Dostupni jezici i funkcije zavise od instaliranih modula. Dodirnite Razumem da završite uvod i otključate aplikaciju.",
+  "tutorial.next": "Razumijem"
 }

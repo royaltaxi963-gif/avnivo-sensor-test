@@ -174,5 +174,16 @@
   "accessibility.download": "Laai af",
   "language.settings.title": "Interface taal",
   "language.settings.aria": "Kies koppelvlaktaal",
-  "language.settings.note": "Die koppelvlaktaal word in ander tale vertaal; spraakmodelle word nie herlaai nie."
+  "language.settings.note": "Die koppelvlaktaal word in ander tale vertaal; spraakmodelle word nie herlaai nie.",
+  "tutorial.history.title": "Kletsgeskiedenis",
+  "tutorial.history.body": "Dit is jou vertaalkletsgeskiedenis. Vorige AVNIVO-gesprekke en vertalings word hier gestoor. Jy kan vroeëre gesprekke heropen en hersien of 'n nuwe een begin.",
+  "tutorial.settings.title": "Instellings",
+  "tutorial.settings.body": "Pas hoe die vertaler hier werk. Aanlyninstellings sluit spraakweergawe, stemme, toon en style in. Vanlyn instellings wys aflaaibare spraakherkenning, vertaling en spraakterugspeel modules en hul status. Kenmerke hang af van die geselekteerde modus en geïnstalleerde modules.",
+  "tutorial.microphone.title": "Mikrofoon",
+  "tutorial.microphone.body": "Gebruik die mikrofoon om spraak te vertaal. Kies jou tale, tik die mikrofoon en praat normaal. Spraakherkenning hang af van die geselekteerde modus. Blaaiermikrofoontoestemming word dalk vereis.",
+  "tutorial.online.title": "Aanlyn modus",
+  "tutorial.online.body": "Hierdie knoppie kies internetgedrewe vertaling. Aanlynmodus kan beskikbare wolkspraakherkenning en vertaaldienste gebruik. 'n Internetverbinding en toegang tot die dienste word vereis. Die toepassing maak tans in Aanlynmodus oop.",
+  "tutorial.offline.title": "Vanlyn modus",
+  "tutorial.offline.body": "Hierdie knoppie kies die modus wat bedoel is vir gebruik sonder internet. Laai vooraf die vereiste taal- en spraakmodules af. Beskikbare tale en kenmerke hang af van geïnstalleerde modules. Tik Verstaan ​​om die inleiding te voltooi en die toepassing te ontsluit.",
+  "tutorial.next": "Verstaan"
 }

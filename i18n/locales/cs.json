@@ -174,5 +174,16 @@
   "accessibility.download": "Stáhnout",
   "language.settings.title": "Jazyk rozhraní",
   "language.settings.aria": "Vyberte jazyk rozhraní",
-  "language.settings.note": "Jazyk rozhraní je přeložen do jiných jazyků; řečové modely nejsou znovu načteny."
+  "language.settings.note": "Jazyk rozhraní je přeložen do jiných jazyků; řečové modely nejsou znovu načteny.",
+  "tutorial.history.title": "Historie chatu",
+  "tutorial.history.body": "Toto je historie vašeho překladového chatu. Předchozí konverzace a překlady AVNIVO se ukládají zde. Můžete znovu otevřít a zkontrolovat dřívější konverzace nebo začít novou.",
+  "tutorial.settings.title": "Nastavení",
+  "tutorial.settings.body": "Zde si přizpůsobte, jak překladač funguje. Online nastavení zahrnují přehrávání řeči, hlasy, tóny a styly. Offline nastavení zobrazuje ke stažení moduly pro rozpoznávání řeči, překlad a přehrávání řeči a jejich stav. Funkce závisí na zvoleném režimu a nainstalovaných modulech.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "K překladu řeči použijte mikrofon. Vyberte si jazyky, klepněte na mikrofon a mluvte normálně. Rozpoznávání řeči závisí na zvoleném režimu. Může být vyžadováno oprávnění k mikrofonu prohlížeče.",
+  "tutorial.online.title": "Online režim",
+  "tutorial.online.body": "Toto tlačítko vybírá internetový překlad. Online režim může využívat dostupné cloudové rozpoznávání řeči a překladatelské služby. Je vyžadováno připojení k internetu a přístup ke službám. Aplikace se aktuálně otevírá v režimu online.",
+  "tutorial.offline.title": "Offline režim",
+  "tutorial.offline.body": "Toto tlačítko vybírá režim určený pro použití bez internetu. Předem si stáhněte požadované jazykové a řečové moduly. Dostupné jazyky a funkce závisí na nainstalovaných modulech. Klepnutím na Rozumím dokončete úvod a odemkněte aplikaci.",
+  "tutorial.next": "Rozuměl"
 }

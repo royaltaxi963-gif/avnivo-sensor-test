@@ -174,5 +174,16 @@
   "accessibility.download": "Download",
   "language.settings.title": "Zimanê navberê",
   "language.settings.aria": "Zimanê navberê hilbijêrin",
-  "language.settings.note": "Zimanê navberê ji bo zimanên din tê wergerandin; modelên axaftinê ji nû ve nayên barkirin."
+  "language.settings.note": "Zimanê navberê ji bo zimanên din tê wergerandin; modelên axaftinê ji nû ve nayên barkirin.",
+  "tutorial.history.title": "dîroka Chat",
+  "tutorial.history.body": "Ev dîroka sohbeta weya wergera we ye. Axaftin û wergerên berê yên AVNIVO li vir têne tomar kirin. Hûn dikarin danûstendinên berê ji nû ve vekin û binirxînin an yek nû dest pê bikin.",
+  "tutorial.settings.title": "Mîhengan",
+  "tutorial.settings.body": "Vebijêrin ka wergêr li vir çawa dixebite. Mîhengên serhêl lîstina axaftinê, deng, awaz û şêwaz hene. Mîhengên negirêdayî modulên naskirina axaftinê yên dakêşbar, werger û lîstika axaftinê û rewşa wan nîşan didin. Taybetmendî bi moda hilbijartî û modulên sazkirî ve girêdayî ye.",
+  "tutorial.microphone.title": "Mîkrofon",
+  "tutorial.microphone.body": "Ji bo wergerandina axaftinê mîkrofonê bikar bînin. Zimanên xwe hilbijêrin, mîkrofonê bikirtînin û bi gelemperî biaxivin. Naskirina axaftinê bi moda hilbijartî ve girêdayî ye. Dibe ku destûra mîkrofona gerokê hewce be.",
+  "tutorial.online.title": "Moda serhêl",
+  "tutorial.online.body": "Ev bişkok wergera bi înternetê hildibijêre. Moda serhêl dikare karûbarên naskirina axaftina ewr û wergerandina berdest bikar bîne. Pêwendiyek înternetê û gihîştina karûbaran hewce ye. Serlêdan niha di moda serhêl de vedibe.",
+  "tutorial.offline.title": "Moda negirêdayî",
+  "tutorial.offline.body": "Ev bişkok moda ku ji bo karanîna bêyî înternetê hatî armanc kirin hildibijêre. Pêşî modulên ziman û axaftinê yên pêwîst dakêşin. Ziman û taybetmendiyên berdest bi modulên sazkirî ve girêdayî ne. Bikirtînin Fêm kirin da ku danasînê biqedînin û sepanê vekin.",
+  "tutorial.next": "Fêm kirin"
 }

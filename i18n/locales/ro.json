@@ -174,5 +174,16 @@
   "accessibility.download": "Descărcați",
   "language.settings.title": "Limbajul interfeței",
   "language.settings.aria": "Selectați limba interfeței",
-  "language.settings.note": "Limba interfeței este tradusă în alte limbi; modelele de vorbire nu sunt reîncărcate."
+  "language.settings.note": "Limba interfeței este tradusă în alte limbi; modelele de vorbire nu sunt reîncărcate.",
+  "tutorial.history.title": "Istoricul chat-urilor",
+  "tutorial.history.body": "Acesta este istoricul dvs. de chat de traducere. Conversațiile și traducerile AVNIVO anterioare sunt salvate aici. Puteți redeschide și revizui conversațiile anterioare sau puteți începe una nouă.",
+  "tutorial.settings.title": "Setări",
+  "tutorial.settings.body": "Personalizați cum funcționează traducătorul aici. Setările online includ redarea vorbirii, vocile, tonurile și stilurile. Setările offline afișează module descărcabile de recunoaștere a vorbirii, traducere și redare a vorbirii și starea acestora. Caracteristicile depind de modul selectat și de modulele instalate.",
+  "tutorial.microphone.title": "Microfon",
+  "tutorial.microphone.body": "Utilizați microfonul pentru a traduce vorbirea. Alegeți limbile, atingeți microfonul și vorbiți normal. Recunoașterea vorbirii depinde de modul selectat. Poate fi necesară permisiunea pentru microfonul browserului.",
+  "tutorial.online.title": "Modul online",
+  "tutorial.online.body": "Acest buton selectează traducerea bazată pe internet. Modul online poate folosi serviciile cloud de recunoaștere a vorbirii și traducere disponibile. Este necesară o conexiune la internet și acces la servicii. În prezent, aplicația se deschide în modul Online.",
+  "tutorial.offline.title": "Modul offline",
+  "tutorial.offline.body": "Acest buton selectează modul destinat utilizării fără internet. Descărcați în avans modulele de limbă și vorbire necesare. Limbile și caracteristicile disponibile depind de modulele instalate. Atingeți Înțeles pentru a finaliza introducerea și a debloca aplicația.",
+  "tutorial.next": "Înțeles"
 }

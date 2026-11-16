@@ -174,5 +174,16 @@
   "accessibility.download": "Tsitsani",
   "language.settings.title": "Chilankhulo chachiyankhulo",
   "language.settings.aria": "Sankhani chinenero cholumikizira",
-  "language.settings.note": "Chilankhulo cholumikizira chimamasuliridwa m'zilankhulo zina; zolankhulidwa sizimayikidwanso."
+  "language.settings.note": "Chilankhulo cholumikizira chimamasuliridwa m'zilankhulo zina; zolankhulidwa sizimayikidwanso.",
+  "tutorial.history.title": "Mbiri yochezera",
+  "tutorial.history.body": "Iyi ndi mbiri yanu yomasulira. Zokambirana zam'mbuyo za AVNIVO ndi zomasulira zasungidwa apa. Mutha kutsegulanso ndikuwunikanso zokambirana zam'mbuyomu kapena kuyambitsa ina.",
+  "tutorial.settings.title": "Zokonda",
+  "tutorial.settings.body": "Sinthani mwamakonda momwe womasulira amagwirira ntchito pano. Zokonda pa intaneti zimaphatikizapo kusewerera mawu, mawu, malankhulidwe ndi masitaelo. Zokonda zapaintaneti zikuwonetsa magawo ozindikirika, omasulira ndi mawu komanso mawonekedwe ake. Zinthu zimadalira mawonekedwe osankhidwa ndi ma module omwe adayikidwa.",
+  "tutorial.microphone.title": "Maikolofoni",
+  "tutorial.microphone.body": "Gwiritsani ntchito cholankhulira kumasulira mawu. Sankhani zinenero zanu, dinani maikolofoni ndi kulankhula bwinobwino. Kuzindikira mawu kumatengera njira yosankhidwa. Chilolezo cha maikolofoni ya msakatuli chingafunike.",
+  "tutorial.online.title": "Intaneti mode",
+  "tutorial.online.body": "Batani ili limasankha zomasulira zoyendetsedwa ndi intaneti. Mawonekedwe a pa intaneti atha kugwiritsa ntchito zozindikiritsa mawu mumtambo ndi ntchito zomasulira. Kulumikizana kwa intaneti ndi mwayi wopeza ntchito ndizofunikira. Pulogalamuyi imatsegulidwa pa intaneti.",
+  "tutorial.offline.title": "Zopanda intaneti",
+  "tutorial.offline.body": "Batani ili limasankha mtundu womwe uyenera kugwiritsidwa ntchito popanda intaneti. Tsitsani pasadakhale zigawo za zilankhulo ndi zoyankhulira. Zinenero ndi mawonekedwe omwe alipo amadalira ma module omwe adayikidwa. Dinani Kumvetsetsa kuti mumalize mawu oyamba ndi kutsegula pulogalamuyi.",
+  "tutorial.next": "Zomveka"
 }

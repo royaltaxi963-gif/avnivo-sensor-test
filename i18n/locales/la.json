@@ -174,5 +174,16 @@
   "accessibility.download": "Download",
   "language.settings.title": "Linguae instrumenti",
   "language.settings.aria": "Lego instrumenti",
-  "language.settings.note": "Lingua instrumenti in alias linguas transfertur; exempla orationis non sunt repositae."
+  "language.settings.note": "Lingua instrumenti in alias linguas transfertur; exempla orationis non sunt repositae.",
+  "tutorial.history.title": "Curabitur historia",
+  "tutorial.history.body": "Haec tua translatione chat historia est. Priores AVNIVO sermones et translationes hic servatae sunt. Potes colloquia priorum aperire et recensere vel novam incipere.",
+  "tutorial.settings.title": "Occasus",
+  "tutorial.settings.body": "Customize quomodo interpres hic operatur. Online occasus includunt loquelam playback, voces, tonos et stilos. Offline occasus ostendunt recognitionem downloadabilem loquelae, translationis et loquelae modulorum playback eorumque status. Features pendent modo delectorum et modulorum institutorum.",
+  "tutorial.microphone.title": "Tortor ligula",
+  "tutorial.microphone.body": "Tortor ligula utere ad transferendum sermonem. Linguas tuas elige, tortor ligula, ICTUS ac soleas loqui. Recognitio sermonis a modo delectae dependet. Licentia pasco tortor ligula requiri potest.",
+  "tutorial.online.title": "Online modus",
+  "tutorial.online.body": "Haec Bulla translationem interrete-powered eligit. Online modus uti potest available nube sermonis recognitionem et officia translationis. Conexio et accessus ad officia interreti requiruntur. In app currently opens in Online modus.",
+  "tutorial.offline.title": "Offline modus",
+  "tutorial.offline.body": "Haec Bulla eligit modum destinatum ad usum sine interrete. Download linguam et loquelam modulorum in antecessum debitam. Praesto sunt linguae et lineamenta ex modulis inauguratis dependentibus. ICTUS intellexit ad perficiendam introductionem et recludam app.",
+  "tutorial.next": "Intellectus"
 }

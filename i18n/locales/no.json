@@ -174,5 +174,16 @@
   "accessibility.download": "Last ned",
   "language.settings.title": "Grensesnittspråk",
   "language.settings.aria": "Velg grensesnittspråk",
-  "language.settings.note": "Grensesnittspråket er oversatt til andre språk; talemodeller lastes ikke inn på nytt."
+  "language.settings.note": "Grensesnittspråket er oversatt til andre språk; talemodeller lastes ikke inn på nytt.",
+  "tutorial.history.title": "Chat historie",
+  "tutorial.history.body": "Dette er din oversettelse chat-historikk. Tidligere AVNIVO-samtaler og oversettelser lagres her. Du kan gjenåpne og se gjennom tidligere samtaler eller starte en ny.",
+  "tutorial.settings.title": "Innstillinger",
+  "tutorial.settings.body": "Tilpass hvordan oversetteren fungerer her. Onlineinnstillinger inkluderer taleavspilling, stemmer, toner og stiler. Frakoblede innstillinger viser nedlastbare talegjenkjennings-, oversettelses- og taleavspillingsmoduler og deres status. Funksjoner avhenger av valgt modus og installerte moduler.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Bruk mikrofonen til å oversette tale. Velg språk, trykk på mikrofonen og snakk normalt. Talegjenkjenning avhenger av den valgte modusen. Nettlesermikrofontillatelse kan være nødvendig.",
+  "tutorial.online.title": "Online-modus",
+  "tutorial.online.body": "Denne knappen velger internettdrevet oversettelse. Online-modus kan bruke tilgjengelige sky-talegjenkjennings- og oversettelsestjenester. Det kreves internettforbindelse og tilgang til tjenestene. Appen åpnes for øyeblikket i Online-modus.",
+  "tutorial.offline.title": "Frakoblet modus",
+  "tutorial.offline.body": "Denne knappen velger modusen beregnet for bruk uten internett. Last ned de nødvendige språk- og talemodulene på forhånd. Tilgjengelige språk og funksjoner avhenger av installerte moduler. Trykk på Forstått for å fullføre introduksjonen og låse opp appen.",
+  "tutorial.next": "Forstått"
 }

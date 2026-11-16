@@ -174,5 +174,16 @@
   "accessibility.download": "Luchdaich sìos",
   "language.settings.title": "Cànan eadar-aghaidh",
   "language.settings.aria": "Tagh cànan eadar-aghaidh",
-  "language.settings.note": "Tha cànan an eadar-aghaidh air eadar-theangachadh gu cànanan eile; Chan eil modalan labhairt air an ath-luchdachadh."
+  "language.settings.note": "Tha cànan an eadar-aghaidh air eadar-theangachadh gu cànanan eile; Chan eil modalan labhairt air an ath-luchdachadh.",
+  "tutorial.history.title": "Eachdraidh cabadaich",
+  "tutorial.history.body": "Seo an eachdraidh cabadaich eadar-theangachaidh agad. Tha còmhraidhean agus eadar-theangachaidhean AVNIVO roimhe air an sàbhaladh an seo. Faodaidh tu còmhraidhean nas tràithe ath-fhosgladh agus ath-sgrùdadh no fear ùr a thòiseachadh.",
+  "tutorial.settings.title": "Suidhichidhean",
+  "tutorial.settings.body": "Gnàthaich mar a tha an t-eadar-theangair ag obair an seo. Tha roghainnean air-loidhne a’ gabhail a-steach ath-chluich cainnte, guthan, tònaichean agus stoidhlichean. Bidh roghainnean far-loidhne a’ sealltainn mhodalan aithneachadh cainnte, eadar-theangachadh agus ath-chluich cainnte a ghabhas luchdachadh a-nuas agus an inbhe. Tha feartan an urra ris a’ mhodh taghte agus na modalan stàlaichte.",
+  "tutorial.microphone.title": "Micreofon",
+  "tutorial.microphone.body": "Cleachd am micreofon gus cainnt eadar-theangachadh. Tagh do chànanan, tap air a’ mhicreofon agus bruidhinn gu h-àbhaisteach. Tha aithne cainnte an urra ris a’ mhodh taghte. Dh’ fhaodadh gum bi feum air cead microfòn brabhsair.",
+  "tutorial.online.title": "Modh air-loidhne",
+  "tutorial.online.body": "Taghaidh am putan seo eadar-theangachadh le cumhachd eadar-lìn. Faodaidh modh air-loidhne seirbheisean aithneachadh cainnt neòil agus eadar-theangachadh a chleachdadh. Tha feum air ceangal eadar-lìn agus ruigsinneachd air na seirbheisean. Tha an aplacaid an-dràsta a’ fosgladh ann am modh Air-loidhne.",
+  "tutorial.offline.title": "Modh far loidhne",
+  "tutorial.offline.body": "Taghaidh am putan seo am modh a thathar an dùil a chleachdadh às aonais eadar-lìn. Luchdaich sìos na modalan cànain is cainnt a tha a dhìth ro làimh. Tha na cànanan agus na feartan a tha rim faighinn an urra ri modalan stàlaichte. Tap air Understood gus crìoch a chuir air an ro-ràdh agus an aplacaid fhuasgladh.",
+  "tutorial.next": "Thuig"
 }

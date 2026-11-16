@@ -174,5 +174,16 @@
   "accessibility.download": "Buusuu",
   "language.settings.title": "Afaan walqunnamtii",
   "language.settings.aria": "Afaan walqunnamtii filadhu",
-  "language.settings.note": "Afaan walqunnamtii gara afaanota birootti hiikama; moodeelotni dubbii irra deebiin hin fe’aman."
+  "language.settings.note": "Afaan walqunnamtii gara afaanota birootti hiikama; moodeelotni dubbii irra deebiin hin fe’aman.",
+  "tutorial.history.title": "Seenaa chat",
+  "tutorial.history.body": "Kun seenaa marii hiikkaa keessaniiti. Haasaa fi hiikkaawwan AVNIVO kanaan duraa asitti kuufamaniiru. Haasaa kanaan duraa irra deebitee bantee irra deebitee ilaaluu dandeessa ykn haaraa jalqabuu dandeessa.",
+  "tutorial.settings.title": "Sajoo",
+  "tutorial.settings.body": "Akkaataa hiikkaan itti hojjetu asitti dhuunfachiisi. Sajoo toora interneetii taphachuu dubbii, sagalee, sagalee fi akkaataa of keessatti qabata. Sajoo sarara ala ta'e moojuulota beekamtii dubbii, hiikkaa fi tapha dubbii buufamuu danda'anii fi haala isaanii agarsiisa. Amaloonni haalata filatamee fi moojuulota fe'aman irratti hundaa'a.",
+  "tutorial.microphone.title": "Maaykiroofoonii",
+  "tutorial.microphone.body": "Haasaa hiikuuf maaykiroofooniitti fayyadami. Afaanota keessan filadhaa, maaykiroofoonii tuqaatii akka idileetti dubbadhaa. Beekkamtiin dubbii haala filatame irratti hundaa'a. Hayyamni maaykiroofoonii biraawzarii barbaachisuu danda'a.",
+  "tutorial.online.title": "Haala toora interneetii",
+  "tutorial.online.body": "Qabduun kun hiikkaa interneetiin hojjetu fila. Haalli toora interneetii tajaajila beekuu fi hiikkaa dubbii duumessaa jiru fayyadamuu danda’a. Intarneetii fi tajaajiloota argachuun barbaachisaadha. Appichi yeroo ammaa haala Online tiin banama.",
+  "tutorial.offline.title": "Haala sarara ala",
+  "tutorial.offline.body": "Qabduun kun haala interneetii malee fayyadamuuf yaadame fila. Moojuulota afaanii fi dubbii barbaachisan dursanii buufadhaa. Afaanonni fi amaloonni jiran moojuulota fe'aman irratti hundaa'u. Seensa xumuruu fi appicha banuuf Understod tuqi.",
+  "tutorial.next": "Hubate"
 }

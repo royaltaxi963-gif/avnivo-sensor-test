@@ -174,5 +174,16 @@
   "accessibility.download": "Downloaden",
   "language.settings.title": "Interfacetaal",
   "language.settings.aria": "Selecteer interfacetaal",
-  "language.settings.note": "De interfacetaal wordt in andere talen vertaald; spraakmodellen worden niet opnieuw geladen."
+  "language.settings.note": "De interfacetaal wordt in andere talen vertaald; spraakmodellen worden niet opnieuw geladen.",
+  "tutorial.history.title": "Chatgeschiedenis",
+  "tutorial.history.body": "Dit is uw vertaalchatgeschiedenis. Eerdere AVNIVO-gesprekken en vertalingen worden hier opgeslagen. U kunt eerdere gesprekken opnieuw openen en bekijken, of een nieuwe starten.",
+  "tutorial.settings.title": "Instellingen",
+  "tutorial.settings.body": "Pas hier aan hoe de vertaler werkt. Online instellingen omvatten het afspelen van spraak, stemmen, tonen en stijlen. Offline-instellingen tonen downloadbare modules voor spraakherkenning, vertaling en spraakweergave en hun status. Functies zijn afhankelijk van de geselecteerde modus en geïnstalleerde modules.",
+  "tutorial.microphone.title": "Microfoon",
+  "tutorial.microphone.body": "Gebruik de microfoon om spraak te vertalen. Kies uw talen, tik op de microfoon en spreek normaal. Spraakherkenning is afhankelijk van de geselecteerde modus. Mogelijk is toestemming voor de browsermicrofoon vereist.",
+  "tutorial.online.title": "Online-modus",
+  "tutorial.online.body": "Met deze knop selecteert u een internetvertaling. De onlinemodus kan gebruik maken van beschikbare cloud-spraakherkennings- en vertaaldiensten. Een internetverbinding en toegang tot de diensten zijn vereist. De app wordt momenteel geopend in de onlinemodus.",
+  "tutorial.offline.title": "Offline-modus",
+  "tutorial.offline.body": "Met deze knop selecteert u de modus die bedoeld is voor gebruik zonder internet. Download vooraf de benodigde taal- en spraakmodules. Beschikbare talen en functies zijn afhankelijk van de geïnstalleerde modules. Tik op Begrepen om de introductie af te ronden en de app te ontgrendelen.",
+  "tutorial.next": "Begrepen"
 }

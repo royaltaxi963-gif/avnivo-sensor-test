@@ -174,5 +174,16 @@
   "accessibility.download": "Download",
   "language.settings.title": "Idioma da interface",
   "language.settings.aria": "Selecione o idioma da interface",
-  "language.settings.note": "O idioma da interface é traduzido para outros idiomas; os modelos de fala não são recarregados."
+  "language.settings.note": "O idioma da interface é traduzido para outros idiomas; os modelos de fala não são recarregados.",
+  "tutorial.history.title": "Histórico de bate-papo",
+  "tutorial.history.body": "Este é o seu histórico de bate-papo de tradução. Conversas e traduções anteriores do AVNIVO são salvas aqui. Você pode reabrir e revisar conversas anteriores ou iniciar uma nova.",
+  "tutorial.settings.title": "Configurações",
+  "tutorial.settings.body": "Personalize como o tradutor funciona aqui. As configurações online incluem reprodução de fala, vozes, tons e estilos. As configurações off-line mostram módulos de reconhecimento de fala, tradução e reprodução de fala para download e seu status. Os recursos dependem do modo selecionado e dos módulos instalados.",
+  "tutorial.microphone.title": "Microfone",
+  "tutorial.microphone.body": "Use o microfone para traduzir a fala. Escolha seus idiomas, toque no microfone e fale normalmente. O reconhecimento de fala depende do modo selecionado. A permissão do microfone do navegador pode ser necessária.",
+  "tutorial.online.title": "Modo on-line",
+  "tutorial.online.body": "Este botão seleciona tradução baseada na Internet. O modo online pode usar serviços de tradução e reconhecimento de fala na nuvem disponíveis. É necessária uma conexão com a Internet e acesso aos serviços. O aplicativo atualmente abre no modo Online.",
+  "tutorial.offline.title": "Modo off-line",
+  "tutorial.offline.body": "Este botão seleciona o modo pretendido para uso sem internet. Baixe os módulos de idioma e fala necessários com antecedência. Os idiomas e recursos disponíveis dependem dos módulos instalados. Toque em Entendido para finalizar a introdução e desbloquear o aplicativo.",
+  "tutorial.next": "Entendido"
 }

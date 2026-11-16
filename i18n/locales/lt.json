@@ -174,5 +174,16 @@
   "accessibility.download": "Atsisiųsti",
   "language.settings.title": "Sąsajos kalba",
   "language.settings.aria": "Pasirinkite sąsajos kalbą",
-  "language.settings.note": "Sąsajos kalba išversta į kitas kalbas; kalbos modeliai neperkraunami."
+  "language.settings.note": "Sąsajos kalba išversta į kitas kalbas; kalbos modeliai neperkraunami.",
+  "tutorial.history.title": "Pokalbių istorija",
+  "tutorial.history.body": "Tai jūsų vertimo pokalbių istorija. Čia išsaugomi ankstesni AVNIVO pokalbiai ir vertimai. Galite iš naujo atidaryti ir peržiūrėti ankstesnius pokalbius arba pradėti naują.",
+  "tutorial.settings.title": "Nustatymai",
+  "tutorial.settings.body": "Tinkinkite, kaip čia veikia vertėjas. Internetiniai nustatymai apima kalbos atkūrimą, balsus, tonus ir stilius. Nustatymuose neprisijungus rodomi atsisiunčiami kalbos atpažinimo, vertimo ir kalbos atkūrimo moduliai bei jų būsena. Funkcijos priklauso nuo pasirinkto režimo ir įdiegtų modulių.",
+  "tutorial.microphone.title": "Mikrofonas",
+  "tutorial.microphone.body": "Kalbai versti naudokite mikrofoną. Pasirinkite kalbas, bakstelėkite mikrofoną ir kalbėkite įprastai. Kalbos atpažinimas priklauso nuo pasirinkto režimo. Gali prireikti naršyklės mikrofono leidimo.",
+  "tutorial.online.title": "Internetinis režimas",
+  "tutorial.online.body": "Šiuo mygtuku pasirenkamas internetinis vertimas. Prisijungimo režimu galima naudoti galimas debesies kalbos atpažinimo ir vertimo paslaugas. Reikalingas interneto ryšys ir prieiga prie paslaugų. Šiuo metu programa atidaroma prisijungimo režimu.",
+  "tutorial.offline.title": "Režimas neprisijungus",
+  "tutorial.offline.body": "Šiuo mygtuku pasirenkamas režimas, skirtas naudoti be interneto. Iš anksto atsisiųskite reikiamus kalbos ir kalbos modulius. Galimos kalbos ir funkcijos priklauso nuo įdiegtų modulių. Bakstelėkite Suprasta, kad užbaigtumėte įžangą ir atrakintumėte programą.",
+  "tutorial.next": "Suprato"
 }

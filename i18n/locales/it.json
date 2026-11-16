@@ -174,5 +174,16 @@
   "accessibility.download": "Scaricamento",
   "language.settings.title": "Linguaggio dell'interfaccia",
   "language.settings.aria": "Seleziona la lingua dell'interfaccia",
-  "language.settings.note": "La lingua dell'interfaccia è tradotta in altre lingue; i modelli vocali non vengono ricaricati."
+  "language.settings.note": "La lingua dell'interfaccia è tradotta in altre lingue; i modelli vocali non vengono ricaricati.",
+  "tutorial.history.title": "Cronologia chat",
+  "tutorial.history.body": "Questa è la cronologia della chat di traduzione. Le conversazioni e le traduzioni precedenti di AVNIVO vengono salvate qui. Puoi riaprire e rivedere le conversazioni precedenti o avviarne una nuova.",
+  "tutorial.settings.title": "Impostazioni",
+  "tutorial.settings.body": "Personalizza qui il modo in cui funziona il traduttore. Le impostazioni online includono la riproduzione vocale, le voci, i toni e gli stili. Le impostazioni offline mostrano i moduli scaricabili di riconoscimento vocale, traduzione e riproduzione vocale e il loro stato. Le funzionalità dipendono dalla modalità selezionata e dai moduli installati.",
+  "tutorial.microphone.title": "Microfono",
+  "tutorial.microphone.body": "Usa il microfono per tradurre il parlato. Scegli la tua lingua, tocca il microfono e parla normalmente. Il riconoscimento vocale dipende dalla modalità selezionata. Potrebbe essere necessaria l'autorizzazione per il microfono del browser.",
+  "tutorial.online.title": "Modalità in linea",
+  "tutorial.online.body": "Questo pulsante seleziona la traduzione basata su Internet. La modalità online può utilizzare il riconoscimento vocale cloud e i servizi di traduzione disponibili. È necessaria una connessione internet e l'accesso ai servizi. L'app attualmente si apre in modalità online.",
+  "tutorial.offline.title": "Modalità offline",
+  "tutorial.offline.body": "Questo pulsante seleziona la modalità prevista per l'uso senza Internet. Scarica in anticipo i moduli linguistici e vocali richiesti. Le lingue e le funzionalità disponibili dipendono dai moduli installati. Tocca Capito per completare l'introduzione e sbloccare l'app.",
+  "tutorial.next": "Inteso"
 }

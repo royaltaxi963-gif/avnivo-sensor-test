@@ -174,5 +174,16 @@
   "accessibility.download": "Herunterladen",
   "language.settings.title": "Schnittstellensprache",
   "language.settings.aria": "Wählen Sie die Sprache der Benutzeroberfläche aus",
-  "language.settings.note": "Die Schnittstellensprache ist in andere Sprachen übersetzt; Sprachmodelle werden nicht neu geladen."
+  "language.settings.note": "Die Schnittstellensprache ist in andere Sprachen übersetzt; Sprachmodelle werden nicht neu geladen.",
+  "tutorial.history.title": "Chatverlauf",
+  "tutorial.history.body": "Dies ist Ihr Übersetzungs-Chat-Verlauf. Frühere AVNIVO-Gespräche und Übersetzungen werden hier gespeichert. Sie können frühere Konversationen erneut öffnen und überprüfen oder eine neue beginnen.",
+  "tutorial.settings.title": "Einstellungen",
+  "tutorial.settings.body": "Passen Sie hier die Funktionsweise des Übersetzers an. Zu den Online-Einstellungen gehören Sprachwiedergabe, Stimmen, Töne und Stile. In den Offline-Einstellungen werden herunterladbare Spracherkennungs-, Übersetzungs- und Sprachwiedergabemodule sowie deren Status angezeigt. Die Funktionen hängen vom ausgewählten Modus und den installierten Modulen ab.",
+  "tutorial.microphone.title": "Mikrofon",
+  "tutorial.microphone.body": "Verwenden Sie das Mikrofon, um Sprache zu übersetzen. Wählen Sie Ihre Sprachen, tippen Sie auf das Mikrofon und sprechen Sie normal. Die Spracherkennung hängt vom ausgewählten Modus ab. Möglicherweise ist eine Genehmigung für das Browsermikrofon erforderlich.",
+  "tutorial.online.title": "Online-Modus",
+  "tutorial.online.body": "Mit dieser Schaltfläche wählen Sie die internetbasierte Übersetzung aus. Im Online-Modus können verfügbare Cloud-Spracherkennungs- und Übersetzungsdienste genutzt werden. Eine Internetverbindung und Zugriff auf die Dienste sind erforderlich. Die App wird derzeit im Online-Modus geöffnet.",
+  "tutorial.offline.title": "Offline-Modus",
+  "tutorial.offline.body": "Mit dieser Schaltfläche wählen Sie den Modus aus, der für die Nutzung ohne Internet vorgesehen ist. Laden Sie sich vorab die benötigten Sprach- und Sprechmodule herunter. Verfügbare Sprachen und Funktionen hängen von den installierten Modulen ab. Tippen Sie auf Verstanden, um die Einführung abzuschließen und die App zu entsperren.",
+  "tutorial.next": "Verstanden"
 }

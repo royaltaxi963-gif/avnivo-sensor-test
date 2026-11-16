@@ -174,5 +174,16 @@
   "accessibility.download": "Kuramo",
   "language.settings.title": "Ururimi rwimbere",
   "language.settings.aria": "Hitamo imvugo yimbere",
-  "language.settings.note": "Ururimi rwimbere rwahinduwe mu zindi ndimi; imvugo yo kuvuga ntisubirwamo."
+  "language.settings.note": "Ururimi rwimbere rwahinduwe mu zindi ndimi; imvugo yo kuvuga ntisubirwamo.",
+  "tutorial.history.title": "Amateka yo kuganira",
+  "tutorial.history.body": "Naya mateka yawe yo kuganira. Ibiganiro bya AVNIVO byabanje hamwe nubusobanuro byabitswe hano. Urashobora gufungura no gusuzuma ibiganiro byabanje cyangwa gutangira ikindi gishya.",
+  "tutorial.settings.title": "Igenamiterere",
+  "tutorial.settings.body": "Hindura uburyo umusemuzi akora hano. Igenamiterere rya interineti ririmo gukina imvugo, amajwi, amajwi nuburyo. Igenamiterere rya interineti ryerekana imvugo ishobora gukururwa kumenyekana, guhindura no kuvuga imvugo yo gukina hamwe na status yabo. Ibiranga biterwa nuburyo bwatoranijwe nuburyo bwashyizweho.",
+  "tutorial.microphone.title": "Mikoro",
+  "tutorial.microphone.body": "Koresha mikoro kugirango uhindure imvugo. Hitamo indimi zawe, kanda mikoro hanyuma uvuge bisanzwe. Kumenyekanisha imvugo biterwa nuburyo bwatoranijwe. Mucukumbuzi ya mikoro irashobora gusabwa.",
+  "tutorial.online.title": "Uburyo bwo kumurongo",
+  "tutorial.online.body": "Iyi buto ihitamo ibisobanuro bikoreshwa na interineti. Uburyo bwo kumurongo burashobora gukoresha ibicu byerekana imvugo hamwe na serivisi zubuhinduzi. Ihuza rya interineti no kugera kuri serivisi birasabwa. Ubu porogaramu ifungura muburyo bwa interineti.",
+  "tutorial.offline.title": "Uburyo bwa interineti",
+  "tutorial.offline.body": "Iyi buto ihitamo uburyo bugenewe gukoreshwa nta interineti. Kuramo imvugo isabwa hamwe nuburyo bwo kuvuga mbere. Indimi ziboneka nibiranga biterwa na module yashizweho. Kanda Byumvikane kugirango urangize intangiriro kandi ufungure porogaramu.",
+  "tutorial.next": "Byumvikane"
 }

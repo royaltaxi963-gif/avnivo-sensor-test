@@ -174,5 +174,16 @@
   "accessibility.download": "Wàcce",
   "language.settings.title": "Làkku interfaas",
   "language.settings.aria": "Tannal làkku interface bi",
-  "language.settings.note": "Làkku interface bi dañu ko tekki ci yeneen làkk; modelu wax yi duñu sarsewaat."
+  "language.settings.note": "Làkku interface bi dañu ko tekki ci yeneen làkk; modelu wax yi duñu sarsewaat.",
+  "tutorial.history.title": "Jaar-jaaru waxtaan",
+  "tutorial.history.body": "Lii mooy sa jaar-jaaru waxtaanu tekki làkk. Waxtaan ak tekki yi njëkka am ci AVNIVO dañu leen denc fii. Mën nga ubbiwaat ak xoolaat waxtaan yi njëkk wala nga tàmbali beneen.",
+  "tutorial.settings.title": "Jekkal",
+  "tutorial.settings.body": "Mengoolal ni tekkikatu làkk bi di doxee fii. Jekkal yi ci net bi dañuy àndaale ak déglu kàddu, baat, ton ak stil. Jekkal yi nekk ci net bi dañuy wane modulu xàmmee kàddu yiñ mëna yebbi, tekki làkk ak leeslu kàddu yi ak seeni tolluwaayu mbir. Man-man yi a ngi aju ci anam wi nga tànn ak modle yiñ samp.",
+  "tutorial.microphone.title": "Mikro",
+  "tutorial.microphone.body": "Jëfandikool mikro bi ngir tekki kàddu. Tannal say làkk, bës mikro bi nga wax bu baax. Xamme kàddu a ngi aju ci anam wi nga tànn. Mën nañu laaj ndigalu mikro nawigatër bi.",
+  "tutorial.online.title": "Mode en ligne",
+  "tutorial.online.body": "Butoŋu bii dafay tànnee tekki làkku internet. Mode online mën na jëfandikoo sarwis yiy xàmmee kàddu yi ak tekki làkk yi ci cloud bi. Dafay laaj nga am koneksioŋ internet ak mëna jëfandikoo serwiis yi. App bi mingi ubbeeku ci mode Online.",
+  "tutorial.offline.title": "Mode offline",
+  "tutorial.offline.body": "Butoŋu bii dafay tànnee anam wi nga bëgga jëfandikoo te doo jëfandikoo internet. Yebbi lakk yi ak modulu wax yi ci njëkk. Làkk yi jàppandi ak man-man yi ñu ngi aju ci modle yiñ samp. Bësal Xam ngir jeexal dugal bi te tijji app bi.",
+  "tutorial.next": "Ndàndoon"
 }
