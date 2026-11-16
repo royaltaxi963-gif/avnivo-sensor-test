@@ -123,7 +123,7 @@ assume WebView reproduces desktop performance.
 
 ## Tests
 
-`offline-stt/tests/offline-stt.test.mjs` (14 cases, all passing) covers sha256 vectors,
+`offline-stt/tests/offline-stt.test.mjs` (20 cases, all passing) covers sha256 vectors,
 model-spec sizes/hashes, registry consistency, routing, and the model manager
 (resume, integrity rejection, no re-download). Browser behaviour was verified with a
 Puppeteer harness against the real app page.
