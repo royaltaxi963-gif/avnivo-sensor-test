@@ -29,7 +29,7 @@ from main import app  # noqa: E402
 
 client = TestClient(app)
 
-CHIRP2_HTML = REPO_ROOT / "avnivo-v11-49-chirp2-multilingual.html"
+CHIRP2_HTML = REPO_ROOT / "tests/fixtures/chirp2-multilingual-legacy.html"
 DOC = REPO_ROOT / "docs" / "chirp2-language-support.md"
 
 
