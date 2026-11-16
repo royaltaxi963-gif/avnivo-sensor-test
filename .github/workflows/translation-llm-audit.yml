@@ -64,6 +64,7 @@ jobs:
           c = json.load(open("translation-llm-audit/run-config.json"))
           print("phase=" + str(c.get("phase", "pilot")))
           print("only=" + str(c.get("only", "")))
+          print("deep=" + str(c.get("deep", "")))
           print("max_requests=" + str(c.get("max_requests", 120)))
           PY
 
@@ -75,7 +76,11 @@ jobs:
           python translation-llm-audit/harness.py \
             --phase "${{ steps.cfg.outputs.phase }}" \
             --only "${{ steps.cfg.outputs.only }}" \
+            --deep "${{ steps.cfg.outputs.deep }}" \
             --max-requests "${{ steps.cfg.outputs.max_requests }}"
+
+      - name: Generate audit deliverables
+        run: python translation-llm-audit/report.py
 
       - name: Commit results back to the audit branch
         run: |

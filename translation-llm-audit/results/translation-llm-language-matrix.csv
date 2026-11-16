@@ -1,118 +1,118 @@
 order,chirp2_code,language_name,translation_llm_code,regional_variant,official_support,experimental,documented_class,api_tested,api_requests,api_success,api_unsupported,api_transient_errors,avg_latency_s,quality_pass,stability_ok,final_decision,decision_reason,sample_translation
-1,af-ZA,Afrikaans (South Africa),af,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
+1,af-ZA,Afrikaans (South Africa),af,base,True,False,A,True,82,82,0,0,0.238,True,True,PASSED,official_support_and_quality_ok,"Hallo, hoe gaan dit?"
 2,am-ET,Amharic (Ethiopia),am,base,False,True,B,True,8,8,0,0,0.363,True,,EXPERIMENTAL,google_experimental_support,ሰላም፣ እንዴት ነዎት?
 3,ar-EG,Arabic (Egypt),ar,base,True,False,A,True,82,82,0,0,0.324,True,True,PASSED,official_support_and_quality_ok,مرحباً، كيف حالك؟
 4,as-IN,Assamese (India),as,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
-5,ast-ES,Asturian (Spain),ast,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-6,az-AZ,Azerbaijani (Azerbaijan),az,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-7,be-BY,Belarusian (Belarus),be,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-8,bg-BG,Bulgarian (Bulgaria),bg,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-9,bn-BD,Bengali (Bangladesh),bn,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-10,bn-IN,Bengali (India),bn-IN,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-11,bs-BA,Bosnian (Bosnia and Herzegovina),bs,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-12,ca-ES,Catalan (Spain),ca,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-13,ceb-PH,Cebuano (Philippines),ceb,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-14,ckb-IQ,Central Kurdish (Iraq),ckb,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-15,cmn-Hans-CN,"Chinese (Simplified, China)",zh,script,True,False,A,True,29,29,0,0,0.264,True,,PASSED,official_support_and_quality_ok,你好，你还好吗？
-16,cmn-Hant-TW,"Chinese, Mandarin (Traditional, Taiwan)",zh-TW,script,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-17,cs-CZ,Czech (Czech Republic),cs,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-18,cy-GB,Welsh (United Kingdom),cy,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-19,da-DK,Danish (Denmark),da,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-20,de-DE,German (Germany),de,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-21,el-GR,Greek (Greece),el,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-22,en-AU,English (Australia),en-AU,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-23,en-GB,English (United Kingdom),en-GB,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-24,en-IN,English (India),en,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-25,en-US,English (United States),en-US,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-26,es-419,Spanish (Latin American),es-419,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-27,es-ES,Spanish (Spain),es-ES,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-28,es-US,Spanish (United States),es-US,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-29,et-EE,Estonian (Estonia),et,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-30,eu-ES,Basque (Spain),eu,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-31,fa-IR,Persian (Iran),fa,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-32,ff-SN,Fulah (Senegal),ff,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-33,fi-FI,Finnish (Finland),fi,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-34,fil-PH,Filipino (Philippines),fil,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-35,fr-CA,French (Canada),fr-CA,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-36,fr-FR,French (France),fr,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-37,ga-IE,Irish (Ireland),ga,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-38,gl-ES,Galician (Spain),gl,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-39,gu-IN,Gujarati (India),gu,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-40,ha-NG,Hausa (Nigeria),ha,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-41,hi-IN,Hindi (India),hi,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-42,hr-HR,Croatian (Croatia),hr,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-43,hu-HU,Hungarian (Hungary),hu,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-44,hy-AM,Armenian (Armenia),hy,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-45,id-ID,Indonesian (Indonesia),id,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-46,ig-NG,Igbo (Nigeria),ig,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-47,is-IS,Icelandic (Iceland),is,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-48,it-IT,Italian (Italy),it,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-49,iw-IL,Hebrew (Israel),iw,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-50,ja-JP,Japanese (Japan),ja,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-51,jv-ID,Javanese (Indonesia),jv,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-52,ka-GE,Georgian (Georgia),ka,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-53,kam-KE,Kamba (Kenya),kam,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-54,kea-CV,Kabuverdianu (Cape Verde),kea,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-55,kk-KZ,Kazakh (Kazakhstan),kk,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-56,km-KH,Khmer (Cambodia),km,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-57,kn-IN,Kannada (India),kn,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-58,ko-KR,Korean (South Korea),ko,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-59,ky-KG,Kyrgyz (Cyrillic),ky,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-60,lb-LU,Luxembourgish (Luxembourg),lb,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-61,lg-UG,Ganda (Uganda),lg,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-62,ln-CD,Lingala (Congo-Kinshasa),ln,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-63,lo-LA,Lao (Laos),lo,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-64,lt-LT,Lithuanian (Lithuania),lt,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-65,luo-KE,Luo (Kenya),luo,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-66,lv-LV,Latvian (Latvia),lv,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-67,mi-NZ,Maori (New Zealand),mi,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-68,mk-MK,Macedonian (North Macedonia),mk,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-69,ml-IN,Malayalam (India),ml,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-70,mn-MN,Mongolian (Mongolia),mn,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-71,mr-IN,Marathi (India),mr,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-72,ms-MY,Malay (Malaysia),ms,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-73,mt-MT,Maltese (Malta),mt,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-74,my-MM,Burmese (Myanmar),my,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-75,ne-NP,Nepali (Nepal),ne,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-76,nl-NL,Dutch (Netherlands),nl,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-77,no-NO,Norwegian Bokmal (Norway),no,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-78,nso-ZA,Sepedi (South Africa),nso,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-79,ny-MW,Nyanja (Malawi),ny,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-80,oc-FR,Occitan (France),oc,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-81,om-ET,Oromo (Ethiopia),om,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-82,or-IN,Oriya (India),or,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-83,pa-Guru-IN,Punjabi (Gurmukhi India),pa,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-84,pl-PL,Polish (Poland),pl,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-85,ps-AF,Pashto,ps,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-86,pt-BR,Portuguese (Brazil),pt-BR,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-87,pt-PT,Portuguese (Portugal),pt-PT,exact,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-88,ro-RO,Romanian (Romania),ro,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-89,ru-RU,Russian (Russia),ru,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-90,rup-BG,Aromanian (Bulgaria),rup,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-91,sd-IN,Sindhi (India),sd,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-92,si-LK,Sinhala (Sri Lanka),si,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-93,sk-SK,Slovak (Slovakia),sk,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-94,sl-SI,Slovenian (Slovenia),sl,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-95,sn-ZW,Shona (Zimbabwe),sn,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-96,so-SO,Somali,so,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-97,sq-AL,Albanian (Albania),sq,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-98,sr-RS,Serbian (Serbia),sr,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-99,su-ID,Sundanese (Indonesia),su,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-100,sv-SE,Swedish (Sweden),sv,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-101,sw,Swahili,sw,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-102,sw-KE,Swahili (Kenya),sw,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-103,ta-IN,Tamil (India),ta,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-104,te-IN,Telugu (India),te,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-105,tg-TJ,Tajik (Tajikistan),tg,base,False,True,B,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-106,th-TH,Thai (Thailand),th,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-107,tr-TR,Turkish (Turkey),tr,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-108,uk-UA,Ukrainian (Ukraine),uk,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-109,umb-AO,Umbundu (Angola),umb,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-110,ur-PK,Urdu (Pakistan),ur,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-111,uz-UZ,Uzbek (Uzbekistan),uz,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-112,vi-VN,Vietnamese (Vietnam),vi,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-113,wo-SN,Wolof (Senegal),wo,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-114,xh-ZA,Xhosa (South Africa),xh,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-115,yo-NG,Yoruba (Nigeria),yo,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-116,yue-Hant-HK,"Chinese, Cantonese (Traditional Hong Kong)",yue,base,False,False,C,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
-117,zu-ZA,Zulu (South Africa),zu,base,True,False,A,False,0,0,0,0,,False,,RETEST_REQUIRED,not_yet_tested,
+5,ast-ES,Asturian (Spain),ast,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+6,az-AZ,Azerbaijani (Azerbaijan),az,base,True,False,A,True,82,82,0,0,0.231,True,True,PASSED,official_support_and_quality_ok,"Salam, necəsiniz?"
+7,be-BY,Belarusian (Belarus),be,base,True,False,A,True,82,82,0,0,0.227,True,True,PASSED,official_support_and_quality_ok,"Прывітанне, як вы?"
+8,bg-BG,Bulgarian (Bulgaria),bg,base,True,False,A,True,82,82,0,0,0.215,True,True,PASSED,official_support_and_quality_ok,"Здравейте, как сте?"
+9,bn-BD,Bengali (Bangladesh),bn,base,True,False,A,True,82,82,0,0,0.217,True,True,PASSED,official_support_and_quality_ok,"হ্যালো, আপনি কেমন আছেন?"
+10,bn-IN,Bengali (India),bn-IN,exact,True,False,A,True,82,82,0,0,0.213,True,True,PASSED,official_support_and_quality_ok,"নমস্কার, আপনি কেমন আছেন?"
+11,bs-BA,Bosnian (Bosnia and Herzegovina),bs,base,True,False,A,True,82,82,0,0,0.2,True,True,PASSED,official_support_and_quality_ok,"Zdravo, kako ste?"
+12,ca-ES,Catalan (Spain),ca,base,True,False,A,True,82,82,0,0,0.205,True,True,PASSED,official_support_and_quality_ok,"Hola, com estàs?"
+13,ceb-PH,Cebuano (Philippines),ceb,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+14,ckb-IQ,Central Kurdish (Iraq),ckb,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+15,cmn-Hans-CN,"Chinese (Simplified, China)",zh,script,True,False,A,True,82,82,0,0,0.233,True,True,PASSED,official_support_and_quality_ok,你好，你还好吗？
+16,cmn-Hant-TW,"Chinese, Mandarin (Traditional, Taiwan)",zh-TW,script,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,你好，最近好嗎？
+17,cs-CZ,Czech (Czech Republic),cs,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,"Dobrý den, jak se máte?"
+18,cy-GB,Welsh (United Kingdom),cy,base,True,False,A,True,82,82,0,0,0.224,True,True,PASSED,official_support_and_quality_ok,"Helo, sut ydych chi?"
+19,da-DK,Danish (Denmark),da,base,True,False,A,True,82,82,0,0,0.209,True,True,PASSED,official_support_and_quality_ok,"Hej, hvordan har du det?"
+20,de-DE,German (Germany),de,base,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,"Hallo, wie geht es Ihnen?"
+21,el-GR,Greek (Greece),el,base,True,False,A,True,82,82,0,0,0.219,True,True,PASSED,official_support_and_quality_ok,"Γεια σας, είστε καλά;"
+22,en-AU,English (Australia),en-AU,exact,True,False,A,True,82,82,0,0,0.194,True,True,PASSED,official_support_and_quality_ok,"Hello, how are you?"
+23,en-GB,English (United Kingdom),en-GB,exact,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"Hello, how are you?"
+24,en-IN,English (India),en,base,True,False,A,True,42,42,0,0,0.21,True,True,PASSED,official_support_and_quality_ok,"Hello, how are you?"
+25,en-US,English (United States),en-US,exact,True,False,A,True,82,82,0,0,0.196,True,True,PASSED,official_support_and_quality_ok,"Hello, how are you?"
+26,es-419,Spanish (Latin American),es-419,exact,True,False,A,True,82,82,0,0,0.204,True,True,PASSED,official_support_and_quality_ok,"Hola, ¿cómo estás?"
+27,es-ES,Spanish (Spain),es-ES,exact,True,False,A,True,82,82,0,0,0.204,True,True,PASSED,official_support_and_quality_ok,"Hola, ¿cómo estás?"
+28,es-US,Spanish (United States),es-US,exact,True,False,A,True,82,82,0,0,0.214,True,True,PASSED,official_support_and_quality_ok,"Hola, ¿cómo estás?"
+29,et-EE,Estonian (Estonia),et,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"Tere, kuidas läheb?"
+30,eu-ES,Basque (Spain),eu,base,False,True,B,True,8,8,0,0,0.236,True,,EXPERIMENTAL,google_experimental_support,"Kaixo, ondo al zaude?"
+31,fa-IR,Persian (Iran),fa,base,True,False,A,True,82,82,0,0,0.217,True,True,PASSED,official_support_and_quality_ok,سلام، حالتان خوب است؟
+32,ff-SN,Fulah (Senegal),ff,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+33,fi-FI,Finnish (Finland),fi,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"Hei, mitä kuuluu?"
+34,fil-PH,Filipino (Philippines),fil,base,True,False,A,True,82,82,0,0,0.227,True,True,PASSED,official_support_and_quality_ok,"Kumusta, ayos lang ba kayo?"
+35,fr-CA,French (Canada),fr-CA,exact,True,False,A,True,82,82,0,0,0.206,True,True,PASSED,official_support_and_quality_ok,"Bonjour, comment allez-vous?"
+36,fr-FR,French (France),fr,base,True,False,A,True,82,82,0,0,0.213,True,True,PASSED,official_support_and_quality_ok,"Bonjour, comment allez-vous ?"
+37,ga-IE,Irish (Ireland),ga,base,False,True,B,True,8,8,0,0,0.199,True,,EXPERIMENTAL,google_experimental_support,"Dia duit, an bhfuil tú go maith?"
+38,gl-ES,Galician (Spain),gl,base,True,False,A,True,82,82,0,0,0.213,True,True,PASSED,official_support_and_quality_ok,"Ola, estás ben?"
+39,gu-IN,Gujarati (India),gu,base,True,False,A,True,82,82,0,0,0.235,True,True,PASSED,official_support_and_quality_ok,"નમસ્તે, કેમ છો?"
+40,ha-NG,Hausa (Nigeria),ha,base,False,True,B,True,8,8,0,0,0.231,True,,EXPERIMENTAL,google_experimental_support,"Sannu, kana lafiya?"
+41,hi-IN,Hindi (India),hi,base,True,False,A,True,82,82,0,0,0.21,True,True,PASSED,official_support_and_quality_ok,"नमस्ते, आप कैसे हैं?"
+42,hr-HR,Croatian (Croatia),hr,base,True,False,A,True,82,82,0,0,0.209,True,True,PASSED,official_support_and_quality_ok,"Pozdrav, kako ste?"
+43,hu-HU,Hungarian (Hungary),hu,base,True,False,A,True,82,82,0,0,0.218,True,True,PASSED,official_support_and_quality_ok,"Szia, hogy vagy?"
+44,hy-AM,Armenian (Armenia),hy,base,False,True,B,True,8,8,0,0,0.226,True,,EXPERIMENTAL,google_experimental_support,"Ողջույն, ինչպե՞ս եք։"
+45,id-ID,Indonesian (Indonesia),id,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,"Halo, apa kabar?"
+46,ig-NG,Igbo (Nigeria),ig,base,False,True,B,True,8,8,0,0,0.218,True,,EXPERIMENTAL,google_experimental_support,"Ndewo, kedu ka ị dị?"
+47,is-IS,Icelandic (Iceland),is,base,True,False,A,True,82,82,0,0,0.22,True,True,PASSED,official_support_and_quality_ok,"Halló, hvernig hefurðu það?"
+48,it-IT,Italian (Italy),it,base,True,False,A,True,82,82,0,0,0.218,True,True,PASSED,official_support_and_quality_ok,"Salve, come sta?"
+49,iw-IL,Hebrew (Israel),iw,exact,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,"שלום, מה שלומך?"
+50,ja-JP,Japanese (Japan),ja,base,True,False,A,True,82,82,0,0,0.234,True,True,PASSED,official_support_and_quality_ok,こんにちは、お元気ですか？
+51,jv-ID,Javanese (Indonesia),jv,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+52,ka-GE,Georgian (Georgia),ka,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"გამარჯობა, როგორ ხართ?"
+53,kam-KE,Kamba (Kenya),kam,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+54,kea-CV,Kabuverdianu (Cape Verde),kea,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+55,kk-KZ,Kazakh (Kazakhstan),kk,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+56,km-KH,Khmer (Cambodia),km,base,True,False,A,True,82,82,0,0,0.214,True,True,PASSED,official_support_and_quality_ok,សួស្ដី តើអ្នកសុខសប្បាយជាទេ?
+57,kn-IN,Kannada (India),kn,base,True,False,A,True,82,82,0,0,0.21,True,True,PASSED,official_support_and_quality_ok,"ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಿ?"
+58,ko-KR,Korean (South Korea),ko,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,"안녕하세요, 잘 지내시나요?"
+59,ky-KG,Kyrgyz (Cyrillic),ky,base,True,False,A,True,82,82,0,0,0.205,True,True,PASSED,official_support_and_quality_ok,"Салам, кандайсыз?"
+60,lb-LU,Luxembourgish (Luxembourg),lb,base,False,True,B,True,8,8,0,0,0.228,True,,EXPERIMENTAL,google_experimental_support,"Moien, geet et Iech gutt?"
+61,lg-UG,Ganda (Uganda),lg,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+62,ln-CD,Lingala (Congo-Kinshasa),ln,base,True,False,A,True,82,82,0,0,0.237,True,True,PASSED,official_support_and_quality_ok,"Mbote, ozali malamu?"
+63,lo-LA,Lao (Laos),lo,base,True,False,A,True,82,82,0,0,0.203,True,True,PASSED,official_support_and_quality_ok,"ສະບາຍດີ, ສະບາຍດີບໍ່?"
+64,lt-LT,Lithuanian (Lithuania),lt,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"Sveiki, kaip laikotės?"
+65,luo-KE,Luo (Kenya),luo,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+66,lv-LV,Latvian (Latvia),lv,base,True,False,A,True,82,82,0,0,0.218,True,True,PASSED,official_support_and_quality_ok,"Sveiki, kā jums klājas?"
+67,mi-NZ,Maori (New Zealand),mi,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+68,mk-MK,Macedonian (North Macedonia),mk,base,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,"Здраво, како сте?"
+69,ml-IN,Malayalam (India),ml,base,True,False,A,True,82,82,0,0,0.225,True,True,PASSED,official_support_and_quality_ok,"നമസ്കാരം, സുഖമാണോ?"
+70,mn-MN,Mongolian (Mongolia),mn,base,False,True,B,True,8,8,0,0,0.182,True,,EXPERIMENTAL,google_experimental_support,Сайн байна уу?
+71,mr-IN,Marathi (India),mr,base,True,False,A,True,82,82,0,0,0.206,True,True,PASSED,official_support_and_quality_ok,"नमस्कार, कसे आहात?"
+72,ms-MY,Malay (Malaysia),ms,base,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,"Hai, apa khabar?"
+73,mt-MT,Maltese (Malta),mt,base,False,True,B,True,8,8,0,0,0.191,True,,EXPERIMENTAL,google_experimental_support,"Hello, kif inti?"
+74,my-MM,Burmese (Myanmar),my,base,True,False,A,True,82,82,0,0,0.221,True,True,PASSED,official_support_and_quality_ok,မင်္ဂလာပါ၊ နေကောင်းပါရဲ့လား။
+75,ne-NP,Nepali (Nepal),ne,base,True,False,A,True,82,82,0,0,0.215,True,True,PASSED,official_support_and_quality_ok,"नमस्ते, आरामै हुनुहुन्छ?"
+76,nl-NL,Dutch (Netherlands),nl,base,True,False,A,True,82,82,0,0,0.211,True,True,PASSED,official_support_and_quality_ok,"Hallo, hoe gaat het met u?"
+77,no-NO,Norwegian Bokmal (Norway),no,base,True,False,A,True,82,82,0,0,0.198,True,True,PASSED,official_support_and_quality_ok,"Hei, hvordan har du det?"
+78,nso-ZA,Sepedi (South Africa),nso,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+79,ny-MW,Nyanja (Malawi),ny,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+80,oc-FR,Occitan (France),oc,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+81,om-ET,Oromo (Ethiopia),om,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+82,or-IN,Oriya (India),or,base,False,True,B,True,8,8,0,0,0.242,True,,EXPERIMENTAL,google_experimental_support,"ନମସ୍କାର, ଆପଣ ଭଲ ଅଛନ୍ତି କି?"
+83,pa-Guru-IN,Punjabi (Gurmukhi India),pa,base,True,False,A,True,82,82,0,0,0.217,True,True,PASSED,official_support_and_quality_ok,"ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਕੀ ਤੁਸੀਂ ਠੀਕ ਹੋ?"
+84,pl-PL,Polish (Poland),pl,base,True,False,A,True,82,82,0,0,0.195,True,True,PASSED,official_support_and_quality_ok,"Cześć, jak się masz?"
+85,ps-AF,Pashto,ps,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+86,pt-BR,Portuguese (Brazil),pt-BR,exact,True,False,A,True,82,82,0,0,0.209,True,True,PASSED,official_support_and_quality_ok,"Olá, tudo bem?"
+87,pt-PT,Portuguese (Portugal),pt-PT,exact,True,False,A,True,82,82,0,0,0.204,True,True,PASSED,official_support_and_quality_ok,"Olá, está bem?"
+88,ro-RO,Romanian (Romania),ro,base,True,False,A,True,82,82,0,0,0.219,True,True,PASSED,official_support_and_quality_ok,"Bună, ce mai faci?"
+89,ru-RU,Russian (Russia),ru,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,"Здравствуйте, как вы?"
+90,rup-BG,Aromanian (Bulgaria),rup,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+91,sd-IN,Sindhi (India),sd,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+92,si-LK,Sinhala (Sri Lanka),si,base,False,False,C,True,1,1,0,0,0.175,True,,RETEST_REQUIRED,translated_despite_absent_from_doc,"ආයුබෝවන්, සුවෙන් ඉන්නවාද?"
+93,sk-SK,Slovak (Slovakia),sk,base,True,False,A,True,82,82,0,0,0.204,True,True,PASSED,official_support_and_quality_ok,"Ahoj, ako sa máš?"
+94,sl-SI,Slovenian (Slovenia),sl,base,True,False,A,True,82,82,0,0,0.218,True,True,PASSED,official_support_and_quality_ok,"Pozdravljeni, kako ste?"
+95,sn-ZW,Shona (Zimbabwe),sn,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+96,so-SO,Somali,so,base,False,True,B,True,8,8,0,0,0.208,True,,EXPERIMENTAL,google_experimental_support,"Salaan, ma fiican tahay?"
+97,sq-AL,Albanian (Albania),sq,base,True,False,A,True,82,82,0,0,0.219,True,True,PASSED,official_support_and_quality_ok,"Përshëndetje, si jeni?"
+98,sr-RS,Serbian (Serbia),sr,base,False,True,B,True,8,8,0,0,0.194,True,,EXPERIMENTAL,google_experimental_support,"Zdravo, kako ste?"
+99,su-ID,Sundanese (Indonesia),su,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+100,sv-SE,Swedish (Sweden),sv,base,True,False,A,True,82,82,0,0,0.202,True,True,PASSED,official_support_and_quality_ok,"Hej, hur mår du?"
+101,sw,Swahili,sw,base,True,False,A,True,82,82,0,0,0.216,True,True,PASSED,official_support_and_quality_ok,"Habari, hujambo?"
+102,sw-KE,Swahili (Kenya),sw,base,True,False,A,True,82,82,0,0,0.216,True,True,PASSED,official_support_and_quality_ok,"Habari, hujambo?"
+103,ta-IN,Tamil (India),ta,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"வணக்கம், நலமாக இருக்கிறீர்களா?"
+104,te-IN,Telugu (India),te,base,True,False,A,True,82,82,0,0,0.206,True,True,PASSED,official_support_and_quality_ok,"నమస్తే, బాగున్నారా?"
+105,tg-TJ,Tajik (Tajikistan),tg,base,False,True,B,True,8,8,0,0,0.244,True,,EXPERIMENTAL,google_experimental_support,"Салом, хуб ҳастед?"
+106,th-TH,Thai (Thailand),th,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,สวัสดีครับ สบายดีไหมครับ?
+107,tr-TR,Turkish (Turkey),tr,base,True,False,A,True,82,82,0,0,0.208,True,True,PASSED,official_support_and_quality_ok,"Merhaba, nasılsınız?"
+108,uk-UA,Ukrainian (Ukraine),uk,base,True,False,A,True,82,82,0,0,0.209,True,True,PASSED,official_support_and_quality_ok,"Привіт, як справи?"
+109,umb-AO,Umbundu (Angola),umb,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+110,ur-PK,Urdu (Pakistan),ur,base,True,False,A,True,82,82,0,0,0.209,True,True,PASSED,official_support_and_quality_ok,سلام، آپ کیسے ہیں؟
+111,uz-UZ,Uzbek (Uzbekistan),uz,base,True,False,A,True,40,40,0,0,0.209,True,,PASSED,official_support_and_quality_ok,"Salom, qandaysiz?"
+112,vi-VN,Vietnamese (Vietnam),vi,base,True,False,A,True,82,82,0,0,0.207,True,True,PASSED,official_support_and_quality_ok,"Xin chào, bạn có khỏe không?"
+113,wo-SN,Wolof (Senegal),wo,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+114,xh-ZA,Xhosa (South Africa),xh,base,False,False,C,True,1,1,0,0,0.254,True,,RETEST_REQUIRED,translated_despite_absent_from_doc,"Molo, unjani?"
+115,yo-NG,Yoruba (Nigeria),yo,base,False,False,C,True,1,1,0,0,0.202,True,,RETEST_REQUIRED,translated_despite_absent_from_doc,"Ẹ kú ààrọ̀, ṣé dáadáa ni?"
+116,yue-Hant-HK,"Chinese, Cantonese (Traditional Hong Kong)",yue,base,False,False,C,True,1,0,1,0,,False,,FAILED,api_rejected_unsupported_language,
+117,zu-ZA,Zulu (South Africa),zu,base,True,False,A,True,82,82,0,0,0.205,True,True,PASSED,official_support_and_quality_ok,"Sawubona, unjani?"

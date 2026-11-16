@@ -20,28 +20,103 @@ Manbalar:
 | B — eksperimental | 13 |
 | C — qo'llab-quvvatlanmaydi | 27 |
 | D — aniqlanmadi | 0 |
-| Haqiqiy API sinovidan o'tgan variantlar | 4 |
-| PASSED | 2 |
-| EXPERIMENTAL | 1 |
-| FAILED | 1 |
-| RETEST_REQUIRED | 113 |
-| Haqiqiy API so'rovlari soni | 120 |
-| Umumiy xarajat (USD) | 0.06077 |
-| Qolgan budjet (USD) | 29.93923 |
-| Qamrov | 3.4% |
+| Haqiqiy API sinovidan o'tgan variantlar | 117 |
+| PASSED | 77 |
+| EXPERIMENTAL | 13 |
+| FAILED | 24 |
+| RETEST_REQUIRED | 3 |
+| Haqiqiy API so'rovlari soni | 6408 |
+| Umumiy xarajat (USD) | 3.85788 |
+| Qolgan budjet (USD) | 26.14212 |
+| Qamrov | 100.0% |
 
 Narx modeli: har 1 million kiruvchi belgi uchun $10 va har 1 million chiquvchi
 belgi uchun $10. $25 da yangi pullik so'rovlar avtomatik to'xtatiladi; mutlaq
 chegara $30.
 
-## 2. PASSED (2)
+## 2. PASSED (77)
 
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
+| 1 | `af-ZA` | Afrikaans (South Africa) | `af` | official_support_and_quality_ok |
 | 3 | `ar-EG` | Arabic (Egypt) | `ar` | official_support_and_quality_ok |
+| 6 | `az-AZ` | Azerbaijani (Azerbaijan) | `az` | official_support_and_quality_ok |
+| 7 | `be-BY` | Belarusian (Belarus) | `be` | official_support_and_quality_ok |
+| 8 | `bg-BG` | Bulgarian (Bulgaria) | `bg` | official_support_and_quality_ok |
+| 9 | `bn-BD` | Bengali (Bangladesh) | `bn` | official_support_and_quality_ok |
+| 10 | `bn-IN` | Bengali (India) | `bn-IN` | official_support_and_quality_ok |
+| 11 | `bs-BA` | Bosnian (Bosnia and Herzegovina) | `bs` | official_support_and_quality_ok |
+| 12 | `ca-ES` | Catalan (Spain) | `ca` | official_support_and_quality_ok |
 | 15 | `cmn-Hans-CN` | Chinese (Simplified, China) | `zh` | official_support_and_quality_ok |
+| 16 | `cmn-Hant-TW` | Chinese, Mandarin (Traditional, Taiwan) | `zh-TW` | official_support_and_quality_ok |
+| 17 | `cs-CZ` | Czech (Czech Republic) | `cs` | official_support_and_quality_ok |
+| 18 | `cy-GB` | Welsh (United Kingdom) | `cy` | official_support_and_quality_ok |
+| 19 | `da-DK` | Danish (Denmark) | `da` | official_support_and_quality_ok |
+| 20 | `de-DE` | German (Germany) | `de` | official_support_and_quality_ok |
+| 21 | `el-GR` | Greek (Greece) | `el` | official_support_and_quality_ok |
+| 22 | `en-AU` | English (Australia) | `en-AU` | official_support_and_quality_ok |
+| 23 | `en-GB` | English (United Kingdom) | `en-GB` | official_support_and_quality_ok |
+| 24 | `en-IN` | English (India) | `en` | official_support_and_quality_ok |
+| 25 | `en-US` | English (United States) | `en-US` | official_support_and_quality_ok |
+| 26 | `es-419` | Spanish (Latin American) | `es-419` | official_support_and_quality_ok |
+| 27 | `es-ES` | Spanish (Spain) | `es-ES` | official_support_and_quality_ok |
+| 28 | `es-US` | Spanish (United States) | `es-US` | official_support_and_quality_ok |
+| 29 | `et-EE` | Estonian (Estonia) | `et` | official_support_and_quality_ok |
+| 31 | `fa-IR` | Persian (Iran) | `fa` | official_support_and_quality_ok |
+| 33 | `fi-FI` | Finnish (Finland) | `fi` | official_support_and_quality_ok |
+| 34 | `fil-PH` | Filipino (Philippines) | `fil` | official_support_and_quality_ok |
+| 35 | `fr-CA` | French (Canada) | `fr-CA` | official_support_and_quality_ok |
+| 36 | `fr-FR` | French (France) | `fr` | official_support_and_quality_ok |
+| 38 | `gl-ES` | Galician (Spain) | `gl` | official_support_and_quality_ok |
+| 39 | `gu-IN` | Gujarati (India) | `gu` | official_support_and_quality_ok |
+| 41 | `hi-IN` | Hindi (India) | `hi` | official_support_and_quality_ok |
+| 42 | `hr-HR` | Croatian (Croatia) | `hr` | official_support_and_quality_ok |
+| 43 | `hu-HU` | Hungarian (Hungary) | `hu` | official_support_and_quality_ok |
+| 45 | `id-ID` | Indonesian (Indonesia) | `id` | official_support_and_quality_ok |
+| 47 | `is-IS` | Icelandic (Iceland) | `is` | official_support_and_quality_ok |
+| 48 | `it-IT` | Italian (Italy) | `it` | official_support_and_quality_ok |
+| 49 | `iw-IL` | Hebrew (Israel) | `iw` | official_support_and_quality_ok |
+| 50 | `ja-JP` | Japanese (Japan) | `ja` | official_support_and_quality_ok |
+| 52 | `ka-GE` | Georgian (Georgia) | `ka` | official_support_and_quality_ok |
+| 56 | `km-KH` | Khmer (Cambodia) | `km` | official_support_and_quality_ok |
+| 57 | `kn-IN` | Kannada (India) | `kn` | official_support_and_quality_ok |
+| 58 | `ko-KR` | Korean (South Korea) | `ko` | official_support_and_quality_ok |
+| 59 | `ky-KG` | Kyrgyz (Cyrillic) | `ky` | official_support_and_quality_ok |
+| 62 | `ln-CD` | Lingala (Congo-Kinshasa) | `ln` | official_support_and_quality_ok |
+| 63 | `lo-LA` | Lao (Laos) | `lo` | official_support_and_quality_ok |
+| 64 | `lt-LT` | Lithuanian (Lithuania) | `lt` | official_support_and_quality_ok |
+| 66 | `lv-LV` | Latvian (Latvia) | `lv` | official_support_and_quality_ok |
+| 68 | `mk-MK` | Macedonian (North Macedonia) | `mk` | official_support_and_quality_ok |
+| 69 | `ml-IN` | Malayalam (India) | `ml` | official_support_and_quality_ok |
+| 71 | `mr-IN` | Marathi (India) | `mr` | official_support_and_quality_ok |
+| 72 | `ms-MY` | Malay (Malaysia) | `ms` | official_support_and_quality_ok |
+| 74 | `my-MM` | Burmese (Myanmar) | `my` | official_support_and_quality_ok |
+| 75 | `ne-NP` | Nepali (Nepal) | `ne` | official_support_and_quality_ok |
+| 76 | `nl-NL` | Dutch (Netherlands) | `nl` | official_support_and_quality_ok |
+| 77 | `no-NO` | Norwegian Bokmal (Norway) | `no` | official_support_and_quality_ok |
+| 83 | `pa-Guru-IN` | Punjabi (Gurmukhi India) | `pa` | official_support_and_quality_ok |
+| 84 | `pl-PL` | Polish (Poland) | `pl` | official_support_and_quality_ok |
+| 86 | `pt-BR` | Portuguese (Brazil) | `pt-BR` | official_support_and_quality_ok |
+| 87 | `pt-PT` | Portuguese (Portugal) | `pt-PT` | official_support_and_quality_ok |
+| 88 | `ro-RO` | Romanian (Romania) | `ro` | official_support_and_quality_ok |
+| 89 | `ru-RU` | Russian (Russia) | `ru` | official_support_and_quality_ok |
+| 93 | `sk-SK` | Slovak (Slovakia) | `sk` | official_support_and_quality_ok |
+| 94 | `sl-SI` | Slovenian (Slovenia) | `sl` | official_support_and_quality_ok |
+| 97 | `sq-AL` | Albanian (Albania) | `sq` | official_support_and_quality_ok |
+| 100 | `sv-SE` | Swedish (Sweden) | `sv` | official_support_and_quality_ok |
+| 101 | `sw` | Swahili | `sw` | official_support_and_quality_ok |
+| 102 | `sw-KE` | Swahili (Kenya) | `sw` | official_support_and_quality_ok |
+| 103 | `ta-IN` | Tamil (India) | `ta` | official_support_and_quality_ok |
+| 104 | `te-IN` | Telugu (India) | `te` | official_support_and_quality_ok |
+| 106 | `th-TH` | Thai (Thailand) | `th` | official_support_and_quality_ok |
+| 107 | `tr-TR` | Turkish (Turkey) | `tr` | official_support_and_quality_ok |
+| 108 | `uk-UA` | Ukrainian (Ukraine) | `uk` | official_support_and_quality_ok |
+| 110 | `ur-PK` | Urdu (Pakistan) | `ur` | official_support_and_quality_ok |
+| 111 | `uz-UZ` | Uzbek (Uzbekistan) | `uz` | official_support_and_quality_ok |
+| 112 | `vi-VN` | Vietnamese (Vietnam) | `vi` | official_support_and_quality_ok |
+| 117 | `zu-ZA` | Zulu (South Africa) | `zu` | official_support_and_quality_ok |
 
-## 3. EXPERIMENTAL (1)
+## 3. EXPERIMENTAL (13)
 
 Google hujjatida eksperimental deb belgilangan. Sinov natijasi qayd etildi,
 lekin asosiy Online ro'yxatga avtomatik qo'shilmaydi.
@@ -49,8 +124,20 @@ lekin asosiy Online ro'yxatga avtomatik qo'shilmaydi.
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
 | 2 | `am-ET` | Amharic (Ethiopia) | `am` | google_experimental_support |
+| 30 | `eu-ES` | Basque (Spain) | `eu` | google_experimental_support |
+| 37 | `ga-IE` | Irish (Ireland) | `ga` | google_experimental_support |
+| 40 | `ha-NG` | Hausa (Nigeria) | `ha` | google_experimental_support |
+| 44 | `hy-AM` | Armenian (Armenia) | `hy` | google_experimental_support |
+| 46 | `ig-NG` | Igbo (Nigeria) | `ig` | google_experimental_support |
+| 60 | `lb-LU` | Luxembourgish (Luxembourg) | `lb` | google_experimental_support |
+| 70 | `mn-MN` | Mongolian (Mongolia) | `mn` | google_experimental_support |
+| 73 | `mt-MT` | Maltese (Malta) | `mt` | google_experimental_support |
+| 82 | `or-IN` | Oriya (India) | `or` | google_experimental_support |
+| 96 | `so-SO` | Somali | `so` | google_experimental_support |
+| 98 | `sr-RS` | Serbian (Serbia) | `sr` | google_experimental_support |
+| 105 | `tg-TJ` | Tajik (Tajikistan) | `tg` | google_experimental_support |
 
-## 4. FAILED (1)
+## 4. FAILED (24)
 
 Model bu til kodini rad etdi yoki yetarli dalillar bilan jiddiy muammo aniqlandi.
 Manba koddan **hech narsa o'chirilmadi**; faqat tavsiya ro'yxati tayyorlandi.
@@ -58,126 +145,39 @@ Manba koddan **hech narsa o'chirilmadi**; faqat tavsiya ro'yxati tayyorlandi.
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
 | 4 | `as-IN` | Assamese (India) | `as` | api_rejected_unsupported_language |
+| 5 | `ast-ES` | Asturian (Spain) | `ast` | api_rejected_unsupported_language |
+| 13 | `ceb-PH` | Cebuano (Philippines) | `ceb` | api_rejected_unsupported_language |
+| 14 | `ckb-IQ` | Central Kurdish (Iraq) | `ckb` | api_rejected_unsupported_language |
+| 32 | `ff-SN` | Fulah (Senegal) | `ff` | api_rejected_unsupported_language |
+| 51 | `jv-ID` | Javanese (Indonesia) | `jv` | api_rejected_unsupported_language |
+| 53 | `kam-KE` | Kamba (Kenya) | `kam` | api_rejected_unsupported_language |
+| 54 | `kea-CV` | Kabuverdianu (Cape Verde) | `kea` | api_rejected_unsupported_language |
+| 55 | `kk-KZ` | Kazakh (Kazakhstan) | `kk` | api_rejected_unsupported_language |
+| 61 | `lg-UG` | Ganda (Uganda) | `lg` | api_rejected_unsupported_language |
+| 65 | `luo-KE` | Luo (Kenya) | `luo` | api_rejected_unsupported_language |
+| 67 | `mi-NZ` | Maori (New Zealand) | `mi` | api_rejected_unsupported_language |
+| 78 | `nso-ZA` | Sepedi (South Africa) | `nso` | api_rejected_unsupported_language |
+| 79 | `ny-MW` | Nyanja (Malawi) | `ny` | api_rejected_unsupported_language |
+| 80 | `oc-FR` | Occitan (France) | `oc` | api_rejected_unsupported_language |
+| 81 | `om-ET` | Oromo (Ethiopia) | `om` | api_rejected_unsupported_language |
+| 85 | `ps-AF` | Pashto | `ps` | api_rejected_unsupported_language |
+| 90 | `rup-BG` | Aromanian (Bulgaria) | `rup` | api_rejected_unsupported_language |
+| 91 | `sd-IN` | Sindhi (India) | `sd` | api_rejected_unsupported_language |
+| 95 | `sn-ZW` | Shona (Zimbabwe) | `sn` | api_rejected_unsupported_language |
+| 99 | `su-ID` | Sundanese (Indonesia) | `su` | api_rejected_unsupported_language |
+| 109 | `umb-AO` | Umbundu (Angola) | `umb` | api_rejected_unsupported_language |
+| 113 | `wo-SN` | Wolof (Senegal) | `wo` | api_rejected_unsupported_language |
+| 116 | `yue-Hant-HK` | Chinese, Cantonese (Traditional Hong Kong) | `yue` | api_rejected_unsupported_language |
 
-## 5. RETEST_REQUIRED (113)
+## 5. RETEST_REQUIRED (3)
 
 Vaqtinchalik API muammosi, noaniq natija yoki yetarli sifat dalili yo'q.
 
 | # | Chirp 2 | Til | LLM kod | Sabab |
 |---|---------|-----|---------|-------|
-| 1 | `af-ZA` | Afrikaans (South Africa) | `af` | not_yet_tested |
-| 5 | `ast-ES` | Asturian (Spain) | `ast` | not_yet_tested |
-| 6 | `az-AZ` | Azerbaijani (Azerbaijan) | `az` | not_yet_tested |
-| 7 | `be-BY` | Belarusian (Belarus) | `be` | not_yet_tested |
-| 8 | `bg-BG` | Bulgarian (Bulgaria) | `bg` | not_yet_tested |
-| 9 | `bn-BD` | Bengali (Bangladesh) | `bn` | not_yet_tested |
-| 10 | `bn-IN` | Bengali (India) | `bn-IN` | not_yet_tested |
-| 11 | `bs-BA` | Bosnian (Bosnia and Herzegovina) | `bs` | not_yet_tested |
-| 12 | `ca-ES` | Catalan (Spain) | `ca` | not_yet_tested |
-| 13 | `ceb-PH` | Cebuano (Philippines) | `ceb` | not_yet_tested |
-| 14 | `ckb-IQ` | Central Kurdish (Iraq) | `ckb` | not_yet_tested |
-| 16 | `cmn-Hant-TW` | Chinese, Mandarin (Traditional, Taiwan) | `zh-TW` | not_yet_tested |
-| 17 | `cs-CZ` | Czech (Czech Republic) | `cs` | not_yet_tested |
-| 18 | `cy-GB` | Welsh (United Kingdom) | `cy` | not_yet_tested |
-| 19 | `da-DK` | Danish (Denmark) | `da` | not_yet_tested |
-| 20 | `de-DE` | German (Germany) | `de` | not_yet_tested |
-| 21 | `el-GR` | Greek (Greece) | `el` | not_yet_tested |
-| 22 | `en-AU` | English (Australia) | `en-AU` | not_yet_tested |
-| 23 | `en-GB` | English (United Kingdom) | `en-GB` | not_yet_tested |
-| 24 | `en-IN` | English (India) | `en` | not_yet_tested |
-| 25 | `en-US` | English (United States) | `en-US` | not_yet_tested |
-| 26 | `es-419` | Spanish (Latin American) | `es-419` | not_yet_tested |
-| 27 | `es-ES` | Spanish (Spain) | `es-ES` | not_yet_tested |
-| 28 | `es-US` | Spanish (United States) | `es-US` | not_yet_tested |
-| 29 | `et-EE` | Estonian (Estonia) | `et` | not_yet_tested |
-| 30 | `eu-ES` | Basque (Spain) | `eu` | not_yet_tested |
-| 31 | `fa-IR` | Persian (Iran) | `fa` | not_yet_tested |
-| 32 | `ff-SN` | Fulah (Senegal) | `ff` | not_yet_tested |
-| 33 | `fi-FI` | Finnish (Finland) | `fi` | not_yet_tested |
-| 34 | `fil-PH` | Filipino (Philippines) | `fil` | not_yet_tested |
-| 35 | `fr-CA` | French (Canada) | `fr-CA` | not_yet_tested |
-| 36 | `fr-FR` | French (France) | `fr` | not_yet_tested |
-| 37 | `ga-IE` | Irish (Ireland) | `ga` | not_yet_tested |
-| 38 | `gl-ES` | Galician (Spain) | `gl` | not_yet_tested |
-| 39 | `gu-IN` | Gujarati (India) | `gu` | not_yet_tested |
-| 40 | `ha-NG` | Hausa (Nigeria) | `ha` | not_yet_tested |
-| 41 | `hi-IN` | Hindi (India) | `hi` | not_yet_tested |
-| 42 | `hr-HR` | Croatian (Croatia) | `hr` | not_yet_tested |
-| 43 | `hu-HU` | Hungarian (Hungary) | `hu` | not_yet_tested |
-| 44 | `hy-AM` | Armenian (Armenia) | `hy` | not_yet_tested |
-| 45 | `id-ID` | Indonesian (Indonesia) | `id` | not_yet_tested |
-| 46 | `ig-NG` | Igbo (Nigeria) | `ig` | not_yet_tested |
-| 47 | `is-IS` | Icelandic (Iceland) | `is` | not_yet_tested |
-| 48 | `it-IT` | Italian (Italy) | `it` | not_yet_tested |
-| 49 | `iw-IL` | Hebrew (Israel) | `iw` | not_yet_tested |
-| 50 | `ja-JP` | Japanese (Japan) | `ja` | not_yet_tested |
-| 51 | `jv-ID` | Javanese (Indonesia) | `jv` | not_yet_tested |
-| 52 | `ka-GE` | Georgian (Georgia) | `ka` | not_yet_tested |
-| 53 | `kam-KE` | Kamba (Kenya) | `kam` | not_yet_tested |
-| 54 | `kea-CV` | Kabuverdianu (Cape Verde) | `kea` | not_yet_tested |
-| 55 | `kk-KZ` | Kazakh (Kazakhstan) | `kk` | not_yet_tested |
-| 56 | `km-KH` | Khmer (Cambodia) | `km` | not_yet_tested |
-| 57 | `kn-IN` | Kannada (India) | `kn` | not_yet_tested |
-| 58 | `ko-KR` | Korean (South Korea) | `ko` | not_yet_tested |
-| 59 | `ky-KG` | Kyrgyz (Cyrillic) | `ky` | not_yet_tested |
-| 60 | `lb-LU` | Luxembourgish (Luxembourg) | `lb` | not_yet_tested |
-| 61 | `lg-UG` | Ganda (Uganda) | `lg` | not_yet_tested |
-| 62 | `ln-CD` | Lingala (Congo-Kinshasa) | `ln` | not_yet_tested |
-| 63 | `lo-LA` | Lao (Laos) | `lo` | not_yet_tested |
-| 64 | `lt-LT` | Lithuanian (Lithuania) | `lt` | not_yet_tested |
-| 65 | `luo-KE` | Luo (Kenya) | `luo` | not_yet_tested |
-| 66 | `lv-LV` | Latvian (Latvia) | `lv` | not_yet_tested |
-| 67 | `mi-NZ` | Maori (New Zealand) | `mi` | not_yet_tested |
-| 68 | `mk-MK` | Macedonian (North Macedonia) | `mk` | not_yet_tested |
-| 69 | `ml-IN` | Malayalam (India) | `ml` | not_yet_tested |
-| 70 | `mn-MN` | Mongolian (Mongolia) | `mn` | not_yet_tested |
-| 71 | `mr-IN` | Marathi (India) | `mr` | not_yet_tested |
-| 72 | `ms-MY` | Malay (Malaysia) | `ms` | not_yet_tested |
-| 73 | `mt-MT` | Maltese (Malta) | `mt` | not_yet_tested |
-| 74 | `my-MM` | Burmese (Myanmar) | `my` | not_yet_tested |
-| 75 | `ne-NP` | Nepali (Nepal) | `ne` | not_yet_tested |
-| 76 | `nl-NL` | Dutch (Netherlands) | `nl` | not_yet_tested |
-| 77 | `no-NO` | Norwegian Bokmal (Norway) | `no` | not_yet_tested |
-| 78 | `nso-ZA` | Sepedi (South Africa) | `nso` | not_yet_tested |
-| 79 | `ny-MW` | Nyanja (Malawi) | `ny` | not_yet_tested |
-| 80 | `oc-FR` | Occitan (France) | `oc` | not_yet_tested |
-| 81 | `om-ET` | Oromo (Ethiopia) | `om` | not_yet_tested |
-| 82 | `or-IN` | Oriya (India) | `or` | not_yet_tested |
-| 83 | `pa-Guru-IN` | Punjabi (Gurmukhi India) | `pa` | not_yet_tested |
-| 84 | `pl-PL` | Polish (Poland) | `pl` | not_yet_tested |
-| 85 | `ps-AF` | Pashto | `ps` | not_yet_tested |
-| 86 | `pt-BR` | Portuguese (Brazil) | `pt-BR` | not_yet_tested |
-| 87 | `pt-PT` | Portuguese (Portugal) | `pt-PT` | not_yet_tested |
-| 88 | `ro-RO` | Romanian (Romania) | `ro` | not_yet_tested |
-| 89 | `ru-RU` | Russian (Russia) | `ru` | not_yet_tested |
-| 90 | `rup-BG` | Aromanian (Bulgaria) | `rup` | not_yet_tested |
-| 91 | `sd-IN` | Sindhi (India) | `sd` | not_yet_tested |
-| 92 | `si-LK` | Sinhala (Sri Lanka) | `si` | not_yet_tested |
-| 93 | `sk-SK` | Slovak (Slovakia) | `sk` | not_yet_tested |
-| 94 | `sl-SI` | Slovenian (Slovenia) | `sl` | not_yet_tested |
-| 95 | `sn-ZW` | Shona (Zimbabwe) | `sn` | not_yet_tested |
-| 96 | `so-SO` | Somali | `so` | not_yet_tested |
-| 97 | `sq-AL` | Albanian (Albania) | `sq` | not_yet_tested |
-| 98 | `sr-RS` | Serbian (Serbia) | `sr` | not_yet_tested |
-| 99 | `su-ID` | Sundanese (Indonesia) | `su` | not_yet_tested |
-| 100 | `sv-SE` | Swedish (Sweden) | `sv` | not_yet_tested |
-| 101 | `sw` | Swahili | `sw` | not_yet_tested |
-| 102 | `sw-KE` | Swahili (Kenya) | `sw` | not_yet_tested |
-| 103 | `ta-IN` | Tamil (India) | `ta` | not_yet_tested |
-| 104 | `te-IN` | Telugu (India) | `te` | not_yet_tested |
-| 105 | `tg-TJ` | Tajik (Tajikistan) | `tg` | not_yet_tested |
-| 106 | `th-TH` | Thai (Thailand) | `th` | not_yet_tested |
-| 107 | `tr-TR` | Turkish (Turkey) | `tr` | not_yet_tested |
-| 108 | `uk-UA` | Ukrainian (Ukraine) | `uk` | not_yet_tested |
-| 109 | `umb-AO` | Umbundu (Angola) | `umb` | not_yet_tested |
-| 110 | `ur-PK` | Urdu (Pakistan) | `ur` | not_yet_tested |
-| 111 | `uz-UZ` | Uzbek (Uzbekistan) | `uz` | not_yet_tested |
-| 112 | `vi-VN` | Vietnamese (Vietnam) | `vi` | not_yet_tested |
-| 113 | `wo-SN` | Wolof (Senegal) | `wo` | not_yet_tested |
-| 114 | `xh-ZA` | Xhosa (South Africa) | `xh` | not_yet_tested |
-| 115 | `yo-NG` | Yoruba (Nigeria) | `yo` | not_yet_tested |
-| 116 | `yue-Hant-HK` | Chinese, Cantonese (Traditional Hong Kong) | `yue` | not_yet_tested |
-| 117 | `zu-ZA` | Zulu (South Africa) | `zu` | not_yet_tested |
+| 92 | `si-LK` | Sinhala (Sri Lanka) | `si` | translated_despite_absent_from_doc |
+| 114 | `xh-ZA` | Xhosa (South Africa) | `xh` | translated_despite_absent_from_doc |
+| 115 | `yo-NG` | Yoruba (Nigeria) | `yo` | translated_despite_absent_from_doc |
 
 ## 6. Metodologiya va cheklovlar
 

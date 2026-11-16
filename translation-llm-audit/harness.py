@@ -33,14 +33,14 @@ RESULTS = HERE / "results"
 RESULTS.mkdir(exist_ok=True)
 
 sys.path.insert(0, str(HERE))
-from corpus import ITEMS, NUMERIC_EXPECTATIONS, SCRIPT_EXPECTATIONS, source_text
+from corpus import ITEMS, source_text
 from language_matrix import (
     DEFAULT_PROJECT,
     DEFAULT_REGION,
-    LLM_OFFICIAL,
     MODEL_ID,
     matrix_rows,
 )
+from quality import score
 
 # --- Budget ---------------------------------------------------------------
 USD_PER_CHAR_IN = 10.0 / 1_000_000
@@ -148,71 +148,22 @@ def translate(client: httpx.Client, token: str, text: str, source: str, target: 
             time.sleep(1.5 * (attempt + 1))
             continue
         return last
-    return last
 
 
-# --- Quality scoring ------------------------------------------------------
-def expected_script(llm_code: str) -> str | None:
-    return SCRIPT_EXPECTATIONS.get(llm_code)
+def build_plan(rows: list[dict], deep: set[str] | None = None) -> list[dict]:
+    """Deterministic request plan per locale (class-aware).
 
-
-_SCRIPT_RANGES = {
-    "Cyrillic": [(0x0400, 0x04FF)], "Arabic": [(0x0600, 0x06FF), (0x0750, 0x077F)],
-    "Hebrew": [(0x0590, 0x05FF)], "Devanagari": [(0x0900, 0x097F)],
-    "Bengali": [(0x0980, 0x09FF)], "Gurmukhi": [(0x0A00, 0x0A7F)],
-    "Gujarati": [(0x0A80, 0x0AFF)], "Tamil": [(0x0B80, 0x0BFF)],
-    "Telugu": [(0x0C00, 0x0C7F)], "Kannada": [(0x0C80, 0x0CFF)],
-    "Malayalam": [(0x0D00, 0x0D7F)], "Sinhala": [(0x0D80, 0x0DFF)],
-    "Thai": [(0x0E00, 0x0E7F)], "Lao": [(0x0E80, 0x0EFF)],
-    "Myanmar": [(0x1000, 0x109F)], "Georgian": [(0x10A0, 0x10FF)],
-    "Ethiopic": [(0x1200, 0x137F)], "Khmer": [(0x1780, 0x17FF)],
-    "Greek": [(0x0370, 0x03FF)], "Han": [(0x4E00, 0x9FFF), (0x3400, 0x4DBF)],
-    "Japanese": [(0x3040, 0x30FF), (0x4E00, 0x9FFF)],
-    "Korean": [(0xAC00, 0xD7AF), (0x1100, 0x11FF)],
-    "Armenian": [(0x0530, 0x058F)],
-}
-
-
-def script_present(text: str, script: str) -> bool:
-    for ch in text:
-        cp = ord(ch)
-        for lo, hi in _SCRIPT_RANGES.get(script, []):
-            if lo <= cp <= hi:
-                return True
-    return False
-
-
-def score(item_id: str, source_text_: str, translated: str, llm_code: str,
-          is_target: bool) -> dict:
-    """Heuristic, script/number based quality signals for one direction."""
-    out = (translated or "").strip()
-    flags = []
-    if not out:
-        flags.append("empty_output")
-    if out and out == source_text_.strip():
-        flags.append("identical_to_source")
-    ratio = (len(out) / len(source_text_)) if source_text_ else 0.0
-    if out and (ratio < 0.15 or ratio > 6.0):
-        flags.append(f"length_ratio_{ratio:.2f}")
-    script = expected_script(llm_code) if is_target else None
-    if script and out and not script_present(out, script):
-        flags.append(f"script_mismatch:{script}")
-    nums = NUMERIC_EXPECTATIONS.get(item_id)
-    if nums and out:
-        digits_in_out = "".join(ch for ch in out if ch.isdigit())
-        src_digits = "".join(ch for ch in source_text_ if ch.isdigit())
-        if src_digits and src_digits not in digits_in_out and not any(n in out for n in nums):
-            flags.append("numeric_mismatch")
-    return {"flags": flags, "length_ratio": round(ratio, 3)}
-
-
-def build_plan(rows: list[dict]) -> list[dict]:
-    """Deterministic request plan per locale (class-aware)."""
+    ``deep`` forces the full four-direction probe for the named locales even
+    when they are not documented as officially supported, so an unexpected API
+    acceptance can be confirmed rather than guessed.
+    """
+    deep = deep or set()
     by_chirp = {r["chirp2_code"]: r for r in rows}
     plan = []
     for chirp, row in by_chirp.items():
         llm = row["translation_llm_code"]
         cls = row["documented_class"]
+        effective = "A" if chirp in deep else cls
 
         def emit(iid, cat, src_field, direction, source, target):
             # A source equal to the target is degenerate (e.g. uz->uz for the
@@ -223,7 +174,7 @@ def build_plan(rows: list[dict]) -> list[dict]:
                          "category": cat, "src_field": src_field, "direction": direction,
                          "source": source, "target": target})
 
-        if cls == "A":
+        if effective == "A":
             for item in ITEMS:
                 iid, cat, _uz, _en = item
                 emit(iid, cat, "uz", "uz2X", "uz", llm)
@@ -232,7 +183,7 @@ def build_plan(rows: list[dict]) -> list[dict]:
                 emit(iid, cat, "X", "X2en", llm, "en")
             for rep in range(_STABILITY_REPEATS - 1):
                 emit(_STABILITY_ITEM, "stability_repeat", "uz", f"uz2X_rep{rep + 2}", "uz", llm)
-        elif cls == "B":
+        elif effective == "B":
             # Reduced probe for experimental locales: record real behaviour only.
             for item in ITEMS[:4]:
                 iid, cat, _uz, _en = item
@@ -267,9 +218,9 @@ def key(entry: dict) -> str:
     return f"{entry['chirp']}|{entry['direction']}|{entry['item']}"
 
 
-def run(phase: str, only: list[str] | None, max_requests: int) -> dict:
+def run(phase: str, only: list[str] | None, max_requests: int, deep: set[str] | None = None) -> dict:
     rows = matrix_rows()
-    plan = build_plan(rows)
+    plan = build_plan(rows, deep=deep)
     if only:
         plan = [e for e in plan if e["chirp"] in only]
     # Pilot: a representative slice across scripts and classes.
@@ -329,7 +280,8 @@ def run(phase: str, only: list[str] | None, max_requests: int) -> dict:
             ledger.add(src, out)
             if res.get("http") != 200:
                 ledger.errors += 1
-            q = score(entry["item"], src, out, entry["llm"], is_target)
+            q = score(entry["item"], src, out, entry["llm"],
+                      entry["source"], entry["target"], is_target)
             done[k] = {
                 "chirp": entry["chirp"], "llm": entry["llm"], "class": entry["class"],
                 "item": entry["item"], "category": entry["category"],
@@ -363,10 +315,12 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--phase", default="full", choices=["pilot", "full"])
     ap.add_argument("--only", default="", help="comma-separated chirp locales")
+    ap.add_argument("--deep", default="", help="comma-separated chirp locales to probe fully")
     ap.add_argument("--max-requests", type=int, default=100000)
     args = ap.parse_args()
     only = [x for x in args.only.split(",") if x] or None
-    run(args.phase, only, args.max_requests)
+    deep = {x for x in args.deep.split(",") if x} or None
+    run(args.phase, only, args.max_requests, deep=deep)
 
 
 if __name__ == "__main__":

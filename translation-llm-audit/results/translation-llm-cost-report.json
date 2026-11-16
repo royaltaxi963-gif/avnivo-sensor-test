@@ -3,19 +3,19 @@
  "rate": "USD 10 per 1M input characters + USD 10 per 1M output characters",
  "source": "https://cloud.google.com/translate/pricing",
  "ledger": {
-  "requests": 120,
-  "errors": 1,
-  "input_chars": 3083,
-  "output_chars": 2994,
-  "cost_usd": 0.06077,
+  "requests": 6408,
+  "errors": 69,
+  "input_chars": 194083,
+  "output_chars": 191705,
+  "cost_usd": 3.85788,
   "budget_ceiling_usd": 30.0,
   "hard_stop_usd": 25.0,
-  "remaining_usd": 29.93923,
+  "remaining_usd": 26.14212,
   "rate": "USD 10 per 1M input chars + USD 10 per 1M output chars"
  },
  "budget_ceiling_usd": 30.0,
  "hard_stop_usd": 25.0,
- "remaining_usd": 29.93923,
+ "remaining_usd": 26.14212,
  "checkpoints": [
   {
    "threshold_usd": 2,

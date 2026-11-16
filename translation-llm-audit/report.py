@@ -23,6 +23,7 @@ from language_matrix import (
     VERIFIED_ON,
     matrix_rows,
 )
+from quality import CRITICAL_FLAGS, score
 
 HERE = Path(__file__).resolve().parent
 RESULTS = HERE / "results"
@@ -67,14 +68,16 @@ def locale_verdict(row: dict, records: list[dict]) -> dict:
     ok = [r for r in records if r["http"] == 200]
     unsupported = [r for r in records if r["http"] in UNSUPPORTED_STATUSES]
     transient = [r for r in records if r["http"] in TRANSIENT_STATUSES and r["http"] != 200]
-    # quality flags only matter for successful target-direction outputs
+    # Quality flags are recomputed from the raw response text so a scoring
+    # refinement applies consistently to already-recorded evidence.
     target_ok = [r for r in ok if r["direction"].startswith("uz2X") or r["direction"].startswith("en2X")]
     crit = Counter()
     for r in target_ok:
-        for f in r["quality"]["flags"]:
+        flags = score(r["item"], r["source_text"], r["translated"], r["llm"],
+                      r["source"], r["target"], True)["flags"]
+        for f in flags:
             crit[f.split(":")[0]] += 1
-    critical = {k: v for k, v in crit.items()
-                if k in {"empty_output", "identical_to_source", "script_mismatch", "numeric_mismatch"}}
+    critical = {k: v for k, v in crit.items() if k in CRITICAL_FLAGS}
     quality_pass = bool(target_ok) and not critical
     st = stability_ok(records)
     latencies = [r["latency_s"] for r in ok if r.get("latency_s")]

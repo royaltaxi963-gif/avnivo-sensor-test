@@ -6,6 +6,144 @@
    "language_name": "Assamese (India)",
    "translation_llm_code": "as",
    "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "ast-ES",
+   "language_name": "Asturian (Spain)",
+   "translation_llm_code": "ast",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "ceb-PH",
+   "language_name": "Cebuano (Philippines)",
+   "translation_llm_code": "ceb",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "ckb-IQ",
+   "language_name": "Central Kurdish (Iraq)",
+   "translation_llm_code": "ckb",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "ff-SN",
+   "language_name": "Fulah (Senegal)",
+   "translation_llm_code": "ff",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "jv-ID",
+   "language_name": "Javanese (Indonesia)",
+   "translation_llm_code": "jv",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "kam-KE",
+   "language_name": "Kamba (Kenya)",
+   "translation_llm_code": "kam",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "kea-CV",
+   "language_name": "Kabuverdianu (Cape Verde)",
+   "translation_llm_code": "kea",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "kk-KZ",
+   "language_name": "Kazakh (Kazakhstan)",
+   "translation_llm_code": "kk",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "lg-UG",
+   "language_name": "Ganda (Uganda)",
+   "translation_llm_code": "lg",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "luo-KE",
+   "language_name": "Luo (Kenya)",
+   "translation_llm_code": "luo",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "mi-NZ",
+   "language_name": "Maori (New Zealand)",
+   "translation_llm_code": "mi",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "nso-ZA",
+   "language_name": "Sepedi (South Africa)",
+   "translation_llm_code": "nso",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "ny-MW",
+   "language_name": "Nyanja (Malawi)",
+   "translation_llm_code": "ny",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "oc-FR",
+   "language_name": "Occitan (France)",
+   "translation_llm_code": "oc",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "om-ET",
+   "language_name": "Oromo (Ethiopia)",
+   "translation_llm_code": "om",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "ps-AF",
+   "language_name": "Pashto",
+   "translation_llm_code": "ps",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "rup-BG",
+   "language_name": "Aromanian (Bulgaria)",
+   "translation_llm_code": "rup",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "sd-IN",
+   "language_name": "Sindhi (India)",
+   "translation_llm_code": "sd",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "sn-ZW",
+   "language_name": "Shona (Zimbabwe)",
+   "translation_llm_code": "sn",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "su-ID",
+   "language_name": "Sundanese (Indonesia)",
+   "translation_llm_code": "su",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "umb-AO",
+   "language_name": "Umbundu (Angola)",
+   "translation_llm_code": "umb",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "wo-SN",
+   "language_name": "Wolof (Senegal)",
+   "translation_llm_code": "wo",
+   "reason": "api_rejected_unsupported_language"
+  },
+  {
+   "chirp2_code": "yue-Hant-HK",
+   "language_name": "Chinese, Cantonese (Traditional Hong Kong)",
+   "translation_llm_code": "yue",
+   "reason": "api_rejected_unsupported_language"
   }
  ]
 }
