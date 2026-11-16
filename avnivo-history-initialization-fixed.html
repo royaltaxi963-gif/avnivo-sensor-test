@@ -165,7 +165,7 @@ historyClose.addEventListener('click',()=>setHistoryOpen(false));
 historyOverlay.addEventListener('click',()=>setHistoryOpen(false));
 historyNew.addEventListener('click',()=>{persistDraft();currentHistoryId=null;persistActiveChat();messages.replaceChildren();loadDraft();setHistoryOpen(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&historyOpen)setHistoryOpen(false)});
-loadHistory();if(currentHistoryId){const current=historySessions.find(x=>x.id===currentHistoryId);if(current)restoreHistory(current)}loadDraft();renderHistory();
+// Initialize saved conversation only after microphone, brand and composer are ready.
 
 const brand=document.querySelector('.center-brand');
 const brandLine=document.querySelector('.brand-translator');
@@ -392,6 +392,8 @@ mic.addEventListener('click',event=>{
  if(active)stopVoice();else if(shell.classList.contains('text-mode'))sendMessage();else if(!holdStarted)startVoice();
 });
 
+// All dependent const bindings and handlers are initialized before restoring a saved draft.
+loadHistory();if(currentHistoryId){const current=historySessions.find(x=>x.id===currentHistoryId);if(current)restoreHistory(current)}loadDraft();renderHistory();
 window.addEventListener('pagehide',()=>{if(active)stopVoice()});
 
 })();
