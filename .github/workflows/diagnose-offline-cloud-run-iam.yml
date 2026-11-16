@@ -43,19 +43,15 @@ jobs:
           echo "Active principal: $PRINCIPAL"
           echo "### Effective principal IAM roles" >> "$GITHUB_STEP_SUMMARY"
           if gcloud projects get-iam-policy "$PROJECT" --format=json > /tmp/avnivo-iam.json 2>/tmp/avnivo-iam-error; then
-            python - "$PRINCIPAL" <<'PY'
-import json,sys,os
-principal=sys.argv[1]
-bindings=json.load(open('/tmp/avnivo-iam.json')).get('bindings',[])
-roles=[b['role'] + (' (conditional)' if b.get('condition') else '') for b in bindings if 'serviceAccount:'+principal in b.get('members',[])]
-print('Direct project IAM roles:')
-print('\\n'.join(roles) if roles else '(none found; check inherited IAM)')
-with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
-    f.write('\\n'.join('- '+role for role in roles) if roles else 'No direct project IAM binding found; inherited roles not checked')
-    f.write('\\n')
-PY
+            jq -r --arg principal "serviceAccount:$PRINCIPAL" '.bindings[] | select(.members | index($principal)) | .role + (if .condition then " (conditional)" else "" end)' /tmp/avnivo-iam.json | tee /tmp/avnivo-roles.txt
+            if [ -s /tmp/avnivo-roles.txt ]; then
+              sed 's/^/- /' /tmp/avnivo-roles.txt >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "No direct project binding found; inherited IAM not checked." >> "$GITHUB_STEP_SUMMARY"
+            fi
           else
-            echo "Cannot read project IAM policy:"; cat /tmp/avnivo-iam-error
+            echo "Cannot read project IAM policy:"
+            cat /tmp/avnivo-iam-error
             echo "Project IAM policy not readable; inspect in Cloud Console." >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "::endgroup::"
