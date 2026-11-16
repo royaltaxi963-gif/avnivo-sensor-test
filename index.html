@@ -396,7 +396,7 @@ document.querySelector('.settings-drawer')?.append(ttsVoiceLabel);
 const ttsStyleSelect=document.createElement('select');
 ttsStyleSelect.setAttribute('aria-label','Ovoz ohangini tanlash');
 ttsStyleSelect.style.cssText=ttsVoiceSelect.style.cssText;
-const AVNIVO_TTS_STYLES=[['auto','Avtomatik'],['calm','Xotirjam'],['happy','Quvnoq'],['sad','Qayg‘uli'],['excited','Hayajonli'],['concerned','Xavotirli']];
+const AVNIVO_TTS_STYLES=[['auto','Avtomatik'],['calm','Xotirjam'],['happy','Quvnoq'],['sad','Qayg‘uli'],['excited','Hayajonli'],['concerned','Xavotirli'],["friendly","Do‘stona"],["professional","Professional"],["narrator","Audiokitob"],["documentary","Hujjatli film"],["news","Yangiliklar"],["storytelling","Hikoyachi"],["dramatic","Dramatik"],["mysterious","Sirli"],["serious","Jiddiy"],["confident","Ishonchli"],["gentle","Muloyim"],["empathetic","Hamdard"],["curious","Qiziquvchan"],["surprised","Hayratlangan"],["nervous","Asabiy"],["fearful","Qo‘rqqan"],["angry","G‘azablangan"],["frustrated","Jahli chiqqan"],["sarcastic","Kinoyali"],["ironic","Istehzo"],["bored","Zerikkan"],["tired","Charchagan"],["whisper","Pichirlash"],["mutter","Pichirlab ming‘irlash"],["breathy","Nafasli ovoz"],["robotic","Robotdek"],["monotone","Bir maromda"],["playful","O‘ynoqi"],["energetic","G‘ayratli"],["thoughtful","O‘ychan"],["persuasive","Ishontiruvchi"],["teacher","O‘qituvchi"],["poetic","She’riy"],["slow","Sekin nutq"],["fast","Tez nutq"],["custom","O‘zim belgilayman"]];
 for(const [value,label] of AVNIVO_TTS_STYLES){const option=document.createElement('option');option.value=value;option.textContent=label;ttsStyleSelect.append(option)}
 try{const saved=localStorage.getItem('avnivoTtsStyle');if(AVNIVO_TTS_STYLES.some(item=>item[0]===saved))ttsStyleSelect.value=saved}catch(e){}
 ttsStyleSelect.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsStyle',ttsStyleSelect.value)}catch(e){}});
@@ -416,6 +416,36 @@ ttsRateLabel.textContent='O‘qish tezligi (Online va Offline)';
 ttsRateLabel.style.cssText=ttsVoiceLabel.style.cssText;
 ttsRateLabel.append(ttsRateSelect);
 document.querySelector('.settings-drawer')?.append(ttsRateLabel);
+
+function addTtsSetting(labelText,storageKey,items){
+ const select=document.createElement('select');select.setAttribute('aria-label',labelText);select.style.cssText=ttsVoiceSelect.style.cssText;
+ for(const [value,title] of items){const option=document.createElement('option');option.value=value;option.textContent=title;select.append(option)}
+ try{const saved=localStorage.getItem(storageKey);if(items.some(x=>x[0]===saved))select.value=saved}catch(e){}
+ select.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem(storageKey,select.value)}catch(e){}});
+ const label=document.createElement('label');label.textContent=labelText;label.style.cssText=ttsVoiceLabel.style.cssText;label.append(select);
+ document.querySelector('.settings-drawer')?.append(label);return select;
+}
+const ttsDeliverySelect=addTtsSetting('Ovoz chiqarish usuli','avnivoTtsDelivery',[
+ ['normal','Oddiy'],['whisper','Pichirlash'],['breathy','Nafasli'],['clear','Ravshan talaffuz'],['soft','Past ovoz'],['projected','Baland va aniq']]);
+const ttsPitchSelect=addTtsSetting('Ovoz baland-pastligi','avnivoTtsPitch',[
+ ['normal','Tabiiy'],['low','Pastroq'],['high','Yuqoriroq'],['flat','Bir tekis'],['expressive','Ifodali']]);
+const ttsPaceSelect=addTtsSetting('AI nutq maromi','avnivoTtsPace',[
+ ['normal','Tabiiy'],['slow','Sekin'],['fast','Tez'],['deliberate','Tanaffusli']]);
+const ttsCustomLabel=document.createElement('label');
+ttsCustomLabel.textContent='Maxsus ohang tavsifi (240 belgigacha)';
+ttsCustomLabel.style.cssText=ttsVoiceLabel.style.cssText;
+const ttsCustomInput=document.createElement('textarea');
+ttsCustomInput.maxLength=240;ttsCustomInput.rows=2;ttsCustomInput.placeholder='Masalan: Speak warmly with gentle pauses.';
+ttsCustomInput.style.cssText=ttsVoiceSelect.style.cssText+';resize:vertical;display:block;';
+try{ttsCustomInput.value=localStorage.getItem('avnivoTtsCustomStyle')||''}catch(e){}
+ttsCustomInput.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsCustomStyle',ttsCustomInput.value)}catch(e){}});
+ttsCustomLabel.append(ttsCustomInput);
+document.querySelector('.settings-drawer')?.append(ttsCustomLabel);
+const ttsTagNote=document.createElement('p');
+ttsTagNote.textContent='Matnda maxsus ovoz belgilari: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. Bu belgilar faqat yozilgan joyda qo‘llanadi; natija modelga bog‘liq.';
+ttsTagNote.style.cssText='font:12px/1.5 system-ui;color:#d6b68c;margin:10px 0;';
+document.querySelector('.settings-drawer')?.append(ttsTagNote);
+
 
 let speakingButton=null,ttsAudio=null,ttsAudioUrl=null,ttsAbort=null,ttsGeneration=0;
 function stopSpeaking(){
@@ -468,7 +498,7 @@ async function playMessage(button,bubble,language){
    if(generation!==ttsGeneration)return;
    const controller=new AbortController();ttsAbort=controller;
    button.dataset.loading='true';button.setAttribute('aria-label','AI ovozi tayyorlanmoqda');
-   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,language:locale,voice,style}),signal:controller.signal});
+   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,language:locale,voice,style,delivery:ttsDeliverySelect.value,pitch:ttsPitchSelect.value,pace:ttsPaceSelect.value,custom_style:style==='custom'?ttsCustomInput.value.trim():''}),signal:controller.signal});
    if(!response.ok)throw Error('TTS HTTP '+response.status);
    const blob=await response.blob();
    if(generation!==ttsGeneration)return;
