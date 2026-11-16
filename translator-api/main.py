@@ -12,6 +12,7 @@ from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.auth.exceptions import DefaultCredentialsError, RefreshError
 from groq import AsyncGroq, RateLimitError, APIError
 from offline_models import router as offline_models_router
+from translation_languages import MODEL_ID as TRANSLATION_MODEL_ID, capabilities as translation_capabilities, is_translation_supported, resolve_translation_code
 
 MODEL = "whisper-large-v3"
 GROQ_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
@@ -184,9 +185,74 @@ async def transcribe_google(request: Request, audio: UploadFile = File(...), lan
     return {"text": text, "model": GOOGLE_MODEL, "language": language}
 
 
+@app.get("/api/translation-languages")
+async def translation_languages():
+    """Expose Translation LLM capability per Chirp 2 locale.
+
+    The frontend uses this to enable only verified languages and to label
+    experimental/undocumented ones. A catalog entry here is a capability
+    statement proven by the audit, never a licence to call the model blindly.
+    """
+    return {
+        "model": TRANSLATION_MODEL_ID,
+        "count": len(translation_capabilities()),
+        "languages": translation_capabilities(),
+    }
+
+
+def _translation_token() -> str:
+    credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+    if not credentials.valid:
+        credentials.refresh(GoogleAuthRequest())
+    return credentials.token
+
+
+async def _call_translation_llm(project: str, region: str, text: str, source: str, target: str) -> str:
+    """Call Translation LLM once; map upstream faults to precise HTTP errors."""
+    try:
+        token = await asyncio.to_thread(_translation_token)
+    except (DefaultCredentialsError, RefreshError):
+        raise HTTPException(503, "Translation credentials unavailable")
+    url = f"https://translation.googleapis.com/v3/projects/{project}/locations/{region}:translateText"
+    payload = {
+        "contents": [text],
+        "mimeType": "text/plain",
+        "sourceLanguageCode": source,
+        "targetLanguageCode": target,
+        "model": f"projects/{project}/locations/{region}/models/{TRANSLATION_MODEL_ID}",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.post(url, headers={"Authorization": f"Bearer {token}"}, json=payload)
+    except httpx.RequestError:
+        raise HTTPException(502, "Translation provider unreachable")
+    if response.status_code == 429:
+        raise HTTPException(429, "Translation quota exceeded")
+    if response.status_code in (401, 403):
+        raise HTTPException(503, "Translation access denied")
+    if response.status_code != 200:
+        # A 400 here means the model rejected this language pair. Surface it as a
+        # client-visible rejection instead of a generic provider outage.
+        if response.status_code == 400:
+            raise HTTPException(400, "Translation language pair not supported")
+        raise HTTPException(502, "Translation provider error")
+    try:
+        translated = response.json()["translations"][0]["translatedText"]
+        if not isinstance(translated, str):
+            raise ValueError()
+    except (KeyError, IndexError, TypeError, ValueError):
+        raise HTTPException(502, "Unexpected translation response")
+    return translated
+
+
 @app.post("/api/translate")
 async def translate_public(request: Request):
-    """Browser translation route using the Cloud Run service identity."""
+    """Browser translation route using the Cloud Run service identity.
+
+    Accepts either a Chirp 2 locale (``uz-UZ``, ``en-US`` ...) or a legacy short
+    code (``uz``, ``ru``, ``en``, ``tr``). The mapping to a Translation LLM code
+    is explicit and audited; a rejected locale is refused, never substituted.
+    """
     origin = request.headers.get("origin")
     if origin is not None and origin not in ALLOWED_ORIGINS:
         raise HTTPException(403, "Origin not allowed")
@@ -204,47 +270,19 @@ async def translate_public(request: Request):
     target = body.get("target")
     if not isinstance(text, str) or not text.strip() or len(text) > 500:
         raise HTTPException(400, "Text must contain 1-500 characters")
-    if source not in {"uz", "ru", "en", "tr"} or target not in {"uz", "ru", "en", "tr"} or source == target:
-        raise HTTPException(400, "Unsupported language pair")
+    if not is_translation_supported(source) or not is_translation_supported(target):
+        raise HTTPException(400, "Translation language pair not supported")
+    source_code = resolve_translation_code(source)
+    target_code = resolve_translation_code(target)
+    if source_code == target_code:
+        raise HTTPException(400, "Source and target languages must differ")
     project = os.getenv("GOOGLE_CLOUD_PROJECT", GOOGLE_PROJECT)
     region = os.getenv("AVNIVO_TRANSLATION_REGION", "us-central1")
     if region not in {"us-central1", "global"}:
         raise HTTPException(503, "Invalid translation region")
-    def get_token():
-        credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
-        if not credentials.valid:
-            credentials.refresh(GoogleAuthRequest())
-        return credentials.token
-    try:
-        token = await asyncio.to_thread(get_token)
-    except (DefaultCredentialsError, RefreshError):
-        raise HTTPException(503, "Translation credentials unavailable")
-    url = f"https://translation.googleapis.com/v3/projects/{project}/locations/{region}:translateText"
-    payload = {
-        "contents": [text],
-        "mimeType": "text/plain",
-        "sourceLanguageCode": source,
-        "targetLanguageCode": target,
-        "model": f"projects/{project}/locations/{region}/models/general/translation-llm",
-    }
-    try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.post(url, headers={"Authorization": f"Bearer {token}"}, json=payload)
-    except httpx.RequestError:
-        raise HTTPException(502, "Translation provider unreachable")
-    if response.status_code == 429:
-        raise HTTPException(429, "Translation quota exceeded")
-    if response.status_code in (401, 403):
-        raise HTTPException(503, "Translation access denied")
-    if response.status_code != 200:
-        raise HTTPException(502, "Translation provider error")
-    try:
-        translated = response.json()["translations"][0]["translatedText"]
-        if not isinstance(translated, str):
-            raise ValueError()
-    except (KeyError, IndexError, TypeError, ValueError):
-        raise HTTPException(502, "Unexpected translation response")
-    return {"text": translated, "model": "general/translation-llm", "source": source, "target": target}
+    translated = await _call_translation_llm(project, region, text, source_code, target_code)
+    return {"text": translated, "model": TRANSLATION_MODEL_ID,
+            "source": source_code, "target": target_code}
 
 
 @app.post("/api/translate-llm-test")
