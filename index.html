@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>AVNIVO Translator — UI maket v11.8 — Clean Conversation Panels</title>
+<title>AVNIVO Translator — v11.49 — Offline STT (Whisper Small)</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon.svg">
 <style>
 :root{color-scheme:dark;--bg:#17120d;--txt:#fff8e9;--muted:#c9b69c;--cyan:#f8c96a;--violet:#ffe0a0}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt)}
@@ -390,7 +393,15 @@ toggle.addEventListener('click',async()=>{
 })();
 </script>
 
-
-
+<!-- Offline STT (Whisper Small Multilingual) + PWA shell. Loaded as a module so the
+     translator UI keeps working even if this script fails to load. -->
+<script type="module" src="./offline-stt/avnivo-offline-stt.mjs"></script>
+<script>
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
 
 </body></html>

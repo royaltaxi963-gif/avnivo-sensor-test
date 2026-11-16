@@ -1252,4 +1252,14 @@ toggle.addEventListener('click',async()=>{
 })();
 </script>
 <script src="./offline-module-manager.js" defer></script>
+<!-- Offline STT (Whisper Small Multilingual) + PWA shell. Loaded as a module so the
+     translator UI keeps working even if this script fails to load. -->
+<script type="module" src="./offline-stt/avnivo-offline-stt.mjs"></script>
+<script>
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
 </body></html>

@@ -1,0 +1,587 @@
+{
+ "engine": "Transformers.js (ONNX Runtime Web, WASM single-thread)",
+ "model": "Xenova/whisper-small (int8, q8)",
+ "environment": "desktop headless Chromium (CPU/WASM, no WebGPU)",
+ "android_tested": false,
+ "model_load_seconds": 3.305,
+ "huggingface_requests_during_inference": 0,
+ "sources": {
+  "ru/en/hi/tr": "google/fleurs validation",
+  "bn": "arif11/Bengali_AI_Speech, imonghose/bengali-asr-data",
+  "tk": "rozumov/TurkmenSpeech"
+ },
+ "summary": {
+  "ru": {
+   "samples": 8,
+   "wer_mean": 0.2105,
+   "wer_median": 0.2111,
+   "cer_mean": 0.0746,
+   "rtf_median": 1.2045
+  },
+  "en": {
+   "samples": 8,
+   "wer_mean": 0.1143,
+   "wer_median": 0.0476,
+   "cer_mean": 0.0334,
+   "rtf_median": 1.8343
+  },
+  "hi": {
+   "samples": 8,
+   "wer_mean": 0.4252,
+   "wer_median": 0.3959,
+   "cer_mean": 0.2949,
+   "rtf_median": 1.6033
+  },
+  "bn": {
+   "samples": 8,
+   "wer_mean": 2.9688,
+   "wer_median": 1.0,
+   "cer_mean": 3.3779,
+   "rtf_median": 3.0515
+  },
+  "tr": {
+   "samples": 8,
+   "wer_mean": 0.1994,
+   "wer_median": 0.1561,
+   "cer_mean": 0.0618,
+   "rtf_median": 0.9323
+  },
+  "tk": {
+   "samples": 8,
+   "wer_mean": 1.1666,
+   "wer_median": 1.0718,
+   "cer_mean": 0.9657,
+   "rtf_median": 2.1512
+  }
+ },
+ "rows": [
+  {
+   "lang": "ru",
+   "id": "ru-00",
+   "ref": "они умеют отлично видеть в темноте при помощи ночного видения и почти незаметно передвигаться оцелоты выслеживают добычу сливаясь с окружающей обстановкой а затем набрасываются на добычу",
+   "hyp": "Они умеют отлично видеть стимноте при помощи ночного видения и почти незаметно передвигаться. Отслоты выслеживают добычу, сливаясь с окружающей обстановкой, а затем набрасываются на добычу.",
+   "audioSeconds": 13.68,
+   "inferenceSeconds": 16.3345,
+   "rtf": 1.194,
+   "wer": 0.1154,
+   "cer": 0.0248
+  },
+  {
+   "lang": "ru",
+   "id": "ru-01",
+   "ref": "он сказал что создал дверной звонок работающий от wifi",
+   "hyp": "Он сказал, что создал дверной звонок, работающий от Wi-Fi.",
+   "audioSeconds": 7.44,
+   "inferenceSeconds": 12.464,
+   "rtf": 1.6753,
+   "wer": 0.2222,
+   "cer": 0
+  },
+  {
+   "lang": "ru",
+   "id": "ru-02",
+   "ref": "в японии приблизительно 7000 островов самый большой из которых — хонсю что делает японию 7-м по величине островом в мире!",
+   "hyp": "В Японии приблизительно 7000 островов, самый большой из которых Хонтью, что делает Японию седьмым по величине острова в мире.",
+   "audioSeconds": 11.82,
+   "inferenceSeconds": 13.605,
+   "rtf": 1.151,
+   "wer": 0.2,
+   "cer": 0.101
+  },
+  {
+   "lang": "ru",
+   "id": "ru-03",
+   "ref": "тысячи лет назад человек по имени аристарх сказал что солнечная система вращается вокруг солнца",
+   "hyp": "Тысячи лет назад человек по имени Ресторх сказал, что солнечная система вращается вокруг солнца.",
+   "audioSeconds": 7.26,
+   "inferenceSeconds": 12.9291,
+   "rtf": 1.7809,
+   "wer": 0.0714,
+   "cer": 0.0366
+  },
+  {
+   "lang": "ru",
+   "id": "ru-04",
+   "ref": "робин утхаппа набрал рекордное количество очков в иннинге 70 ранов за всего 41 подачу отбил 11 четвёрок и 2 шестёрки",
+   "hyp": "Робин Удхаппа набрал рекордное количество очков в вынинге 70 ранов за всего 41 подачу, отбил 11.4 и 2.6",
+   "audioSeconds": 12.06,
+   "inferenceSeconds": 13.8898,
+   "rtf": 1.1517,
+   "wer": 0.2,
+   "cer": 0.1959
+  },
+  {
+   "lang": "ru",
+   "id": "ru-05",
+   "ref": "эти теории предполагают что у людей есть определённые потребности и/или желания которые накапливаются внутри в процессе взросления",
+   "hyp": "Эти теории предполагают, что у людей есть определенная потребность или желание, которое накапливается внутри в процессе взросления.",
+   "audioSeconds": 11.04,
+   "inferenceSeconds": 13.4132,
+   "rtf": 1.215,
+   "wer": 0.3333,
+   "cer": 0.0708
+  },
+  {
+   "lang": "ru",
+   "id": "ru-06",
+   "ref": "о первых случаях заболевания в этом сезоне было сообщено в июле",
+   "hyp": "А первый случай заболевания в этом сезоне было сообщено в июле.",
+   "audioSeconds": 4.8,
+   "inferenceSeconds": 12.4309,
+   "rtf": 2.5898,
+   "wer": 0.2727,
+   "cer": 0.0755
+  },
+  {
+   "lang": "ru",
+   "id": "ru-07",
+   "ref": "в северной части то есть на хребте сентинел находятся самые высокие горы антарктиды массив винсон самая высшая точка которого достигает 4892 м и называется пик винсон",
+   "hyp": "В северной части, то есть на хребте Сантинял, находится самый высокий горы Антрактида - Массив Винсон, самая высшая точка которого достигает 4892 метра и называется Ик Винсон.",
+   "audioSeconds": 17.04,
+   "inferenceSeconds": 15.0069,
+   "rtf": 0.8807,
+   "wer": 0.2692,
+   "cer": 0.0922
+  },
+  {
+   "lang": "en",
+   "id": "en-00",
+   "ref": "when you call someone who is thousands of miles away you are using a satellite",
+   "hyp": "When you call someone who is thousands of miles away, you are using a satellite.",
+   "audioSeconds": 6.54,
+   "inferenceSeconds": 12.3963,
+   "rtf": 1.8955,
+   "wer": 0,
+   "cer": 0
+  },
+  {
+   "lang": "en",
+   "id": "en-01",
+   "ref": "now widely available throughout the archipelago javanese cuisine features an array of simply seasoned dishes the predominant flavorings the javanese favor being peanuts chillies sugar especially javanese coconut sugar and various aromatic spices",
+   "hyp": "Now widely available throughout the Archi Palago, Japanese cuisine features an array of simply seasoned dishes, the predominant flavorings, the Japanese favor being peanut chilies, sugar, especially Japanese coconut sugar and various aromatic spices.",
+   "audioSeconds": 16.38,
+   "inferenceSeconds": 14.1874,
+   "rtf": 0.8661,
+   "wer": 0.2121,
+   "cer": 0.0282
+  },
+  {
+   "lang": "en",
+   "id": "en-02",
+   "ref": "the u.n. also hopes to finalize a fund to help countries affected by global warming to cope with the impacts",
+   "hyp": "The UN also hopes to finalize a fund to help countries affected by global warming to cope with the impacts.",
+   "audioSeconds": 7.92,
+   "inferenceSeconds": 12.8103,
+   "rtf": 1.6175,
+   "wer": 0.0952,
+   "cer": 0
+  },
+  {
+   "lang": "en",
+   "id": "en-03",
+   "ref": "then lakkha singh took the lead in singing the bhajans",
+   "hyp": "Then, Lakka singing to the lead and singing the bhajjams.",
+   "audioSeconds": 4.14,
+   "inferenceSeconds": 12.4052,
+   "rtf": 2.9964,
+   "wer": 0.5,
+   "cer": 0.2222
+  },
+  {
+   "lang": "en",
+   "id": "en-04",
+   "ref": "the major religion in moldova is orthodox christian",
+   "hyp": "The major religion in Moldova is Orthodox Christian.",
+   "audioSeconds": 4.92,
+   "inferenceSeconds": 12.184,
+   "rtf": 2.4764,
+   "wer": 0,
+   "cer": 0
+  },
+  {
+   "lang": "en",
+   "id": "en-05",
+   "ref": "the east african islands are in the indian ocean off the eastern coast of africa",
+   "hyp": "The East African islands are in the Indian Ocean off the Eastern coast of Africa.",
+   "audioSeconds": 4.44,
+   "inferenceSeconds": 12.3458,
+   "rtf": 2.7806,
+   "wer": 0,
+   "cer": 0
+  },
+  {
+   "lang": "en",
+   "id": "en-06",
+   "ref": "some festivals have special camping areas for families with young children",
+   "hyp": "Some festivals have special camping areas for families with young children.",
+   "audioSeconds": 6.84,
+   "inferenceSeconds": 12.1281,
+   "rtf": 1.7731,
+   "wer": 0,
+   "cer": 0
+  },
+  {
+   "lang": "en",
+   "id": "en-07",
+   "ref": "the tibetan buddhism is based on the teachings of buddha but were extended by the mahayana path of love and by a lot of techniques from indian yoga",
+   "hyp": "The Tibetan Buddhism is based on the teachings of Buddha, but we're extended by the Mayana path of love and by a lot of techniques from Indian yoga.",
+   "audioSeconds": 10.02,
+   "inferenceSeconds": 13.2968,
+   "rtf": 1.327,
+   "wer": 0.1071,
+   "cer": 0.0167
+  },
+  {
+   "lang": "hi",
+   "id": "hi-00",
+   "ref": "मेजरकेन खाना भूमध्य सागर में समान क्षेत्रों की तरह रोटी सब्जियों और मांस विशेष रूप से सूअर का मांस पर आधारित है और जैतून के तेल का उपयोग करता है।",
+   "hyp": "मेजर किन खाना बूम दिसागर में समान शेतरों की तरा रोती सबजींगो और मास विशेश रूप से सूर का मास पर आदारित है और जैतून के तेल का अ प्योग करता है",
+   "audioSeconds": 12.24,
+   "inferenceSeconds": 20.0434,
+   "rtf": 1.6375,
+   "wer": 0.3636,
+   "cer": 0.1667
+  },
+  {
+   "lang": "hi",
+   "id": "hi-01",
+   "ref": "वैज्ञानिकों का मानना है कि ओसेलोट्स गंध के द्वारा जानवरों का पीछा करते और खाते शिकार हैं यह सूँघते हुए कि वे ज़मीन पर कहाँ रहे होंगे।",
+   "hyp": "यानिको का मानना है की अईसे लोड़ गंद के दवारा जान्वरो का पीच्छा करते और खाते हैं ये सूमते होई की वे जमीन पर कहा रहे हूंगे",
+   "audioSeconds": 10.26,
+   "inferenceSeconds": 18.8673,
+   "rtf": 1.8389,
+   "wer": 0.4167,
+   "cer": 0.25
+  },
+  {
+   "lang": "hi",
+   "id": "hi-02",
+   "ref": "आर्मंड वर्सास ने कहा मैंने अपनी बहन और उसकी दोस्त को खो दिया और रास्ते में व्हीलचेयर में दो दिव्यांग लोग थे और लोग उनपर उछल रहे थे और उन्हें धक्का दे रहे थे",
+   "hyp": "आर्म्द वर्षास्ने कहा, मेंने अपनी बहन और उनकी डोस्त को खोडया. और रास्ते में हुल्जेर में दो दिब्यांग लोग ते और लोग उन्पर उचल रहे थे और उने दखा देर रहे थे.",
+   "audioSeconds": 21.36,
+   "inferenceSeconds": 21.4485,
+   "rtf": 1.0041,
+   "wer": 0.3519,
+   "cer": 0.2051
+  },
+  {
+   "lang": "hi",
+   "id": "hi-03",
+   "ref": "कुतूहल गांव में आधे घंटे टहलना समय की हानि नहीं है",
+   "hyp": "कुतु हल गाँ में आदे गन्तिट तहलना समझ की हानी नहीं है",
+   "audioSeconds": 6.42,
+   "inferenceSeconds": 14.3329,
+   "rtf": 2.2325,
+   "wer": 0.375,
+   "cer": 0.2917
+  },
+  {
+   "lang": "hi",
+   "id": "hi-04",
+   "ref": "जब घायलों को लड़ाई बंद होने के बाद अस्पताल ले जाया गया तो लगभग 40 अन्य बचे हुए कैदी यार्ड में रुके और अपनी कोठरियों में लौटने से इनकार कर दिया",
+   "hyp": "जब गयलों को लड़ाई बन दोने के बाद अस्पताल लेज आया गया तो लगबबक चालिस आन ने बचछे हुए कैदी याड मेरुके और अपनी कोट्रीो में लोटने से इंखान कर दिया.",
+   "audioSeconds": 13.62,
+   "inferenceSeconds": 21.3729,
+   "rtf": 1.5692,
+   "wer": 0.36,
+   "cer": 0.2714
+  },
+  {
+   "lang": "hi",
+   "id": "hi-05",
+   "ref": "पूर्व हाउस स्पीकर न्यूट गिंग्रिच टेक्सास के गर्वनर रिक पैरी और कांग्रेसवुमन मिशेल बैचमैन ने क्रमश चौथा पांचवां और छठा स्थान हासिल किया",
+   "hyp": "पूर्व हाँस प्रिकर नूट ग्रिंकिच टाख सास के गवरनर रिक पैरी और कुँगरस भूमें मिशल बैज मैंने क्रम्शा चोथा पाच्वा और च्धा इस ठाल रहाशिल किया",
+   "audioSeconds": 14.22,
+   "inferenceSeconds": 20.8741,
+   "rtf": 1.4679,
+   "wer": 0.4909,
+   "cer": 0.2899
+  },
+  {
+   "lang": "hi",
+   "id": "hi-06",
+   "ref": "रॉबिन उथप्पा ने केवल 41 गेंदों में 11 चौकों और 2 छक्कों की मदद से 70 रन बना कर पारी का सर्वोच्च स्कोर बनाया",
+   "hyp": "रोबिन उदफपा ने केवल एक तालीस गेंदो में गयारा चोंको और दो चख्कों की मदद से सथरन बना कर पाडिका सरवो चेस्कोर बनाया",
+   "audioSeconds": 9.48,
+   "inferenceSeconds": 18.7257,
+   "rtf": 1.9753,
+   "wer": 0.4211,
+   "cer": 0.3208
+  },
+  {
+   "lang": "hi",
+   "id": "hi-07",
+   "ref": "यदि आप सर्दियों में आर्कटिक या अंटार्कटिक क्षेत्रों में जाते हैं तो आप ध्रुवीय रात का अनुभव करेंगे जिसका अर्थ है कि सूरज क्षितिज से ऊपर नहीं उगता है",
+   "hyp": "यह द्रूवे रात का अनुबव करेंगे जिसका अर्थ है कि सुरज शितिच रे उपन नहीं उपता है",
+   "audioSeconds": 14.16,
+   "inferenceSeconds": 16.5234,
+   "rtf": 1.1669,
+   "wer": 0.6226,
+   "cer": 0.5634
+  },
+  {
+   "lang": "bn",
+   "id": "bn-00",
+   "ref": "ও বলেছে আপনার ঠিকানা!",
+   "hyp": "अपना थीए प्रच्या आपना थीए प्रच्या आपना थीए प्रच्या आपना थीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आपना तीए प्रच्या आप",
+   "audioSeconds": 1.116,
+   "inferenceSeconds": 43.4648,
+   "rtf": 38.947,
+   "wer": 16.625,
+   "cer": 18.1818
+  },
+  {
+   "lang": "bn",
+   "id": "bn-01",
+   "ref": "কোন মহান রাষ্ট্রের নাগরিক হতে চাও?",
+   "hyp": "कुन महन्राशे नागरी को ते चाओ",
+   "audioSeconds": 2.448,
+   "inferenceSeconds": 13.089,
+   "rtf": 5.3468,
+   "wer": 1,
+   "cer": 1
+  },
+  {
+   "lang": "bn",
+   "id": "bn-02",
+   "ref": "আমি তোমার কষ্টটা বুঝছি, কিন্তু এটা সঠিক পথ না।",
+   "hyp": "आमी तो मर्पष्ट तब उचिकें तो एटार्ष्वा तिख बाप्तना",
+   "audioSeconds": 4.716,
+   "inferenceSeconds": 14.8296,
+   "rtf": 3.1445,
+   "wer": 1.125,
+   "cer": 1.087
+  },
+  {
+   "lang": "bn",
+   "id": "bn-03",
+   "ref": "নাচ শেষ হওয়ার পর সকলে শরীর ধুয়ে একসঙ্গে ভোজন করেন।",
+   "hyp": "आज शेश हर पर शकोले शोरी दूये अक संगे भोजन करें",
+   "audioSeconds": 7.452,
+   "inferenceSeconds": 14.2345,
+   "rtf": 1.9102,
+   "wer": 1,
+   "cer": 1
+  },
+  {
+   "lang": "bn",
+   "id": "bn-04",
+   "ref": "হুমম, ওহ হেই, দেখো।",
+   "hyp": "ḍ្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្្",
+   "audioSeconds": 2.16,
+   "inferenceSeconds": 43.565,
+   "rtf": 20.169,
+   "wer": 1,
+   "cer": 1
+  },
+  {
+   "lang": "bn",
+   "id": "bn-05",
+   "ref": "ক্যাপ্টেন, আমরা ব্লাস্টারটাকে ঠিক ধরে ফেলবো।",
+   "hyp": "अम्रा अद लास्टार तके तिप भरितल्वोग",
+   "audioSeconds": 4.608,
+   "inferenceSeconds": 13.6332,
+   "rtf": 2.9586,
+   "wer": 1,
+   "cer": 1
+  },
+  {
+   "lang": "bn",
+   "id": "bn-06",
+   "ref": "নাটক, সাংবাদিকতা, শিক্ষার উপরে তার উচ্চতর প্রশিক্ষণ রয়েছে এবং তিনি এ সম্পর্কিত অনেক কর্মশালা বা সেমিনার পরিচালনা করছেন।",
+   "hyp": "nātok shāng bādhikotā shīkhāru pār tāru chitāru prāśikānt rādh chē bāng tīni eshāmpār pītāni karma shalā bāsīnīnār pūr jarana kūr chen.",
+   "audioSeconds": 8.1,
+   "inferenceSeconds": 16.2988,
+   "rtf": 2.0122,
+   "wer": 1,
+   "cer": 1.7812
+  },
+  {
+   "lang": "bn",
+   "id": "bn-07",
+   "ref": "গুলিবিদ্ধ ইমাম শাহিনুর রহমানের সঙ্গে কথা বলে এমনটা জানতে পেরেছে পুলিশ।",
+   "hyp": "guli biddo imam shahin ur laho mane shahange ko tha, nye boli yamata jante pere chen pulis.",
+   "audioSeconds": 9.036,
+   "inferenceSeconds": 13.4835,
+   "rtf": 1.4922,
+   "wer": 1,
+   "cer": 1.973
+  },
+  {
+   "lang": "tr",
+   "id": "tr-00",
+   "ref": "teknoloji çözümü sanal bir tur sunarak getirir öğrenciler müzedeki yapıları inceleyebilir bir akvaryumu ziyaret edebilir veya sınıfta otururken güzel sanat eserlerinin büyüsüne kapılabilir",
+   "hyp": "Teknoloji çözümü sanal bir tur sunarak getirir. Öğrenciler müzeydeki yapıları inceleyebilir. Bir akvaryum ziyaret edebilir veya sınıfta otururken güzel sanat esadelerinin büyüsüne kapılabilir.",
+   "audioSeconds": 16.8,
+   "inferenceSeconds": 15.2236,
+   "rtf": 0.9062,
+   "wer": 0.1304,
+   "cer": 0.0301
+  },
+  {
+   "lang": "tr",
+   "id": "tr-01",
+   "ref": "japonlar en büyüğü honshu olan 7.000 civarında adaya sahiptir ki bu durum japonya'yı yeryüzünün en büyük 7. adası yapıyor",
+   "hyp": "Japonlar en büyüğü Honcho olan 7 bin civarında adaya sahiptir ki bu durum Japonya'yı yeryüzünün en büyük 7. adası yapıyor.",
+   "audioSeconds": 15.18,
+   "inferenceSeconds": 13.6566,
+   "rtf": 0.8996,
+   "wer": 0.0952,
+   "cer": 0.05
+  },
+  {
+   "lang": "tr",
+   "id": "tr-02",
+   "ref": "sonra lakkha singh bhajans'ın söylenmesinde liderliği ele aldı",
+   "hyp": "Sonra Laka Singh Bajansın Söylenmesini liderliği ele aldı.",
+   "audioSeconds": 9.06,
+   "inferenceSeconds": 12.4633,
+   "rtf": 1.3756,
+   "wer": 0.4444,
+   "cer": 0.0926
+  },
+  {
+   "lang": "tr",
+   "id": "tr-03",
+   "ref": "bir alt kültürü ayrı olarak belirleyen nitelikler dilsel estetik dini politik cinsel coğrafi veya çeşitli faktörlerin bir kombinasyonu olabilir",
+   "hyp": "Bir alt kültürü ayrı olarak belirleyen nitelikler, dilsel, estetik, dini, politik, cinsel, coğrafi veya çeşitli faktörlerin bir kombinasyonu olabilir.",
+   "audioSeconds": 16.44,
+   "inferenceSeconds": 14.5799,
+   "rtf": 0.8869,
+   "wer": 0,
+   "cer": 0
+  },
+  {
+   "lang": "tr",
+   "id": "tr-04",
+   "ref": "bazı eyerler özellikle de i̇ngiliz eyerleri düşmekte olan bir binicinin geriye çekmesiyle üzengi derisinin eyerden düşmesine izin veren güvenlik çubukları bulunur",
+   "hyp": "Bazı eğerler özellikle de İngiliz eğerleri düşmekte olan bir binicinin geriye çekmesiyle üzengi derisinin eğerden düşmesini izin veren güvenlik çubukları bulunur.",
+   "audioSeconds": 15.3,
+   "inferenceSeconds": 14.554,
+   "rtf": 0.9512,
+   "wer": 0.1818,
+   "cer": 0.0284
+  },
+  {
+   "lang": "tr",
+   "id": "tr-05",
+   "ref": "11 dörtlük ve 2 altılık vurarak sadece 41 topta 70 run ile robin uthappa atışta en yüksek skoru elde etmiştir",
+   "hyp": "11-4'lük ve 2-6'lük buralar sadece 41 topta 70 run ile Robin Woodhapa atışta en yüksek skoru elde etmiştir.",
+   "audioSeconds": 10.68,
+   "inferenceSeconds": 13.6586,
+   "rtf": 1.2789,
+   "wer": 0.3,
+   "cer": 0.1889
+  },
+  {
+   "lang": "tr",
+   "id": "tr-06",
+   "ref": "başlıca yerel birası 'number one'dır. çok karmaşık bir bira olmasa da hoş ve ferahlatıcıdır. diğer yerel birasının adı da manta\"dır",
+   "hyp": "Başlıca Yerel virası Namburvandır. Çok karmaşık bir bira olmasa da hoş ve ferahlatıcıdır. Diğer Yerel virasının adı da Mantıdır.",
+   "audioSeconds": 15.42,
+   "inferenceSeconds": 14.0834,
+   "rtf": 0.9133,
+   "wer": 0.3182,
+   "cer": 0.0748
+  },
+  {
+   "lang": "tr",
+   "id": "tr-07",
+   "ref": "buzlanmış ve karlı yollarda sürtünme oldukça düşüktür ve kuru asfalt üzerindeymiş gibi araç sürmeniz mümkün değildir",
+   "hyp": "Buzlanmış ve karlı yollarda sürtünme oldukça düşük duru ve kuru asfalt üzerindeymiş gibi araç sürmeniz mümkün değildir.",
+   "audioSeconds": 12.12,
+   "inferenceSeconds": 14.0842,
+   "rtf": 1.1621,
+   "wer": 0.125,
+   "cer": 0.0297
+  },
+  {
+   "lang": "tk",
+   "id": "tk-00",
+   "ref": "türkmen halkynyň milli lideri türkmenistanyň halk maslahatynyň başlygy gahryman arkadagymyz çykyş etmek bilen şeýle diýdi",
+   "hyp": "Turqmin halqanan mili lideri Turqministanan xalqma thaatanan barxaghe qaqiman arqada. Qamad, tsqxet meqbulen xeyledi de.",
+   "audioSeconds": 6.768,
+   "inferenceSeconds": 14.7582,
+   "rtf": 2.1806,
+   "wer": 0.9333,
+   "cer": 0.4299
+  },
+  {
+   "lang": "tk",
+   "id": "tk-01",
+   "ref": "arkadalykahyrman serdarymyzyň magtymuly dünýäniň akyldary atly täze kitabynda türkmen halkynyň taryhy ösüşine ýurdumyzyň",
+   "hyp": "Arakadha lakhaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaq",
+   "audioSeconds": 7.198,
+   "inferenceSeconds": 43.5685,
+   "rtf": 6.0529,
+   "wer": 1,
+   "cer": 3.9907
+  },
+  {
+   "lang": "tk",
+   "id": "tk-02",
+   "ref": "saýarlanýan önümleriň hil derejesi ýokary bolansoň öndürilýän önümlere hyrydarlaň sanam gün saýyny artýa",
+   "hyp": "xayarlanyanyu unumnan qil dereceze yokuru bronsonu önumnuliyanyu unumnora xreydarli nqe anam gun sayinu artiyam.",
+   "audioSeconds": 6.3,
+   "inferenceSeconds": 14.3791,
+   "rtf": 2.2824,
+   "wer": 1.0769,
+   "cer": 0.5652
+  },
+  {
+   "lang": "tk",
+   "id": "tk-03",
+   "ref": "ýokary tehnologiýalar senagat ulag we oba hojalyk ulgamlarynda özara bähbitli oňyn hyzmatdaşlyk andy balýa",
+   "hyp": "Yookol etsikhna law geler, tiena aqad uloghwe uwawu qozolok ulgomlor na, yöze aqab eqveitli uwungin xxmata shlik anapalia.",
+   "audioSeconds": 7.084,
+   "inferenceSeconds": 15.0304,
+   "rtf": 2.1217,
+   "wer": 1.2857,
+   "cer": 0.6129
+  },
+  {
+   "lang": "tk",
+   "id": "tk-04",
+   "ref": "türkmenistanda germaniýanyň arasynda ikitaraplyn hyzmatdaşlyk işjeň biz sylýa germaniýaly hyzmatdaşlar bilen gatnaşyklar uzak möhletleýin esasda ýola goýulýar",
+   "hyp": "Turqmithana, Germania nanyan arathun ekterapin xadmatasla izzchen wethsulia. Germania lei xadmataslar nanyan atnansklar udoq muxlutlayin izzasa yo loqilia.",
+   "audioSeconds": 8.851,
+   "inferenceSeconds": 15.4043,
+   "rtf": 1.7404,
+   "wer": 1.0588,
+   "cer": 0.5211
+  },
+  {
+   "lang": "tk",
+   "id": "tk-05",
+   "ref": "döwlete dahylly bolmadyk hususy ulugy müň wekilleri dürli senagat harytlarynyň bolçulygynyň döredilmegine hem özleriniň mynasyp goşantlaryny goşýalar",
+   "hyp": "d'hulata d'akhil'i bul mudoq, khusus uluqa munguqilare, durle senagat kharitlar nang borchulon nang durdulmoq, xtem xtem xtem nang manas eqoshantlar nunguqa shialar.",
+   "audioSeconds": 10.119,
+   "inferenceSeconds": 16.2517,
+   "rtf": 1.6061,
+   "wer": 1.4118,
+   "cer": 0.5489
+  },
+  {
+   "lang": "tk",
+   "id": "tk-06",
+   "ref": "ýurdumyz boýunça sentaraýnyň otuzyna magnit hadysasynyň durnukly ýagdaýda bolmagyna garaşylýar",
+   "hyp": "Yordum odoon qe xen tiara enum otizunan magneit xaadis atan qldurnoklu yagdeida bolm oon oqarashilya.",
+   "audioSeconds": 4.946,
+   "inferenceSeconds": 14.1475,
+   "rtf": 2.8604,
+   "wer": 1.5,
+   "cer": 0.4706
+  },
+  {
+   "lang": "tk",
+   "id": "tk-07",
+   "ref": "beýlenişi ýaly türkmenistan daşary syýasy strategiýasynde oňyn bitaraplyk özara bähbitli hyzmatdaşlyk gatnaşyklaryna ul orun berýä",
+   "hyp": "Velen shiyare turqmenthan da sarathiyathestratiya gethirna ungun bhi tarablak yodara berkhviyetler qadimattashla qatin nysqlarna ul onun merya.",
+   "audioSeconds": 7.708,
+   "inferenceSeconds": 14.9583,
+   "rtf": 1.9406,
+   "wer": 1.0667,
+   "cer": 0.5862
+  }
+ ]
+}
