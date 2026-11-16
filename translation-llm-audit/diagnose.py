@@ -184,7 +184,8 @@ def main() -> None:
                                   "quality_flags": len(crit), "results": per_item})
 
         else:  # regression
-            sample = ["af-ZA", "ar-EG", "de-DE", "ja-JP", "ru-RU", "tr-TR", "zh-CN", "hi-IN"]
+            sample = ["af-ZA", "ar-EG", "de-DE", "ja-JP", "ru-RU", "tr-TR",
+                      "cmn-Hans-CN", "hi-IN", "ko-KR", "pt-BR"]
             diagnosis = []
             for chirp in sample:
                 row = rows[chirp]
