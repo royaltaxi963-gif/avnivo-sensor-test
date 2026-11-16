@@ -99,7 +99,11 @@ html[data-avnivo-mode=offline] .settings-description{display:none}
 .offline-module-action.is-downloading{background:conic-gradient(#65d7f3 var(--module-progress,0%),#20475d 0);color:white}
 .offline-module-action.is-downloading::before{content:"";position:absolute;inset:3px;border-radius:50%;background:#122e40;z-index:-1}
 .offline-module-action .module-percent{font:700 9px/1 system-ui;letter-spacing:-.2px;font-variant-numeric:tabular-nums}
-.offline-module-action.is-ready{background:#137d55;color:white}
+.offline-module-action.is-ready{background:#137d55;color:white;animation:avnivoReadyPop .6s cubic-bezier(.2,1.6,.35,1)}
+@keyframes avnivoReadyPop{0%{transform:scale(.7)}65%{transform:scale(1.17)}100%{transform:scale(1)}}
+.offline-module-card.is-demo-ready{border-color:#2b9c7b;box-shadow:0 0 0 1px #2b9c7b33,0 4px 15px #0003}
+.offline-demo-note{font:600 10px/1.35 system-ui;color:#f6cb83;margin:0 0 8px}
+.offline-module-card .offline-module-state.is-demo{color:#64dfb4}
 .offline-module-action.is-ready svg{stroke-width:2.5}
 @media(prefers-reduced-motion:reduce){.offline-module-action{transition:none}.offline-module-action.is-tapped{animation:none}}
 .offline-module-progress{grid-column:1/-1;width:100%;margin-top:10px}
@@ -409,6 +413,7 @@ function updateOfflineModule(id,state,progress){
  }
  return true;
 }
+const demoRuns=new Set();
 for(const module of offlineModuleCatalog){
  const row=document.createElement('article');row.className='offline-module-card';row.dataset.moduleId=module.id;
  const mark=document.createElement('span');mark.className='offline-module-mark';mark.innerHTML=offlineSvg(module.icon);
@@ -416,15 +421,43 @@ for(const module of offlineModuleCatalog){
  const name=document.createElement('h3');name.className='offline-module-name';name.textContent=module.name;
  const desc=document.createElement('p');desc.className='offline-module-desc';desc.textContent=module.desc;
  const size=document.createElement('p');size.className='offline-module-size';size.textContent=module.bytes?'Hajmi: '+offlineMb(module.bytes):'Hajmi: aniqlanmoqda';size.title=module.sizeNote;
- const status=document.createElement('p');status.className='offline-module-state';status.textContent='Yuklanmagan';
- const meta=document.createElement('div');meta.className='offline-module-meta';meta.append(size,status);copy.append(name,desc,meta);
+ const status=document.createElement('p');status.className='offline-module-state';status.textContent='Sinovga tayyor';
+ const meta=document.createElement('div');meta.className='offline-module-meta';meta.append(size,status);const demoNote=document.createElement('p');demoNote.className='offline-demo-note';demoNote.textContent='DEMO · Fayl yuklanmaydi';copy.append(name,desc,demoNote,meta);
  const btn=document.createElement('button');btn.type='button';btn.className='offline-module-action';btn.innerHTML=offlineSvg('download');btn.setAttribute('aria-label',module.name+' — yuklab olish');
  const progress=document.createElement('div');progress.className='offline-module-progress';progress.hidden=true;
  progress.innerHTML='<div class="offline-module-progress-label"><span class="offline-module-percent">0%</span><span class="offline-module-mb">0 MB</span></div><div class="offline-module-track" role="progressbar" aria-label="Yuklash jarayoni" aria-valuemin="0" aria-valuemax="100"><div class="offline-module-fill"></div></div>';
  btn.addEventListener('click',()=>{
-  if(document.documentElement.dataset.avnivoMode!=='offline'||offlineState.get(module.id)==='ready')return;
+  if(document.documentElement.dataset.avnivoMode!=='offline'||demoRuns.has(module.id))return;
   btn.classList.remove('is-tapped');void btn.offsetWidth;btn.classList.add('is-tapped');
-  offlineNotice.textContent=module.name+': yuklash manbasi hali ulanmagan. Yuklash boshlanmadi.';
+  row.classList.remove('is-demo-ready');
+  const total=module.bytes||100000000;
+  const start=performance.now();
+  const duration=10000;
+  demoRuns.add(module.id);
+  offlineNotice.textContent='SINOV: haqiqiy fayl yuklanmaydi. Animatsiya 10 soniya davom etadi.';
+  const tick=(now)=>{
+   if(!row.isConnected){demoRuns.delete(module.id);return}
+   const elapsed=Math.min(duration,now-start);
+   const ratio=Math.min(1,elapsed/duration);
+   if(ratio<.85){
+    updateOfflineModule(module.id,'downloading',{downloadedBytes:Math.floor(total*(ratio/.85)),totalBytes:total});
+    status.textContent='Sinov: yuklanmoqda…';
+   }else if(ratio<.96){
+    updateOfflineModule(module.id,'verifying',{downloadedBytes:total,totalBytes:total});
+    status.textContent='Sinov: tekshirilmoqda…';
+   }else if(ratio<1){
+    updateOfflineModule(module.id,'verifying',{downloadedBytes:total,totalBytes:total});
+    status.textContent='Sinov: faollashtirilmoqda…';
+   }else{
+    updateOfflineModule(module.id,'ready',{downloadedBytes:total,totalBytes:total});
+    row.classList.add('is-demo-ready');status.textContent='SINOV: faol ko‘rinishi';status.classList.add('is-demo');
+    btn.disabled=false;btn.setAttribute('aria-label','Sinovni qayta ko‘rish');
+    demoRuns.delete(module.id);return;
+   }
+   requestAnimationFrame(tick);
+  };
+  updateOfflineModule(module.id,'downloading',{downloadedBytes:0,totalBytes:total});
+  requestAnimationFrame(tick);
  });
  btn.addEventListener('animationend',()=>btn.classList.remove('is-tapped'));
  row.append(mark,copy,btn,progress);offlineList.append(row);offlineState.set(module.id,'not_installed');
