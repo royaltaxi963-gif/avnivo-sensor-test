@@ -1,0 +1,635 @@
+{
+  "schema_version": 1,
+  "model": "general/translation-llm",
+  "source": "https://docs.cloud.google.com/translate/docs/languages",
+  "checked_on": "2026-11-15",
+  "scope": "Translation LLM only; not NMT or Chirp 2",
+  "status": "documented_not_live_tested",
+  "languages": [
+    {
+      "code": "af",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "sq",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "am",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ar-SA",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ar",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "hy",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "az",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "eu",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "be",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "bn-IN",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "bn",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "bs-Cyrl",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "bs",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "bg",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "my",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ca",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "zh-CN",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "zh-HK",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "zh-Hans",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "zh-TW",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "zh-Hant",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "zh",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "hr",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "cs",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "da",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "nl-BE",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "nl",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "en-AU",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "en-CA",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "en-NZ",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "en-PH",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "en-ZA",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "en-GB",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "en-US",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "en",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "et",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "fil",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "fi",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "fr-CA",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "fr-CH",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "fr",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "fy",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "gl",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ka",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "de",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "el",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "gn",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "gu",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ha",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "he",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "iw",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "hi",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "hu",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "is",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ig",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "id",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ga",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "it",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ja",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "kn",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "km",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ko",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ky",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "lo",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "lv",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ln",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "lt",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "lb",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "mk",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ms",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ml",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "mt",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "mr",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "mn",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ne",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "nb",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "no",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "or",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "fa",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "pl",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "pt-BR",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "pt-PT",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "pt",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "pa-PK",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "pa",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ro",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ru",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "gd",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "sr",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "sk",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "sl",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "so",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-AR",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-CL",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-CO",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-CR",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-EC",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-SV",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-GT",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-HN",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-419",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-MX",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-NI",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-PA",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-PY",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-PR",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-ES",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-US",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-UY",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es-VE",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "es",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "sw",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "sv",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "tl",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "tg",
+      "support": "experimental",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ta",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "te",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "th",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "tr",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "uk",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "ur",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "uz",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "vi",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "cy",
+      "support": "official",
+      "enabled_in_avnivo": false
+    },
+    {
+      "code": "zu",
+      "support": "official",
+      "enabled_in_avnivo": false
+    }
+  ]
+}

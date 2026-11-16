@@ -1,0 +1,31 @@
+name: Translation language picker checks
+on:
+  push:
+    branches:
+      - feature/online-translation-language-registry
+    paths:
+      - 'translator-ui/**'
+      - 'config/translation-llm-supported-languages.json'
+      - '.github/workflows/translation-language-picker.yml'
+  pull_request:
+    paths:
+      - 'translator-ui/**'
+      - 'config/translation-llm-supported-languages.json'
+      - '.github/workflows/translation-language-picker.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: node --check translator-ui/translation-language-picker.mjs
+      - name: Unit tests
+        run: node --test translator-ui/translation-language-picker.test.mjs
+      - name: Validate catalog structure
+        run: node translator-ui/validate-translation-catalog.mjs
