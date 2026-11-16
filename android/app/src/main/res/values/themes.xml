@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches the web UI's dark AVNIVO palette so the shell does not flash a
+         light surface before the WebView paints. -->
+    <style name="Theme.Avnivo" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/avnivo_background</item>
+        <item name="android:statusBarColor">@color/avnivo_background</item>
+        <item name="android:navigationBarColor">@color/avnivo_background</item>
+    </style>
+</resources>
