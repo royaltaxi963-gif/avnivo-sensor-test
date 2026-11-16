@@ -137,10 +137,15 @@ html[data-avnivo-mode=online] .offline-modules{display:none}
 #avnivo-first-launch .lang-pill.selected{animation:avnivo-pill-depart 1.85s cubic-bezier(.22,.65,.26,1) forwards;pointer-events:none}
 @keyframes avnivo-pill-depart{0%{transform:translate(-50%,-50%);opacity:1}16%{transform:translate(-50%,-89%);opacity:1}36%{transform:translate(-50%,-28%);opacity:1}53%{transform:translate(-50%,-56%);opacity:1}100%{transform:translate(-50%,calc(55dvh + 100px));opacity:0}}
 #avnivo-first-launch.departing{background:#000;pointer-events:auto}
-#avnivo-first-launch.departing .intro-colors,#avnivo-first-launch.departing .intro-brand{opacity:0;transition:opacity .95s ease}
+#avnivo-first-launch.departing .intro-colors{opacity:0;transition:opacity .95s ease}
 #avnivo-first-launch.departing .lang-pill{transition:none}
 #avnivo-first-launch.departing #avnivo-language-menu{display:none}
 #avnivo-first-launch.departing{transition:none}
+/* After the selected language pill has fully left, return the brand to the chat center. */
+#avnivo-first-launch.brand-to-chat .intro-brand{top:var(--brand-center,50%);transform:translate(-50%,-50%) scale(.92);transition:top 1.2s cubic-bezier(.22,.72,.16,1),transform 1.2s cubic-bezier(.22,.72,.16,1)}
+#avnivo-first-launch.brand-to-chat .intro-brand-name{font-size:clamp(39px,11vw,64px)}
+#avnivo-first-launch.brand-to-chat .intro-colors{opacity:0}
+
 #avnivo-tutorial-dim{position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:2000;visibility:hidden;opacity:0;pointer-events:none;transition:opacity 1.15s ease,visibility 1.15s}
 #avnivo-tutorial-dim.active{visibility:visible;opacity:1;pointer-events:auto}
 #avnivo-tutorial-spot{position:fixed;z-index:2001;display:none;pointer-events:none;border-radius:14px;box-shadow:0 0 0 2px #ffdc9d,0 0 18px 7px #e7b85bba,0 0 48px 15px #d79e4777;animation:avnivo-spot-glow 2.2s ease-in-out infinite alternate;transition:left .5s ease,top .5s ease,opacity .4s ease}
@@ -1200,7 +1205,34 @@ let wordOrder=shuffledIndices(names.length),languageOrder=shuffledIndices(langua
 let wi=0,wp=0,we=false,li=0,lp=0,le=false,selected=false,menuOpen=false;
 function typeWord(){if(selected)return;const chars=segment(names[wordOrder[wi]]);if(!we){wp=Math.min(chars.length,wp+1);word.textContent=chars.slice(0,wp).join('');if(wp===chars.length){we=true;setTimeout(typeWord,800)}else setTimeout(typeWord,95)}else{wp=Math.max(0,wp-1);word.textContent=chars.slice(0,wp).join('');if(!wp){we=false;wi++;if(wi>=wordOrder.length){const last=wordOrder[wordOrder.length-1];wordOrder=shuffledIndices(names.length);if(wordOrder.length>1&&wordOrder[0]===last){[wordOrder[0],wordOrder[1]]=[wordOrder[1],wordOrder[0]]}wi=0}setTimeout(typeWord,180)}else setTimeout(typeWord,45)}}
 function typeLanguage(){if(selected)return;const chars=segment(languageNames[languageOrder[li]]);if(!le){lp=Math.min(chars.length,lp+1);lang.textContent=chars.slice(0,lp).join('');if(lp===chars.length){le=true;setTimeout(typeLanguage,1200)}else setTimeout(typeLanguage,95)}else{lp=Math.max(0,lp-1);lang.textContent=chars.slice(0,lp).join('');if(!lp){le=false;li++;if(li>=languageOrder.length){const last=languageOrder[languageOrder.length-1];languageOrder=shuffledIndices(languageNames.length);if(languageOrder.length>1&&languageOrder[0]===last){[languageOrder[0],languageOrder[1]]=[languageOrder[1],languageOrder[0]]}li=0}setTimeout(typeLanguage,250)}else setTimeout(typeLanguage,55)}}
-function choose(){if(selected||!menuOpen)return;selected=true;menuOpen=false;document.getElementById('avnivo-language-menu').classList.remove('open');pill.setAttribute('aria-expanded','false');lang.textContent='O‘zbek tili';localStorage.setItem('avnivo-onboarding-language','uz');pill.classList.add('selected');setTimeout(()=>root.classList.add('departing'),300);setTimeout(()=>{root.classList.add('finished');setTimeout(()=>{root.remove();startTutorial()},1150)},2200)}
+function choose(){if(selected||!menuOpen)return;selected=true;menuOpen=false;document.getElementById('avnivo-language-menu').classList.remove('open');pill.setAttribute('aria-expanded','false');lang.textContent='O‘zbek tili';localStorage.setItem('avnivo-onboarding-language','uz');pill.classList.add('selected');
+setTimeout(()=>root.classList.add('departing'),300);
+setTimeout(()=>{
+  // The language pill has finished leaving the bottom of the screen.
+  // Only now may the brand return to the exact chat center.
+  const chatBrand=document.querySelector('.center-brand');
+  const introBrand=root.querySelector('.intro-brand');
+  if(chatBrand&&introBrand){
+    const target=chatBrand.getBoundingClientRect();
+    const current=introBrand.getBoundingClientRect();
+    const centerY=target.top+target.height/2;
+    introBrand.style.top=centerY+'px';
+    const chatName=chatBrand.querySelector('.brand-name');
+    const introName=introBrand.querySelector('.intro-brand-name');
+    if(chatName&&introName){introName.style.fontSize=getComputedStyle(chatName).fontSize}
+    // Brand typography and scale transition into the app's brand position.
+  }
+  root.classList.add('brand-to-chat');
+  setTimeout(()=>{
+    // Fade from black into the actual application after the brand settles.
+    root.classList.add('finished');
+    setTimeout(()=>{
+      root.remove();
+      // Leave the real chat completely visible before fading to the tutorial dim.
+      setTimeout(startTutorial,750);
+    },1200);
+  },1250);
+},2200)}
 const dim=document.getElementById('avnivo-tutorial-dim'),spot=document.getElementById('avnivo-tutorial-spot'),label=document.getElementById('avnivo-tutorial-label'),next=document.getElementById('avnivo-tutorial-next'),heading=document.getElementById('avnivo-tutorial-heading'),description=document.getElementById('avnivo-tutorial-description');
 let tutorialStage=-1;
 function spotlight(selector){const source=document.querySelector(selector);if(!source)return;const rect=source.getBoundingClientRect();spot.style.left=rect.left+'px';spot.style.top=rect.top+'px';spot.style.width=rect.width+'px';spot.style.height=rect.height+'px';spot.style.background=getComputedStyle(source).background;spot.style.color=getComputedStyle(source).color;spot.style.border=getComputedStyle(source).border;spot.innerHTML=source.querySelector('svg')?.outerHTML||'';spot.classList.add('active')}
