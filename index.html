@@ -397,6 +397,7 @@ const avnivoVoiceSelect=document.getElementById('avnivo-tts-voice');
 const avnivoTtsStatus=document.getElementById('avnivo-tts-status');
 try{avnivoVoiceSelect.value=localStorage.getItem('avnivo.tts.voice')||'Kore'}catch(e){}
 avnivoVoiceSelect.addEventListener('change',()=>{try{localStorage.setItem('avnivo.tts.voice',avnivoVoiceSelect.value)}catch(e){}});
+let speakingButton=null,playingAudio=null,playingUrl=null,ttsController=null,ttsRequestId=0;
 const ttsDefaults={speed:1,volume:80,pitch:0,style:'natural',pauses:'normal',custom:'',autoplay:true,repeat:false};
 const ttsControls={speed:document.getElementById('avnivo-tts-speed'),volume:document.getElementById('avnivo-tts-volume'),pitch:document.getElementById('avnivo-tts-pitch'),style:document.getElementById('avnivo-tts-style'),pauses:document.getElementById('avnivo-tts-pauses'),custom:document.getElementById('avnivo-tts-custom'),autoplay:document.getElementById('avnivo-tts-autoplay'),repeat:document.getElementById('avnivo-tts-repeat')};
 function ttsSetting(key){const e=ttsControls[key];return e.type==='checkbox'?e.checked:e.type==='range'?Number(e.value):e.value}
@@ -407,7 +408,7 @@ ttsRestore();
 for(const el of Object.values(ttsControls))el.addEventListener('input',ttsSave);
 document.getElementById('avnivo-tts-reset').addEventListener('click',()=>{for(const [key,el] of Object.entries(ttsControls)){if(el.type==='checkbox')el.checked=ttsDefaults[key];else el.value=ttsDefaults[key]}ttsSave();ttsStatus('Standart sozlamalar tiklandi')});
 document.getElementById('avnivo-tts-test').addEventListener('click',()=>{const sample=document.createElement('div');sample.textContent='Salom. Bu AVNIVO ovozini tekshirish.';const button=document.createElement('button');playMessage(button,sample,'left')});
-let speakingButton=null,playingAudio=null,playingUrl=null,ttsController=null,ttsRequestId=0;
+
 function ttsStatus(message){avnivoTtsStatus.textContent=message}
 function stopSpeaking(){
  ttsRequestId++;
