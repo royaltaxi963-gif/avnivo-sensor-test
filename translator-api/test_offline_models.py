@@ -53,3 +53,16 @@ def test_audited_manifest_accepts_fixed_prefix(monkeypatch):
                                 "name": "model.pt", "bytes": 10, "sha256": "a"*64}]}
     monkeypatch.setenv("AVNIVO_AUDITED_MODEL_MANIFEST", __import__("json").dumps(manifest))
     assert offline_models._load_audited_models()["navoiy-tts"][0]["bytes"] == 10
+
+def test_ticket_rejects_untrusted_browser_origin():
+    result = client.get("/api/offline-models/uzbek-stt/download-ticket",
+                        headers={"Origin": "https://evil.example"})
+    assert result.status_code == 403
+
+def test_ticket_allows_preview_origin_to_reach_signer_check(monkeypatch):
+    monkeypatch.delenv("AVNIVO_SIGNER_SERVICE_ACCOUNT", raising=False)
+    with patch("offline_models.google_auth_default") as auth:
+        auth.return_value = (MagicMock(valid=True, token="test"), "project")
+        result = client.get("/api/offline-models/uzbek-stt/download-ticket",
+                            headers={"Origin": "https://raw.githack.com"})
+    assert result.status_code == 503
