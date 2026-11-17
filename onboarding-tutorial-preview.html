@@ -892,7 +892,7 @@ function shuffleTranslationOrder(){
  translationLast=a[a.length-1];return a;
 }
 translationOrder=shuffleTranslationOrder();
-function updateBrandVisibility(){brand.classList.toggle('brand-hidden',Boolean(input.value)||messages.children.length>0||shell.classList.contains('voice-active')||shell.classList.contains('hold-voice'))}
+function updateBrandVisibility(){brand.classList.toggle('brand-hidden',messages.children.length>0)}
 function translationTick(){
  const id=translationOrder[translationIndex];
  const [lang]=greetings[id],word=translationWords[id],chars=segment(word);
