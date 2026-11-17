@@ -23,6 +23,9 @@ def test_signed_ticket_contains_verified_hashes(monkeypatch):
     with patch("offline_models.google_auth_default") as auth, patch("offline_models.storage.Client") as storage:
         auth.return_value = (MagicMock(valid=True, token="test"), "project")
         blob = storage.return_value.bucket.return_value.blob.return_value
+        blob.size = 591649160
+        # Distinct audited sizes for the model and its tokenizer.
+        storage.return_value.bucket.return_value.blob.side_effect = [blob, MagicMock(size=411, generate_signed_url=MagicMock(return_value="https://example.invalid/tokens"))]
         blob.generate_signed_url.side_effect = ["https://example.invalid/model", "https://example.invalid/tokens"]
         result = client.get("/api/offline-models/uzbek-stt/download-ticket")
     assert result.status_code == 200
@@ -66,3 +69,12 @@ def test_ticket_allows_preview_origin_to_reach_signer_check(monkeypatch):
         result = client.get("/api/offline-models/uzbek-stt/download-ticket",
                             headers={"Origin": "https://raw.githack.com"})
     assert result.status_code == 503
+
+def test_ticket_rejects_resized_cloud_object(monkeypatch):
+    monkeypatch.setenv("AVNIVO_SIGNER_SERVICE_ACCOUNT", "test@example.iam.gserviceaccount.com")
+    with patch("offline_models.google_auth_default") as auth, patch("offline_models.storage.Client") as storage:
+        auth.return_value = (MagicMock(valid=True, token="test"), "project")
+        storage.return_value.bucket.return_value.blob.return_value.size = 123
+        result = client.get("/api/offline-models/uzbek-stt/download-ticket")
+    assert result.status_code == 503
+    assert "url" not in result.text
