@@ -350,7 +350,19 @@ rightLanguage.addEventListener('click',()=>selectLanguage('right'));
 // Audited exact Chirp 2 locale -> Translation LLM code. No language substitutions.
 const ONLINE_LANGUAGES=[["af-ZA","af","official"],["am-ET","am","experimental"],["ar-EG","ar","official"],["az-AZ","az","official"],["be-BY","be","official"],["bg-BG","bg","official"],["bn-BD","bn","official"],["bn-IN","bn-IN","official"],["bs-BA","bs","official"],["ca-ES","ca","official"],["cmn-Hans-CN","zh","official"],["cmn-Hant-TW","zh-TW","official"],["cs-CZ","cs","official"],["cy-GB","cy","official"],["da-DK","da","official"],["de-DE","de","official"],["el-GR","el","official"],["en-AU","en-AU","official"],["en-GB","en-GB","official"],["en-IN","en","official"],["en-US","en-US","official"],["es-419","es-419","official"],["es-ES","es-ES","official"],["es-US","es-US","official"],["et-EE","et","official"],["eu-ES","eu","experimental"],["fa-IR","fa","official"],["fi-FI","fi","official"],["fil-PH","fil","official"],["fr-CA","fr-CA","official"],["fr-FR","fr","official"],["ga-IE","ga","experimental"],["gl-ES","gl","official"],["gu-IN","gu","official"],["ha-NG","ha","experimental"],["hi-IN","hi","official"],["hr-HR","hr","official"],["hu-HU","hu","official"],["hy-AM","hy","experimental"],["id-ID","id","official"],["ig-NG","ig","experimental"],["is-IS","is","official"],["it-IT","it","official"],["iw-IL","iw","official"],["ja-JP","ja","official"],["ka-GE","ka","official"],["km-KH","km","official"],["kn-IN","kn","official"],["ko-KR","ko","official"],["ky-KG","ky","official"],["lb-LU","lb","experimental"],["ln-CD","ln","official"],["lo-LA","lo","official"],["lt-LT","lt","official"],["lv-LV","lv","official"],["mk-MK","mk","official"],["ml-IN","ml","official"],["mn-MN","mn","experimental"],["mr-IN","mr","official"],["ms-MY","ms","official"],["mt-MT","mt","experimental"],["my-MM","my","official"],["ne-NP","ne","official"],["nl-NL","nl","official"],["no-NO","no","official"],["or-IN","or","experimental"],["pa-Guru-IN","pa","official"],["pl-PL","pl","official"],["pt-BR","pt-BR","official"],["pt-PT","pt-PT","official"],["ro-RO","ro","official"],["ru-RU","ru","official"],["si-LK","si","retest"],["sk-SK","sk","official"],["sl-SI","sl","official"],["so-SO","so","experimental"],["sq-AL","sq","official"],["sr-RS","sr","experimental"],["sv-SE","sv","official"],["sw","sw","official"],["sw-KE","sw","official"],["ta-IN","ta","official"],["te-IN","te","official"],["tg-TJ","tg","experimental"],["th-TH","th","official"],["tr-TR","tr","official"],["uk-UA","uk","official"],["ur-PK","ur","official"],["uz-UZ","uz","official"],["vi-VN","vi","official"],["xh-ZA","xh","retest"],["yo-NG","yo","retest"],["zu-ZA","zu","official"]];
 const onlineLanguagesByCode=new Map(ONLINE_LANGUAGES.map(x=>[x[0],x]));
+const onlineLanguageStorageKey='avnivo.online.language-pair.v1';
 const onlineChoice={left:'uz-UZ',right:'ru-RU'};
+try{
+ const saved=JSON.parse(localStorage.getItem(onlineLanguageStorageKey)||'null');
+ if(saved&&typeof saved==='object'){
+  for(const side of ['left','right']){
+   if(typeof saved[side]==='string'&&onlineLanguagesByCode.has(saved[side]))onlineChoice[side]=saved[side];
+  }
+ }
+}catch(e){console.warn('Saved languages unavailable',e)}
+function persistOnlineLanguagePair(){
+ try{localStorage.setItem(onlineLanguageStorageKey,JSON.stringify(onlineChoice))}catch(e){console.warn('Cannot save language pair',e)}
+}
 const languageSheet=document.querySelector('.online-language-sheet'),languageSearch=languageSheet.querySelector('.online-language-search'),languageResults=languageSheet.querySelector('.online-language-results');
 let longPressTimer=0,longPressSide=null,longPressFired=false;
 const languageDisplay=typeof Intl.DisplayNames==='function'?new Intl.DisplayNames(['uz'],{type:'language'}):null;
@@ -367,6 +379,7 @@ function updateOnlineLanguageLabels(){
   button.setAttribute('aria-label',name+' ('+locale+')');
  }
 }
+updateOnlineLanguageLabels();
 function renderOnlineLanguages(){
  const q=languageSearch.value.trim().toLocaleLowerCase();
  languageResults.replaceChildren();
@@ -381,7 +394,7 @@ function renderOnlineLanguages(){
    if(!onlineLanguagesByCode.has(locale))return;
    if(onlineChoice[longPressSide]!==locale){requestToken++;cancelOnlineRecording();if(active)stopVoice()}
     onlineChoice[longPressSide]=locale;
-   updateOnlineLanguageLabels();closeOnlineLanguages();
+   persistOnlineLanguagePair();updateOnlineLanguageLabels();closeOnlineLanguages();
   });
   languageResults.append(item);
  }
