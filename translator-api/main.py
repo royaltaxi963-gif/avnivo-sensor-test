@@ -25,7 +25,7 @@ MAX_AUDIO = 10 * 1024 * 1024
 RATE_LIMIT = 12
 WINDOW = 60
 app = FastAPI(title="AVNIVO Translator API", docs_url=None, redoc_url=None)
-app.add_middleware(CORSMiddleware, allow_origins=sorted(ALLOWED_ORIGINS), allow_methods=["POST"], allow_headers=["Content-Type"], allow_credentials=False)
+app.add_middleware(CORSMiddleware, allow_origins=sorted(ALLOWED_ORIGINS), allow_methods=["GET", "POST"], allow_headers=["Content-Type"], allow_credentials=False)
 app.include_router(offline_models_router)
 recent = defaultdict(deque)
 
