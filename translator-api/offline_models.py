@@ -75,6 +75,13 @@ def download_ticket(model_id: str, request: Request):
 
     This endpoint intentionally does NOT claim installation or activation.
     """
+    # Browser origin restriction is defense in depth, not authentication.
+    origin = request.headers.get("origin")
+    allowed = {"https://royaltaxi963-gif.github.io", "https://raw.githack.com",
+               "https://rawcdn.githack.com", "http://localhost:3000",
+               "http://localhost:8080"}
+    if origin is not None and origin not in allowed:
+        raise HTTPException(403, "Origin not allowed")
     models = {**OBJECTS, **_load_audited_models()}
     if model_id not in models:
         raise HTTPException(404, "Unknown or unverified offline model")
