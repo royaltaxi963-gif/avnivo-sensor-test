@@ -559,7 +559,7 @@ onlineTtsSettings.setAttribute('aria-label','Online ovoz sozlamalari');
 document.querySelector('.settings-drawer')?.append(onlineTtsSettings);
 // Existing Gemini Cloud TTS is used only in Online mode. Offline keeps device speech.
 const AVNIVO_TTS_URL='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts';
-const AVNIVO_TTS_VOICES=["Kore","Aoede","Leda","Zephyr","Achernar","Puck","Charon","Orus","Achird","Iapetus"];
+const AVNIVO_TTS_VOICES=["Zephyr","Puck","Charon","Kore","Fenrir","Leda","Orus","Aoede","Callirrhoe","Autonoe","Enceladus","Iapetus","Umbriel","Algieba","Despina","Erinome","Algenib","Rasalgethi","Laomedeia","Achernar","Alnilam","Schedar","Gacrux","Pulcherrima","Achird","Zubenelgenubi","Vindemiatrix","Sadachbia","Sadaltager","Sulafat"];
 const ttsVoiceSelect=document.createElement('select');
 ttsVoiceSelect.setAttribute('aria-label','AI ovoz turini tanlash');
 ttsVoiceSelect.style.cssText='width:100%;max-width:280px;margin:10px 0;padding:10px;border-radius:10px;background:#241b15;color:#ffe7b9;border:1px solid #b58a52;font:15px system-ui';
@@ -591,7 +591,26 @@ for(const amount of [30,50,70,80,90,100]){const opt=document.createElement('opti
 try{const saved=localStorage.getItem('avnivoTtsVolume');ttsVolumeSelect.value=[30,50,70,80,90,100].includes(Number(saved))?saved:'80'}catch(e){ttsVolumeSelect.value='80'}
 ttsVolumeSelect.addEventListener('change',()=>{if(ttsAudio)ttsAudio.volume=Number(ttsVolumeSelect.value)/100;try{localStorage.setItem('avnivoTtsVolume',ttsVolumeSelect.value)}catch(e){}});
 ttsVolumeLabel.append(ttsVolumeSelect);onlineTtsSettings.append(ttsVolumeLabel);
-const ttsOnlineStatus=document.createElement('p');ttsOnlineStatus.setAttribute('role','status');ttsOnlineStatus.style.cssText='font:12px/1.5 system-ui;color:#e6c99c;margin:12px 0';ttsOnlineStatus.textContent='Gemini Flash TTS — online. Ovoz: Kore. Ohang avtomatik tanlanadi (server).';onlineTtsSettings.append(ttsOnlineStatus);
+function onlineTtsSelect(labelText, key, items, fallback){
+ const label=document.createElement('label');label.textContent=labelText;label.style.cssText=ttsVoiceLabel.style.cssText;
+ const select=document.createElement('select');select.style.cssText=ttsVoiceSelect.style.cssText;
+ for(const [value,name] of items){const option=document.createElement('option');option.value=value;option.textContent=name;select.append(option)}
+ try{const saved=localStorage.getItem(key);select.value=items.some(x=>x[0]===saved)?saved:fallback}catch(e){select.value=fallback}
+ select.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem(key,select.value)}catch(e){}});
+ label.append(select);onlineTtsSettings.append(label);return select;
+}
+const ttsEmotionSelect=onlineTtsSelect('Hissiy ohang (Online)','avnivoTtsEmotion',[
+ ['natural','Tabiiy / avtomatik'],['cheerful','Quvnoq'],['angry','Jahldor'],['sad','G‘amgin'],['calm','Xotirjam'],['excited','Hayajonli'],['serious','Jiddiy'],['gentle','Muloyim'],['confident','Ishonchli'],['sarcastic','Kinoyali'],['playful','O‘ynoqi'],['mysterious','Sirli'],['empathetic','Hamdard'],['narrator','Hikoyachi'],['whisper','Pichirlash'],['robotic','Robotga o‘xshash'],['dramatic','Dramatik'],['curious','Qiziquvchan'],['tired','Charchagan'],['fearful','Qo‘rqqan'],['frustrated','Asabiy'],['formal','Rasmiy']],'natural');
+const ttsPaceSelect=onlineTtsSelect('Nutq maromi (AI)','avnivoTtsPace',[['natural','Tabiiy'],['slow','Sekin'],['fast','Tez'],['deliberate','O‘ylab, pauzali']],'natural');
+const ttsProsodySelect=onlineTtsSelect('Intonatsiya va pitch (AI)','avnivoTtsProsody',[['natural','Tabiiy'],['expressive','Ifodali'],['flat','Bir tekis'],['high','Balandroq ohang'],['low','Pastroq ohang']],'natural');
+const ttsDeliverySelect=onlineTtsSelect('Talaffuz va ovoz uslubi (AI)','avnivoTtsDelivery',[['natural','Tabiiy'],['soft','Yumshoq'],['projected','Baland va aniq'],['breathy','Nafasli'],['clear','Ravshan talaffuz']],'natural');
+const ttsCustomLabel=document.createElement('label');ttsCustomLabel.textContent='Maxsus uslub tavsifi (180 belgigacha)';ttsCustomLabel.style.cssText=ttsVoiceLabel.style.cssText;
+const ttsCustomInput=document.createElement('textarea');ttsCustomInput.maxLength=180;ttsCustomInput.rows=2;ttsCustomInput.placeholder='Masalan: warm and enthusiastic';ttsCustomInput.style.cssText=ttsVoiceSelect.style.cssText+';resize:vertical;display:block';
+try{ttsCustomInput.value=localStorage.getItem('avnivoTtsCustomStyle')||''}catch(e){}
+ttsCustomInput.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsCustomStyle',ttsCustomInput.value)}catch(e){}});
+ttsCustomLabel.append(ttsCustomInput);onlineTtsSettings.append(ttsCustomLabel);
+const ttsVoiceNote=document.createElement('p');ttsVoiceNote.style.cssText='font:12px/1.5 system-ui;color:#d6b68c;margin:10px 0';ttsVoiceNote.textContent='30 ta tayyor ovoz. Erkak/ayol/yosh ovoz xarakteri ovoz tanlovi bilan belgilanadi; uslub sozlamalari ovozning doimiy kimligini o‘zgartirmaydi. Kengaytirilgan ovozlar uchun alohida Voices API kerak.';onlineTtsSettings.append(ttsVoiceNote);
+const ttsOnlineStatus=document.createElement('p');ttsOnlineStatus.setAttribute('role','status');ttsOnlineStatus.style.cssText='font:12px/1.5 system-ui;color:#e6c99c;margin:12px 0';ttsOnlineStatus.textContent='Gemini 3.8 Flash TTS — online. Ovoz va hissiy uslubni tanlang.';onlineTtsSettings.append(ttsOnlineStatus);
 const ttsTestButton=document.createElement('button');ttsTestButton.type='button';ttsTestButton.textContent='🔊 Ovoz sinovi';ttsTestButton.style.cssText='padding:10px 15px;border:1px solid #b58a52;border-radius:10px;background:#49321e;color:#ffe7b9;font:14px system-ui;cursor:pointer';onlineTtsSettings.append(ttsTestButton);
 let speakingButton=null,ttsAudio=null,ttsAudioUrl=null,ttsAbort=null,ttsGeneration=0;
 function stopSpeaking(){
@@ -643,7 +662,7 @@ async function playMessage(button,bubble,language){
    if(generation!==ttsGeneration)return;
    const controller=new AbortController();ttsAbort=controller;
    button.dataset.loading='true';button.setAttribute('aria-label','AI ovozi tayyorlanmoqda');ttsOnlineStatus.textContent='Gemini ovozi tayyorlanmoqda…';
-   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,voice}),signal:controller.signal});
+   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,voice,emotion:ttsEmotionSelect.value,pace:ttsPaceSelect.value,prosody:ttsProsodySelect.value,delivery:ttsDeliverySelect.value,custom_style:ttsCustomInput.value.trim()}),signal:controller.signal});
    if(!response.ok){let detail='HTTP '+response.status;if(response.status===429)detail='So‘rovlar limiti tugadi, birozdan keyin qayta urinib ko‘ring';else if(response.status===503)detail='Ovoz serveri hozir mavjud emas';else if(response.status===502)detail='Gemini ovoz xizmati javob bermadi';throw Error(detail)}
    const blob=await response.blob();
    if(generation!==ttsGeneration)return;
