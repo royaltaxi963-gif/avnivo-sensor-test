@@ -1,0 +1,32 @@
+name: Offline model safety checks
+on:
+  pull_request:
+    paths:
+      - 'offline-model-installer.js'
+      - 'translator-api/offline_models.py'
+      - 'translator-api/test_offline_models.py'
+      - 'translator-api/audit_gcs_models.py'
+      - 'translator-api/test_audit_gcs_models.py'
+      - 'tests/offline-sha256.test.cjs'
+      - '.github/workflows/offline-model-safety.yml'
+  workflow_dispatch:
+jobs:
+  sha256:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check offline-model-installer.js
+      - run: node tests/offline-sha256.test.cjs
+  python-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m py_compile translator-api/offline_models.py translator-api/audit_gcs_models.py translator-api/test_offline_models.py translator-api/test_audit_gcs_models.py
+      - run: pip install google-cloud-storage
+      - run: cd translator-api && python -m unittest test_audit_gcs_models.py

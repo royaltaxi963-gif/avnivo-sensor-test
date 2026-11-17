@@ -18,6 +18,55 @@ OBJECTS = {
          "bytes": 411, "sha256": "2022129a0c61784d4a1838da59e5875f9b29d2c6ad12413cbedc98632f98710f"},
     ]
 }
+
+# Additional models are enabled only after an operator supplies an audited manifest.
+# Never infer hashes from untrusted requests or grant arbitrary GCS object access.
+import json
+import re
+ADDITIONAL_MODEL_PREFIXES = {
+    "whisper-small-q8": "multilingual-stt/whisper-small-q8_0/",
+    "whisper-large-v3-turbo": "multilingual-stt/whisper-large-v3-turbo-q5_0/",
+    "nllb-200-600m-int8": "multilingual-translation/nllb-200-600m-int8/",
+    "navoiy-tts": "tts/uzbek/navoiy/",
+    "mms-tts": "tts/mms/",
+}
+def _load_audited_models():
+    """Optional JSON from a private deployment secret; fail closed if absent/invalid."""
+    raw = os.getenv("AVNIVO_AUDITED_MODEL_MANIFEST", "")
+    if not raw:
+        return {}
+    try:
+        catalog = json.loads(raw)
+        if not isinstance(catalog, dict):
+            raise ValueError("catalog")
+        result = {}
+        for model_id, files in catalog.items():
+            prefix = ADDITIONAL_MODEL_PREFIXES.get(model_id)
+            if prefix is None or not isinstance(files, list) or not files or len(files)>1000:
+                raise ValueError("model")
+            checked = []
+            seen = set()
+            for item in files:
+                obj = item["object"]
+                name = item["name"]
+                size = item["bytes"]
+                sha = item["sha256"]
+                if (not isinstance(obj,str) or not obj.startswith(prefix)
+                    or ".." in obj or not isinstance(name,str)
+                    or not re.fullmatch(r"[a-zA-Z0-9_.\\/-]{1,180}",name)
+                    or ".." in name or name in seen
+                    or not isinstance(size,int) or isinstance(size,bool) or size<=0
+                    or not isinstance(sha,str) or not re.fullmatch(r"[a-f0-9]{64}",sha)):
+                    raise ValueError("file")
+                seen.add(name)
+                checked.append({"object":obj,"name":name,"bytes":size,"sha256":sha})
+            result[model_id]=checked
+        return result
+    except (ValueError, TypeError, KeyError, json.JSONDecodeError):
+        import logging
+        logging.getLogger("avnivo.models").warning("Audited model manifest rejected")
+        return {}
+
 _requests = defaultdict(deque)
 
 @router.get("/api/offline-models/{model_id}/download-ticket")
@@ -26,8 +75,16 @@ def download_ticket(model_id: str, request: Request):
 
     This endpoint intentionally does NOT claim installation or activation.
     """
-    if model_id not in OBJECTS:
-        raise HTTPException(404, "Unknown offline model")
+    # Browser origin restriction is defense in depth, not authentication.
+    origin = request.headers.get("origin")
+    allowed = {"https://royaltaxi963-gif.github.io", "https://raw.githack.com",
+               "https://rawcdn.githack.com", "http://localhost:3000",
+               "http://localhost:8080"}
+    if origin is not None and origin not in allowed:
+        raise HTTPException(403, "Origin not allowed")
+    models = {**OBJECTS, **_load_audited_models()}
+    if model_id not in models:
+        raise HTTPException(404, "Unknown or unverified offline model")
     ip = request.client.host if request.client else "unknown"
     now = time.monotonic()
     hits = _requests[ip]
@@ -46,8 +103,12 @@ def download_ticket(model_id: str, request: Request):
         client = storage.Client(credentials=credentials)
         bucket = client.bucket(BUCKET)
         files = []
-        for item in OBJECTS[model_id]:
+        for item in models[model_id]:
             blob = bucket.blob(item["object"])
+            # Fail closed if an audited object was removed or its size changed.
+            blob.reload(client=client)
+            if blob.size != item["bytes"]:
+                raise RuntimeError("Audited object size mismatch")
             url = blob.generate_signed_url(
                 version="v4", expiration=timedelta(minutes=15), method="GET",
                 service_account_email=email, access_token=credentials.token,

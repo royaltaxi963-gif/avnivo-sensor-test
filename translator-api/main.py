@@ -25,7 +25,7 @@ MAX_AUDIO = 10 * 1024 * 1024
 RATE_LIMIT = 12
 WINDOW = 60
 app = FastAPI(title="AVNIVO Translator API", docs_url=None, redoc_url=None)
-app.add_middleware(CORSMiddleware, allow_origins=sorted(ALLOWED_ORIGINS), allow_methods=["POST"], allow_headers=["Content-Type"], allow_credentials=False)
+app.add_middleware(CORSMiddleware, allow_origins=sorted(ALLOWED_ORIGINS), allow_methods=["GET", "POST"], allow_headers=["Content-Type"], allow_credentials=False)
 app.include_router(offline_models_router)
 recent = defaultdict(deque)
 
@@ -408,13 +408,60 @@ async def synthesize_emotional_speech(request: Request):
     if not isinstance(spoken, str) or not spoken.strip() or len(spoken) > 350:
         raise HTTPException(400, "Text must contain 1-350 characters")
     spoken = spoken.strip()
+    # Online TTS only. Do not modify the offline models or their routes.
     allowed_voices = {
-        "Kore", "Aoede", "Leda", "Zephyr", "Achernar",
-        "Puck", "Charon", "Orus", "Achird", "Iapetus",
+        "Zephyr", "Puck", "Charon", "Kore", "Fenrir", "Leda", "Orus",
+        "Aoede", "Callirrhoe", "Autonoe", "Enceladus", "Iapetus",
+        "Umbriel", "Algieba", "Despina", "Erinome", "Algenib",
+        "Rasalgethi", "Laomedeia", "Achernar", "Alnilam", "Schedar",
+        "Gacrux", "Pulcherrima", "Achird", "Zubenelgenubi",
+        "Vindemiatrix", "Sadachbia", "Sadaltager", "Sulafat",
     }
     voice = body.get("voice", "Kore")
     if not isinstance(voice, str) or voice not in allowed_voices:
         raise HTTPException(400, "Unsupported TTS voice")
+    # Google supports free-form speechMetadata.style, not numeric age/gender knobs.
+    style_parts = []
+    style_choices = {
+        "natural": "", "cheerful": "cheerful and friendly",
+        "angry": "angry and forceful", "sad": "sad and subdued",
+        "calm": "calm and reassuring", "excited": "excited and energetic",
+        "serious": "serious and professional", "gentle": "gentle and warm",
+        "confident": "confident and clear", "sarcastic": "dry and sarcastic",
+        "playful": "playful and lively", "mysterious": "mysterious and hushed",
+        "empathetic": "empathetic and caring", "narrator": "natural storytelling narrator",
+        "whisper": "whispering", "robotic": "flat and robotic",
+        "dramatic": "dramatic and expressive", "curious": "curious and inquisitive",
+        "tired": "tired and low energy", "fearful": "fearful and nervous",
+        "frustrated": "frustrated and tense", "formal": "formal and precise",
+    }
+    emotion = body.get("emotion", "natural")
+    if not isinstance(emotion, str) or emotion not in style_choices:
+        raise HTTPException(400, "Unsupported TTS emotion")
+    if style_choices[emotion]:
+        style_parts.append(style_choices[emotion])
+    pace = body.get("pace", "natural")
+    if pace not in ("natural", "slow", "fast", "deliberate"):
+        raise HTTPException(400, "Unsupported TTS pace")
+    if pace != "natural":
+        style_parts.append({"slow":"speaking slowly", "fast":"speaking rapidly", "deliberate":"deliberate measured pacing"}[pace])
+    prosody = body.get("prosody", "natural")
+    if prosody not in ("natural", "expressive", "flat", "high", "low"):
+        raise HTTPException(400, "Unsupported TTS prosody")
+    if prosody != "natural":
+        style_parts.append({"expressive":"expressive intonation", "flat":"monotone and flat", "high":"higher pitch inflection", "low":"lower pitch inflection"}[prosody])
+    delivery = body.get("delivery", "natural")
+    if delivery not in ("natural", "soft", "projected", "breathy", "clear"):
+        raise HTTPException(400, "Unsupported TTS delivery")
+    if delivery != "natural":
+        style_parts.append({"soft":"softly spoken", "projected":"projected voice", "breathy":"breathy delivery", "clear":"clear articulation"}[delivery])
+    custom = body.get("custom_style", "")
+    if not isinstance(custom, str) or len(custom) > 180 or any(c in custom for c in "<>\\r\\n"):
+        raise HTTPException(400, "Invalid custom style")
+    if custom.strip():
+        style_parts.append(custom.strip())
+    # Default remains the backend's existing automatic emotion detector.
+    selected_style = ", ".join(style_parts) if style_parts else None
     ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "unknown").split(",")[0].strip()
     now = time.monotonic()
     hits = recent[ip]
@@ -445,7 +492,7 @@ async def synthesize_emotional_speech(request: Request):
     tts_payload = {
         "contents": [{"role": "user", "parts": [{
             "text": spoken,
-            "speechMetadata": {"style": _TTS_STYLES[style]},
+            "speechMetadata": {"style": selected_style or _TTS_STYLES[style]},
         }]}],
         "generationConfig": {
             "responseModalities": ["AUDIO"],
