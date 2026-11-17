@@ -1011,6 +1011,7 @@ async function stopVoice(){
  requestToken++;active=false;cancelAnimationFrame(frame);
  shell.classList.remove('voice-active');mic.setAttribute('aria-pressed','false');mic.setAttribute('aria-label','Mikrofonni yoqish');syncComposerMode();
  if(onlineRecorder&&onlineRecorder.state==='recording'){onlineState('loading');try{onlineRecorder.stop()}catch(e){onlineState('error')}}
+ shell.classList.remove('hold-voice');
  if(mediaStream){mediaStream.getTracks().forEach(track=>track.stop());mediaStream=null}
  if(audioContext){const context=audioContext;audioContext=null;await context.close().catch(()=>{})}
  analyser=null;samples=null;level=0;idleWave();
@@ -1029,6 +1030,7 @@ async function startVoice(){
   const source=ctx.createMediaStreamSource(stream),a=ctx.createAnalyser();
   a.fftSize=1024;a.smoothingTimeConstant=.22;source.connect(a);
   mediaStream=stream;audioContext=ctx;analyser=a;samples=new Uint8Array(a.fftSize);active=true;
+  avnivoRecordingAt=performance.now();
   if(document.documentElement.dataset.avnivoMode==='online'){
    if(!beginOnlineRecording(stream)){await stopVoice();return}
   }
@@ -1121,6 +1123,7 @@ function cancelOnlineRecording(){
 }
 
 let holdTimer=0,holdStarted=false,holdPointer=null,holdSuppressClick=false,holdRecognizer=null,holdBase='',holdTranscript='',holdFinal='',holdSession=0,holdWaveStream=null,holdWaveContext=null,holdWaveFrame=0,holdWaveAnalyser=null;
+let avnivoPressStartedAt=0,avnivoRecordingAt=0,avnivoCancelHold=false,avnivoHoldFinalizing=false;
 function hint(message){if(document.documentElement.dataset.avnivoMode==='online'){voiceHint.hidden=true;return}voiceHint.textContent=message;voiceHint.hidden=!message}
 function appendTranscript(base,transcript){
  const spoken=transcript.trim();
@@ -1159,21 +1162,26 @@ async function startHoldWave(session){
   animate();
  }catch(e){if(session===holdSession&&holdStarted)hint('Mikrofon ruxsatini tekshiring')}
 }
-function finishHold(){
+function finishHold(cancel=false){
  if(!holdStarted)return;
+ avnivoCancelHold=cancel;avnivoHoldFinalizing=true;
  holdStarted=false;holdSession++;
  shell.classList.remove('hold-voice');cancelAnimationFrame(holdWaveFrame);
  if(holdWaveStream){holdWaveStream.getTracks().forEach(t=>t.stop());holdWaveStream=null}
  if(holdWaveContext){const ctx=holdWaveContext;holdWaveContext=null;ctx.close().catch(()=>{})}
  holdWaveAnalyser=null;trace.style.backgroundImage='none';
- if(holdRecognizer){try{holdRecognizer.stop()}catch(e){}}
- else {input.value=appendTranscript(holdBase,holdFinal||holdTranscript);persistDraft();resize();syncComposerMode();hint('')}
+ if(holdRecognizer){try{if(cancel)holdRecognizer.abort();else holdRecognizer.stop()}catch(e){} }
+ else {if(!cancel)input.value=appendTranscript(holdBase,holdFinal||holdTranscript);persistDraft();resize();syncComposerMode();hint('')}
  syncComposerMode();
 }
 function beginHold(){
- if(document.documentElement.dataset.avnivoMode==='online'){if(!active)startVoice();return}
- if(!input.value.trim()||active||holdStarted)return;
- holdStarted=true;holdSession++;
+ if(active||holdStarted)return;
+ if(document.documentElement.dataset.avnivoMode==='online'){
+   avnivoRecordingAt=0;
+   shell.classList.add('hold-voice');
+   startVoice();return;
+ }
+ holdStarted=true;holdSession++;avnivoRecordingAt=performance.now();avnivoCancelHold=false;avnivoHoldFinalizing=false;
  holdBase=input.value;holdTranscript='';holdFinal='';
  shell.classList.add('hold-voice');shell.classList.remove('text-mode');
  mic.setAttribute('aria-label','Barmoqni uzib ovoz yozishni tugatish');
@@ -1196,10 +1204,10 @@ function beginHold(){
   recognition.onerror=e=>{if(holdRecognizer===recognition)hint('Ovoz tanish: '+e.error)};
   recognition.onend=()=>{
    if(holdRecognizer!==recognition)return;
-   if(holdStarted){finishHold()}
+   if(holdStarted){finishHold(false)}
    holdRecognizer=null;
-   input.value=appendTranscript(holdBase,holdFinal||holdTranscript);
-   persistDraft();resize();syncComposerMode();hint('');
+   if(!avnivoCancelHold)input.value=appendTranscript(holdBase,holdFinal||holdTranscript);
+   avnivoHoldFinalizing=false;persistDraft();resize();syncComposerMode();hint('');
   };
   recognition.start();
   startHoldWave(session);
@@ -1240,28 +1248,43 @@ function preserveKeyboardOnMicPress(event){
   input.blur();
  }
 }
+// Keep the original microphone/send icons and waveform. Only gesture semantics change.
 mic.addEventListener('pointerdown',event=>{
- // Preserve textarea focus and Android keyboard while pressing the action button.
  preserveKeyboardOnMicPress(event);
- if(event.button!==0||active||(document.documentElement.dataset.avnivoMode!=='online'&&!input.value.trim()))return;
- holdPointer=event.pointerId;holdSuppressClick=false;
+ if(event.button!==0||holdPointer!==null)return;
+ holdPointer=event.pointerId;holdSuppressClick=true;avnivoPressStartedAt=performance.now();
  try{mic.setPointerCapture(event.pointerId)}catch(e){}
- clearHoldTimer();holdTimer=setTimeout(()=>{holdTimer=0;holdSuppressClick=true;beginHold()},1050);
+ clearHoldTimer();
+ if(input.value.trim()){
+   // Existing send arrow: 1.1 second hold starts dictation; quick tap sends.
+   holdSuppressClick=false;
+   holdTimer=setTimeout(()=>{holdTimer=0;holdSuppressClick=true;beginHold()},1100);
+ }else beginHold();
 });
 function releaseHold(event){
  if(holdPointer===null||event.pointerId!==holdPointer)return;
- const wasHold=holdStarted;clearHoldTimer();holdPointer=null;
- if(wasHold){holdSuppressClick=true;finishHold()}
+ const wasHold=holdStarted||active||shell.classList.contains('hold-voice');
+ const held=performance.now()-avnivoPressStartedAt;
+ clearHoldTimer();holdPointer=null;
+ if(wasHold){
+   holdSuppressClick=true;
+   const cancel=avnivoRecordingAt===0||performance.now()-avnivoRecordingAt<1000;
+   if(document.documentElement.dataset.avnivoMode==='online'){
+     if(cancel)cancelOnlineRecording();
+     stopVoice();
+     shell.classList.remove('hold-voice');
+   }else finishHold(cancel);
+ }else{
+   holdSuppressClick=true;
+   if(held<1100&&input.value.trim())sendMessage();
+ }
 }
 mic.addEventListener('pointerup',releaseHold);
 mic.addEventListener('mousedown',preserveKeyboardOnMicPress);
-mic.addEventListener('pointercancel',releaseHold);
+mic.addEventListener('pointercancel',event=>{if(holdPointer!==event.pointerId)return;clearHoldTimer();holdPointer=null;holdSuppressClick=true;if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();stopVoice();shell.classList.remove('hold-voice')}else finishHold(true)});
 mic.addEventListener('lostpointercapture',event=>{if(holdPointer===event.pointerId)releaseHold(event)});
-mic.addEventListener('contextmenu',event=>{if(holdTimer||holdStarted)event.preventDefault()});
-mic.addEventListener('click',event=>{
- if(holdSuppressClick){event.preventDefault();holdSuppressClick=false;return}
- if(active)stopVoice();else if(shell.classList.contains('text-mode'))sendMessage();else if(!holdStarted)startVoice();
-});
+mic.addEventListener('contextmenu',event=>{if(holdTimer||holdStarted||active)event.preventDefault()});
+mic.addEventListener('click',event=>{event.preventDefault();holdSuppressClick=false});
 
 // All dependent const bindings and handlers are initialized before restoring a saved draft.
 // Session continuity: reopening within three seconds resumes the same chat.
