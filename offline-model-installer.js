@@ -10,8 +10,8 @@ const CHUNK=4*1024*1024;
 const active=new Map();
 function database(){return new Promise((ok,fail)=>{const q=indexedDB.open('avnivo-offline-installer-v2',1);q.onupgradeneeded=()=>{q.result.createObjectStore('parts');q.result.createObjectStore('verified')};q.onsuccess=()=>ok(q.result);q.onerror=()=>fail(q.error)})}
 async function record(store,key,value){const d=await database();try{return await new Promise((ok,fail)=>{const t=d.transaction(store,value===undefined?'readonly':'readwrite'),q=value===undefined?t.objectStore(store).get(key):t.objectStore(store).put(value,key);q.onsuccess=()=>ok(q.result);q.onerror=()=>fail(q.error);t.onerror=()=>fail(t.error)})}finally{d.close()}}
-const hex=b=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,'0')).join('');
-const digest=b=>crypto.subtle.digest('SHA-256',b).then(hex);
+
+
 // Incremental SHA-256: bounded memory for multi-GB model files.
 class SHA256 {
  constructor(){this.h=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);this.buf=new Uint8Array(64);this.used=0;this.bytes=0;this.w=new Uint32Array(64)}
@@ -28,11 +28,15 @@ async function ticket(id){
  if(m.model_id!==id||!Array.isArray(m.files)||!m.files.length)throw Error('Manifest noto‘g‘ri');
  let total=0;const names=new Set();
  for(const f of m.files){
-  if(!f||typeof f.name!=='string'||!/^[a-zA-Z0-9_.\/-]+$/.test(f.name)||f.name.includes('..')||names.has(f.name)||!Number.isSafeInteger(f.bytes)||f.bytes<1||!/^[a-f0-9]{64}$/.test(f.sha256)||typeof f.url!=='string'||!/^https:\/\/(?:storage\\.googleapis\\.com|[a-z0-9.-]+\\.storage\\.googleapis\\.com)\//.test(f.url))throw Error('Xavfsiz manifest talablari bajarilmadi');
+  if(!f||typeof f.name!=='string'||!/^[a-zA-Z0-9_.\/-]+$/.test(f.name)||f.name.includes('..')||names.has(f.name)||!Number.isSafeInteger(f.bytes)||f.bytes<1||!/^[a-f0-9]{64}$/.test(f.sha256)||typeof f.url!=='string'||!/^https:\/\/(?:storage\.googleapis\.com|[a-z0-9.-]+\.storage\.googleapis\.com)\//.test(f.url))throw Error('Xavfsiz manifest talablari bajarilmadi');
   names.add(f.name);total+=f.bytes;
  }
  if(!Number.isSafeInteger(total)||total>15*1024**3)throw Error('Model hajmi cheklovdan katta');
  return m;
+}
+async function clearParts(id,file){
+ const d=await database();
+ try{await new Promise((resolve,reject)=>{const tx=d.transaction(['parts','verified'],'readwrite');const parts=tx.objectStore('parts');const prefix=id+'/'+file.sha256+'/'+file.name+'/';const request=parts.openCursor();request.onsuccess=()=>{const cursor=request.result;if(cursor){if(typeof cursor.key==='string'&&cursor.key.startsWith(prefix))cursor.delete();cursor.continue()}};tx.objectStore('verified').delete(id+'/'+file.name);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}finally{d.close()}
 }
 async function download(id,onProgress,onStatus){
  if(!IDS.has(id))throw Error('Noma’lum model');
@@ -41,7 +45,7 @@ async function download(id,onProgress,onStatus){
  const work=(async()=>{
   let manifest=await ticket(id);
   const total=manifest.files.reduce((n,f)=>n+f.bytes,0);
-  if(navigator.storage?.estimate){const e=await navigator.storage.estimate();if(e.quota&&e.usage&&e.quota-e.usage<total*1.1)throw Error('Telefonda yetarli bo‘sh xotira yo‘q')}
+  if(navigator.storage?.estimate){const e=await navigator.storage.estimate();if(Number.isFinite(e.quota)&&Number.isFinite(e.usage)&&e.quota-e.usage<total*1.1)throw Error('Telefonda yetarli bo‘sh xotira yo‘q')}
   let done=0;
   for(const f of manifest.files){
    const chunks=Math.ceil(f.bytes/CHUNK);
@@ -60,11 +64,11 @@ async function download(id,onProgress,onStatus){
       if(!navigator.onLine)await new Promise(resolve=>window.addEventListener('online',resolve,{once:true}));
       const fresh=manifest.files.find(x=>x.name===f.name);
       const r=await fetch(fresh.url,{headers:{Range:'bytes='+start+'-'+end},cache:'no-store'});
-      if(r.status===401||r.status===403){manifest=await ticket(id);continue}
+      if(r.status===401||r.status===403){const next=await ticket(id);const replacement=next.files.find(x=>x.name===f.name&&x.sha256===f.sha256&&x.bytes===f.bytes);if(!replacement)throw Error('Yangi manifest model fayliga mos emas');manifest=next;continue}
       if(r.status!==206||r.headers.get('Content-Range')!=='bytes '+start+'-'+end+'/'+f.bytes)throw Error('Server bo‘laklab yuklashni qo‘llamaydi');
       const data=await r.arrayBuffer();if(data.byteLength!==end-start+1)throw Error('Yuklangan hajm mos emas');
       await record('parts',k,data);done+=data.byteLength;onProgress?.(done,total);success=true;
-     }catch(e){if(attempt===3)throw e;await new Promise(resolve=>setTimeout(resolve,1000*(attempt+1)));manifest=await ticket(id)}
+     }catch(e){if(attempt===3)throw e;await new Promise(resolve=>setTimeout(resolve,1000*(attempt+1)));{const next=await ticket(id);if(!next.files.some(x=>x.name===f.name&&x.sha256===f.sha256&&x.bytes===f.bytes))throw Error('Manifest yuklash davomida o‘zgardi');manifest=next}}
     }
    }
    onStatus?.('SHA-256 tekshirilmoqda: '+f.name);
@@ -75,7 +79,7 @@ async function download(id,onProgress,onStatus){
     hasher.update(part);
     if(i%8===0)await new Promise(resolve=>setTimeout(resolve,0));
    }
-   if(hasher.finish()!==f.sha256)throw Error('SHA-256 mos kelmadi: '+f.name);
+   if(hasher.finish()!==f.sha256){await clearParts(id,f);throw Error('SHA-256 mos kelmadi: '+f.name)}
    await record('verified',id+'/'+f.name,{sha256:f.sha256,bytes:f.bytes});
   }
   onStatus?.('Fayllar tekshirildi. Offline ijro dvigateli ishga tushishi kutilmoqda.');
