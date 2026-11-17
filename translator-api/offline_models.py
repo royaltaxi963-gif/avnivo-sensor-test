@@ -105,6 +105,10 @@ def download_ticket(model_id: str, request: Request):
         files = []
         for item in models[model_id]:
             blob = bucket.blob(item["object"])
+            # Fail closed if an audited object was removed or its size changed.
+            blob.reload(client=client)
+            if blob.size != item["bytes"]:
+                raise RuntimeError("Audited object size mismatch")
             url = blob.generate_signed_url(
                 version="v4", expiration=timedelta(minutes=15), method="GET",
                 service_account_email=email, access_token=credentials.token,
