@@ -662,8 +662,27 @@ async function playMessage(button,bubble,language){
    if(generation!==ttsGeneration)return;
    const controller=new AbortController();ttsAbort=controller;
    button.dataset.loading='true';button.setAttribute('aria-label','AI ovozi tayyorlanmoqda');ttsOnlineStatus.textContent='Gemini ovozi tayyorlanmoqda…';
-   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,voice,emotion:ttsEmotionSelect.value,pace:ttsPaceSelect.value,prosody:ttsProsodySelect.value,delivery:ttsDeliverySelect.value,custom_style:ttsCustomInput.value.trim()}),signal:controller.signal});
-   if(!response.ok){let detail='HTTP '+response.status;if(response.status===429)detail='So‘rovlar limiti tugadi, birozdan keyin qayta urinib ko‘ring';else if(response.status===503)detail='Ovoz serveri hozir mavjud emas';else if(response.status===502)detail='Gemini ovoz xizmati javob bermadi';throw Error(detail)}
+   // Online-only compatibility: the live Cloud Run backend may still use its original
+   // 10-voice contract. A 400 from that server must not disable audio playback.
+   const preferred={text:chunk,voice,emotion:ttsEmotionSelect.value,pace:ttsPaceSelect.value,prosody:ttsProsodySelect.value,delivery:ttsDeliverySelect.value,custom_style:ttsCustomInput.value.trim()};
+   const requestAudio=payload=>fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
+   let response=await requestAudio(preferred);
+   if(response.status===400){
+    // Original deployed API accepts text + one of ten voices; ignore unsupported
+    // expressive options until the backend change has been deployed.
+    const compatibleVoices=['Kore','Aoede','Leda','Zephyr','Achernar','Puck','Charon','Orus','Achird','Iapetus'];
+    const compatibleVoice=compatibleVoices.includes(voice)?voice:'Kore';
+    response=await requestAudio({text:chunk,voice:compatibleVoice});
+    if(response.ok)ttsOnlineStatus.textContent=compatibleVoice===voice?'Server eski ovoz sozlamalarida ishlayapti':'Tanlangan ovoz serverda hali yo‘q; vaqtincha Kore ishlatildi';
+   }
+   if(!response.ok){
+    let detail='HTTP '+response.status;
+    if(response.status===400)detail='Ovoz serveri so‘rovni qabul qilmadi (HTTP 400)';
+    else if(response.status===429)detail='So‘rovlar limiti tugadi, birozdan keyin qayta urinib ko‘ring';
+    else if(response.status===503)detail='Ovoz serveri hozir mavjud emas';
+    else if(response.status===502)detail='Gemini ovoz xizmati javob bermadi';
+    throw Error(detail);
+   }
    const blob=await response.blob();
    if(generation!==ttsGeneration)return;
    if(!blob.size||!blob.type.startsWith('audio/'))throw Error('Audio javobi noto‘g‘ri');
