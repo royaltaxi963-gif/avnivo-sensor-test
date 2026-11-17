@@ -807,7 +807,7 @@ function restoreHistory(session){
  for(const entry of session.messages.slice(-30)){
   const source=renderChatBubble(entry,firstLanguage);
   messages.append(attachSpeaker(source,messageData(entry,firstLanguage).language));
-  if(previewTranslation(entry)){
+  if(typeof entry.translation==='string'&&entry.translation.length>0){
    const language=entry.language==='right'?'right':'left';
    const translationBubble=renderChatBubble({text:entry.translation,language:oppositeLanguage(language)},firstLanguage);
    translationBubble.classList.add('translation-preview');
@@ -939,9 +939,10 @@ async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,h
   }
   const data=await response.json();
   if(data.model!=='general/translation-llm'||data.source!==source[1]||data.target!==target[1]||typeof data.text!=='string')throw Error('Tarjima javobida til kodlari mos kelmadi');
+  // Persist verified translation even if user closed the page or switched chats.
+  if(entry){entry.translation=data.text;persistHistory()}
   if(!bubble.isConnected)return;
   typeTranslation(bubble,data.text);
-  if(entry){entry.translation=data.text;persistHistory()}
  }catch(error){
   if(!bubble.isConnected)return;
   bubble.textContent=error.name==='AbortError'?'Tarjima vaqti tugadi':error instanceof TypeError?'Tarjima serveriga ulanib bo‘lmadi':error.message;
