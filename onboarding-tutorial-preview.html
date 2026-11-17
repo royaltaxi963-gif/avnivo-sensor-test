@@ -1431,8 +1431,14 @@ function spotlight(selector){
  spot.style.width=rect.width+'px';spot.style.height=rect.height+'px';
  spot.style.background=style.background;spot.style.color='#ffe3a5';
  spot.style.border=style.border;
+ const isLanguageStep=selector==='.language-row';
  const svg=selector==='.mic-icon'?source.querySelector('.mic-symbol'):source.querySelector('svg');
- spot.innerHTML=svg?.outerHTML||'';
+ spot.innerHTML=isLanguageStep?source.innerHTML:(svg?.outerHTML||'');
+ if(isLanguageStep){
+  spot.style.display='grid';spot.style.gridTemplateColumns='minmax(0,1fr) 44px minmax(0,1fr)';spot.style.alignItems='center';spot.style.gap='4px';spot.style.padding='0 5px';
+  spot.style.background=getComputedStyle(source).background;
+  for(const el of spot.querySelectorAll('button')){el.disabled=true;el.style.pointerEvents='none';el.style.opacity='1'}
+ }else{spot.style.gridTemplateColumns='';spot.style.alignItems='';spot.style.gap='';spot.style.padding=''}
  const icon=spot.querySelector('svg');if(icon){icon.removeAttribute('class');icon.style.display='block';icon.style.opacity='1';icon.style.visibility='visible';icon.style.stroke='currentColor';icon.style.fill='none';}
  spot.classList.add('active');
 }
@@ -1441,7 +1447,8 @@ const tutorialSteps=[
  {selector:'.settings-toggle',title:'Sozlamalar',body:'Sozlamalar bo‘limida tarjimonning ishlash usulini o‘zingizga moslashtirasiz. Online rejimda ovoz chiqarib o‘qish, mavjud ovozlar, o‘qish ohangi va uslubi kabi imkoniyatlarni boshqarish mumkin. Offline rejimda esa qurilmaga yuklanadigan ovoz tanish, tarjima va ovozli o‘qish modullarini hamda ularning holatini ko‘rishingiz mumkin. Ayrim imkoniyatlar tanlangan rejim va o‘rnatilgan modullarga bog‘liq.'},
  {selector:'.mic-icon',title:'Mikrofon',body:'Mikrofon tugmasi orqali gapirib tarjima qilishni boshlaysiz. Avval kerakli tillarni tanlang, so‘ng mikrofonni bosing va odatdagidek gapiring. Ilova tanlangan rejim imkoniyatlariga qarab nutqni taniydi va tarjima qilishga yordam beradi. Mikrofon uchun brauzer ruxsati talab qilinishi mumkin.'},
  {selector:'#mode-online',title:'Online rejim',body:'Bu tugma internet orqali ishlaydigan tarjimon rejimini tanlaydi. Online rejimda mavjud bulutli ovoz tanish va tarjima xizmatlaridan foydalanish mumkin. Internet aloqasi va tegishli xizmatlarning mavjudligi zarur. Hozir ilova Online rejimida ochilgan.'},
- {selector:'#mode-offline',title:'Offline rejim',body:'Bu tugma internetsiz ishlash uchun mo‘ljallangan rejimni tanlaydi. Offline imkoniyatlardan foydalanish uchun kerakli til va ovoz modullari qurilmaga oldindan yuklangan bo‘lishi lozim. Qo‘llab-quvvatlanadigan tillar va funksiyalar o‘rnatilgan modullarga bog‘liq. Tushunarli tugmasini bossangiz, tanishtirish yakunlanadi va ilova ishlashga tayyor bo‘ladi.'}
+ {selector:'#mode-offline',title:'Offline rejim',body:'Bu tugma internetsiz ishlash uchun mo‘ljallangan rejimni tanlaydi. Offline imkoniyatlardan foydalanish uchun kerakli til va ovoz modullari qurilmaga oldindan yuklangan bo‘lishi lozim. Qo‘llab-quvvatlanadigan tillar va funksiyalar o‘rnatilgan modullarga bog‘liq.'},
+ {selector:'.language-row',title:'Tillarni tanlash',body:'Pastdagi ikki til bo‘limidan qaysi tilni tanlasangiz, yozilgan yoki ovozdan matnga aylantirilgan gap o‘sha tilniki sifatida chatga yuboriladi. Tilni almashtirmoqchi bo‘lsangiz, til nomi ustiga biroz bosib turing — tillar ro‘yxati ochiladi. O‘rtadagi ikkita strelka tanlangan yo‘nalishni ko‘rsatadi.'}
 ];
 let tutorialStage=-1,tutorialTransitioning=false;
 function showTutorialStage(n){
@@ -1450,7 +1457,7 @@ function showTutorialStage(n){
  heading.textContent=step.title;description.textContent=step.body;
  spotlight(step.selector);
  requestAnimationFrame(()=>requestAnimationFrame(()=>{spot.classList.add('illuminated');label.classList.add('active')}));
- next.disabled=false;next.textContent='Tushunarli';
+ next.disabled=false;next.textContent=n===tutorialSteps.length-1?'Yakunlash':'Tushunarli';
 }
 function finishTutorial(){
  tutorialStage=-1;
