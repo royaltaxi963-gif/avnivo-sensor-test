@@ -124,6 +124,7 @@ html[data-avnivo-mode=offline] .settings-description{display:none}
 .offline-module-size,.offline-module-state{font-size:10px}
 .offline-module-action{width:32px;height:32px}
 .offline-module-progress{margin-top:6px}
+.offline-module-action.is-verified{background:#315c7d;color:#c7efff}
 /* Keep Online AI voice controls separate from Offline model downloads. */
 .avnivo-online-tts-settings{padding:0 15px 24px}
 html[data-avnivo-mode=offline] .avnivo-online-tts-settings{display:none}
@@ -449,7 +450,7 @@ const offlineState=new Map();
 const offlineMb=bytes=>(bytes/1e6).toFixed(1).replace('.',',')+' MB';
 function updateOfflineModule(id,state,progress){
  const module=offlineModuleCatalog.find(m=>m.id===id);
- if(!module||!['not_installed','downloading','verifying','ready','error'].includes(state))return false;
+ if(!module||!['not_installed','downloading','verifying','downloaded','ready','error'].includes(state))return false;
  const row=offlineList.querySelector('[data-module-id="'+id+'"]');if(!row)return false;
  offlineState.set(id,state);
  const btn=row.querySelector('.offline-module-action'),status=row.querySelector('.offline-module-state');
@@ -458,11 +459,12 @@ function updateOfflineModule(id,state,progress){
  const pct=row.querySelector('.offline-module-percent'),mb=row.querySelector('.offline-module-mb');
  const ready=state==='ready';
  btn.classList.toggle('is-ready',ready);
+ btn.classList.toggle('is-verified',downloaded);
  btn.classList.toggle('is-downloading',state==='downloading'||state==='verifying');
  btn.disabled=state==='downloading'||state==='verifying';
- btn.innerHTML=offlineSvg(ready?'check':'download');
- btn.setAttribute('aria-label',ready?'Modul faol':module.name+' — yuklab olish');
- status.textContent=({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state];
+ btn.innerHTML=offlineSvg(ready||downloaded?'check':'download');
+ btn.setAttribute('aria-label',ready?'Modul faol':downloaded?'Model tekshirildi, dvigatel kutilmoqda':module.name+' — yuklab olish');
+ status.textContent=({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',downloaded:'Yuklangan · faollashtirish kutilmoqda',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state];
  const hasProgress=progress&&Number.isFinite(progress.downloadedBytes)&&Number.isFinite(progress.totalBytes)&&progress.totalBytes>0&&progress.downloadedBytes>=0;
  progressEl.hidden=!(state==='downloading'||state==='verifying')||!hasProgress;
  if(hasProgress){
@@ -497,7 +499,7 @@ for(const module of offlineModuleCatalog){
    downloader.run(
     (done,total)=>updateOfflineModule(module.id,'downloading',{downloadedBytes:done,totalBytes:total}),
     text=>{offlineNotice.textContent=text;if(text.startsWith('SHA-256'))updateOfflineModule(module.id,'verifying',{downloadedBytes:module.bytes,totalBytes:module.bytes})}
-   ).then(()=>{updateOfflineModule(module.id,'not_installed');status.textContent='Yuklangan va tekshirilgan · dvigatel ulanmagan';offlineNotice.textContent='Fayllar saqlandi va SHA-256 tasdiqlandi. Sherpa-ONNX ijro mexanizmi ulanmaguncha faol emas.'})
+   ).then(()=>{updateOfflineModule(module.id,'downloaded');status.textContent='Yuklangan · dvigatel ulanmagan';offlineNotice.textContent='Fayllar saqlandi va SHA-256 tasdiqlandi. Sherpa-ONNX ijro mexanizmi ulanmaguncha faol emas.'})
     .catch(err=>{updateOfflineModule(module.id,'error');offlineNotice.textContent='Yuklash to‘xtadi: '+err.message+'. Qayta bosilsa saqlangan bo‘laklardan davom etadi.'})
     .finally(()=>{btn.disabled=false});
    return;
@@ -510,7 +512,7 @@ for(const module of offlineModuleCatalog){
    installer.download(module.installerId,
     (done,total)=>updateOfflineModule(module.id,'downloading',{downloadedBytes:done,totalBytes:total}),
     message=>{offlineNotice.textContent=message;if(message.startsWith('SHA-256'))updateOfflineModule(module.id,'verifying')}
-   ).then(()=>{updateOfflineModule(module.id,'not_installed');status.textContent='Yuklangan va tekshirilgan · dvigatel kutilmoqda'})
+   ).then(()=>{updateOfflineModule(module.id,'downloaded');status.textContent='Yuklangan · dvigatel kutilmoqda'})
     .catch(e=>{updateOfflineModule(module.id,'error');offlineNotice.textContent=e.message})
     .finally(()=>{btn.disabled=false});
    return;
