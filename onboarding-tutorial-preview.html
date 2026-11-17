@@ -320,7 +320,7 @@ const leftLanguage=languageRow.querySelector('.source-language'),rightLanguage=l
 let languageTransitionTimer=0;
 function selectLanguage(side){
  if(languageRow.dataset.selected===side)return;
- if(document.documentElement.dataset.avnivoMode==='online'){
+ if(document.documentElement.dataset.avnivoMode==='online'&&(active||onlineRecorder)){
   requestToken++;cancelOnlineRecording();if(active)stopVoice();
  }
  languageRow.dataset.selected=side;
@@ -328,6 +328,8 @@ function selectLanguage(side){
  rightLanguage.classList.toggle('is-selected',side==='right');
  leftLanguage.setAttribute('aria-pressed',String(side==='left'));
  rightLanguage.setAttribute('aria-pressed',String(side==='right'));
+ // Keep the composer icon state stable when switching between source and target.
+ shell.classList.toggle('text-mode',Boolean(input.value)&&!active&&!holdStarted);
  languageRow.classList.remove('direction-changing');
  void languageRow.offsetWidth;
  languageRow.classList.add('direction-changing');
