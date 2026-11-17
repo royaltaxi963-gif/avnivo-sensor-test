@@ -28,7 +28,7 @@ async function ticket(id){
  if(m.model_id!==id||!Array.isArray(m.files)||!m.files.length)throw Error('Manifest noto‘g‘ri');
  let total=0;const names=new Set();
  for(const f of m.files){
-  if(!f||typeof f.name!=='string'||!/^[a-zA-Z0-9_.\/-]+$/.test(f.name)||f.name.includes('..')||names.has(f.name)||!Number.isSafeInteger(f.bytes)||f.bytes<1||!/^[a-f0-9]{64}$/.test(f.sha256)||typeof f.url!=='string'||!f.url.startsWith('https://'))throw Error('Xavfsiz manifest talablari bajarilmadi');
+  if(!f||typeof f.name!=='string'||!/^[a-zA-Z0-9_.\/-]+$/.test(f.name)||f.name.includes('..')||names.has(f.name)||!Number.isSafeInteger(f.bytes)||f.bytes<1||!/^[a-f0-9]{64}$/.test(f.sha256)||typeof f.url!=='string'||!/^https:\/\/(?:storage\\.googleapis\\.com|[a-z0-9.-]+\\.storage\\.googleapis\\.com)\//.test(f.url))throw Error('Xavfsiz manifest talablari bajarilmadi');
   names.add(f.name);total+=f.bytes;
  }
  if(!Number.isSafeInteger(total)||total>15*1024**3)throw Error('Model hajmi cheklovdan katta');
