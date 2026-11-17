@@ -1,0 +1,48 @@
+name: AVNIVO private GCS model audit
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check configured workload identity
+        env:
+          PROVIDER: ${{ vars.AVNIVO_GCP_WIF_PROVIDER }}
+          SERVICE_ACCOUNT: ${{ vars.AVNIVO_GCP_AUDIT_SA }}
+        run: |
+          test -n "$PROVIDER" || { echo "::error::Set AVNIVO_GCP_WIF_PROVIDER repository variable"; exit 1; }
+          test -n "$SERVICE_ACCOUNT" || { echo "::error::Set AVNIVO_GCP_AUDIT_SA repository variable"; exit 1; }
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.AVNIVO_GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.AVNIVO_GCP_AUDIT_SA }}
+          create_credentials_file: true
+          export_environment_variables: true
+      - run: python -m pip install 'google-cloud-storage>=2.18,<4'
+      - name: Audit private bucket (read-only)
+        run: |
+          python translator-api/audit_gcs_models.py --bucket avnivo-offline-models-792624108019 --output "$RUNNER_TEMP/avnivo-model-manifest.json"
+          python - "$RUNNER_TEMP/avnivo-model-manifest.json" <<'PY'
+          import json,sys
+          manifest=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("Verified model groups:", len(manifest))
+          for name,files in manifest.items():
+              print(name, "files:",len(files),"bytes:",sum(f["bytes"] for f in files))
+          if not manifest:
+              raise SystemExit("No audited models found: verify GCS prefixes")
+          PY
+      - name: Upload short-lived audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-private-model-audit
+          path: ${{ runner.temp }}/avnivo-model-manifest.json
+          retention-days: 1
+          if-no-files-found: error
