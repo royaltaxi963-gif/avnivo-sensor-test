@@ -215,7 +215,7 @@ function shuffleRound(){
 let order=shuffleRound();
 const delay=ms=>{clearTimeout(timeout);timeout=setTimeout(tick,ms)};
 function tick(){
- if(input.value.length||messages.children.length||shell.classList.contains("voice-active")||shell.classList.contains("hold-voice")){label.hidden=true;delay(350);return}
+ if(input.value.length||messages.children.length||shell.classList.contains("voice-active")||shell.classList.contains("hold-voice")||document.querySelector(".online-stt-status")?.dataset.state==="loading"||document.querySelector(".online-stt-status")?.dataset.state==="recording"||window.avnivoVoiceFinalizing){label.hidden=true;delay(350);return}
  label.hidden=false;
  const [lang,word]=greetings[order[index]];const letters=segment(word);
  label.lang=lang;label.dir=/^(ar|fa|ur|ps|ug|sd|dv|ku|yi|he)$/.test(lang)?'rtl':'auto';
@@ -1166,14 +1166,14 @@ async function startHoldWave(session){
 }
 function finishHold(cancel=false){
  if(!holdStarted)return;
- avnivoCancelHold=cancel;avnivoHoldFinalizing=true;
+ avnivoCancelHold=cancel;avnivoHoldFinalizing=true;window.avnivoVoiceFinalizing=!cancel;
  holdStarted=false;holdSession++;
  shell.classList.remove('hold-voice');cancelAnimationFrame(holdWaveFrame);
  if(holdWaveStream){holdWaveStream.getTracks().forEach(t=>t.stop());holdWaveStream=null}
  if(holdWaveContext){const ctx=holdWaveContext;holdWaveContext=null;ctx.close().catch(()=>{})}
  holdWaveAnalyser=null;trace.style.backgroundImage='none';
  if(holdRecognizer){try{if(cancel)holdRecognizer.abort();else holdRecognizer.stop()}catch(e){} }
- else {if(!cancel)input.value=appendTranscript(holdBase,holdFinal||holdTranscript);persistDraft();resize();syncComposerMode();hint('')}
+ else {if(!cancel)input.value=appendTranscript(holdBase,holdFinal||holdTranscript);window.avnivoVoiceFinalizing=false;persistDraft();resize();syncComposerMode();hint('')}
  syncComposerMode();
 }
 function beginHold(){
@@ -1209,7 +1209,7 @@ function beginHold(){
    if(holdStarted){finishHold(false)}
    holdRecognizer=null;
    if(!avnivoCancelHold)input.value=appendTranscript(holdBase,holdFinal||holdTranscript);
-   avnivoHoldFinalizing=false;persistDraft();resize();syncComposerMode();hint('');
+   avnivoHoldFinalizing=false;window.avnivoVoiceFinalizing=false;persistDraft();resize();syncComposerMode();hint('');
   };
   recognition.start();
   startHoldWave(session);
