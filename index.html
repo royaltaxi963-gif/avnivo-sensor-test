@@ -570,6 +570,7 @@ async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,h
   if(!bubble.isConnected)return;
   typeTranslation(bubble,data.text);
   if(entry){entry.translation=data.text;persistHistory()}
+  if(ttsSetting('autoplay')&&historyId===currentHistoryId){const speaker=bubble.parentElement?.querySelector('.speak-message');if(speaker)setTimeout(()=>{if(bubble.isConnected&&speaker.isConnected&&document.documentElement.dataset.avnivoMode==='online')playMessage(speaker,bubble,oppositeLanguage(entry?.language||'left'))},700)}
  }catch(error){
   if(!bubble.isConnected)return;
   bubble.textContent=error.name==='AbortError'?'Tarjima vaqti tugadi':error instanceof TypeError?'Tarjima serveriga ulanib bo‘lmadi':error.message;
