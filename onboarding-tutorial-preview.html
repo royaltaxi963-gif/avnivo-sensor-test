@@ -112,6 +112,18 @@ html[data-avnivo-mode=offline] .settings-description{display:none}
 @media(max-width:360px){.offline-module-card{grid-template-columns:34px minmax(0,1fr) 34px;column-gap:8px;padding:10px 9px}.offline-module-mark{width:34px;height:34px}.offline-module-action{width:34px;height:34px}}
 
 
+/* Compact offline model settings: keep download actions and online settings untouched. */
+.offline-modules{padding:3px 12px 12px}
+.offline-modules-title{font-size:14px;margin:5px 0 3px}
+.offline-modules-subtitle{font-size:10.5px;line-height:1.3;margin:0 0 8px}
+.offline-module-card{grid-template-columns:30px minmax(0,1fr) 32px;column-gap:8px;padding:8px 9px;margin-bottom:6px;border-radius:11px}
+.offline-module-mark{width:30px;height:30px;border-radius:9px}
+.offline-module-mark svg{width:17px;height:17px}
+.offline-module-name{font-size:12px;margin:0 0 2px}
+.offline-module-desc{font-size:10px;line-height:1.3;margin:0 0 4px}
+.offline-module-size,.offline-module-state{font-size:10px}
+.offline-module-action{width:32px;height:32px}
+.offline-module-progress{margin-top:6px}
 /* Keep Online AI voice controls separate from Offline model downloads. */
 .avnivo-online-tts-settings{padding:0 15px 24px}
 html[data-avnivo-mode=offline] .avnivo-online-tts-settings{display:none}
@@ -413,10 +425,11 @@ settingsOverlay.addEventListener('click',()=>setSettingsOpen(false));
 
 /* Offline module UI: only installer-verified states may show success. */
 const offlineModuleCatalog=[
- {id:'uz-stt',serverModelId:'uzbek-stt',name:'O‘zbekcha ovoz tanish',desc:'O‘zbekcha nutqni tushunib, aytilgan so‘zlarni matnga aylantiradi.',icon:'mic',bytes:591649160,sizeNote:'Model fayli: 591,6 MB · qo‘shimcha fayllar alohida'},
- {id:'multilingual-stt',name:'Ko‘p tilli ovoz tanish',desc:'Turli tillardagi nutqni matnga aylantiradi. 99 til sifati hali tasdiqlanmagan.',icon:'languages',bytes:251875316,sizeNote:'Model: 251,9 MB · qo‘shimcha runtime alohida'},
- {id:'offline-translate',name:'Internetsiz tarjima',desc:'Matnlarni internetga ulanmasdan boshqa tilga tarjima qilishga yordam beradi.',icon:'translate',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'},
- {id:'offline-tts',name:'Matnni ovozli o‘qish',desc:'Yozilgan matn va tarjimalarni internetsiz ovoz chiqarib o‘qiydi.',icon:'speaker',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'}
+ {id:'uz-stt',serverModelId:'uzbek-stt',name:'O‘zbek tilini tanish modeli',desc:'O‘zbekcha nutqni matnga aylantiradi.',icon:'mic',bytes:591649160,sizeNote:'ONNX model: 591,6 MB; qo‘shimcha fayllar va ishchi dvigatel alohida'},
+ {id:'multilingual-stt',name:'Ko‘p tillarni tanish modeli',desc:'Whisper Small Q8 — ixcham ko‘p tilli nutqni tanish.',icon:'languages',bytes:264646607,sizeNote:'Cloud Storage’dagi Whisper Small Q8 modeli; ishchi dvigatel alohida'},
+ {id:'offline-translate',name:'Offline tarjima — standart',desc:'NLLB-200 INT8 · ko‘p tilli tarjima modeli.',icon:'translate',bytes:916816094,sizeNote:'Encoder va decoder jami 916,8 MB; tokenizer va qo‘shimcha fayllar alohida'},
+ {id:'offline-translate-large',name:'Offline tarjima — katta',desc:'Kengaytirilgan sifat uchun mo‘ljallangan. Muhim: katta xotira talab qiladi, ayrim telefonlarni sekinlashtirishi mumkin.',icon:'translate',bytes:null,sizeNote:'Katta tarjima modeli omborda hali tasdiqlanmagan; hajmi aniqlanmagan'},
+ {id:'offline-tts',name:'Offline ovozli o‘qish — MMS',desc:'Ko‘p tilli matnni ovozga aylantirish · 60 tildan 11 tasi yuklangan.',icon:'speaker',bytes:null,sizeNote:'Har bir til modeli alohida; umumiy yuklash hajmi aniqlanmagan'}
 ];
 const offlineModuleIcons={
  mic:'<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/>',
