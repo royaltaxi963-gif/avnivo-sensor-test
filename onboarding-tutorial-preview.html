@@ -1302,32 +1302,48 @@ if(alreadyCompleted){
  if(firstLaunch)firstLaunch.remove();
  const returning=window.avnivoReturningLaunch||{};
  if(!returning.fast){
-   // Reveal the actual existing center chat brand. No duplicate brand or logo.
+   // Actual chat brand only: keep it above the black veil, no duplicate logo.
    const center=document.querySelector('.center-brand');
+   const app=document.querySelector('main.app');
    const overlay=document.createElement('div');
    overlay.id='avnivo-return-reveal';
    overlay.setAttribute('aria-hidden','true');
-   overlay.style.cssText='position:fixed;inset:0;background:#000;z-index:4000;pointer-events:auto;will-change:mask-image,-webkit-mask-image,opacity';
-   document.body.append(overlay);
-   const app=document.querySelector('main.app');
+   overlay.style.cssText='position:fixed;inset:0;background:#000;z-index:100;pointer-events:auto;will-change:mask-image,-webkit-mask-image';
+   // Place the veil inside main so the existing center brand can sit above it.
+   (app||document.body).append(overlay);
+   const previousZ=center?.style.zIndex||'';
+   const previousTransition=center?.style.transition||'';
+   const previousOpacity=center?.style.opacity||'';
+   if(center){
+     center.style.zIndex='101';
+     center.style.transition='opacity .35s ease';
+     center.style.opacity='0';
+     requestAnimationFrame(()=>{center.style.opacity='1'});
+   }
    if(app)app.inert=true;
    const start=performance.now();
    const rect=center?.getBoundingClientRect();
    const x=rect?rect.left+rect.width/2:innerWidth/2;
    const y=rect?rect.top+rect.height/2:innerHeight/2;
-   const max=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y))+140;
-   const feather=100;
+   const max=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y))+180;
+   const feather=125;
    function frame(now){
      const elapsed=now-start;
-     // Center brand appears immediately; after 0.5s a soft radial reveal takes 0.5s.
-     const t=Math.min(1,Math.max(0,(elapsed-500)/500));
+     // Gentle brand fade-in (0.35 s), then hold against pure black for 1 s.
+     // Reveal outward for 0.8 s with a feathered radial edge.
+     const t=Math.min(1,Math.max(0,(elapsed-1350)/800));
      const eased=t*t*(3-2*t);
-     const radius=20+eased*max;
-     const gradient='radial-gradient(circle at '+x+'px '+y+'px,transparent '+Math.max(0,radius-feather)+'px,#000 '+(radius+feather)+'px)';
-     overlay.style.maskImage=gradient;overlay.style.webkitMaskImage=gradient;
-     overlay.style.opacity=String(1-t);
+     const radius=eased*max;
+     if(t>0){
+       const gradient='radial-gradient(circle at '+x+'px '+y+'px,transparent '+Math.max(0,radius-feather)+'px,#000 '+(radius+feather)+'px)';
+       overlay.style.maskImage=gradient;overlay.style.webkitMaskImage=gradient;
+     }
      if(t<1)requestAnimationFrame(frame);
-     else{overlay.remove();if(app)app.inert=false}
+     else{
+       overlay.remove();
+       if(center){center.style.zIndex=previousZ;center.style.transition=previousTransition;center.style.opacity=previousOpacity}
+       if(app)app.inert=false;
+     }
    }
    requestAnimationFrame(frame);
  }
