@@ -1,4 +1,4 @@
-name: AVNIVO private GCS model audit
+name: AVNIVO private GCS model audit and manifest
 on:
   workflow_dispatch:
 permissions:
@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install 'google-cloud-storage>=2.18,<4'
-      - name: Audit GCS objects without publishing private paths
+      - name: Audit GCS objects and create private SHA-256 manifest
         env:
           BUCKET: avnivo-offline-models-792624108019
         run: |
@@ -30,19 +30,28 @@ jobs:
           prefixes=['multilingual-stt/','multilingual-translation/','stt-uzbek/','tts/']
           client=storage.Client()
           report={'bucket':bucket,'prefixes':{},'verified_objects':0,'verified_bytes':0}
+          manifest={'schema_version':1,'bucket':bucket,'objects':[]}
           for prefix in prefixes:
               objects=0
               total=0
               for blob in client.list_blobs(bucket,prefix=prefix):
                   if blob.name.endswith('/'): continue
                   if blob.size is None: raise RuntimeError('Missing object size')
+                  generation=blob.generation
+                  if generation is None: raise RuntimeError('Missing object generation')
                   sha=hashlib.sha256()
                   with blob.open('rb',chunk_size=4*1024*1024) as stream:
                       while True:
                           part=stream.read(4*1024*1024)
                           if not part: break
                           sha.update(part)
-                  # Do not print or upload signed URLs, object names, or model bytes.
+                  # Fail if the object changed while being audited.
+                  current=client.bucket(bucket).blob(blob.name)
+                  current.reload()
+                  if str(current.generation)!=str(generation) or current.size!=blob.size:
+                      raise RuntimeError('Object changed during audit')
+                  manifest['objects'].append({'name':blob.name,'bytes':blob.size,'sha256':sha.hexdigest(),'generation':str(generation)})
+                  # Never print private object names or hashes in public job logs.
                   objects+=1
                   total+=blob.size
                   if len(sha.digest())!=32: raise RuntimeError('Digest failed')
@@ -53,11 +62,22 @@ jobs:
           with open(os.environ['RUNNER_TEMP']+'/avnivo-gcs-audit-summary.json','w') as f:
               json.dump(report,f,indent=2)
           if report['verified_objects']==0: sys.exit('No objects found in audited prefixes')
+          manifest['objects'].sort(key=lambda x:x['name'])
+          with open(os.environ['RUNNER_TEMP']+'/avnivo-gcs-private-sha256-manifest.json','w') as f:
+              json.dump(manifest,f,indent=2)
+          if len(manifest['objects'])!=report['verified_objects']: raise RuntimeError('Manifest count mismatch')
           print('Verified objects:',report['verified_objects'])
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: avnivo-gcs-audit-summary
           path: ${{ runner.temp }}/avnivo-gcs-audit-summary.json
+          retention-days: 1
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-gcs-private-sha256-manifest
+          path: ${{ runner.temp }}/avnivo-gcs-private-sha256-manifest.json
           retention-days: 1
           if-no-files-found: error
