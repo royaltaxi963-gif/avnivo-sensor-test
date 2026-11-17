@@ -5,7 +5,7 @@
 (function(){
 'use strict';
 const API='https://avnivo-translation-test-792624108019.europe-west1.run.app';
-const IDS=new Set(['multilingual-stt','offline-translate','offline-tts']);
+const IDS=new Set(['whisper-small-q8','whisper-large-v3-turbo','nllb-200-600m-int8','navoiy-tts','mms-tts']);
 const CHUNK=4*1024*1024;
 const active=new Map();
 function database(){return new Promise((ok,fail)=>{const q=indexedDB.open('avnivo-offline-installer-v2',1);q.onupgradeneeded=()=>{q.result.createObjectStore('parts');q.result.createObjectStore('verified')};q.onsuccess=()=>ok(q.result);q.onerror=()=>fail(q.error)})}
