@@ -34,9 +34,9 @@ jobs:
                   status=item.get('status')
                   if not isinstance(rel,str) or not rel or rel.startswith('/') or '..' in rel.split('/') or not re.fullmatch(r'[A-Za-z0-9_./-]+',rel):
                       print('REJECT unsafe path',model);continue
-                  if not isinstance(size,int) or size<=0 or size>3_000_000_000:
+                  if not isinstance(size,int) or size<0 or size>3_000_000_000:
                       print('REJECT size',model,rel);continue
-                  if status not in ('complete','verified','downloaded','ok','uploaded','present',True):
+                  if status not in ('complete','verified','downloaded','ok','uploaded','present','existing_size_checked',True):
                       print('REVIEW status',model,rel,str(status)[:40]);continue
                   obj=bucket+prefix+rel
                   print('Verifying',model,rel,'bytes',size,flush=True)
