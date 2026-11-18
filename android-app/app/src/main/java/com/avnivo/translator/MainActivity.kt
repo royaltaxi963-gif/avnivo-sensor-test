@@ -42,6 +42,18 @@ class MainActivity : Activity() {
         web.addJavascriptInterface(Bridge(), "AvnivoOfflineSTT")
         setContentView(web)
         web.loadUrl("file:///android_asset/index.html")
+        web.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                if (modelReady) worker.execute {
+                    try {
+                        OfflineSpeechEngine(modelDir).use { it.prepare() }
+                        notifyJs("AvnivoOfflineEngineReady", "O‘zbekcha ovoz tanish dvigateli tayyor")
+                    } catch (e: Exception) {
+                        notifyJs("AvnivoOfflineError", "Dvigatelni ishga tushirish xatosi: ${e.message}")
+                    }
+                }
+            }
+        }
     }
 
     private fun notifyJs(function: String, value: String) {
@@ -101,7 +113,9 @@ class MainActivity : Activity() {
                     { notifyJs("AvnivoOfflineStatus", it) },
                     { done, total -> notifyJs("AvnivoOfflineProgress", "$done/$total") }
                 )
-                notifyJs("AvnivoOfflineStatus", "Model yuklandi. Mikrofonni qayta bosing.")
+                OfflineSpeechEngine(modelDir).use { it.prepare() }
+                notifyJs("AvnivoOfflineEngineReady", "O‘zbekcha ovoz tanish dvigateli tayyor")
+                notifyJs("AvnivoOfflineStatus", "Model yuklandi. Dvigatel tayyor.")
             } catch (e: Exception) {
                 notifyJs("AvnivoOfflineError", "Model yuklash xatosi: ${e.message}")
             } finally { busy = false }
