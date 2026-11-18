@@ -697,7 +697,8 @@ function tick(){
  label.hidden=false;
  const [lang,word]=greetings[order[index]];const letters=segment(word);
  label.lang=lang;label.dir=/^(ar|fa|ur|ps|ug|sd|dv|ku|yi|he)$/.test(lang)?'rtl':'auto';
- if(!erasing){  position=Math.min(position+1,letters.length);label.textContent=letters.slice(0,position).join('');
+ if(!erasing){
+  position=Math.min(position+1,letters.length);label.textContent=letters.slice(0,position).join('');
   if(position===letters.length){erasing=true;delay(1000)}else delay(85);
  }else{
   position=Math.max(0,position-1);label.textContent=letters.slice(0,position).join('');
@@ -1035,16 +1036,8 @@ for(const module of offlineModuleCatalog){
  btn.addEventListener('click',()=>{
   if(document.documentElement.dataset.avnivoMode!=='offline'||offlineState.get(module.id)==='ready')return;
   btn.classList.remove('is-tapped');void btn.offsetWidth;btn.classList.add('is-tapped');
-  if(module.serverModelId && window.AvnivoOfflineSTT){
-   try{
-    offlineNotice.textContent='Android offline modeli yuklanmoqda. Internet kerak.';
-    updateOfflineModule(module.id,'downloading',{downloadedBytes:0,totalBytes:module.bytes});
-    window.AvnivoOfflineSTT.download();
-   }catch(e){updateOfflineModule(module.id,'error');offlineNotice.textContent=e.message}
-   return;
-  }
   if(module.serverModelId){
-   const downloader=window.avnivoVerifiedUzbekDownload;
+   const downloader=window.AvnivoOfflineSTT?{run:(progress,status)=>new Promise((resolve,reject)=>{window.AvnivoOfflineProgress=(v)=>{const [done,total]=String(v).split('/').map(Number);progress(done,total)};window.AvnivoOfflineStatus=(v)=>{status(v);if(String(v).includes('Model yuklandi'))resolve()};window.AvnivoOfflineError=(v)=>reject(Error(v));window.AvnivoOfflineSTT.download()})}:window.avnivoVerifiedUzbekDownload;
    if(!downloader){offlineNotice.textContent='Yuklash moduli ochilmadi. Sahifani yangilang.';return}
    btn.disabled=true;
    offlineNotice.textContent='Haqiqiy yuklash boshlanmoqda. Internet uzilsa qayta bosib davom ettiring.';
@@ -1076,43 +1069,6 @@ for(const module of offlineModuleCatalog){
 }
 // The future verified installer must supply actual byte counts; no simulated progress.
 window.avnivoOfflineModuleUi={setVerifiedState:updateOfflineModule,isEnabled:id=>offlineState.get(id)==='ready'&&offlineEnabled.get(id)!==false};
-window.AvnivoOfflineProgress=function(raw){
- const parts=String(raw||'').split('/');
- const done=Number(parts[0]),total=Number(parts[1]);
- if(Number.isFinite(done)&&Number.isFinite(total)&&total>0){
-  updateOfflineModule('uz-stt','downloading',{downloadedBytes:done,totalBytes:total});
-  offlineNotice.textContent='O‘zbekcha model: '+offlineMb(done)+' / '+offlineMb(total);
- }
-};
-window.AvnivoOfflineStatus=function(message){
- offlineNotice.textContent=String(message||'');
- if(String(message||'').includes('Model yuklandi'))updateOfflineModule('uz-stt','ready');
- if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.status){
-  try{if(window.AvnivoOfflineSTT.status().includes('yuklangan'))updateOfflineModule('uz-stt','ready')}
-  catch(e){}
- }
-};
-window.AvnivoOfflineError=function(message){
- const error=String(message||'Noma’lum xatolik');
- offlineNotice.textContent='Offline STT: '+error;
- updateOfflineModule('uz-stt','error');
- const row=offlineList.querySelector('[data-module-id="uz-stt"]');
- if(row){
-  const status=row.querySelector('.offline-module-state');
-  if(status){status.textContent='Yuklash xatosi: '+error;status.title=error}
- }
-};
-window.AvnivoOfflineResult=function(text){
- if(document.documentElement.dataset.avnivoMode!=='offline')return;
- const spoken=String(text||'').trim();
- if(!spoken){hint('Nutq aniqlanmadi');return}
- input.value=appendTranscript(input.value,spoken);
- persistDraft();resize();syncComposerMode();hint('Ovoz matnga aylantirildi');
-};
-if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.status){
- try{if(window.AvnivoOfflineSTT.status().includes('yuklangan'))updateOfflineModule('uz-stt','ready')}
- catch(e){}
-}
 
 const historyStorageKey='avnivo.preview.chat-history.v1';
 const activeHistoryKey='avnivo.preview.active-chat.v1';
@@ -1441,7 +1397,8 @@ document.addEventListener('keydown',e=>{
  if(!languageSheet.hidden)closeOnlineLanguages();
  else if(settingsOpen)setSettingsOpen(false);
  else if(historyOpen)setHistoryOpen(false);
-});// Initialize saved conversation only after microphone, brand and composer are ready.
+});
+// Initialize saved conversation only after microphone, brand and composer are ready.
 
 const brand=document.querySelector('.center-brand');
 const brandLine=document.querySelector('.brand-translator');
@@ -1584,12 +1541,6 @@ async function stopVoice(){
  if(!input.value){clearTimeout(timeout);timeout=0;delay(300)}
 }
 async function startVoice(){
- if(document.documentElement.dataset.avnivoMode==='offline'){
-  if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
-  try{window.AvnivoOfflineSTT.start();hint('Ovoz yozish boshlandi. Tugatish uchun mikrofonni qayta bosing.')}
-  catch(e){hint('Offline STT xatosi: '+e.message)}
-  return;
- }
  if(!navigator.mediaDevices?.getUserMedia){return}
  const token=++requestToken;
  try{
@@ -1747,10 +1698,6 @@ function finishHold(cancel=false){
  syncComposerMode();
 }
 function beginHold(){
- if(document.documentElement.dataset.avnivoMode==='offline' && window.AvnivoOfflineSTT){
-  try{window.AvnivoOfflineSTT.start();hint('Offline nutq tanilmoqda…')}catch(e){hint('Offline STT xatosi: '+e.message)}
-  return;
- }
  if(active||holdStarted)return;
  if(document.documentElement.dataset.avnivoMode==='online'){
    avnivoRecordingAt=0;
