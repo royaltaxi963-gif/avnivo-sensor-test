@@ -97,7 +97,10 @@ class MainActivity : Activity() {
         busy = true
         worker.execute {
             try {
-                VerifiedModelDownloader(modelDir).download { notifyJs("AvnivoOfflineStatus", it) }
+                VerifiedModelDownloader(modelDir).download(
+                    { notifyJs("AvnivoOfflineStatus", it) },
+                    { done, total -> notifyJs("AvnivoOfflineProgress", "$done/$total") }
+                )
                 notifyJs("AvnivoOfflineStatus", "Model yuklandi. Mikrofonni qayta bosing.")
             } catch (e: Exception) {
                 notifyJs("AvnivoOfflineError", "Model yuklash xatosi: ${e.message}")
