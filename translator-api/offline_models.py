@@ -88,7 +88,7 @@ def download_ticket(model_id: str, request: Request):
             url = blob.generate_signed_url(
                 version="v4", expiration=timedelta(minutes=15), method="GET",
                 service_account_email=email, access_token=credentials.token,
-                response_disposition='attachment; filename="' + item["name"] + '"',
+                response_disposition='attachment; filename="' + item["name"].rsplit("/", 1)[-1] + '"',
             )
             files.append({"name": item["name"], "bytes": item["bytes"],
                           "sha256": item["sha256"], "url": url})
@@ -97,3 +97,21 @@ def download_ticket(model_id: str, request: Request):
         logging.getLogger("avnivo.models").warning("Cannot issue model ticket: %s", type(exc).__name__)
         raise HTTPException(503, "Model downloads are not configured")
     return {"model_id": model_id, "expires_in_seconds": 900, "files": files}
+
+
+@router.get("/api/offline-models/catalog")
+def model_catalog():
+    """Public verified metadata only: no signed URLs or storage credentials."""
+    models = load_verified_models()
+    return {
+        "models": [
+            {
+                "model_id": model_id,
+                "file_count": len(files),
+                "total_bytes": sum(item["bytes"] for item in files),
+                "download_ticket_available": True,
+                "runtime_verified": False,
+            }
+            for model_id, files in sorted(models.items())
+        ]
+    }
