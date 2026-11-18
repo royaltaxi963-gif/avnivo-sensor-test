@@ -1,0 +1,64 @@
+name: Deploy verified Translator API to Cloud Run
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Verify model manifests before deployment
+        run: |
+          python3 - <<'PY'
+          import json,re,pathlib
+          for model,prefix,count in [('navoiy-tts','tts/uzbek/navoiy/',22),('mms-tts','tts/mms/rus/',6)]:
+              p=pathlib.Path('translator-api/verified_models')/(model+'.json')
+              data=json.loads(p.read_text())
+              assert data['model_id']==model and len(data['files'])==count
+              for f in data['files']:
+                  assert f['object']==prefix+f['name']
+                  assert re.fullmatch('[0-9a-f]{64}',f['sha256'])
+                  assert isinstance(f['bytes'],int) and f['bytes']>=0
+              print(model,'verified manifest ready')
+          PY
+      - name: Deploy Cloud Run service (preserve existing environment and identity)
+        run: |
+          set -euo pipefail
+          gcloud run deploy avnivo-translation-test \
+            --project=project-6bcf7fe6-cb55-49b7-9f4 \
+            --region=europe-west1 \
+            --source=translator-api \
+            --quiet
+      - name: Smoke test public API and download tickets
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import urllib.request,urllib.error,json,time
+          base='https://avnivo-translation-test-792624108019.europe-west1.run.app'
+          for attempt in range(8):
+              try:
+                  with urllib.request.urlopen(base+'/health',timeout=20) as r:
+                      assert r.status==200
+                  break
+              except Exception:
+                  if attempt==7:raise
+                  time.sleep(5)
+          for model in ('uzbek-stt','navoiy-tts','mms-tts'):
+              try:
+                  with urllib.request.urlopen(base+'/api/offline-models/'+model+'/download-ticket',timeout=30) as r:
+                      data=json.load(r)
+                      assert r.status==200 and data['model_id']==model and data['files']
+                      assert all(f.get('sha256') and f.get('url') for f in data['files'])
+                      print(model,'HTTP 200,',len(data['files']),'files')
+              except urllib.error.HTTPError as e:
+                  print(model,'HTTP',e.code)
+                  raise
+          PY
