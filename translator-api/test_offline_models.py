@@ -78,3 +78,11 @@ def test_ticket_rejects_resized_cloud_object(monkeypatch):
         result = client.get("/api/offline-models/uzbek-stt/download-ticket")
     assert result.status_code == 503
     assert "url" not in result.text
+
+def test_ticket_allows_android_asset_origin_and_reports_missing_signer(monkeypatch):
+    monkeypatch.delenv("AVNIVO_SIGNER_SERVICE_ACCOUNT", raising=False)
+    result = client.get("/api/offline-models/uzbek-stt/download-ticket",
+                        headers={"Origin": "https://appassets.androidplatform.net"})
+    assert result.status_code == 503
+    assert result.json()["detail"] == "Model download signer is not configured"
+    assert "url" not in result.text
