@@ -9,16 +9,14 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
-import androidx.webkit.WebResourceRequestCompat;
 import android.webkit.WebResourceResponse;
-import android.net.Uri;
 
 public class MainActivity extends Activity {
   private WebView webView;
-  private final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
-      .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this)).build();
+  private WebViewAssetLoader loader;
   @Override public void onCreate(Bundle state) {
     super.onCreate(state);
+    loader = new WebViewAssetLoader.Builder().addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this)).build();
     webView = new WebView(this);
     setContentView(webView);
     WebSettings settings = webView.getSettings();
