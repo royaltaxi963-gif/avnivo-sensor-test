@@ -19,9 +19,19 @@ for(const m of html.matchAll(/\b(?:aria-label|title|placeholder|alt|data-tooltip
 for(const m of html.matchAll(/\b(?:textContent|innerText|placeholder|ariaLabel)\s*=\s*(["'])(.*?)\1/gs))add('js-assignment',m[2],m.index);
 for(const m of html.matchAll(/\b(?:hint|alert|confirm|onlineState)\s*\(\s*(["'])(.*?)\1/gs))add('js-notice',m[2],m.index);
 for(const m of html.matchAll(/\b(?:title|body)\s*:\s*(["'])(.*?)\1/gs))add('object-label',m[2],m.index);
+// Visible static HTML text nodes outside scripts/styles; excludes SVG geometry.
+const markup=html.replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,m=>' '.repeat(m.length))
+ .replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,m=>' '.repeat(m.length))
+ .replace(/<!--[^]*?-->/g,m=>' '.repeat(m.length));
+for(const m of markup.matchAll(/>([^<>]+)</g)){
+ const raw=m[1].replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\\s+/g,' ').trim();
+ if(raw && !/^[\\d\\W]+$/u.test(raw))add('html-text',raw,m.index+1);
+}
+// Dynamic messages may use template literals or concatenation; flag for manual review.
+for(const m of html.matchAll(/\\b(?:hint|alert|confirm)\\s*\\(\\s*`([^`]+)`/g))add('js-template-notice',m[1],m.index);
 const seen=new Set();
 const unique=records.filter(r=>{const key=r.category+'|'+r.text;if(seen.has(key))return false;seen.add(key);return true});
 const tutorial=(html.match(/const tutorialSteps=\[([\s\S]*?)\n\];/)||[])[1]||'';
 const tutorialSteps=[...tutorial.matchAll(/\{selector:'([^']+)',title:'([^']+)',body:'([^']+)'/g)].map(m=>({selector:m[1],title:m[2],body:m[3]}));
-const output={file:path,generatedAt:new Date().toISOString(),summary:{candidates:records.length,uniqueCandidates:unique.length,tutorialSteps:tutorialSteps.length,hasRuntimeI18n:html.includes('AVNIVO_I18N')||/data-i18n(?:=|-)/.test(html)},tutorialSteps,candidates:unique,limitations:['Regex-based inventory; does not cover every DOM text node, template literal, concatenated runtime string or external module.','This report does not certify translated text or language accuracy.']};
+const output={file:path,generatedAt:new Date().toISOString(),summary:{candidates:records.length,uniqueCandidates:unique.length,tutorialSteps:tutorialSteps.length,hasRuntimeI18n:html.includes('AVNIVO_I18N')||/data-i18n(?:=|-)/.test(html)},tutorialSteps,candidates:unique,limitations:['Regex-based inventory; dynamic DOM creation, concatenated runtime strings, some template literals and external modules still need manual review.','This report does not certify translated text or language accuracy.']};
 process.stdout.write(JSON.stringify(output,null,2)+'\n');
