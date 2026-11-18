@@ -97,3 +97,21 @@ def download_ticket(model_id: str, request: Request):
         logging.getLogger("avnivo.models").warning("Cannot issue model ticket: %s", type(exc).__name__)
         raise HTTPException(503, "Model downloads are not configured")
     return {"model_id": model_id, "expires_in_seconds": 900, "files": files}
+
+
+@router.get("/api/offline-models/catalog")
+def model_catalog():
+    """Public verified metadata only: no signed URLs or storage credentials."""
+    models = load_verified_models()
+    return {
+        "models": [
+            {
+                "model_id": model_id,
+                "file_count": len(files),
+                "total_bytes": sum(item["bytes"] for item in files),
+                "download_ticket_available": True,
+                "runtime_verified": False,
+            }
+            for model_id, files in sorted(models.items())
+        ]
+    }
