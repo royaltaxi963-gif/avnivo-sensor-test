@@ -81,23 +81,16 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot
           disable-animations: true
           script: |
-            set -x
             adb wait-for-device
-            for i in $(seq 1 60); do
-              [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ] && break
-              sleep 5
-            done
             adb install -r apk/app-debug.apk
-            adb shell pm list packages | grep -q com.avnivo.translator || { echo "NOT_INSTALLED"; exit 1; }
+            adb shell pm list packages | grep -q com.avnivo.translator || { echo NOT_INSTALLED; exit 1; }
             adb shell am start -W -n com.avnivo.translator/.MainActivity
             sleep 20
-            PID=$(adb shell pidof com.avnivo.translator | tr -d '\r')
-            echo "app pid: $PID"
-            adb logcat -d > logcat.txt 2>&1 || true
+            adb logcat -d > logcat.txt
             adb shell dumpsys window | grep -i mCurrentFocus || true
-            [ -n "$PID" ] || { echo "APP_NOT_RUNNING"; exit 1; }
-            if grep -iE "FATAL EXCEPTION" logcat.txt; then echo "FATAL_IN_LOGCAT"; exit 1; fi
-            echo "EMULATOR_SMOKE_OK"
+            PID=$(adb shell pidof com.avnivo.translator | tr -d '\r'); echo "app pid: $PID"; [ -n "$PID" ] || { echo APP_NOT_RUNNING; exit 1; }
+            grep -iE "FATAL EXCEPTION" logcat.txt && { echo FATAL_IN_LOGCAT; exit 1; } || true
+            echo EMULATOR_SMOKE_OK
       - uses: actions/upload-artifact@v4
         if: always()
         with:
