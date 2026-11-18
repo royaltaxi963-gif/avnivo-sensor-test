@@ -587,6 +587,17 @@ async function stopVoice(){
  if(!input.value){clearTimeout(timeout);timeout=0;delay(300)}
 }
 async function startVoice(){
+ if(document.documentElement.dataset.avnivoMode==='offline'){
+  if(!window.AvnivoOfflineSTT || typeof window.AvnivoOfflineSTT.start !== 'function'){
+   hint('Offline ovoz tanish Android moduliga ulanmagan. Bu brauzerda offline STT mavjud emas.');
+   return;
+  }
+  try{
+   window.AvnivoOfflineSTT.start();
+   hint('Offline ovoz tanish ishga tushmoqda…');
+  }catch(e){hint('Offline modul xatosi: '+String(e.message||e))}
+  return;
+ }
  if(!navigator.mediaDevices?.getUserMedia){return}
  const token=++requestToken;
  try{
@@ -610,6 +621,17 @@ async function startVoice(){
  }catch(error){if(token===requestToken){mic.setAttribute('aria-label','Mikrofonga ruxsat berilmadi');console.warn('Microphone unavailable',error)}}
 }
 
+// Android's embedded offline recognizer sends results here. Never substitute browser/cloud STT.
+window.AvnivoOfflineResult=function(text){
+ if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ const transcript=String(text||'').trim();
+ if(!transcript){hint('Nutq aniqlanmadi');return}
+ input.value=appendTranscript(input.value,transcript);
+ persistDraft();resize();syncComposerMode();hint('Offline ovoz tanildi');
+};
+window.AvnivoOfflineError=function(message){
+ hint('Offline STT: '+String(message||'Noma’lum xato'));
+};
 const voiceHint=document.querySelector('.voice-hint');
 const SpeechAPI=window.SpeechRecognition||window.webkitSpeechRecognition;
 // Online-only Google Chirp 2 STT. No API key is embedded in the browser.
