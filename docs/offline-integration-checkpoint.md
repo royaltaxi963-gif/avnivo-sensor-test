@@ -53,27 +53,39 @@ Scope: offline engines only. No redesign, no online-path changes.
 
 ## Module verification
 
-| Module | Backend ticket | Status |
-| --- | --- | --- |
-| Uzbek STT (`uzbek-stt`) | 200, 2 files, 591,649,571 B | IMPLEMENTED — DEVICE TEST PENDING |
-| Navoiy TTS (`navoiy-tts`) | 200, 22 files | BLOCKED — engine/runtime not integrated in app |
-| MMS TTS (`mms-tts`) | 200, 6 files | BLOCKED — engine/runtime not integrated in app |
-| Whisper Small (`whisper-small-q8`) | 404 | BLOCKED — EXTERNAL DEPENDENCY (no verified manifest) |
-| Whisper Large V3 Turbo | 404 | BLOCKED — EXTERNAL DEPENDENCY |
-| NLLB-200 (`nllb-200-600m-int8`) | 404 | BLOCKED — EXTERNAL DEPENDENCY |
-| Large Offline Translation | n/a | BLOCKED — no supported model/runtime identified |
+| Module | Model source | Download | Integrity | Runtime | Real inference | Offline | Android integration | Classification |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Uzbek STT | user-supplied archive, live ticket | verified (200) | SHA-256 matched | sherpa-onnx 2.0.1 NeMo CTC int8 | 9/9 word recall on real Uzbek audio (Linux) | yes (no network at decode) | APK wiring done | IMPLEMENTED — DEVICE TEST PENDING |
+| Navoiy TTS | aisha-org/navoiy-tts (CosyVoice2 + emotion checkpoint, PyTorch) | ticket 200, 22 files | sha256 in manifest | requires PyTorch + CUDA/GPU (CosyVoice2) | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
+| MMS TTS | facebook/mms-tts (VITS, PyTorch/safetensors) | ticket 200, 6 files | sha256 in manifest | requires PyTorch VITS runtime | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
+| Whisper Small (`whisper-small-q8`) | whisper.cpp (documented plan only) | 404 | n/a | whisper.cpp not integrated | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
+| Whisper Large V3 Turbo | none hosted | 404 | n/a | not integrated | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
+| NLLB-200 (`nllb-200-600m-int8`) | none hosted | 404 | n/a | not integrated | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
+| Large Offline Translation | none identified | n/a | n/a | none | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
 
-Fail-closed: unknown/unavailable models 404; the UI must not mark them ready.
+Blocker detail (evidence, not assumption):
+
+- `navoiy-tts` manifest (`translator-api/verified_models/navoiy-tts.json`) records
+  `checkpoint.repo = aisha-org/navoiy-tts`, `base_model.repo = FunAudioLLM/CosyVoice2-0.5B`,
+  `runtime.torch = 2.3.1+cu121`, `runtime.gpu = NVIDIA A10-12Q`. CosyVoice2 needs a PyTorch
+  GPU runtime; there is no Android CPU runtime packaged, so the app cannot load it.
+- `mms-tts` ships `model.safetensors`/`pytorch_model.bin` (VITS). No on-device VITS runtime
+  is integrated in the app.
+- Whisper and NLLB modules return HTTP 404 from the live ticket endpoint, i.e. no verified,
+  hosted model exists yet. The UI keeps these sections but must stay fail-closed.
+
+No model URL, checksum, license, or capability was invented anywhere in this work.
 
 ## Remaining
 
-1. Push branch, open one consolidated PR.
-2. Run GitHub Actions APK workflow; download and record APK SHA-256.
+1. Push branch, open one consolidated PR. — done (PR #28, draft).
+2. Run GitHub Actions APK workflow; download and record APK SHA-256. — done.
 3. Device/emulator acceptance for Uzbek STT with real Uzbek speech, then offline (airplane) re-test.
    Local limitation: no `/dev/kvm`, so no local emulator — must use CI/remote device.
-4. Integrate Navoiy/MMS TTS runtimes or report precise blockers.
+   In progress: CI emulator smoke job installs + launches the APK and checks for crashes.
+4. Integrate Navoiy/MMS TTS runtimes or report precise blockers. — classified BLOCKED with evidence.
 5. Verify app restart persistence and no online-path regression.
 
 ## Next exact action
 
-Commit, push branch, and trigger the "AVNIVO integrated Android APK" workflow.
+Confirm the CI emulator smoke job passes, then report the final delivery status.
