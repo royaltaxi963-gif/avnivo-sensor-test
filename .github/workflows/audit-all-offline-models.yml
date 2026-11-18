@@ -24,14 +24,25 @@ jobs:
           BUCKET=avnivo-offline-models-792624108019
           API=https://avnivo-translation-test-792624108019.europe-west1.run.app
           echo "== Private GCS inventory (names and sizes only; no signed URLs) =="
-          gcloud storage ls -l "gs://$BUCKET/**" --project="$PROJECT" | grep -v 'TOTAL:' || true
+          for PREFIX in stt-uzbek stt whisper translation translate tts/uzbek/navoiy tts/mms; do
+            echo "::group::Storage prefix $PREFIX"
+            gcloud storage ls -l "gs://$BUCKET/$PREFIX/**" --project="$PROJECT" 2>&1 | grep -v 'TOTAL:' || true
+            echo "::endgroup::"
+          done
           echo "== Ticket availability (HTTP status only; do not print signed URLs) =="
+          FAIL=0
           for MODEL in uzbek-stt whisper-small-q8 whisper-large-v3-turbo nllb-200-600m-int8 navoiy-tts mms-tts; do
             STATUS="$(curl --silent --show-error --output /tmp/avnivo-ticket.json --write-out '%{http_code}' "$API/api/offline-models/$MODEL/download-ticket" || true)"
             if [[ "$STATUS" == 200 ]]; then
               python3 -c 'import json; d=json.load(open("/tmp/avnivo-ticket.json")); print("Ticket files:", len(d.get("files",[])), "Total bytes:", sum(f.get("bytes",0) for f in d.get("files",[])))'
             else
-              echo "$MODEL: HTTP $STATUS"
+              echo "::warning::$MODEL: HTTP $STATUS (not downloadable)"
+              FAIL=$((FAIL+1))
             fi
           done
-          echo "Read-only audit complete. Unknown or unverified models must remain unavailable."
+          echo "Unavailable ticket endpoints: $FAIL"
+          if [[ "$FAIL" -gt 0 ]]; then
+            echo "::error::$FAIL offline models are not available; do not claim all modules ready"
+            exit 1
+          fi
+          echo "All ticket endpoints responded HTTP 200; Android activation remains unverified."
