@@ -50,6 +50,27 @@ class MainActivity : Activity() {
     }
 
     inner class Bridge {
+        @JavascriptInterface fun status(): String = when {
+            busy -> "Jarayon bajarilmoqda…"
+            modelReady -> "O‘zbekcha STT modeli yuklangan (fayllar mavjud)."
+            else -> "O‘zbekcha STT modeli hali yuklanmagan (592 MB)."
+        }
+        @JavascriptInterface fun download() {
+            runOnUiThread {
+                if (busy) {
+                    notifyJs("AvnivoOfflineStatus", "Oldingi jarayon tugashini kuting.")
+                } else if (modelReady) {
+                    notifyJs("AvnivoOfflineStatus", "Model allaqachon yuklangan.")
+                } else {
+                    AlertDialog.Builder(this@MainActivity)
+                        .setTitle("O‘zbekcha offline model")
+                        .setMessage("592 MB modelni internet orqali yuklaysizmi?")
+                        .setNegativeButton("Bekor qilish", null)
+                        .setPositiveButton("Yuklash") { _, _ -> downloadModel() }
+                        .show()
+                }
+            }
+        }
         @JavascriptInterface fun start() {
             runOnUiThread {
                 if (busy) { recorder?.stop(); return@runOnUiThread }
@@ -76,8 +97,8 @@ class MainActivity : Activity() {
         busy = true
         worker.execute {
             try {
-                VerifiedModelDownloader(modelDir).download { notifyJs("AvnivoOfflineError", it) }
-                notifyJs("AvnivoOfflineError", "Model yuklandi. Mikrofonni qayta bosing.")
+                VerifiedModelDownloader(modelDir).download { notifyJs("AvnivoOfflineStatus", it) }
+                notifyJs("AvnivoOfflineStatus", "Model yuklandi. Mikrofonni qayta bosing.")
             } catch (e: Exception) {
                 notifyJs("AvnivoOfflineError", "Model yuklash xatosi: ${e.message}")
             } finally { busy = false }
