@@ -83,7 +83,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
             if (existing > 0) file.inputStream().use { old -> val b=ByteArray(65536); while(true){val n=old.read(b);if(n<0)break;digest.update(b,0,n)} }
             progress(total,size)
             c.inputStream.use { input ->
-                file.outputStream().let { if(existing>0) file.appendOutputStream() else it }.buffered().use { output ->
+                (if (existing > 0) file.appendOutputStream() else file.outputStream()).buffered().use { output ->
                     val buffer = ByteArray(65536)
                     while (true) {
                         val n = input.read(buffer)
