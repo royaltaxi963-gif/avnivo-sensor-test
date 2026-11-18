@@ -1828,7 +1828,7 @@ function showTutorialStage(n){
  description.textContent=i18n&&n<5?i18n.t('tutorial.'+key+'.body'):step.body;
  spotlight(step.selector);
  requestAnimationFrame(()=>requestAnimationFrame(()=>{spot.classList.add('illuminated');label.classList.add('active')}));
- next.disabled=false;next.textContent=n===tutorialSteps.length-1?'Yakunlash':'Tushunarli';
+ next.disabled=false;next.textContent=n===tutorialSteps.length-1?'Yakunlash':(i18n&&n<5?i18n.t('tutorial.next'):'Tushunarli');
 }
 function finishTutorial(){
  tutorialStage=-1;
