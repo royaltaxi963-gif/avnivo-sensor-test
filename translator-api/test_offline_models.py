@@ -76,3 +76,19 @@ def test_browser_cors_allows_ticket_get():
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == "https://royaltaxi963-gif.github.io"
     assert "GET" in response.headers["access-control-allow-methods"]
+
+
+def test_nested_model_file_disposition_uses_basename(monkeypatch):
+    monkeypatch.setenv("AVNIVO_SIGNER_SERVICE_ACCOUNT", "test@example.iam.gserviceaccount.com")
+    from offline_models import load_verified_models
+    nested = [f for f in load_verified_models()["navoiy-tts"] if "/" in f["name"]]
+    assert nested, "Navoiy manifest must include nested assets for this regression"
+    with patch("offline_models.google_auth_default") as auth, patch("offline_models.storage.Client") as storage:
+        auth.return_value = (MagicMock(valid=True, token="test"), "project")
+        blob = storage.return_value.bucket.return_value.blob.return_value
+        blob.generate_signed_url.return_value = "https://example.invalid/signed"
+        response = client.get("/api/offline-models/navoiy-tts/download-ticket")
+        assert response.status_code == 200
+        dispositions = [call.kwargs["response_disposition"] for call in blob.generate_signed_url.call_args_list]
+        assert all("/" not in value for value in dispositions)
+        assert len(dispositions) == len(load_verified_models()["navoiy-tts"])
