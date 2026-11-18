@@ -63,3 +63,16 @@ def test_unverified_models_not_advertised():
     models = load_verified_models()
     for model in ("whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8"):
         assert model not in models
+
+
+def test_browser_cors_allows_ticket_get():
+    response = client.options(
+        "/api/offline-models/uzbek-stt/download-ticket",
+        headers={
+            "Origin": "https://royaltaxi963-gif.github.io",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "https://royaltaxi963-gif.github.io"
+    assert "GET" in response.headers["access-control-allow-methods"]
