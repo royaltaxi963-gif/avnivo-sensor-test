@@ -78,7 +78,7 @@ def download_ticket(model_id: str, request: Request):
     # Browser origin restriction is defense in depth, not authentication.
     origin = request.headers.get("origin")
     allowed = {"https://royaltaxi963-gif.github.io", "https://raw.githack.com",
-               "https://rawcdn.githack.com", "http://localhost:3000",
+               "https://rawcdn.githack.com", "https://appassets.androidplatform.net", "http://localhost:3000",
                "http://localhost:8080"}
     if origin is not None and origin not in allowed:
         raise HTTPException(403, "Origin not allowed")
@@ -93,13 +93,13 @@ def download_ticket(model_id: str, request: Request):
     if len(hits) >= 6:
         raise HTTPException(429, "Too many download requests")
     hits.append(now)
+    email = os.getenv("AVNIVO_SIGNER_SERVICE_ACCOUNT")
+    if not email:
+        raise HTTPException(503, "Model download signer is not configured")
     try:
         credentials, _ = google_auth_default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
         if not credentials.valid:
             credentials.refresh(GoogleRequest())
-        email = os.getenv("AVNIVO_SIGNER_SERVICE_ACCOUNT")
-        if not email:
-            raise RuntimeError("Signing service account is not configured")
         client = storage.Client(credentials=credentials)
         bucket = client.bucket(BUCKET)
         files = []
