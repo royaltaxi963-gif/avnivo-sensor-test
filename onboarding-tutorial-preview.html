@@ -666,87 +666,7 @@ const check=setInterval(()=>{
 setTimeout(()=>clearInterval(check),12000);
 })();
 </script>
-<script>
-/* Localize the history empty state and the offline model catalog without
-   changing model IDs, byte counts, download logic, or stored chat content. */
-(function(){
-'use strict';
-const translations={
- ru:{
-  empty:'Пока нет сохранённых чатов. После отправки сообщения оно появится здесь с датой.',
-  size:'Размер',unknown:'уточняется',download:'Скачать',on:'Включено',off:'Выключено',
-  statuses:['Не загружено','Загрузка…','Проверка…','Загружено · ожидает активации','Установлено и активно','Ошибка установки'],
-  names:['Распознавание узбекской речи','Многоязычное распознавание — Whisper Small Q8','Многоязычное распознавание — Whisper Large V3 Turbo','Офлайн-перевод — NLLB-200 600M INT8','Офлайн-перевод — большая модель (не выбрана)','Озвучивание узбекского текста — Navoiy','Многоязычное озвучивание — MMS'],
-  desc:['Преобразует узбекскую речь в текст.','Компактная модель распознавания речи на нескольких языках.','Более крупная многоязычная модель. Требует больше памяти и может замедлять некоторые телефоны.','Стандартная модель многоязычного перевода.','Планируется для более высокого качества. Требует много памяти и может замедлять некоторые телефоны.','Озвучивает узбекский текст.','Отдельная голосовая модель для каждого языка; запланировано 60 языков.']
- },
- en:{
-  empty:'No saved chats yet. When you send a message, it will appear here with its date.',
-  size:'Size',unknown:'to be determined',download:'Download',on:'Enabled',off:'Disabled',
-  statuses:['Not downloaded','Downloading…','Verifying…','Downloaded · awaiting activation','Installed and active','Installation error'],
-  names:['Uzbek speech recognition model','Multilingual recognition — Whisper Small Q8','Multilingual recognition — Whisper Large V3 Turbo','Offline translation — NLLB-200 600M INT8','Offline translation — large model (not selected)','Uzbek speech playback — Navoiy','Multilingual speech playback — MMS'],
-  desc:['Converts Uzbek speech to text.','Compact multilingual speech recognition model.','Larger multilingual model. Requires more memory and may slow down some phones.','Standard multilingual translation model.','Planned for higher quality. Requires substantial memory and may slow some phones.','Reads Uzbek text aloud.','Separate voice model for each language; 60 languages planned.']
- }
-};
-const states=['not_installed','downloading','verifying','downloaded','ready','error'];
-const original={names:[],desc:[]};
-function update(){
- const engine=window.AVNIVO_I18N;
- if(!engine)return;
- const lang=engine.getLanguage();
- const pack=translations[lang]||null;
- const empty=document.querySelector('.history-empty');
- if(empty){
-  const text=pack?pack.empty:engine.t('history.empty');
-  if(empty.textContent!==text)empty.textContent=text;
- }
- const cards=[...document.querySelectorAll('.offline-module-card')];
- cards.forEach((card,index)=>{
-  const name=card.querySelector('.offline-module-name'),desc=card.querySelector('.offline-module-desc');
-  const size=card.querySelector('.offline-module-size'),status=card.querySelector('.offline-module-state');
-  if(!original.names[index]&&name)original.names[index]=name.textContent;
-  if(!original.desc[index]&&desc)original.desc[index]=desc.textContent;
-  if(!pack)return;
-  if(name&&pack.names[index])name.textContent=pack.names[index];
-  if(desc&&pack.desc[index])desc.textContent=pack.desc[index];
-  if(size){
-   const originalSize=size.dataset.avnivoOriginalSize||(size.dataset.avnivoOriginalSize=size.textContent);
-   const value=originalSize.replace(/^Hajmi:\s*/,'');
-   const next=pack.size+': '+(value==='aniqlanmoqda'?pack.unknown:value);
-   if(size.textContent!==next)size.textContent=next;
-  }
-  if(status){
-   const originalState=status.dataset.avnivoState||'not_installed';
-   const key=states.indexOf(originalState);
-   if(key>=0&&status.textContent!==pack.statuses[key])status.textContent=pack.statuses[key];
-  }
-  const button=card.querySelector('.offline-module-action');
-  if(button)button.setAttribute('aria-label',(pack.names[index]||original.names[index])+' — '+pack.download);
- });
- const active=document.querySelectorAll('.offline-active-item');
- active.forEach(row=>{
-  const btn=row.querySelector('.offline-active-switch');
-  if(btn&&pack)btn.textContent=btn.getAttribute('aria-pressed')==='true'?pack.on:pack.off;
- });
-}
-let pending=false;
-function schedule(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;update()})}
-document.addEventListener('DOMContentLoaded',()=>{
- const history=document.querySelector('#history-drawer');
- const offline=document.querySelector('#offline-modules');
- const observer=new MutationObserver(records=>{
-  if(records.some(r=>r.type==='childList'&&[...r.addedNodes].some(n=>n.nodeType===1)))schedule();
- });
- if(history)observer.observe(history,{subtree:true,childList:true});
- if(offline)observer.observe(offline,{subtree:true,childList:true});
- schedule();
-});
-const timer=setInterval(()=>{
- if(window.AVNIVO_I18N&&window.AVNIVO_I18N.onChange){
-  clearInterval(timer);window.AVNIVO_I18N.onChange(schedule);schedule();
- }
-},100);setTimeout(()=>clearInterval(timer),12000);
-})();
-</script>
+
 <script src="offline-uzbek-download.js"></script>
 <script src="offline-model-installer.js"></script>
 <script>
@@ -1005,6 +925,21 @@ settingsToggle.addEventListener('click',()=>{if(historyOpen)setHistoryOpen(false
 settingsClose.addEventListener('click',()=>setSettingsOpen(false));
 settingsOverlay.addEventListener('click',()=>setSettingsOpen(false));
 
+/* Shared UI dictionary lookup: all 100 locale bundles use the same keys.
+   Missing translations use the existing original text, never fabricated text. */
+function avnivoUiText(key,fallback,vars){
+ const engine=window.AVNIVO_I18N;
+ if(!engine||typeof engine.t!=='function')return fallback;
+ const value=engine.t(key,vars);
+ const human=key.split('.').pop().replace(/_/g,' ');
+ if(!value||value.toLowerCase()===human.toLowerCase())return fallback;
+ return value;
+}
+function avnivoOfflineKey(module,field){
+ const known={'uz-stt':'uz-stt','multilingual-stt':'multilingual-stt','offline-translate':'offline-translate','offline-tts':'offline-tts'};
+ const name=known[module.id];
+ return name?'offline.module.'+name+'.'+field:null;
+}
 /* Offline module UI: only installer-verified states may show success. */
 const offlineModuleCatalog=[
  {id:'uz-stt',serverModelId:'uzbek-stt',name:'O‘zbek tilini tanish modeli',desc:'O‘zbekcha nutqni matnga aylantiradi.',icon:'mic',bytes:591649160,sizeNote:'ONNX model: 591,6 MB; qo‘shimcha fayllar va ishchi dvigatel alohida'},
@@ -1038,7 +973,7 @@ function renderOfflineActiveList(){
  offlineActiveSection.hidden=!ready.length;
  for(const module of ready){
   const row=document.createElement('div');row.className='offline-active-item';
-  const name=document.createElement('span');name.className='offline-active-name';name.textContent=module.name;
+  const name=document.createElement('span');name.className='offline-active-name';name.textContent=avnivoUiText(avnivoOfflineKey(module,'name')||'missing.name',module.name);
   const toggle=document.createElement('button');toggle.type='button';toggle.className='offline-active-switch';
   const enabled=offlineEnabled.get(module.id)!==false;
   toggle.textContent=enabled?'Yoqilgan':'O‘chirilgan';
@@ -1073,7 +1008,7 @@ function updateOfflineModule(id,state,progress){
  btn.disabled=state==='downloading'||state==='verifying';
  btn.innerHTML=offlineSvg(ready||downloaded?'check':'download');
  btn.setAttribute('aria-label',ready?'Modul faol':downloaded?'Model tekshirildi, dvigatel kutilmoqda':module.name+' — yuklab olish');
- status.textContent=({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',downloaded:'Yuklangan · faollashtirish kutilmoqda',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state];
+ status.textContent=avnivoUiText(({not_installed:'offline.state.not_installed',downloading:'offline.state.downloading',verifying:'offline.state.verifying',downloaded:'offline.status.verifiedInactive',ready:'offline.state.ready',error:'offline.state.error'})[state],({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',downloaded:'Yuklangan · faollashtirish kutilmoqda',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state]);
  const hasProgress=progress&&Number.isFinite(progress.downloadedBytes)&&Number.isFinite(progress.totalBytes)&&progress.totalBytes>0&&progress.downloadedBytes>=0;
  progressEl.hidden=!(state==='downloading'||state==='verifying')||!hasProgress;
  if(hasProgress){
@@ -1090,10 +1025,10 @@ for(const module of offlineModuleCatalog){
  const row=document.createElement('article');row.className='offline-module-card';row.dataset.moduleId=module.id;
  const mark=document.createElement('span');mark.className='offline-module-mark';mark.innerHTML=offlineSvg(module.icon);
  const copy=document.createElement('div');copy.className='offline-module-copy';
- const name=document.createElement('h3');name.className='offline-module-name';name.textContent=module.name;
- const desc=document.createElement('p');desc.className='offline-module-desc';desc.textContent=module.desc;
- const size=document.createElement('p');size.className='offline-module-size';size.textContent=module.bytes?'Hajmi: '+offlineMb(module.bytes):'Hajmi: aniqlanmoqda';size.title=module.sizeNote;
- const status=document.createElement('p');status.className='offline-module-state';status.textContent='Yuklanmagan';
+ const name=document.createElement('h3');name.className='offline-module-name';name.textContent=avnivoUiText(avnivoOfflineKey(module,'name')||'missing.name',module.name);
+ const desc=document.createElement('p');desc.className='offline-module-desc';desc.textContent=avnivoUiText(avnivoOfflineKey(module,'desc')||'missing.desc',module.desc);
+ const size=document.createElement('p');size.className='offline-module-size';size.textContent=module.bytes?avnivoUiText('offline.module.size','Hajmi: {{size}}',{size:offlineMb(module.bytes)}):avnivoUiText('offline.module.sizePending','Hajmi: aniqlanmoqda');size.title=module.sizeNote;
+ const status=document.createElement('p');status.className='offline-module-state';status.textContent=avnivoUiText('offline.state.not_installed','Yuklanmagan');
  const meta=document.createElement('div');meta.className='offline-module-meta';meta.append(size,status);copy.append(name,desc,meta);
  const btn=document.createElement('button');btn.type='button';btn.className='offline-module-action';btn.innerHTML=offlineSvg('download');btn.setAttribute('aria-label',module.name+' — yuklab olish');
  const progress=document.createElement('div');progress.className='offline-module-progress';progress.hidden=true;
@@ -1155,9 +1090,24 @@ function loadHistory(){
  }catch(e){console.warn('Tarixni o‘qib bo‘lmadi',e)}
 }
 function historyDate(iso){const d=new Date(iso);return Number.isNaN(d.getTime())?'':new Intl.DateTimeFormat('uz-UZ',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric',hour12:false}).format(d)}
+
+// Re-apply translated labels on locale changes without touching download states.
+window.AVNIVO_I18N?.onChange(function(){
+ const empty=document.querySelector('.history-empty');
+ if(empty)empty.textContent=avnivoUiText('history.empty','Hozircha saqlangan chatlar yo‘q. Yangi xabar yuborilganda shu yerda sana bilan paydo bo‘ladi.');
+ offlineModuleCatalog.forEach(function(module){
+  const row=offlineList.querySelector('[data-module-id="'+module.id+'"]');if(!row)return;
+  const name=row.querySelector('.offline-module-name'),desc=row.querySelector('.offline-module-desc'),size=row.querySelector('.offline-module-size'),status=row.querySelector('.offline-module-state');
+  if(name)name.textContent=avnivoUiText(avnivoOfflineKey(module,'name')||'missing.name',module.name);
+  if(desc)desc.textContent=avnivoUiText(avnivoOfflineKey(module,'desc')||'missing.desc',module.desc);
+  if(size)size.textContent=module.bytes?avnivoUiText('offline.module.size','Hajmi: {{size}}',{size:offlineMb(module.bytes)}):avnivoUiText('offline.module.sizePending','Hajmi: aniqlanmoqda');
+  if(status){const state=offlineState.get(module.id)||'not_installed';const keys={not_installed:'offline.state.not_installed',downloading:'offline.state.downloading',verifying:'offline.state.verifying',downloaded:'offline.status.verifiedInactive',ready:'offline.state.ready',error:'offline.state.error'};const fallback={not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',downloaded:'Yuklangan · faollashtirish kutilmoqda',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'};status.textContent=avnivoUiText(keys[state],fallback[state]||'');}
+ });
+});
+
 function renderHistory(){
  historyItems.replaceChildren();
- if(!historySessions.length){const empty=document.createElement('div');empty.className='history-empty';empty.textContent='Hozircha saqlangan chatlar yo‘q. Yangi xabar yuborilganda shu yerda sana bilan paydo bo‘ladi.';historyItems.append(empty);return}
+ if(!historySessions.length){const empty=document.createElement('div');empty.className='history-empty';empty.textContent=avnivoUiText('history.empty','Hozircha saqlangan chatlar yo‘q. Yangi xabar yuborilganda shu yerda sana bilan paydo bo‘ladi.');historyItems.append(empty);return}
  for(const session of historySessions){
   const button=document.createElement('button');button.type='button';button.className='history-entry'+(session.id===currentHistoryId?' current':'');
   const title=document.createElement('span');title.className='history-entry-title';title.textContent='O‘zbek tili = русский язык';
