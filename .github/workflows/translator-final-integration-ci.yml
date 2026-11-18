@@ -21,6 +21,17 @@ jobs:
         run: |
           python -m pip install -r translator-api/requirements.txt
           python -m pip install pytest
+      - name: Check offline UI JavaScript syntax and runtime guard
+        run: |
+          node --check offline-module-manager.js
+          node - <<'JS'
+          const fs = require('fs');
+          const source = fs.readFileSync('offline-module-manager.js', 'utf8');
+          if (!source.includes('b.supports(mod.id)===true')) throw new Error('Missing native capability gate');
+          if (!source.includes("id:'whisper-small-q8'")) throw new Error('Whisper model ID mismatch');
+          if (!source.includes("id:'nllb-200-600m-int8'")) throw new Error('NLLB model ID mismatch');
+          console.log('Offline UI capability checks passed');
+          JS
       - name: Compile backend
         run: python -m compileall -q translator-api
       - name: Run offline model API tests
