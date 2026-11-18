@@ -53,12 +53,13 @@ Scope: offline engines only. No redesign, no online-path changes.
   - app process stayed alive (`app pid: 3562`), no `FATAL EXCEPTION` in logcat.
   - WebView loaded and rendered the packaged interface.
   - logcat artifact: `avnivo-emulator-logcat`.
-- APK artifact (run 44413040002):
+- APK artifact (final HEAD `ef8374b`, run 44414437306, jobs `apk` + `emulator-smoke` both passed):
   - package `com.avnivo.translator`, versionName `1.0.0`, versionCode 1, minSdk 26, targetSdk 35.
   - ABIs packaged: arm64-v8a, armeabi-v7a, x86, x86_64.
-  - SHA-256 `83f84ae545adc1ce5489c889f0f619a55372dd83aad9efea2c3ec859af8f0473`.
+  - SHA-256 `bc6f50010d827f74b37e5dc3a8555ba6d8d0165bfa083d938dabf7b9532f20fb`.
+  - `Displayed com.avnivo.translator/.MainActivity for user 0: +6s396ms`; no fatal exception.
   - Note: debug APKs embed build timestamps, so the SHA-256 differs per build; the value above is
-    for the exact artifact of run 44413040002.
+    for the exact artifact of run 44414437306.
 
 ## Module verification
 
