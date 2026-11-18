@@ -1076,8 +1076,17 @@ for(const module of offlineModuleCatalog){
 }
 // The future verified installer must supply actual byte counts; no simulated progress.
 window.avnivoOfflineModuleUi={setVerifiedState:updateOfflineModule,isEnabled:id=>offlineState.get(id)==='ready'&&offlineEnabled.get(id)!==false};
+window.AvnivoOfflineProgress=function(raw){
+ const parts=String(raw||'').split('/');
+ const done=Number(parts[0]),total=Number(parts[1]);
+ if(Number.isFinite(done)&&Number.isFinite(total)&&total>0){
+  updateOfflineModule('uz-stt','downloading',{downloadedBytes:done,totalBytes:total});
+  offlineNotice.textContent='O‘zbekcha model: '+offlineMb(done)+' / '+offlineMb(total);
+ }
+};
 window.AvnivoOfflineStatus=function(message){
  offlineNotice.textContent=String(message||'');
+ if(String(message||'').includes('Model yuklandi'))updateOfflineModule('uz-stt','ready');
  if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.status){
   try{if(window.AvnivoOfflineSTT.status().includes('yuklangan'))updateOfflineModule('uz-stt','ready')}
   catch(e){}
