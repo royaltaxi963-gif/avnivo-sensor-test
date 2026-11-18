@@ -1,0 +1,137 @@
+{
+  "model_id": "navoiy-tts",
+  "files": [
+    {
+      "name": ".gitattributes",
+      "object": "tts/uzbek/navoiy/.gitattributes",
+      "bytes": 1561,
+      "sha256": "1301f5da1d189f21124a38b721bb9be7b3ba5d8ddacd7b9da4fbe5777cabfddf"
+    },
+    {
+      "name": ".gitignore",
+      "object": "tts/uzbek/navoiy/.gitignore",
+      "bytes": 95,
+      "sha256": "47c8e4c654eaf3cd20a561cea11166e0306a7bd75f1175ce8f99fe823c099b68"
+    },
+    {
+      "name": "LICENSE",
+      "object": "tts/uzbek/navoiy/LICENSE",
+      "bytes": 11337,
+      "sha256": "b7914cf08d5f5c6b7d017b64cd97ad874e0c359d8ebea6a2834801dbf4946bb7"
+    },
+    {
+      "name": "NOTICE",
+      "object": "tts/uzbek/navoiy/NOTICE",
+      "bytes": 423,
+      "sha256": "8b4bb8d2d2f41bfede7e714c03f8c1677ccb57ca5bdc1d2577e7456b4b67c490"
+    },
+    {
+      "name": "README.md",
+      "object": "tts/uzbek/navoiy/README.md",
+      "bytes": 2299,
+      "sha256": "3fe9cbf38d12ffe13cdfd385f6f3fa306a9e9a0169f3d43720add3877da187e7"
+    },
+    {
+      "name": "SECURITY.md",
+      "object": "tts/uzbek/navoiy/SECURITY.md",
+      "bytes": 608,
+      "sha256": "114a55a16df55e9b0aa511faccf2bfedab8e5132540693443b67d492feb72b3c"
+    },
+    {
+      "name": "demo/angry.wav",
+      "object": "tts/uzbek/navoiy/demo/angry.wav",
+      "bytes": 238124,
+      "sha256": "bce1550533e58782de4aed8307f101aa23c52009bdb72c9fcf31fec40c2c4749"
+    },
+    {
+      "name": "demo/calm_intro.wav",
+      "object": "tts/uzbek/navoiy/demo/calm_intro.wav",
+      "bytes": 240044,
+      "sha256": "fe8fe9f9ce3958b22b646c31ebc49878e192f694ac78c7f2a9f0dc0d4e329df4"
+    },
+    {
+      "name": "demo/happy.wav",
+      "object": "tts/uzbek/navoiy/demo/happy.wav",
+      "bytes": 253484,
+      "sha256": "3a44a6f9d061ccf162631d1ef75f34b9aa016a9fc2351f40f07b0f2abb0dc664"
+    },
+    {
+      "name": "demo/long_form.wav",
+      "object": "tts/uzbek/navoiy/demo/long_form.wav",
+      "bytes": 518444,
+      "sha256": "552405b3f85cef01d57ba0f1f88367a84d30aaa3392c0e76e6062d51d52061f3"
+    },
+    {
+      "name": "demo/manifest.json",
+      "object": "tts/uzbek/navoiy/demo/manifest.json",
+      "bytes": 6108,
+      "sha256": "609643f624004687e702e19877a4824df8965005bc1afea58e8b7fd78245093d"
+    },
+    {
+      "name": "demo/numbers_dates.wav",
+      "object": "tts/uzbek/navoiy/demo/numbers_dates.wav",
+      "bytes": 445484,
+      "sha256": "45c44ba2da559cc914d44a3961ff49c6be19de69b70954501244d491c553ea2b"
+    },
+    {
+      "name": "demo/sad.wav",
+      "object": "tts/uzbek/navoiy/demo/sad.wav",
+      "bytes": 234284,
+      "sha256": "bffd3fd68fade9bb0fa2b40ceb9e10d9985c037156e9cfb0aa9a05f04ac1fe1f"
+    },
+    {
+      "name": "demo/surprised.wav",
+      "object": "tts/uzbek/navoiy/demo/surprised.wav",
+      "bytes": 165164,
+      "sha256": "befb17ec7bcd09ad32188f6dc760988e921982e671fe257a0965d87142abe5c9"
+    },
+    {
+      "name": "demo/warm_agent.wav",
+      "object": "tts/uzbek/navoiy/demo/warm_agent.wav",
+      "bytes": 182444,
+      "sha256": "31258e694c5ec71369c696f3caf151a801b7952bb36dcd61f53d20f1fa3eeb44"
+    },
+    {
+      "name": "emotion_600h_joint.pt",
+      "object": "tts/uzbek/navoiy/emotion_600h_joint.pt",
+      "bytes": 2023318452,
+      "sha256": "ced40fe65cf0a006a1708fd033cfee37b2c583747d3fd06279ba12d3dbe058af"
+    },
+    {
+      "name": "emotions_40h.json",
+      "object": "tts/uzbek/navoiy/emotions_40h.json",
+      "bytes": 1952,
+      "sha256": "35aff28452d3ecc895e652fc4931d30b3c39ef72be37542e4d8d859ca57accbc"
+    },
+    {
+      "name": "inference.py",
+      "object": "tts/uzbek/navoiy/inference.py",
+      "bytes": 5184,
+      "sha256": "34adb34b35158bda9c5afe36b1419ccb60d9884a8a971ab74dba82b9494e8006"
+    },
+    {
+      "name": "requirements.txt",
+      "object": "tts/uzbek/navoiy/requirements.txt",
+      "bytes": 59,
+      "sha256": "83e670461c92850fd00a9d9ad2fcb9407353278e097ae89dbcd8d57e6b5739b4"
+    },
+    {
+      "name": "tests/test_normalize.py",
+      "object": "tts/uzbek/navoiy/tests/test_normalize.py",
+      "bytes": 960,
+      "sha256": "48a6d23da9018994fb89a45448a86cce53bae085225a8b6696d9e7bbc7041182"
+    },
+    {
+      "name": "uztts/__init__.py",
+      "object": "tts/uzbek/navoiy/uztts/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "uztts/normalize.py",
+      "object": "tts/uzbek/navoiy/uztts/normalize.py",
+      "bytes": 7999,
+      "sha256": "133b3f11d70fdf39c14824d8b4acc9eb4ddb90da5cdfdb28c9647845166f82cc"
+    }
+  ]
+}

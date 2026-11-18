@@ -1,0 +1,41 @@
+{
+  "model_id": "mms-tts",
+  "files": [
+    {
+      "name": "config.json",
+      "object": "tts/mms/rus/config.json",
+      "bytes": 1641,
+      "sha256": "d76f3cad35e24a6d10f9d65d833555b7ab8020d8fa8d30eb5d70070ef15ae315"
+    },
+    {
+      "name": "model.safetensors",
+      "object": "tts/mms/rus/model.safetensors",
+      "bytes": 145232120,
+      "sha256": "4ed1b47c11a9d3242ec1a094847f8252f7860c96aeb5ce316047985e58fe8759"
+    },
+    {
+      "name": "pytorch_model.bin",
+      "object": "tts/mms/rus/pytorch_model.bin",
+      "bytes": 145393330,
+      "sha256": "ac9217af2fb1d47902b2cc2696accab8f72f030ef727b4c446184da2d2f2b21b"
+    },
+    {
+      "name": "special_tokens_map.json",
+      "object": "tts/mms/rus/special_tokens_map.json",
+      "bytes": 48,
+      "sha256": "7807cfe333571a07dbcf74a5ad1e9755da2ff17a43f8fae808a76f48508d621b"
+    },
+    {
+      "name": "tokenizer_config.json",
+      "object": "tts/mms/rus/tokenizer_config.json",
+      "bytes": 288,
+      "sha256": "8a4d38ec4879e5632899764dae779b6ead35e8e295cc0ed79c2d9d0af648323a"
+    },
+    {
+      "name": "vocab.json",
+      "object": "tts/mms/rus/vocab.json",
+      "bytes": 511,
+      "sha256": "05dc299fc7281439c4792e6a6e12fa5f5a7bd4a2cf6b9cc807b602a2ff4e7abb"
+    }
+  ]
+}
