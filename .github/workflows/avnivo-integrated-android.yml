@@ -59,7 +59,7 @@ jobs:
   emulator-smoke:
     needs: apk
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     permissions:
       contents: read
     steps:
@@ -102,6 +102,8 @@ jobs:
             adb install -r androidtest/app-debug-androidTest.apk
             adb shell am instrument -w -e class com.avnivo.translator.OfflineEngineInstrumentedTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument.txt
             grep -q "OK (" instrument.txt || { echo INSTRUMENTED_TESTS_FAILED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineRealInferenceTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_real.txt
+            grep -q "OK (" instrument_real.txt || { echo REAL_INFERENCE_FAILED; exit 1; }
             echo EMULATOR_SMOKE_OK
       - uses: actions/upload-artifact@v4
         if: always()
