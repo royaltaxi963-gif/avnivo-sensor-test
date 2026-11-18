@@ -3,11 +3,11 @@ android {
  namespace = "com.avnivo.translator"
  compileSdk = 35
  defaultConfig {
-  applicationId = "com.avnivo.translator"
+  applicationId = "com.avnivo.translator.stttest"
   minSdk = 26
   targetSdk = 35
   versionCode = 1
-  versionName = "1.0.0"
+  versionName = "1.0.0-stt-test"
  }
  compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
  kotlinOptions { jvmTarget = "17" }
