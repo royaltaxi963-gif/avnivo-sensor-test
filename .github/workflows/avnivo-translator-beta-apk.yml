@@ -1,0 +1,43 @@
+name: AVNIVO Translator Beta APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/offline-model-safe-installer-20261117]
+    paths:
+      - 'android-beta/**'
+      - '.github/workflows/avnivo-translator-beta-apk.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Bundle immutable saved HTML and required JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p android-beta/app/src/main/assets
+          cp snapshots/AVNIVO_TRANSLATOR_LATEST_2026-11-18.html android-beta/app/src/main/assets/index.html
+          for file in offline-uzbek-download.js offline-model-installer.js; do
+            test -s "$file"
+            cp "$file" android-beta/app/src/main/assets/
+          done
+          grep -q 'avnivoSafeOfflineInstaller' android-beta/app/src/main/assets/index.html
+          grep -q 'avnivoVerifiedUzbekDownload' android-beta/app/src/main/assets/index.html
+      - name: Build debug APK
+        working-directory: android-beta
+        run: gradle --no-daemon assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-translator-beta-debug
+          path: android-beta/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
