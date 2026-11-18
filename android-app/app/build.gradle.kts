@@ -1,4 +1,11 @@
 plugins { id("com.android.application"); id("org.jetbrains.kotlin.android") }
+
+// A stable signing identity is required for in-place APK updates. The keystore is supplied by CI
+// secrets (never committed); when it is absent (local builds, pull requests) the debug key is used.
+val keystoreFile = System.getenv("AVNIVO_KEYSTORE_FILE")
+// Monotonic versionCode: CI overrides it per release, otherwise it defaults to the base value.
+val buildVersionCode = System.getenv("AVNIVO_VERSION_CODE")?.toIntOrNull() ?: 1
+
 android {
  namespace = "com.avnivo.translator"
  compileSdk = 35
@@ -6,9 +13,25 @@ android {
   applicationId = "com.avnivo.translator"
   minSdk = 26
   targetSdk = 35
-  versionCode = 1
+  versionCode = buildVersionCode
   versionName = "1.0.0"
   testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+ }
+ signingConfigs {
+  if (keystoreFile != null) {
+   create("release") {
+    storeFile = file(keystoreFile)
+    storePassword = System.getenv("AVNIVO_KEYSTORE_PASSWORD")
+    keyAlias = System.getenv("AVNIVO_KEY_ALIAS")
+    keyPassword = System.getenv("AVNIVO_KEY_PASSWORD")
+   }
+  }
+ }
+ buildTypes {
+  release {
+   isMinifyEnabled = false
+   if (keystoreFile != null) signingConfig = signingConfigs.getByName("release")
+  }
  }
  compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
  kotlinOptions { jvmTarget = "17" }

@@ -23,6 +23,7 @@ class MainActivity : Activity() {
 
     @Volatile private var state = OfflineModuleState.NOT_INSTALLED
     @Volatile private var percent = 0
+    @Volatile private var recording = false
 
     /** Files present. Necessary but not sufficient for READY; the engine must also initialize. */
     private val modelInstalled get() = OfflineSpeechEngine.hasRequiredFiles(modelDir)
@@ -101,6 +102,7 @@ class MainActivity : Activity() {
 
     inner class Bridge {
         @JavascriptInterface fun status(): String = when {
+            recording -> "Yozib olinmoqda…"
             busy -> "Jarayon bajarilmoqda…"
             state.isOperational -> "O‘zbekcha STT modeli yuklangan va dvigatel tayyor."
             modelInstalled -> "Model fayllari mavjud; dvigatel hali tayyor emas."
@@ -122,9 +124,10 @@ class MainActivity : Activity() {
                 }
             }
         }
+        /** Begins a gesture-controlled recording session. Ignored if one is already running. */
         @JavascriptInterface fun start() {
             runOnUiThread {
-                if (busy) { recorder?.stop(); return@runOnUiThread }
+                if (recording || busy) return@runOnUiThread
                 if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 100)
                     return@runOnUiThread
@@ -139,8 +142,12 @@ class MainActivity : Activity() {
                         .show()
                     return@runOnUiThread
                 }
-                recognize()
+                beginRecording()
             }
+        }
+        /** Ends the active recording at the next buffer boundary (finger released). */
+        @JavascriptInterface fun stop() {
+            recorder?.stop()
         }
     }
 
@@ -167,9 +174,14 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun recognize() {
-        if (busy || !state.isOperational) return
+    /**
+     * Records until [Bridge.stop] is called (finger released), streaming the live amplitude to the
+     * existing waveform, then transcribes and returns the recognized text to the interface.
+     */
+    private fun beginRecording() {
+        if (busy || recording) return
         busy = true
+        recording = true
         val capture = OfflinePcmRecorder(this)
         recorder = capture
         worker.execute {
@@ -177,9 +189,13 @@ class MainActivity : Activity() {
             try {
                 engine = OfflineSpeechEngine(modelDir)
                 engine.prepare()
-                val samples = capture.capture(12)
-                val result = engine.transcribe(samples)
-                notifyJs("AvnivoOfflineResult", result)
+                val samples = capture.capture(30) { level -> notifyJs("AvnivoOfflineLevel", level.toString()) }
+                if (samples.size < MIN_SAMPLES) {
+                    // Too short to contain speech: report no recognition rather than an error.
+                    notifyJs("AvnivoOfflineResult", "")
+                } else {
+                    notifyJs("AvnivoOfflineResult", engine.transcribe(samples))
+                }
             } catch (e: Exception) {
                 notifyJs("AvnivoOfflineError", e.message ?: "Offline STT xatosi")
             } catch (e: UnsatisfiedLinkError) {
@@ -188,7 +204,9 @@ class MainActivity : Activity() {
                 capture.close()
                 engine?.close()
                 recorder = null
+                recording = false
                 busy = false
+                notifyJs("AvnivoOfflineLevel", "0")
             }
         }
     }
@@ -196,7 +214,7 @@ class MainActivity : Activity() {
     override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(code, permissions, results)
         if (code == 100 && results.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-            if (state.isOperational) recognize() else notifyJs("AvnivoOfflineError", "Modelni yuklash uchun mikrofonni qayta bosing.")
+            notifyJs("AvnivoOfflineHint", "Mikrofon ruxsati berildi. Yozish uchun mikrofonni bosing va ushlab turing.")
         else if (code == 100) notifyJs("AvnivoOfflineError", "Mikrofon ruxsati berilmadi")
     }
 
@@ -205,5 +223,9 @@ class MainActivity : Activity() {
         worker.shutdown()
         web.destroy()
         super.onDestroy()
+    }
+
+    private companion object {
+        const val MIN_SAMPLES = 4800 // 0.3 s at 16 kHz: below this there is no usable speech.
     }
 }

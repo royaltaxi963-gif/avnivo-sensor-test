@@ -787,8 +787,8 @@ function applyMode(mode){
  document.querySelector('meta[name="theme-color"]').content=chosen==='offline'?'#080f19':'#17120d';
  try{localStorage.setItem('avnivo.ui.mode.v1',chosen)}catch(e){}
 }
-modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online');updateOnlineLanguageLabels()});
-modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){requestToken++;cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
+modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'){if(active)stopVoice();try{window.AvnivoOfflineSTT&&window.AvnivoOfflineSTT.stop()}catch(e){}finishOfflineHold()}voiceHint.hidden=true;applyMode('online');updateOnlineLanguageLabels()});
+modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){requestToken++;cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}else{try{window.AvnivoOfflineSTT&&window.AvnivoOfflineSTT.stop()}catch(e){}finishOfflineHold()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
 try{applyMode(localStorage.getItem('avnivo-first-launch-v1-complete')==='yes'?localStorage.getItem('avnivo.ui.mode.v1'):'online')}catch(e){applyMode('online')}
 const mic=shell.querySelector('.mic-icon');
 const trace=shell.querySelector('.voice-trace-glow');
@@ -1084,23 +1084,32 @@ window.AvnivoOfflineProgress=function(raw){
   offlineNotice.textContent='O‘zbekcha model: '+offlineMb(done)+' / '+offlineMb(total);
  }
 };
+window.AvnivoOfflineLevel=function(value){
+ // Real microphone amplitude from the native recorder drives the existing waveform.
+ if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ const parsed=Number(value);
+ offlineLevel=Number.isFinite(parsed)?Math.max(0,Math.min(1,parsed)):0;
+};
+window.AvnivoOfflineHint=function(message){
+ hint(String(message||''));
+};
 window.AvnivoOfflineStatus=function(message){
  offlineNotice.textContent=String(message||'');
  // Never promote to ready from a status string: only a verified engine may activate the module.
- // Any native status means the gesture is over; restore the composer visual state.
- shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
+ // A native status that is not a recording start ends the gesture: restore the composer state.
+ if(!/yozib olin/i.test(String(message||'')))finishOfflineHold();
 };
 window.AvnivoOfflineEngineReady=function(message){
  // Emitted by the native bridge only after runtime init + inference smoke test succeed.
  offlineNotice.textContent=String(message||'');
- shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
+ finishOfflineHold();
  updateOfflineModule('uz-stt','ready');
 };
 window.AvnivoOfflineError=function(message){
  const error=String(message||'Noma’lum xatolik');
  offlineNotice.textContent='Offline STT: '+error;
- // Native session ended (or failed): restore the composer visual state.
- shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
+ // Native session ended (or failed): restore the composer visual state and report via diagnostics.
+ finishOfflineHold();
  hint('Offline STT: '+error);
  updateOfflineModule('uz-stt','error');
  const row=offlineList.querySelector('[data-module-id="uz-stt"]');
@@ -1111,11 +1120,12 @@ window.AvnivoOfflineError=function(message){
 };
 window.AvnivoOfflineResult=function(text){
  if(document.documentElement.dataset.avnivoMode!=='offline')return;
- shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
+ finishOfflineHold();
  const spoken=String(text||'').trim();
  if(!spoken){hint('Nutq aniqlanmadi');return}
+ // Only real recognized speech is inserted into the composer; no lifecycle text is added.
  input.value=appendTranscript(input.value,spoken);
- persistDraft();resize();syncComposerMode();hint('Ovoz matnga aylantirildi');
+ persistDraft();resize();syncComposerMode();
 };
 if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.moduleStatus){
  try{
@@ -1709,6 +1719,8 @@ function cancelOnlineRecording(){
 
 let holdTimer=0,holdStarted=false,holdPointer=null,holdSuppressClick=false,holdRecognizer=null,holdBase='',holdTranscript='',holdFinal='',holdSession=0,holdWaveStream=null,holdWaveContext=null,holdWaveFrame=0,holdWaveAnalyser=null;
 let avnivoPressStartedAt=0,avnivoRecordingAt=0,avnivoCancelHold=false,avnivoHoldFinalizing=false;
+// Offline gesture state: the native recorder owns capture; JS only reflects its live amplitude.
+let offlineWaveFrame=0,offlineWaveActive=false,offlineLevel=0,avnivoOfflineCancel=false;
 function hint(message){if(document.documentElement.dataset.avnivoMode==='online'){voiceHint.hidden=true;return}voiceHint.textContent=message;voiceHint.hidden=!message}
 function appendTranscript(base,transcript){
  const spoken=transcript.trim();
@@ -1747,6 +1759,33 @@ async function startHoldWave(session){
   animate();
  }catch(e){if(session===holdSession&&holdStarted)hint('Mikrofon ruxsatini tekshiring')}
 }
+// Drives the existing waveform from the native recorder's real microphone amplitude while the
+// user holds the microphone. Reuses the same appearance; only the amplitude source differs.
+function offlineWaveFrameStep(){
+ if(!offlineWaveActive)return;
+ const amp=Math.max(1.5,Math.min(13,offlineLevel*15));
+ const now=performance.now();
+ const path='M '+Array.from({length:61},(_,i)=>{
+  const x=i/60*100,env=Math.sin(Math.PI*i/60);
+  const y=16+Math.sin(i*.76+now*.014)*amp*env;
+  return x.toFixed(2)+','+y.toFixed(2);
+ }).join(' L ');
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 32" preserveAspectRatio="none"><path d="'+path+'" fill="none" stroke="#f6c776" stroke-width="1.8" vector-effect="non-scaling-stroke"/></svg>';
+ trace.style.backgroundImage='url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
+ trace.style.backgroundSize='100% 100%';
+ trace.style.filter='drop-shadow(0 0 '+Math.min(17,4+offlineLevel*14).toFixed(1)+'px #eeb552)';
+ offlineWaveFrame=requestAnimationFrame(offlineWaveFrameStep);
+}
+function stopOfflineWave(){
+ offlineWaveActive=false;cancelAnimationFrame(offlineWaveFrame);offlineLevel=0;
+ trace.style.backgroundImage='none';idleWave();
+}
+function finishOfflineHold(){
+ if(!offlineWaveActive&&!shell.classList.contains('hold-voice'))return;
+ stopOfflineWave();
+ shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
+ syncComposerMode();
+}
 function finishHold(cancel=false){
  if(!holdStarted)return;
  avnivoCancelHold=cancel;avnivoHoldFinalizing=true;window.avnivoVoiceFinalizing=!cancel;
@@ -1762,12 +1801,15 @@ function finishHold(cancel=false){
 function beginHold(){
  if(document.documentElement.dataset.avnivoMode==='offline'){
   if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
-  // The native bridge owns recording start/stop, permission prompts and error reporting.
-  // Reuse the existing recording appearance/animation while the native session is active.
+  // The native bridge owns capture start/stop, permission prompts and error reporting. Reuse the
+  // existing recording appearance/animation; the waveform follows the native amplitude callback.
   shell.classList.add('hold-voice');shell.classList.remove('text-mode');
-  mic.setAttribute('aria-label','Yozishni tugatish uchun bosing');
+  mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label','Yozishni tugatish uchun bosing');
+  avnivoOfflineCancel=false;
+  clearTimeout(timeout);timeout=0;label.hidden=true;
+  offlineLevel=0;offlineWaveActive=true;cancelAnimationFrame(offlineWaveFrame);offlineWaveFrame=requestAnimationFrame(offlineWaveFrameStep);
   try{window.AvnivoOfflineSTT.start()}
-  catch(e){shell.classList.remove('hold-voice');hint('Offline STT xatosi: '+(e&&e.message||e))}
+  catch(e){stopOfflineWave();shell.classList.remove('hold-voice');mic.setAttribute('aria-pressed','false');hint('Offline STT xatosi: '+(e&&e.message||e))}
   return;
  }
  if(active||holdStarted)return;
@@ -1858,9 +1900,17 @@ mic.addEventListener('pointerdown',event=>{
 });
 function releaseHold(event){
  if(holdPointer===null||event.pointerId!==holdPointer)return;
- const wasHold=holdStarted||active||shell.classList.contains('hold-voice');
+ const offline=document.documentElement.dataset.avnivoMode==='offline';
+ const wasHold=offline?shell.classList.contains('hold-voice'):(holdStarted||active||shell.classList.contains('hold-voice'));
  const held=performance.now()-avnivoPressStartedAt;
  clearHoldTimer();holdPointer=null;
+ if(offline){
+  // Stop the native recording immediately when the finger is released; keep tap-to-send.
+  holdSuppressClick=true;
+  if(wasHold){try{window.AvnivoOfflineSTT.stop()}catch(e){}}
+  else if(held<1100&&input.value.trim())sendMessage();
+  return;
+ }
  if(wasHold){
    holdSuppressClick=true;
    const cancel=avnivoRecordingAt===0||performance.now()-avnivoRecordingAt<1000;
@@ -1876,7 +1926,7 @@ function releaseHold(event){
 }
 mic.addEventListener('pointerup',releaseHold);
 mic.addEventListener('mousedown',preserveKeyboardOnMicPress);
-mic.addEventListener('pointercancel',event=>{if(holdPointer!==event.pointerId)return;clearHoldTimer();holdPointer=null;holdSuppressClick=true;if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();stopVoice();shell.classList.remove('hold-voice')}else finishHold(true)});
+mic.addEventListener('pointercancel',event=>{if(holdPointer!==event.pointerId)return;clearHoldTimer();holdPointer=null;holdSuppressClick=true;if(document.documentElement.dataset.avnivoMode==='offline'){try{window.AvnivoOfflineSTT.stop()}catch(e){}finishOfflineHold()}else if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();stopVoice();shell.classList.remove('hold-voice')}else finishHold(true)});
 mic.addEventListener('lostpointercapture',event=>{if(holdPointer===event.pointerId)releaseHold(event)});
 mic.addEventListener('contextmenu',event=>{if(holdTimer||holdStarted||active)event.preventDefault()});
 mic.addEventListener('click',event=>{event.preventDefault();holdSuppressClick=false});
@@ -1902,12 +1952,15 @@ loadDraft();renderHistory();
 window.avnivoReturningLaunch={fast:avnivoResumeFast,completed:avnivoFirstRunDone};
 function avnivoMarkHidden(){
  persistDraft();persistHistory();persistActiveChat();
+ // Ending backgrounding must not leave a native recording running.
+ try{window.AvnivoOfflineSTT&&window.AvnivoOfflineSTT.stop()}catch(e){}
+ finishOfflineHold();
  try{localStorage.setItem(avnivoCloseKey,String(Date.now()))}catch(e){}
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')avnivoMarkHidden()});
 window.addEventListener('pagehide',avnivoMarkHidden);
 
-window.addEventListener('pagehide',()=>{stopSpeaking();cancelOnlineRecording();if(active)stopVoice()});
+window.addEventListener('pagehide',()=>{stopSpeaking();cancelOnlineRecording();try{window.AvnivoOfflineSTT&&window.AvnivoOfflineSTT.stop()}catch(e){}if(active)stopVoice()});
 
 })();
 </script>

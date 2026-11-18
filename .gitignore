@@ -5,6 +5,8 @@ android-app/build/
 android-app/app/build/
 android-app/app/libs/
 android-app/local.properties
+*.jks
+*.keystore
 **/__pycache__/
 *.pyc
 .venv/
