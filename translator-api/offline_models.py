@@ -88,7 +88,7 @@ def download_ticket(model_id: str, request: Request):
             url = blob.generate_signed_url(
                 version="v4", expiration=timedelta(minutes=15), method="GET",
                 service_account_email=email, access_token=credentials.token,
-                response_disposition='attachment; filename="' + item["name"] + '"',
+                response_disposition='attachment; filename="' + item["name"].rsplit("/", 1)[-1] + '"',
             )
             files.append({"name": item["name"], "bytes": item["bytes"],
                           "sha256": item["sha256"], "url": url})
