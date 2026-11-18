@@ -44,12 +44,21 @@ Scope: offline engines only. No redesign, no online-path changes.
 ## CI evidence
 
 - Workflow: "AVNIVO integrated Android APK" (`.github/workflows/avnivo-integrated-android.yml`).
-- Runs JVM unit tests, builds the debug APK, then installs and launches it on an x86_64
-  Android API 34 emulator, asserting the process stays alive and no fatal exception is logged.
-- APK artifact (verified locally from run 44405275116):
-  - package `com.avnivo.translator`, versionName `1.0.0`, minSdk 26, targetSdk 35.
+- Jobs: `apk` (JVM unit tests + build) then `emulator-smoke` (needs apk).
+- Emulator smoke (run 44413040002, job 135186695244) — PASSED:
+  - x86_64 Android API 34 google_apis emulator, KVM enabled on the runner.
+  - `adb install -r app-debug.apk` succeeded.
+  - `pm list packages` found `com.avnivo.translator`.
+  - `am start -W com.avnivo.translator/.MainActivity` -> `Displayed ... for user 0: +2s7ms`.
+  - app process stayed alive (`app pid: 3562`), no `FATAL EXCEPTION` in logcat.
+  - WebView loaded and rendered the packaged interface.
+  - logcat artifact: `avnivo-emulator-logcat`.
+- APK artifact (run 44413040002):
+  - package `com.avnivo.translator`, versionName `1.0.0`, versionCode 1, minSdk 26, targetSdk 35.
   - ABIs packaged: arm64-v8a, armeabi-v7a, x86, x86_64.
-  - SHA-256 `a66303509bd26dbdd031a16b66a7251c373c2cbebab939284c984b5028a86f46`.
+  - SHA-256 `83f84ae545adc1ce5489c889f0f619a55372dd83aad9efea2c3ec859af8f0473`.
+  - Note: debug APKs embed build timestamps, so the SHA-256 differs per build; the value above is
+    for the exact artifact of run 44413040002.
 
 ## Module verification
 
@@ -80,12 +89,16 @@ No model URL, checksum, license, or capability was invented anywhere in this wor
 
 1. Push branch, open one consolidated PR. — done (PR #28, draft).
 2. Run GitHub Actions APK workflow; download and record APK SHA-256. — done.
-3. Device/emulator acceptance for Uzbek STT with real Uzbek speech, then offline (airplane) re-test.
-   Local limitation: no `/dev/kvm`, so no local emulator — must use CI/remote device.
-   In progress: CI emulator smoke job installs + launches the APK and checks for crashes.
-4. Integrate Navoiy/MMS TTS runtimes or report precise blockers. — classified BLOCKED with evidence.
-5. Verify app restart persistence and no online-path regression.
+3. CI emulator smoke: install + launch + crash check. — done (passed).
+4. Real Uzbek-speech inference *on the Android device/emulator* and the airplane-mode re-test.
+   The model+runtime are proven correct on Linux and the app installs/launches on the emulator,
+   but no automated test yet feeds real microphone audio through the on-device engine. This needs
+   either a physical device or an emulator audio-injection harness. Not yet done.
+5. Integrate Navoiy/MMS TTS runtimes or report precise blockers. — classified BLOCKED with evidence.
+6. Confirm no online-path regression. — diff shows no online files changed; runtime UI parity not
+   machine-verified beyond successful launch.
 
 ## Next exact action
 
-Confirm the CI emulator smoke job passes, then report the final delivery status.
+Feed a known Uzbek WAV through the on-device engine (emulator `adb` audio injection or a physical
+device) to close the remaining on-device inference gap; otherwise report it as the open limitation.
