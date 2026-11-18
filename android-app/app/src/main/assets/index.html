@@ -1093,8 +1093,14 @@ window.AvnivoOfflineStatus=function(message){
  }
 };
 window.AvnivoOfflineError=function(message){
- offlineNotice.textContent='Offline STT: '+String(message||'xatolik');
+ const error=String(message||'Noma’lum xatolik');
+ offlineNotice.textContent='Offline STT: '+error;
  updateOfflineModule('uz-stt','error');
+ const row=offlineList.querySelector('[data-module-id="uz-stt"]');
+ if(row){
+  const status=row.querySelector('.offline-module-state');
+  if(status){status.textContent='Yuklash xatosi: '+error;status.title=error}
+ }
 };
 window.AvnivoOfflineResult=function(text){
  if(document.documentElement.dataset.avnivoMode!=='offline')return;
