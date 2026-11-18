@@ -555,6 +555,117 @@ window.AVNIVO_I18N_BUNDLE={"uz":{"_meta":{"code":"uz","english":"Uzbek","machine
  document.addEventListener('DOMContentLoaded',function(){bind();window.AVNIVO_I18N.init().then(function(){window.AVNIVO_DYNAMIC_I18N.start()}).catch(function(e){console.warn('i18n initialization',e)})});
 })();
 </script>
+<script>
+/* Keep settings, dynamic TTS controls, history and onboarding localized.
+   Bind known dictionary keys; never send private chat content for translation. */
+(function(){
+'use strict';
+const rules=[
+ ['.settings-header span','settings.title'],
+ ['.settings-description','settings.description'],
+ ['.offline-settings-top-title','offline.settings.title'],
+ ['.offline-settings-top-note','offline.settings.note'],
+ ['.offline-modules-title','offline.modules.title'],
+ ['.offline-modules-subtitle','offline.modules.subtitle'],
+ ['.settings-close','settings.close','aria-label'],
+ ['.settings-toggle','settings.toggle','aria-label'],
+ ['.history-header span','history.title'],
+ ['.history-toggle','history.toggle','aria-label'],
+ ['.history-close','history.close','aria-label'],
+ ['.history-new','history.new'],
+ ['.offline-active-title','offline.modules.title'],
+ ['#avnivo-interface-language','language.settings.aria','aria-label'],
+ ['.avnivo-ui-language-control label','language.settings.title'],
+ ['.online-tts-settings label:nth-of-type(1)','tts.voice.label'],
+ ['.online-tts-settings label:nth-of-type(2)','tts.rate.label']
+];
+const original=new WeakMap();
+function setKey(el,key,attr){
+ if(!el)return;
+ if(attr){if(el.getAttribute('data-i18n-'+attr)!==key)el.setAttribute('data-i18n-'+attr,key);return}
+ if(el.getAttribute('data-i18n')!==key)el.setAttribute('data-i18n',key);
+}
+function bind(){
+ for(const [selector,key,attr] of rules){
+  try{document.querySelectorAll(selector).forEach(el=>setKey(el,key,attr))}catch(e){}
+ }
+ const container=document.querySelector('#settings-drawer');
+ if(!container)return;
+ const labels=container.querySelectorAll('label');
+ const directLabels={
+  'AI ovozi (Online)':'tts.voice.label',
+  'O‘qish tezligi (Online)':'tts.rate.label',
+  'Nutq maromi (AI)':'tts.pace.label',
+  'Intonatsiya va pitch (AI)':'tts.pitch.label',
+  'Talaffuz va ovoz uslubi (AI)':'tts.delivery.label',
+  'Maxsus uslub tavsifi (180 belgigacha)':'tts.custom.label'
+ };
+ const optionKeys={
+  'Tabiiy':'tts.pitch.normal','Sekin':'tts.pace.slow','Tez':'tts.pace.fast',
+  'O‘ylab, pauzali':'tts.pace.deliberate','Ifodali':'tts.pitch.expressive',
+  'Bir tekis':'tts.pitch.flat','Balandroq ohang':'tts.pitch.high',
+  'Pastroq ohang':'tts.pitch.low','Yumshoq':'tts.delivery.soft',
+  'Baland va aniq':'tts.delivery.projected','Nafasli':'tts.delivery.breathy',
+  'Ravshan talaffuz':'tts.delivery.clear',
+  'Xotirjam':'tts.style.calm','Quvnoq':'tts.style.happy',
+  'G‘amgin':'tts.style.sad','Hayajonli':'tts.style.excited',
+  'Jiddiy':'tts.style.serious','Muloyim':'tts.style.gentle',
+  'Ishonchli':'tts.style.confident','Kinoyali':'tts.style.sarcastic',
+  'O‘ynoqi':'tts.style.playful','Sirli':'tts.style.mysterious',
+  'Hamdard':'tts.style.empathetic','Hikoyachi':'tts.style.narrator',
+  'Pichirlash':'tts.style.whisper','Robotga o‘xshash':'tts.style.robotic',
+  'Dramatik':'tts.style.dramatic','Qiziquvchan':'tts.style.curious',
+  'Charchagan':'tts.style.tired','Qo‘rqqan':'tts.style.fearful',
+  'Asabiy':'tts.style.frustrated','Rasmiy':'tts.style.professional'
+ };
+ labels.forEach(label=>{
+  const text=[...label.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
+  if(!original.has(label))original.set(label,text);
+  const key=directLabels[original.get(label)];
+  if(key){
+   const i18n=window.AVNIVO_I18N;
+   if(i18n){
+    const translated=i18n.t(key);
+    const textNode=[...label.childNodes].find(n=>n.nodeType===3);
+    if(textNode&&translated!==textNode.textContent.trim())textNode.textContent=translated+' ';
+   }
+  }
+ });
+ container.querySelectorAll('select option').forEach(option=>{
+  if(!original.has(option))original.set(option,option.textContent.trim());
+  const key=optionKeys[original.get(option)];
+  if(key&&window.AVNIVO_I18N){
+   const translated=window.AVNIVO_I18N.t(key);
+   if(option.textContent!==translated)option.textContent=translated;
+  }
+ });
+ const input=container.querySelector('textarea[placeholder="Masalan: warm and enthusiastic"]');
+ if(input)setKey(input,'tts.custom.placeholder','placeholder');
+ const i18n=window.AVNIVO_I18N;
+ if(i18n)i18n.apply(container);
+}
+let queued=false;
+function schedule(){
+ if(queued)return;queued=true;
+ requestAnimationFrame(()=>{queued=false;bind()});
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ const drawer=document.querySelector('#settings-drawer');
+ if(drawer)new MutationObserver(records=>{
+  if(records.some(r=>r.type==='childList'&&[...r.addedNodes].some(n=>n.nodeType===1)))schedule();
+ }).observe(drawer,{childList:true,subtree:true});
+ schedule();
+});
+const check=setInterval(()=>{
+ if(window.AVNIVO_I18N&&window.AVNIVO_I18N.onChange){
+  clearInterval(check);
+  window.AVNIVO_I18N.onChange(schedule);
+  schedule();
+ }
+},100);
+setTimeout(()=>clearInterval(check),12000);
+})();
+</script>
 <script src="offline-uzbek-download.js"></script>
 <script src="offline-model-installer.js"></script>
 <script>
