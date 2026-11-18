@@ -1,5 +1,8 @@
 """Private GCS model download tickets; fixed allowlist, no arbitrary object paths."""
 import os
+import json
+import re
+from pathlib import Path
 import time
 from collections import defaultdict, deque
 from datetime import timedelta
@@ -18,6 +21,39 @@ OBJECTS = {
          "bytes": 411, "sha256": "2022129a0c61784d4a1838da59e5875f9b29d2c6ad12413cbedc98632f98710f"},
     ]
 }
+# Only SHA256-verified, repository-reviewed manifests can enable extra models.
+# Files are deliberately not fetched from GCS at request time.
+MANIFEST_DIR = Path(__file__).resolve().parent / "verified_models"
+ALLOWED_PREFIXES = {"navoiy-tts": "tts/uzbek/navoiy/", "mms-tts": "tts/mms/rus/"}
+
+def load_verified_models():
+    models = dict(OBJECTS)
+    for model_id, prefix in ALLOWED_PREFIXES.items():
+        path = MANIFEST_DIR / (model_id + ".json")
+        if not path.is_file():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            files = data["files"]
+            if data.get("model_id") != model_id or not isinstance(files, list) or not files or len(files) > 100:
+                continue
+            checked = []
+            for item in files:
+                name, obj, digest, size = (item[k] for k in ("name", "object", "sha256", "bytes"))
+                if not all(isinstance(x, str) for x in (name, obj, digest)):
+                    raise ValueError("Invalid manifest strings")
+                if not obj.startswith(prefix) or obj != prefix + name or name.startswith("/") or ".." in name.split("/"):
+                    raise ValueError("Unsafe object path")
+                if not re.fullmatch(r"[A-Za-z0-9_./-]+", name) or not re.fullmatch(r"[a-f0-9]{64}", digest):
+                    raise ValueError("Invalid manifest hash or name")
+                if not isinstance(size, int) or isinstance(size, bool) or size < 0 or size > 3_000_000_000:
+                    raise ValueError("Invalid size")
+                checked.append({"name": name, "object": obj, "sha256": digest, "bytes": size})
+            models[model_id] = checked
+        except (ValueError, KeyError, TypeError, OSError, json.JSONDecodeError):
+            continue
+    return models
+
 _requests = defaultdict(deque)
 
 @router.get("/api/offline-models/{model_id}/download-ticket")
@@ -26,7 +62,8 @@ def download_ticket(model_id: str, request: Request):
 
     This endpoint intentionally does NOT claim installation or activation.
     """
-    if model_id not in OBJECTS:
+    available = load_verified_models()
+    if model_id not in available:
         raise HTTPException(404, "Unknown offline model")
     ip = request.client.host if request.client else "unknown"
     now = time.monotonic()
@@ -46,7 +83,7 @@ def download_ticket(model_id: str, request: Request):
         client = storage.Client(credentials=credentials)
         bucket = client.bucket(BUCKET)
         files = []
-        for item in OBJECTS[model_id]:
+        for item in available[model_id]:
             blob = bucket.blob(item["object"])
             url = blob.generate_signed_url(
                 version="v4", expiration=timedelta(minutes=15), method="GET",
