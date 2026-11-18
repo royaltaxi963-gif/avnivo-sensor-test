@@ -16,7 +16,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
         )
     }
 
-    fun download(progress: (String) -> Unit) {
+    fun download(progress: (String) -> Unit, bytesProgress: (Long, Long) -> Unit) {
         require(directory.mkdirs() || directory.isDirectory) { "Cannot create model directory" }
         val ticket = JSONObject(readHttps(API))
         require(ticket.getString("model_id") == "uzbek-stt") { "Unexpected model" }
@@ -41,7 +41,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
                 val temporary = File(directory, "$name.download")
                 val destination = File(directory, name)
                 progress("Yuklanmoqda: $name")
-                downloadFile(url, temporary, spec.first, spec.second)
+                downloadFile(url, temporary, spec.first, spec.second, bytesProgress)
                 staged.add(temporary to destination)
             }
             require(seen == expected.keys) { "Missing model file" }
@@ -51,7 +51,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
             progress("Model yuklandi va SHA-256 tekshirildi. Ishga tushirish uchun tayyorlang.")
         } finally {
             for ((temporary, _) in staged) temporary.delete()
-            for (name in expected.keys) File(directory, "$name.download").delete()
+            // Keep partial downloads for retry; verified files are only promoted after SHA-256.
         }
     }
 
@@ -71,14 +71,19 @@ internal class VerifiedModelDownloader(private val directory: File) {
         } finally { c.disconnect() }
     }
 
-    private fun downloadFile(url: String, file: File, size: Long, hash: String) {
+    private fun downloadFile(url: String, file: File, size: Long, hash: String, progress: (Long, Long) -> Unit) {
+        val existing = if (file.isFile && file.length() in 1 until size) file.length() else 0L
         val c = connection(url)
+        if (existing > 0) c.setRequestProperty("Range", "bytes=$existing-")
         try {
-            require(c.responseCode == 200) { "Download HTTP ${c.responseCode}" }
+            require(c.responseCode == if (existing > 0) 206 else 200) { "Download HTTP ${c.responseCode}" }
+            if (existing > 0) require(c.getHeaderField("Content-Range")?.startsWith("bytes $existing-") == true) { "Resume range mismatch" }
             val digest = MessageDigest.getInstance("SHA-256")
-            var total = 0L
+            var total = existing
+            if (existing > 0) file.inputStream().use { old -> val b=ByteArray(65536); while(true){val n=old.read(b);if(n<0)break;digest.update(b,0,n)} }
+            progress(total,size)
             c.inputStream.use { input ->
-                file.outputStream().buffered().use { output ->
+                file.outputStream().let { if(existing>0) file.appendOutputStream() else it }.buffered().use { output ->
                     val buffer = ByteArray(65536)
                     while (true) {
                         val n = input.read(buffer)
@@ -87,6 +92,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
                         require(total <= size) { "File exceeds expected size" }
                         digest.update(buffer, 0, n)
                         output.write(buffer, 0, n)
+                        progress(total,size)
                     }
                 }
             }
