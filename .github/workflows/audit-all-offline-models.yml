@@ -1,0 +1,37 @@
+name: Audit all AVNIVO offline model assets (read-only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Verify GCS inventory and live ticket contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=project-6bcf7fe6-cb55-49b7-9f4
+          BUCKET=avnivo-offline-models-792624108019
+          API=https://avnivo-translation-test-792624108019.europe-west1.run.app
+          echo "== Private GCS inventory (names and sizes only; no signed URLs) =="
+          gcloud storage ls -l "gs://$BUCKET/**" --project="$PROJECT" | grep -v 'TOTAL:' || true
+          echo "== Ticket availability (HTTP status only; do not print signed URLs) =="
+          for MODEL in uzbek-stt whisper-small-q8 whisper-large-v3-turbo nllb-200-600m-int8 navoiy-tts mms-tts; do
+            STATUS="$(curl --silent --show-error --output /tmp/avnivo-ticket.json --write-out '%{http_code}' "$API/api/offline-models/$MODEL/download-ticket" || true)"
+            if [[ "$STATUS" == 200 ]]; then
+              python3 -c 'import json; d=json.load(open("/tmp/avnivo-ticket.json")); print("Ticket files:", len(d.get("files",[])), "Total bytes:", sum(f.get("bytes",0) for f in d.get("files",[])))'
+            else
+              echo "$MODEL: HTTP $STATUS"
+            fi
+          done
+          echo "Read-only audit complete. Unknown or unverified models must remain unavailable."
