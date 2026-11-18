@@ -2,13 +2,16 @@ name: Verify offline model assets and SHA256
 on:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   id-token: write
 jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -54,10 +57,25 @@ jobs:
                   verified.append({'name':rel,'object':prefix+rel,'bytes':size,'sha256':digest.hexdigest()})
               with open('verified/'+model+'.json','w') as f:json.dump({'model_id':model,'files':verified},f,indent=2)
               print(model,'verified',len(verified),'of',len(manifest.get('files',[])),flush=True)
-              if not verified:raise SystemExit('No verified files for '+model)
+              if len(verified) != len(manifest.get('files',[])):raise SystemExit('Incomplete verification for '+model)
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: offline-verified-sha256-manifests
           path: verified/*.json
           retention-days: 7
+      - name: Publish reviewed integrity data to backend directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p translator-api/verified_models
+          cp verified/navoiy-tts.json verified/mms-tts.json translator-api/verified_models/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add translator-api/verified_models/
+          if git diff --cached --quiet; then
+            echo "Verified manifests already current"
+          else
+            git commit -m "Publish SHA256-verified offline model manifests"
+            git push origin HEAD:main
+          fi
