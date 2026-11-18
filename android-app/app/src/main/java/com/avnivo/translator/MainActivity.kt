@@ -20,8 +20,12 @@ class MainActivity : Activity() {
     private val modelDir get() = File(filesDir, "models/uzbek-stt")
     private var recorder: OfflinePcmRecorder? = null
     private var busy = false
-    private val modelReady get() = File(modelDir, "model.int8.onnx").length() == 591649160L &&
-        File(modelDir, "tokens.txt").length() == 411L
+
+    @Volatile private var state = OfflineModuleState.NOT_INSTALLED
+    @Volatile private var percent = 0
+
+    /** Files present. Necessary but not sufficient for READY; the engine must also initialize. */
+    private val modelInstalled get() = OfflineSpeechEngine.hasRequiredFiles(modelDir)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +33,12 @@ class MainActivity : Activity() {
         web.settings.javaScriptEnabled = true
         web.settings.domStorageEnabled = true
         web.settings.allowFileAccess = true
-        web.webViewClient = WebViewClient()
+        web.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                // Re-activate a previously installed model after an app restart or process death.
+                if (modelInstalled && !busy) worker.execute { verifyEngine() }
+            }
+        }
         web.webChromeClient = object : WebChromeClient() {
             override fun onPermissionRequest(request: PermissionRequest) {
                 runOnUiThread {
@@ -49,17 +58,59 @@ class MainActivity : Activity() {
         runOnUiThread { web.evaluateJavascript("window.$function && window.$function($escaped)", null) }
     }
 
+    /** Applies a state transition, rejecting illegal jumps (e.g. DOWNLOADING -> READY). */
+    private fun transition(next: OfflineModuleState): Boolean {
+        if (!state.canTransitionTo(next)) return false
+        state = next
+        if (next != OfflineModuleState.DOWNLOADING) percent = 0
+        return true
+    }
+
+    /** Machine-readable state for diagnostics and future native module cards. */
+    @JavascriptInterface
+    fun moduleStatus(): String = org.json.JSONObject()
+        .put("id", "uzbek-stt")
+        .put("state", state.code)
+        .put("percent", percent)
+        .put("active", state.isOperational)
+        .toString()
+
+    /** Loads the native runtime and runs an inference smoke test; only then promotes to READY. */
+    private fun verifyEngine() {
+        if (!modelInstalled) {
+            transition(OfflineModuleState.NOT_INSTALLED)
+            return
+        }
+        transition(OfflineModuleState.INITIALIZING)
+        notifyJs("AvnivoOfflineStatus", "Dvigatel ishga tushirilmoqda…")
+        try {
+            OfflineSpeechEngine(modelDir).use { engine ->
+                engine.prepare()
+                engine.smokeTest()
+            }
+            transition(OfflineModuleState.READY)
+            notifyJs("AvnivoOfflineEngineReady", "O‘zbekcha ovoz tanish dvigateli tayyor")
+        } catch (e: Exception) {
+            transition(OfflineModuleState.INSTALLED)
+            notifyJs("AvnivoOfflineError", "Dvigatelni ishga tushirish xatosi: ${e.message}")
+        } catch (e: UnsatisfiedLinkError) {
+            transition(OfflineModuleState.INSTALLED)
+            notifyJs("AvnivoOfflineError", "Sherpa native kutubxonasi yuklanmadi")
+        }
+    }
+
     inner class Bridge {
         @JavascriptInterface fun status(): String = when {
             busy -> "Jarayon bajarilmoqda…"
-            modelReady -> "O‘zbekcha STT modeli yuklangan (fayllar mavjud)."
+            state.isOperational -> "O‘zbekcha STT modeli yuklangan va dvigatel tayyor."
+            modelInstalled -> "Model fayllari mavjud; dvigatel hali tayyor emas."
             else -> "O‘zbekcha STT modeli hali yuklanmagan (592 MB)."
         }
         @JavascriptInterface fun download() {
             runOnUiThread {
                 if (busy) {
                     notifyJs("AvnivoOfflineStatus", "Oldingi jarayon tugashini kuting.")
-                } else if (modelReady) {
+                } else if (state.isOperational) {
                     notifyJs("AvnivoOfflineStatus", "Model allaqachon yuklangan.")
                 } else {
                     AlertDialog.Builder(this@MainActivity)
@@ -78,10 +129,11 @@ class MainActivity : Activity() {
                     requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 100)
                     return@runOnUiThread
                 }
-                if (!modelReady) {
+                if (!state.isOperational) {
+                    notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli hali tayyor emas. Model yuklanishi kerak.")
                     AlertDialog.Builder(this@MainActivity)
                         .setTitle("Offline o‘zbekcha ovoz tanish")
-                        .setMessage("Ovoz tanish uchun 592 MB model yuklanishi kerak. Wi-Fi tavsiya etiladi. Yuklaysizmi?")
+                        .setMessage("Ovoz tanish uchun 592 MB model yuklanishi va dvigatel tayyor bo‘lishi kerak. Wi-Fi tavsiya etiladi. Yuklaysizmi?")
                         .setNegativeButton("Bekor qilish", null)
                         .setPositiveButton("Yuklash") { _, _ -> downloadModel() }
                         .show()
@@ -95,21 +147,28 @@ class MainActivity : Activity() {
     private fun downloadModel() {
         if (busy) return
         busy = true
+        transition(OfflineModuleState.DOWNLOADING)
         worker.execute {
             try {
                 VerifiedModelDownloader(modelDir).download(
                     { notifyJs("AvnivoOfflineStatus", it) },
-                    { done, total -> notifyJs("AvnivoOfflineProgress", "$done/$total") }
+                    { done, total ->
+                        percent = if (total > 0) ((done * 100) / total).toInt().coerceIn(0, 100) else 0
+                        notifyJs("AvnivoOfflineProgress", "$done/$total")
+                    }
                 )
-                notifyJs("AvnivoOfflineStatus", "Model yuklandi. Mikrofonni qayta bosing.")
+                transition(OfflineModuleState.VERIFYING)
+                transition(OfflineModuleState.INSTALLED)
+                verifyEngine()
             } catch (e: Exception) {
+                transition(OfflineModuleState.ERROR)
                 notifyJs("AvnivoOfflineError", "Model yuklash xatosi: ${e.message}")
             } finally { busy = false }
         }
     }
 
     private fun recognize() {
-        if (busy) return
+        if (busy || !state.isOperational) return
         busy = true
         val capture = OfflinePcmRecorder(this)
         recorder = capture
@@ -137,7 +196,7 @@ class MainActivity : Activity() {
     override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(code, permissions, results)
         if (code == 100 && results.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-            if (modelReady) recognize() else notifyJs("AvnivoOfflineError", "Modelni yuklash uchun mikrofonni qayta bosing.")
+            if (state.isOperational) recognize() else notifyJs("AvnivoOfflineError", "Modelni yuklash uchun mikrofonni qayta bosing.")
         else if (code == 100) notifyJs("AvnivoOfflineError", "Mikrofon ruxsati berilmadi")
     }
 

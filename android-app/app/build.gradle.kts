@@ -15,4 +15,6 @@ android {
 dependencies {
  implementation("androidx.core:core-ktx:1.15.0")
  implementation(files("libs/sherpa-onnx-2.0.1.aar"))
+ testImplementation("junit:junit:4.13.2")
+ testImplementation("org.json:json:20240303")
 }

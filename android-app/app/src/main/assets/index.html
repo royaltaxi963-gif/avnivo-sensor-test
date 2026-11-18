@@ -1086,15 +1086,22 @@ window.AvnivoOfflineProgress=function(raw){
 };
 window.AvnivoOfflineStatus=function(message){
  offlineNotice.textContent=String(message||'');
- if(String(message||'').includes('Model yuklandi'))updateOfflineModule('uz-stt','ready');
- if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.status){
-  try{if(window.AvnivoOfflineSTT.status().includes('yuklangan'))updateOfflineModule('uz-stt','ready')}
-  catch(e){}
- }
+ // Never promote to ready from a status string: only a verified engine may activate the module.
+ // Any native status means the gesture is over; restore the composer visual state.
+ shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
+};
+window.AvnivoOfflineEngineReady=function(message){
+ // Emitted by the native bridge only after runtime init + inference smoke test succeed.
+ offlineNotice.textContent=String(message||'');
+ shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
+ updateOfflineModule('uz-stt','ready');
 };
 window.AvnivoOfflineError=function(message){
  const error=String(message||'Noma’lum xatolik');
  offlineNotice.textContent='Offline STT: '+error;
+ // Native session ended (or failed): restore the composer visual state.
+ shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
+ hint('Offline STT: '+error);
  updateOfflineModule('uz-stt','error');
  const row=offlineList.querySelector('[data-module-id="uz-stt"]');
  if(row){
@@ -1104,14 +1111,19 @@ window.AvnivoOfflineError=function(message){
 };
 window.AvnivoOfflineResult=function(text){
  if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
  const spoken=String(text||'').trim();
  if(!spoken){hint('Nutq aniqlanmadi');return}
  input.value=appendTranscript(input.value,spoken);
  persistDraft();resize();syncComposerMode();hint('Ovoz matnga aylantirildi');
 };
-if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.status){
- try{if(window.AvnivoOfflineSTT.status().includes('yuklangan'))updateOfflineModule('uz-stt','ready')}
- catch(e){}
+if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.moduleStatus){
+ try{
+  const raw=window.AvnivoOfflineSTT.moduleStatus();
+  const info=typeof raw==='string'?JSON.parse(raw):raw;
+  if(info&&info.state==='ready')updateOfflineModule('uz-stt','ready');
+  else if(info&&info.state==='initializing')updateOfflineModule('uz-stt','verifying');
+ }catch(e){}
 }
 
 const historyStorageKey='avnivo.preview.chat-history.v1';
@@ -1586,8 +1598,9 @@ async function stopVoice(){
 async function startVoice(){
  if(document.documentElement.dataset.avnivoMode==='offline'){
   if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
-  try{window.AvnivoOfflineSTT.start();hint('Ovoz yozish boshlandi. Tugatish uchun mikrofonni qayta bosing.')}
-  catch(e){hint('Offline STT xatosi: '+e.message)}
+  // Native bridge reports real state (permission, model readiness, runtime errors) via AvnivoOffline*.
+  try{window.AvnivoOfflineSTT.start()}
+  catch(e){hint('Offline STT xatosi: '+(e&&e.message||e))}
   return;
  }
  if(!navigator.mediaDevices?.getUserMedia){return}
@@ -1747,8 +1760,14 @@ function finishHold(cancel=false){
  syncComposerMode();
 }
 function beginHold(){
- if(document.documentElement.dataset.avnivoMode==='offline' && window.AvnivoOfflineSTT){
-  try{window.AvnivoOfflineSTT.start();hint('Offline nutq tanilmoqda…')}catch(e){hint('Offline STT xatosi: '+e.message)}
+ if(document.documentElement.dataset.avnivoMode==='offline'){
+  if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
+  // The native bridge owns recording start/stop, permission prompts and error reporting.
+  // Reuse the existing recording appearance/animation while the native session is active.
+  shell.classList.add('hold-voice');shell.classList.remove('text-mode');
+  mic.setAttribute('aria-label','Yozishni tugatish uchun bosing');
+  try{window.AvnivoOfflineSTT.start()}
+  catch(e){shell.classList.remove('hold-voice');hint('Offline STT xatosi: '+(e&&e.message||e))}
   return;
  }
  if(active||holdStarted)return;

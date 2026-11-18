@@ -31,6 +31,15 @@ jobs:
           mkdir -p app/libs
           curl --fail --location --retry 3 --output app/libs/sherpa-onnx-2.0.1.aar https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.1/sherpa-onnx-2.0.1.aar
           test -s app/libs/sherpa-onnx-2.0.1.aar
+      - name: Run JVM unit tests
+        run: gradle --no-daemon testDebugUnitTest
+      - name: Upload unit test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-unit-test-reports
+          path: android-app/app/build/reports/tests/testDebugUnitTest
+          if-no-files-found: warn
       - name: Build integrated APK
         run: gradle --no-daemon assembleDebug
       - uses: actions/upload-artifact@v4
