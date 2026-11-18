@@ -59,13 +59,22 @@ Scope: offline engines only. No redesign, no online-path changes.
   - SHA-256 `bc6f50010d827f74b37e5dc3a8555ba6d8d0165bfa083d938dabf7b9532f20fb`.
   - `Displayed com.avnivo.translator/.MainActivity for user 0: +6s396ms`; no fatal exception.
   - Note: debug APKs embed build timestamps, so the SHA-256 differs per build; the value above is
-    for the exact artifact of run 44414437306.
+    for the exact artifact of run 14414437306.
+- On-device instrumented tests (run 44416575550, job 135199150422, both passed):
+  - `OfflineEngineInstrumentedTest`: `System.loadLibrary("sherpa-onnx-jni")` succeeds on the x86_64
+    device ABI, and `OfflineSpeechEngine.prepare()` fails closed when the model is absent.
+  - `OfflineRealInferenceTest` (`OK (1 test)`, 41.5 s): the emulator downloaded the real 592 MB
+    model through `VerifiedModelDownloader`, initialized the native engine, ran the silence smoke
+    test, and transcribed the bundled real Uzbek utterance `uzbek_calm_intro_16k.wav` with word
+    recall >= expected-1. This is real on-device inference, not a mock.
+  - Limitation: audio is fed as a bundled WAV, not captured live from the microphone. Live-mic
+    capture still needs a physical device (or an emulator mic-injection harness).
 
 ## Module verification
 
 | Module | Model source | Download | Integrity | Runtime | Real inference | Offline | Android integration | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Uzbek STT | user-supplied archive, live ticket | verified (200) | SHA-256 matched | sherpa-onnx 2.0.1 NeMo CTC int8 | 9/9 word recall on real Uzbek audio (Linux) | yes (no network at decode) | APK wiring done | IMPLEMENTED — DEVICE TEST PENDING |
+| Uzbek STT | user-supplied archive, live ticket | verified (200) | SHA-256 matched | sherpa-onnx 2.0.1 NeMo CTC int8 | 9/9 word recall (Linux) and on-device emulator test OK | yes (no network at decode) | APK wiring done | VERIFIED WORKING (emulator); physical device pending |
 | Navoiy TTS | aisha-org/navoiy-tts (CosyVoice2 + emotion checkpoint, PyTorch) | ticket 200, 22 files | sha256 in manifest | requires PyTorch + CUDA/GPU (CosyVoice2) | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
 | MMS TTS | facebook/mms-tts (VITS, PyTorch/safetensors) | ticket 200, 6 files | sha256 in manifest | requires PyTorch VITS runtime | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
 | Whisper Small (`whisper-small-q8`) | whisper.cpp (documented plan only) | 404 | n/a | whisper.cpp not integrated | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
@@ -91,15 +100,14 @@ No model URL, checksum, license, or capability was invented anywhere in this wor
 1. Push branch, open one consolidated PR. — done (PR #28, draft).
 2. Run GitHub Actions APK workflow; download and record APK SHA-256. — done.
 3. CI emulator smoke: install + launch + crash check. — done (passed).
-4. Real Uzbek-speech inference *on the Android device/emulator* and the airplane-mode re-test.
-   The model+runtime are proven correct on Linux and the app installs/launches on the emulator,
-   but no automated test yet feeds real microphone audio through the on-device engine. This needs
-   either a physical device or an emulator audio-injection harness. Not yet done.
-5. Integrate Navoiy/MMS TTS runtimes or report precise blockers. — classified BLOCKED with evidence.
-6. Confirm no online-path regression. — diff shows no online files changed; runtime UI parity not
+4. Real on-device inference on the emulator. — done (passed).
+5. Live-microphone capture path on a physical device (or emulator mic injection). The engine and
+   WAV inference are proven on-device; only live-mic capture is unverified automatically.
+6. Integrate Navoiy/MMS TTS runtimes or report precise blockers. — classified BLOCKED with evidence.
+7. Confirm no online-path regression. — diff shows no online files changed; runtime UI parity not
    machine-verified beyond successful launch.
 
 ## Next exact action
 
-Feed a known Uzbek WAV through the on-device engine (emulator `adb` audio injection or a physical
-device) to close the remaining on-device inference gap; otherwise report it as the open limitation.
+Optionally add an emulator microphone-injection step, or record the live-mic gap as the only
+remaining unverified item, then finalize the PR report.
