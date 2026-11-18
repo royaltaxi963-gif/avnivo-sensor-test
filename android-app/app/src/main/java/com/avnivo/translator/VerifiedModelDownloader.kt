@@ -18,6 +18,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
 
     fun download(progress: (String) -> Unit, bytesProgress: (Long, Long) -> Unit) {
         require(directory.mkdirs() || directory.isDirectory) { "Cannot create model directory" }
+        progress("Model serveriga ulanmoqda…")
         val ticket = JSONObject(readHttps(API))
         require(ticket.getString("model_id") == "uzbek-stt") { "Unexpected model" }
         val files = ticket.getJSONArray("files")
@@ -66,7 +67,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
     private fun readHttps(url: String): String {
         val c = connection(url)
         return try {
-            require(c.responseCode == 200) { "Ticket HTTP ${c.responseCode}" }
+            require(c.responseCode == 200) { "Model serveri HTTP ${c.responseCode}: ${c.errorStream?.bufferedReader()?.use { it.readText().take(240) } ?: "javob yo‘q"}" }
             c.inputStream.bufferedReader().use { it.readText() }
         } finally { c.disconnect() }
     }
@@ -76,7 +77,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
         val c = connection(url)
         if (existing > 0) c.setRequestProperty("Range", "bytes=$existing-")
         try {
-            require(c.responseCode == if (existing > 0) 206 else 200) { "Download HTTP ${c.responseCode}" }
+            require(c.responseCode == if (existing > 0) 206 else 200) { "Model fayli HTTP ${c.responseCode}" }
             if (existing > 0) require(c.getHeaderField("Content-Range")?.startsWith("bytes $existing-") == true) { "Resume range mismatch" }
             val digest = MessageDigest.getInstance("SHA-256")
             var total = existing
