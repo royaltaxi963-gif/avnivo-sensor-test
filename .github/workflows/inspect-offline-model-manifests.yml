@@ -1,0 +1,41 @@
+name: Inspect offline model manifests (read-only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Inspect manifest structure and required files
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUCKET=avnivo-offline-models-792624108019
+          for PREFIX in stt/whisper-small-q8 stt/whisper-large-v3-turbo translation/nllb-200-600m-int8 translate/nllb-200-600m-int8 tts/uzbek/navoiy tts/mms; do
+            echo "::group::$PREFIX"
+            gcloud storage ls "gs://$BUCKET/$PREFIX/**" 2>/dev/null | head -40 || true
+            echo "::endgroup::"
+          done
+          python3 - <<'PY'
+          import subprocess,json
+          b='gs://avnivo-offline-models-792624108019'
+          for prefix in ['tts/uzbek/navoiy','tts/mms/rus','tts/mms/eng','tts/mms/uzb']:
+              path=f'{b}/{prefix}/avnivo-manifest.json'
+              r=subprocess.run(['gcloud','storage','cat',path],capture_output=True,text=True)
+              if r.returncode: print(prefix,'NO MANIFEST');continue
+              try:
+                  obj=json.loads(r.stdout)
+                  print(prefix,'manifest fields:',list(obj) if isinstance(obj,dict) else type(obj).__name__)
+                  for k,v in obj.items():
+                      if isinstance(v,list): print(' ',k,'items:',len(v),'first item keys:',list(v[0]) if v and isinstance(v[0],dict) else 'not objects')
+                      elif isinstance(v,dict): print(' ',k,'keys:',list(v))
+                      else: print(' ',k,'type:',type(v).__name__)
+              except Exception as e: print(prefix,'INVALID JSON:',type(e).__name__)
+          PY
