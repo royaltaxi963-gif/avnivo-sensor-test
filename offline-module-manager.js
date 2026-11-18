@@ -65,6 +65,7 @@ function mount(){
   function refresh(){
    const b=bridge(),data=read(mod.id);
    const phase=String(data?.state||'not_installed');
+   const supported=!!b&&typeof b.supports==='function'&&b.supports(mod.id)===true;
    installed=!!b&&(phase==='installed'||phase==='active');
    const percent=Number(data?.percent);
    const loading=!!b&&(phase==='downloading'||phase==='activating');
@@ -79,7 +80,7 @@ function mount(){
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18H6a4 4 0 0 1-.5-7.97A7 7 0 0 1 19 9.5a4.5 4.5 0 0 1-.5 8.5H17"/><path d="M12 11v10m-4-4 4 4 4-4"/></svg>';}
    action.setAttribute('aria-label',installed?mod.name+' modulini o‘chirish':mod.name+' modulini yuklab olish');
    action.title=action.getAttribute('aria-label');
-   action.disabled=!b||loading||(!installed&&!mod.ready)||(!installed&&typeof b.download!=='function')||(installed&&typeof b.remove!=='function');
+   action.disabled=!b||loading||(!installed&&(!mod.ready||!supported))||(!installed&&typeof b.download!=='function')||(installed&&typeof b.remove!=='function');
    progress.hidden=!loading;progressText.hidden=!loading;
    if(loading){const p=Number.isFinite(percent)?Math.max(0,Math.min(100,percent)):0;progress.value=p;progressText.textContent=phase==='activating'?'Faollashtirilmoqda…':Math.round(p)+'% yuklandi';}
    if(!b)status.textContent='Hozircha faqat ko‘rish mumkin — APK yuklash xizmati ulanmagan';
@@ -87,13 +88,14 @@ function mount(){
    else if(loading)status.textContent=phase==='activating'?'Faollashtirilmoqda…':'Yuklanmoqda…';
    else if(phase==='error')status.textContent='Xato: '+String(data?.message||'Yuklash bajarilmadi');
    else if(!mod.ready)status.textContent='Model fayllari aniqlanmaguncha yuklab bo‘lmaydi';
+   else if(!supported)status.textContent='Server fayllari mavjud, ammo Android ijro moduli tasdiqlanmagan';
    else status.textContent='Yuklab olinmagan';
   }
   action.addEventListener('click',()=>{
    const b=bridge();if(!b)return;
    try{
     if(installed){if(!window.confirm(mod.name+' modulini telefondan o‘chirasizmi?'))return;b.remove(mod.id)}
-    else if(mod.ready)b.download(mod.id);
+    else if(mod.ready&&typeof b.supports==='function'&&b.supports(mod.id)===true)b.download(mod.id);
     refresh();
    }catch(e){status.textContent='Xato: '+String(e?.message||e)}
   });
