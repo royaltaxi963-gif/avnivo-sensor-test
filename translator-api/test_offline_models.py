@@ -92,3 +92,26 @@ def test_nested_model_file_disposition_uses_basename(monkeypatch):
         dispositions = [call.kwargs["response_disposition"] for call in blob.generate_signed_url.call_args_list]
         assert all("/" not in value for value in dispositions)
         assert len(dispositions) == len(load_verified_models()["navoiy-tts"])
+
+
+def test_catalog_only_advertises_verified_assets_without_signed_urls():
+    response = client.get("/api/offline-models/catalog")
+    assert response.status_code == 200
+    data = response.json()
+    models = {m["model_id"]: m for m in data["models"]}
+    assert {"uzbek-stt", "navoiy-tts", "mms-tts"}.issubset(models)
+    assert not {"whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8"} & models.keys()
+    assert models["navoiy-tts"]["file_count"] == 22
+    assert models["mms-tts"]["file_count"] == 6
+    assert all(m["total_bytes"] > 0 and m["runtime_verified"] is False for m in models.values())
+    assert "url" not in response.text.lower()
+    assert "sha256" not in response.text.lower()
+
+
+def test_catalog_browser_cors():
+    response = client.get(
+        "/api/offline-models/catalog",
+        headers={"Origin": "https://royaltaxi963-gif.github.io"},
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "https://royaltaxi963-gif.github.io"
