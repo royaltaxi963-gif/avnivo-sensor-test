@@ -3,9 +3,11 @@
 (function(){
 'use strict';
 const modules=[
- {id:'uzbek-stt',name:'O‘zbekcha ovoz tanish',size:'ZIP ~431,5 MB · ONNX 591,6 MB',sizeBytes:591649160,description:'Internetsiz o‘zbekcha nutqni matnga aylantiradi.',ready:false},
- {id:'whisper-small',name:'Whisper Small Multilingual',size:'466 MiB',sizeBytes:488636416,description:'Internetsiz nutqni matnga aylantiradi.',ready:true},
- {id:'nllb-int8',name:'NLLB-200 600M INT8',size:'Taxminan 895 MB (tasdiqlanmagan)',sizeBytes:null,description:'Internetsiz matnni boshqa tilga tarjima qiladi.',ready:false}
+ {id:'uzbek-stt',name:'O‘zbekcha ovoz tanish',size:'591,6 MB',sizeBytes:591649571,description:'Internetsiz o‘zbekcha nutqni matnga aylantiradi.',ready:true},
+ {id:'whisper-small-q8',name:'Whisper Small Multilingual',size:'Fayllar tasdiqlanmagan',sizeBytes:null,description:'Internetsiz nutqni matnga aylantiradi.',ready:false},
+ {id:'nllb-200-600m-int8',name:'NLLB-200 600M INT8',size:'Taxminan 895 MB (tasdiqlanmagan)',sizeBytes:null,description:'Internetsiz matnni boshqa tilga tarjima qiladi.',ready:false}
+ ,{id:'navoiy-tts',name:'Navoiy o‘zbekcha TTS',size:'2 GB dan ortiq',sizeBytes:null,description:'O‘zbekcha ovoz sintezi. Android ijro dvigateli talab qilinadi.',ready:true}
+ ,{id:'mms-tts',name:'MMS ruscha TTS',size:'291 MB atrofida',sizeBytes:null,description:'Ruscha ovoz sintezi. Android ijro dvigateli talab qilinadi.',ready:true}
 ];
 const css=document.createElement('style');
 css.textContent=`
