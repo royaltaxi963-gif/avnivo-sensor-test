@@ -29,10 +29,13 @@ jobs:
         run: |
           set -euo pipefail
           PROJECT=project-6bcf7fe6-cb55-49b7-9f4
-          SERVICE=avnivo-sensor-test
+          SERVICE=avnivo-translation-test
           REGION=europe-west1
           BUCKET=avnivo-offline-models-792624108019
           gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT" >/dev/null
+          URL="$(gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT" --format='value(status.url)')"
+          [[ "$URL" == *"avnivo-translation-test"* ]] || { echo "::error::Unexpected target service URL: $URL"; exit 1; }
+          echo "Target URL: $URL"
           SA="$(gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT" --format='value(spec.template.spec.serviceAccountName)')"
           if [[ -z "$SA" ]]; then
             NUMBER="$(gcloud projects describe "$PROJECT" --format='value(projectNumber)')"
@@ -54,3 +57,10 @@ jobs:
           gcloud iam service-accounts add-iam-policy-binding "$SA" --project="$PROJECT" --member="serviceAccount:$SA" --role="roles/iam.serviceAccountTokenCreator"
           gcloud run services update "$SERVICE" --region "$REGION" --project "$PROJECT" --update-env-vars="AVNIVO_SIGNER_SERVICE_ACCOUNT=$SA,AVNIVO_MODEL_BUCKET=$BUCKET"
           echo "IAM and signer env applied. Confirm deployed backend revision and ticket response separately."
+          STATUS="$(curl -sS -o /tmp/model-ticket-response.json -w '%{http_code}' "$URL/api/offline-models/uzbek-stt/download-ticket" || true)"
+          echo "Model ticket HTTP status: $STATUS"
+          if [[ "$STATUS" != 200 ]]; then
+            echo "::error::Live model ticket endpoint is not healthy; inspect Cloud Run revision and service logs"
+            exit 1
+          fi
+          python3 -c 'import json; d=json.load(open("/tmp/model-ticket-response.json")); assert d.get("model_id")=="uzbek-stt" and len(d.get("files",[]))==2; print("Verified two model ticket entries")'
