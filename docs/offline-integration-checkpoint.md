@@ -364,3 +364,26 @@ below; it is **not** verified until that job passes.
 The first `OfflineWhisperInferenceTest` invocation (no inference flag) ran in
 0.05 s and its 4 tests are skipped by `assumeTrue`. Only the second invocation
 with `-e avnivoWhisperInference true` is evidence of inference.
+
+### NLLB-200 translation: real inference measured (run 44587444906)
+
+`nllb-smoke` passed: `OK (6 tests)` in 120 s. `translatesUzbekToRussianOffline`
+downloaded the 916 MB INT8 model, reached `ready`, and produced:
+
+| Input | Output | Latency |
+| --- | --- | --- |
+| `Salom, qalaysiz?` | `Привет, как вы?` | 3,866 ms |
+| `Bugun havo juda issiq.` | `It's very hot today.` | 4,265 ms |
+| `Rahmat` | `Спасибо` | 1,553 ms |
+
+Logged by the test itself (`AvnivoNllb` tag in `logcat_nllb.txt`). Translations
+are correct and the engine instance is reused across calls, so this is genuine
+offline inference, not a stub.
+
+**Caveat that this run does not close:** the job comment claimed the device had
+no network access, but no step disabled networking, and logcat shows requests to
+the model host while downloading. So this run proves translation works, not that
+it works with the network down. Commit `daf4112` adds an offline re-verification
+stage (disable wifi/data/airplane mode, assert the network is down, repeat the
+suites) to both `nllb-smoke` and `emulator-smoke`. The offline result is
+**unverified** until that stage runs.
