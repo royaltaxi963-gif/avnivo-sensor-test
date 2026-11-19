@@ -448,3 +448,17 @@ MMS is additionally licensed CC-BY-NC-4.0, so redistributing it needs an owner
 decision independent of the hosting gap. Both modules stay registered as
 `OfflineEngineKind.UNAVAILABLE` with a blocker string, so the settings card explains
 the real reason and `download()` refuses instead of failing obscurely.
+
+### Uzbek STT offline operation: VERIFIED (run 44598239880, commit da08080)
+
+With wifi, mobile data and airplane mode disabled and `NETWORK_DOWN` confirmed,
+`OfflineRealInferenceTest` passed offline: `OK (1 test)` in 4.6 s, against 91.8 s
+for the online run. The model was already installed, so the faster time reflects
+reuse rather than a weaker check: the same assertion on Uzbek word recall ran.
+
+That job then failed, but not on a test. The multi-line `if` block around the
+optional Whisper offline stage broke, because `android-emulator-runner` feeds the
+script to `sh` one line at a time, producing `Syntax error: end of file unexpected
+(expecting "fi")`. Every suite before it had already passed. `a67a49e` collapses
+the block onto a single line and a scanner now checks all script lines for
+multi-line control structures.
