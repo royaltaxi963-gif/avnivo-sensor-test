@@ -58,6 +58,9 @@ jobs:
       - name: Run offline translation routing tests
         working-directory: .
         run: node --test tests/offline-translation/route.test.mjs
+      - name: Run model integrity tests
+        working-directory: .
+        run: node --test tests/offline-sha256.test.cjs
       - name: Upload unit test reports
         if: always()
         uses: actions/upload-artifact@v4
