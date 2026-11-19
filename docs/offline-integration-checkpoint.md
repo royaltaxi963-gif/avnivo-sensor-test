@@ -122,16 +122,17 @@ Blocker detail (evidence, not assumption):
 
 No model URL, checksum, license, or capability was invented anywhere in this work.
 
-## Final artifact (run 44429259410, HEAD a1065b5)
+## Final artifact (run 44430821489, HEAD 6d84b12)
 
 - Release APK artifact: `avnivo-translator-release-apk` (GitHub Actions artifact,
   built by the `update-install` job).
 - Package `com.avnivo.translator`, versionCode 101, versionName 1.0.0, minSdk 26, targetSdk 35.
-- SHA-256 `60729f65ad14412fc7e3c32da01123a0714006984eb093504cf3578fd931fbe5`
-  (128,206,663 bytes).
-- Signed with the CI release key `CN=AVNIVO CI, O=AVNIVO`; in-place update verified on
-  the emulator. This is a GitHub Actions artifact, not a GitHub Release (no production
-  release is published without approval).
+- ABIs: arm64-v8a, armeabi-v7a, x86, x86_64.
+- SHA-256 `5e3271fdb225923f8a48955d814e6e695f7af4b65fc6552d6c6c6d134dccf0a5`
+  (128,206,663 bytes). The hash is per-run because the artifact is signed with the
+  ephemeral CI key; the APK installs and updates in place (verified in `update-install`).
+- This is a GitHub Actions artifact, not a GitHub Release (no production release is
+  published without approval).
 
 ## Remaining
 
