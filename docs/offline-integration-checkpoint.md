@@ -277,3 +277,42 @@ translation run is the opt-in `nllb-smoke` CI job.
 2. Dispatch with `run_large_model_verification: true` for Whisper Large V3 Turbo.
 3. Integrate Navoiy/MMS TTS runtimes or record the precise blocker (currently BLOCKED with evidence).
 4. Physical-device check (Samsung Galaxy S23 Ultra) for live-microphone capture and Large-model RAM.
+
+## Regression evidence vs the protected original (`05429fee`)
+
+Measured with `git diff 05429fee35166ea07e22923f8235ef2e61ee8d3a HEAD`.
+
+The shipped UI is `android-app/app/src/main/assets/index.html`, derived from the
+original `onboarding-tutorial-preview.html`. Diffing those two files directly is
+the meaningful regression check, because the repository-root `index.html` is a
+separate development page that the APK does not package (it is not referenced by
+`build.gradle.kts`, `settings.gradle.kts`, or the Android workflow).
+
+Original UI -> shipped UI: **220 insertions, 13 deletions**, and every deleted
+line was re-added in modified form. Each was verified present afterwards:
+
+| Deleted line | Status in shipped UI |
+| --- | --- |
+| `if(!erasing){` brand typing loop | present, 1 occurrence |
+| `modeOnline` / `modeOffline` click handlers | present, 2 occurrences |
+| `multilingual-stt` and `multilingual-stt-large` catalog rows | present, 4 occurrences |
+| saved-conversation init comment | present |
+| `typeTranslation(...)` preview branch | present |
+| `const wasHold=...` hold-state capture | present |
+| `mic.addEventListener('pointercancel', ...)` | present, 3 occurrences |
+| `pagehide` cleanup listener | present, 2 occurrences |
+| `</html>` | present |
+
+Original feature markers are unchanged, count-for-count against the original:
+
+| Marker | Original | Shipped |
+| --- | --- | --- |
+| `SpeechRecognition` | 1 | 1 |
+| `speechSynthesis` | 3 | 3 |
+| `speak-message` | 2 | 2 |
+| `language-chip` | 5 | 5 |
+| `history-drawer` | 3 | 3 |
+| `mode-switch` | 2 | 2 |
+
+So the online STT, online TTS, language selector, history drawer and the
+online/offline switch are all intact, and the offline additions are additive.
