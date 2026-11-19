@@ -47,8 +47,8 @@ class OfflineMicGestureInstrumentedTest {
             web.set(view)
         }
         assertTrue("interface did not load", loaded.await(30, TimeUnit.SECONDS))
-        // Offline mode is what the native bridge targets.
-        evaluate(web.get(), "document.documentElement.dataset.avnivoMode='offline';'ok'")
+        // Offline mode is what the native bridge targets; start from a clean composer.
+        evaluate(web.get(), "localStorage.clear();document.documentElement.dataset.avnivoMode='offline';document.querySelector('.writing-area').value='';'ok'")
         return web.get()
     }
 
