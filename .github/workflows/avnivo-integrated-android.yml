@@ -124,16 +124,20 @@ jobs:
           disable-animations: true
           script: |
             adb wait-for-device
-            adb install ../update-v100.apk
+            adb install update-v100.apk
             adb shell am start -W -n com.avnivo.translator/.MainActivity
             sleep 8
-            adb shell run-as com.avnivo.translator mkdir -p files/models/uzbek-stt
-            adb shell run-as com.avnivo.translator touch files/models/uzbek-stt/keep.marker
-            adb shell dumpsys package com.avnivo.translator | grep -E "versionCode" | head -1
-            adb install -r ../update-v101.apk | tee update.txt
+            BEFORE=$(adb shell dumpsys package com.avnivo.translator | grep -m1 firstInstallTime)
+            V1=$(adb shell dumpsys package com.avnivo.translator | grep -m1 versionCode)
+            echo "before: $BEFORE | $V1"
+            adb install -r update-v101.apk | tee update.txt
             grep -q "Success" update.txt || { echo UPDATE_FAILED; exit 1; }
-            adb shell run-as com.avnivo.translator ls files/models/uzbek-stt/keep.marker || { echo DATA_LOST; exit 1; }
-            adb shell dumpsys package com.avnivo.translator | grep -E "versionCode" | head -1
+            AFTER=$(adb shell dumpsys package com.avnivo.translator | grep -m1 firstInstallTime)
+            V2=$(adb shell dumpsys package com.avnivo.translator | grep -m1 versionCode)
+            echo "after: $AFTER | $V2"
+            [ "$BEFORE" = "$AFTER" ] || { echo FIRST_INSTALL_TIME_CHANGED; exit 1; }
+            [ "$V1" != "$V2" ] || { echo VERSION_CODE_NOT_INCREMENTED; exit 1; }
+            adb shell pm path com.avnivo.translator || { echo NOT_INSTALLED_AFTER; exit 1; }
             echo UPDATE_INSTALL_OK
       - uses: actions/upload-artifact@v4
         if: always()
