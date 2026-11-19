@@ -10,13 +10,18 @@ import java.io.File
 internal data class OfflineModelSpec(
     val id: String,
     val engine: OfflineEngineKind,
-    val files: Map<String, Pair<Long, String>>
+    val files: Map<String, Pair<Long, String>>,
+    /** Bytes of RAM the loaded model needs, from the model's own size and runtime overhead. */
+    val requiredRamBytes: Long = 0L
 ) {
     fun directory(filesDir: File): File = File(filesDir, "models/$id")
 
     fun installed(directory: File): Boolean = files.keys.all { name ->
         File(directory, name).let { it.isFile && it.length() == files.getValue(name).first }
     }
+
+    /** True only when this build can actually run the model; otherwise the card must fail closed. */
+    val runnable: Boolean get() = engine != OfflineEngineKind.UNAVAILABLE && engine != OfflineEngineKind.NLLB_ONNX
 }
 
 internal enum class OfflineEngineKind { UZBEK_NEMO_CTC, WHISPER_GGML, NLLB_ONNX, UNAVAILABLE }
@@ -33,7 +38,10 @@ internal object OfflineModelSpecs {
     private val WHISPER_LARGE = OfflineModelSpec(
         id = "whisper-large-v3-turbo",
         engine = OfflineEngineKind.WHISPER_GGML,
-        files = mapOf("ggml-large-v3-turbo-q5_0.bin" to (574041195L to "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2"))
+        files = mapOf("ggml-large-v3-turbo-q5_0.bin" to (574041195L to "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2")),
+        // whisper.cpp keeps the quantized weights plus decoder/KV buffers resident; 2.5x the
+        // model size is the headroom this build refuses to go below instead of risking an OOM kill.
+        requiredRamBytes = 1_435_000_000L
     )
 
     // Verified from GCS: multilingual-translation/nllb-200-600m-int8/

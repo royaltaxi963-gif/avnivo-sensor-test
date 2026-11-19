@@ -62,7 +62,7 @@ class OfflineWhisperInferenceTest {
             InstrumentationRegistry.getArguments().getString("avnivoWhisperInference") == "true"
         )
 
-        val manager = OfflineModuleManager(context.filesDir) { _, _ -> }
+        val manager = OfflineModuleManager(context.filesDir, context.applicationContext) { _, _ -> }
         try {
             manager.download("whisper-small-q8")
             manager.awaitIdle()
@@ -100,7 +100,7 @@ class OfflineWhisperInferenceTest {
             InstrumentationRegistry.getArguments().getString("avnivoWhisperLargeInference") == "true"
         )
 
-        val manager = OfflineModuleManager(context.filesDir) { _, _ -> }
+        val manager = OfflineModuleManager(context.filesDir, context.applicationContext) { _, _ -> }
         try {
             manager.download("whisper-large-v3-turbo")
             manager.awaitIdle()

@@ -106,4 +106,25 @@ class OfflineModuleManagerTest {
         assertEquals(OfflineModelSpecs.all.size, array.length())
         manager.close()
     }
+
+    @Test fun moduleWithoutRuntimeNeverDownloads() {
+        // NLLB has no on-device runtime in this build, so its card must not fetch ~916 MB first.
+        val spec = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
+        assertFalse(spec.runnable)
+        val manager = manager()
+        manager.download(spec.id)
+        manager.awaitIdle()
+
+        assertEquals("not_installed", JSONObject(manager.status(spec.id)).getString("state"))
+        assertFalse(spec.directory(temp.root).exists())
+        assertTrue(messages.any { it.first == "AvnivoOfflineModuleError" && it.second.startsWith(spec.id) })
+        manager.close()
+    }
+
+    @Test fun everyRunnableModuleHasAVerifiedEngineKind() {
+        for (spec in OfflineModelSpecs.all.values.filter { it.runnable }) {
+            assertEquals(OfflineEngineKind.WHISPER_GGML, spec.engine)
+            assertTrue("${spec.id} needs a verified byte size and hash", spec.files.values.all { it.first > 0 && it.second.length == 64 })
+        }
+    }
 }

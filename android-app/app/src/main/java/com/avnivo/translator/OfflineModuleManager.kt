@@ -1,5 +1,7 @@
 package com.avnivo.translator
 
+import android.app.ActivityManager
+import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Closeable
@@ -13,6 +15,7 @@ import java.util.concurrent.Executors
  */
 internal class OfflineModuleManager(
     private val filesDir: File,
+    private val appContext: Context? = null,
     private val notify: (String, String) -> Unit
 ) {
     private class Module(val spec: OfflineModelSpec) {
@@ -71,6 +74,10 @@ internal class OfflineModuleManager(
     fun download(id: String) {
         val module = modules[id] ?: run {
             notify("AvnivoOfflineModuleError", "$id|Noma’lum offline modul")
+            return
+        }
+        if (!module.spec.runnable) {
+            notify("AvnivoOfflineModuleError", "$id|Bu modul uchun ijro dvigateli hali ulanmagan")
             return
         }
         worker.execute {
@@ -132,6 +139,7 @@ internal class OfflineModuleManager(
 
     private fun buildEngine(spec: OfflineModelSpec, directory: File): Closeable = when (spec.engine) {
         OfflineEngineKind.WHISPER_GGML -> {
+            requireRam(spec)
             val model = directory.listFiles()?.firstOrNull { it.name.endsWith(".bin") }
                 ?: error("Missing ggml model")
             WhisperEngine(model, language = "auto").also { it.prepare(); it.smokeTest() }
@@ -139,6 +147,23 @@ internal class OfflineModuleManager(
         OfflineEngineKind.NLLB_ONNX -> error("NLLB runtime not available in this build")
         OfflineEngineKind.UZBEK_NEMO_CTC -> error("Uzbek engine is managed by the STT bridge")
         OfflineEngineKind.UNAVAILABLE -> error("No engine available for ${spec.id}")
+    }
+
+    /**
+     * Refuses to load a model that cannot fit, so a large model reports a clear error instead of
+     * being killed by the low-memory killer mid-inference.
+     */
+    private fun requireRam(spec: OfflineModelSpec) {
+        if (spec.requiredRamBytes <= 0) return
+        val activityManager = appContext?.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+        val available = activityManager?.let { am ->
+            val info = ActivityManager.MemoryInfo()
+            am.getMemoryInfo(info)
+            info.availMem
+        } ?: return
+        require(available >= spec.requiredRamBytes) {
+            "Not enough memory: needs ${spec.requiredRamBytes / 1024 / 1024} MB, ${available / 1024 / 1024} MB available"
+        }
     }
 
     fun close() {

@@ -55,7 +55,7 @@ class MainActivity : Activity() {
         web.loadUrl("file:///android_asset/index.html")
     }
 
-    private val moduleManager by lazy { OfflineModuleManager(filesDir) { fn, v -> notifyJs(fn, v) } }
+    private val moduleManager by lazy { OfflineModuleManager(filesDir, applicationContext) { fn, v -> notifyJs(fn, v) } }
 
     /** The ready Whisper module id, if any; recognition prefers it over the Uzbek engine. */
     private fun readyWhisper(): String? = when {
