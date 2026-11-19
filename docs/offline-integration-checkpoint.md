@@ -316,3 +316,32 @@ Original feature markers are unchanged, count-for-count against the original:
 
 So the online STT, online TTS, language selector, history drawer and the
 online/offline switch are all intact, and the offline additions are additive.
+
+## Device verification run (emulator), commit 925b7c1
+
+Workflow `avnivo-integrated-android.yml`, run 44582570636, job `emulator-smoke`:
+**success**. Four instrumented suites ran on the Android emulator against the
+installed APK, 16 tests total, all passing:
+
+| Suite | Result |
+| --- | --- |
+| `OfflineEngineInstrumentedTest` | OK (2 tests) |
+| `OfflineMicGestureInstrumentedTest` | OK (6 tests) |
+| `OfflineRealInferenceTest` (`-e avnivoRealInference true`) | OK (4 tests) |
+| `OfflineWhisperInferenceTest` (runtime + `-e avnivoWhisperInference true`) | OK (4 tests) |
+
+`OfflineRealInferenceTest.transcribesRealUzbekSpeechOffline` downloads the Uzbek
+model, prepares the engine, runs `smokeTest()`, and transcribes the bundled
+`uzbek_calm_intro_16k.wav`, requiring at least 6 of 7 expected Uzbek words. It
+passed, so Uzbek STT inference is real, not mocked.
+
+One failure was found and fixed on the way. The first run of the new mic gesture
+test reported `during:true, after:false, started:1, stopped:1` yet failed: the
+helper trims only the outer quotes of `evaluateJavascript`, so a `JSON.stringify`
+result still contains escaped quotes and the assertion could never match. The
+behaviour under test was already correct; the assertion was wrong. Commit 925b7c1
+compares joined fields instead.
+
+Device gap: this is an emulator, not the Samsung Galaxy S23 Ultra. Physical-device
+verification (real microphone, real thermal and memory pressure) remains
+unverified and is not claimed.
