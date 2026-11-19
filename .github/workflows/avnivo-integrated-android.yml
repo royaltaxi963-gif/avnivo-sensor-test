@@ -253,7 +253,10 @@ jobs:
           api-level: 34
           arch: x86_64
           target: google_apis
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -memory 4096
+          # NLLB-200 needs ~2.7 GB resident for its two ONNX sessions; on a 4 GB AVD the low-memory
+          # killer ended the process mid-run, so this job gives the emulator real headroom.
+          ram-size: 8192
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -memory 8192
           disable-animations: true
           script: |
             set +e

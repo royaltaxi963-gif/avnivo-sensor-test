@@ -107,7 +107,12 @@ struct Runtime {
         }
         if ((status = api->CreateSessionOptions(&options)) ||
             (status = api->SetIntraOpNumThreads(options, 2)) ||
-            (status = api->SetSessionGraphOptimizationLevel(options, ORT_ENABLE_ALL))) {
+            (status = api->SetSessionGraphOptimizationLevel(options, ORT_ENABLE_ALL)) ||
+            // The CPU arena and the memory-pattern planner both pre-allocate for the worst case.
+            // Measured on this 600M INT8 model they add ~1 GB of resident memory, which is what got
+            // the process killed by the low-memory killer; disabling them costs a little speed.
+            (status = api->DisableCpuMemArena(options)) ||
+            (status = api->DisableMemPattern(options))) {
             error = takeError(api, status);
             return false;
         }

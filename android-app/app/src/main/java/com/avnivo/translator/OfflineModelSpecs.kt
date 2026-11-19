@@ -62,8 +62,10 @@ internal object OfflineModelSpecs {
             "tokenizer_config.json" to (544L to "ddf411c9f790d081e72de76bb8e8b714d74e160e61bc10c9bd8f56022dcd7fd7"),
             "special_tokens_map.json" to (3548L to "992bd4ed610d644d6823081937bcc91bb8878dd556cea4ae5327f2480361330e")
         ),
-        // 600M INT8 weights (~895 MB) stay resident alongside the encoder/decoder activations.
-        requiredRamBytes = 1_800_000_000L
+        // Measured peak resident memory for both ONNX sessions plus a decode pass: 2703 MB with the
+        // CPU arena disabled. The earlier 1800 MB figure only covered the weights and under-reported
+        // the real requirement, so the guard has to use the measured peak plus headroom.
+        requiredRamBytes = 2_900_000_000L
     )
 
     /**
