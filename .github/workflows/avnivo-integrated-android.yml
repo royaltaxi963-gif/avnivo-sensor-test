@@ -127,18 +127,7 @@ jobs:
             adb install update-v100.apk
             adb shell am start -W -n com.avnivo.translator/.MainActivity
             sleep 8
-            BEFORE=$(adb shell dumpsys package com.avnivo.translator | grep -m1 firstInstallTime)
-            V1=$(adb shell dumpsys package com.avnivo.translator | grep -m1 versionCode)
-            echo "before: $BEFORE | $V1"
-            adb install -r update-v101.apk | tee update.txt
-            grep -q "Success" update.txt || { echo UPDATE_FAILED; exit 1; }
-            AFTER=$(adb shell dumpsys package com.avnivo.translator | grep -m1 firstInstallTime)
-            V2=$(adb shell dumpsys package com.avnivo.translator | grep -m1 versionCode)
-            echo "after: $AFTER | $V2"
-            [ "$BEFORE" = "$AFTER" ] || { echo FIRST_INSTALL_TIME_CHANGED; exit 1; }
-            [ "$V1" != "$V2" ] || { echo VERSION_CODE_NOT_INCREMENTED; exit 1; }
-            adb shell pm path com.avnivo.translator || { echo NOT_INSTALLED_AFTER; exit 1; }
-            echo UPDATE_INSTALL_OK
+            BEFORE=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 firstInstallTime); V1=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 versionCode); echo "before: $BEFORE | $V1"; [ -n "$BEFORE" ] && [ -n "$V1" ] || { echo NO_BASELINE; exit 1; }; adb install -r update-v101.apk | tee update.txt; grep -q "Success" update.txt || { echo UPDATE_FAILED; exit 1; }; AFTER=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 firstInstallTime); V2=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 versionCode); echo "after: $AFTER | $V2"; [ "$BEFORE" = "$AFTER" ] || { echo FIRST_INSTALL_TIME_CHANGED; exit 1; }; [ "$V1" != "$V2" ] || { echo VERSION_CODE_NOT_INCREMENTED; exit 1; }; adb shell pm path com.avnivo.translator || { echo NOT_INSTALLED_AFTER; exit 1; }; echo UPDATE_INSTALL_OK
       - uses: actions/upload-artifact@v4
         if: always()
         with:
