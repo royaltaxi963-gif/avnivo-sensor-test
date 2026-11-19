@@ -6,6 +6,10 @@ on:
         description: 'Also verify Whisper Large V3 Turbo on the emulator (long, ~1h)'
         type: boolean
         default: false
+      publish_direct_apk:
+        description: 'Publish a public pre-release APK for direct download (requires explicit manual selection and stable signing secrets)'
+        type: boolean
+        default: false
       run_nllb_verification:
         description: 'Also verify NLLB-200 offline translation on the emulator (long, ~1h)'
         type: boolean
@@ -77,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
-      contents: read
+      contents: write
     defaults:
       run:
         working-directory: android-app
@@ -150,6 +154,25 @@ jobs:
             adb shell am start -W -n com.avnivo.translator/.MainActivity
             sleep 8
             BEFORE=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 firstInstallTime); V1=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 versionCode); echo "before: $BEFORE | $V1"; [ -n "$BEFORE" ] && [ -n "$V1" ] || { echo NO_BASELINE; exit 1; }; adb install -r update-v101.apk | tee update.txt; grep -q "Success" update.txt || { echo UPDATE_FAILED; exit 1; }; AFTER=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 firstInstallTime); V2=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 versionCode); echo "after: $AFTER | $V2"; [ "$BEFORE" = "$AFTER" ] || { echo FIRST_INSTALL_TIME_CHANGED; exit 1; }; [ "$V1" != "$V2" ] || { echo VERSION_CODE_NOT_INCREMENTED; exit 1; }; adb shell pm path com.avnivo.translator || { echo NOT_INSTALLED_AFTER; exit 1; }; echo UPDATE_INSTALL_OK
+      - name: Publish direct APK as prerelease (manual opt-in only)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_direct_apk }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ "${SIGNING_MODE:-}" != "secret" ]; then
+            echo "::error::Stable release signing secrets are required; refusing to publish an ephemeral-signed APK."
+            exit 1
+          fi
+          CODE=$((1000 + GITHUB_RUN_NUMBER))
+          TAG="avnivo-android-test-v${CODE}"
+          cp ../update-v101.apk "../AVNIVO-Translator-v${CODE}.apk"
+          gh release create "$TAG" "../AVNIVO-Translator-v${CODE}.apk" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "AVNIVO Translator Android test v${CODE}" \
+            --notes "Pre-release Android APK. Same stable signing identity required for in-place updates. Install only after backing up existing app data. Not a production release." \
+            --prerelease
+          echo "DIRECT_APK_URL=https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/AVNIVO-Translator-v${CODE}.apk" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
