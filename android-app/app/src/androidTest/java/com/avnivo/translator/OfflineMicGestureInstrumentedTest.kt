@@ -112,13 +112,10 @@ class OfflineMicGestureInstrumentedTest {
                 "m.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
                 "var during=s.classList.contains('hold-voice');" +
                 "m.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
-                "JSON.stringify({during:during,after:s.classList.contains('hold-voice')," +
-                "started:window.__started,stopped:window.__stopped,composer:document.querySelector('.writing-area').value})"
+                "[during,s.classList.contains('hold-voice'),window.__started,window.__stopped," +
+                "document.querySelector('.writing-area').value].join('|')"
         )
-        assertTrue("press must start recording: $value", value.contains("\"during\":true"))
-        assertTrue("release must stop the native recorder: $value", value.contains("\"stopped\":1"))
-        assertTrue("release must clear the recording visual: $value", value.contains("\"after\":false"))
-        assertTrue("release must not write status text: $value", value.contains("\"composer\":\"\""))
+        assertEquals("press must start recording: $value", "true|false|1|1|", value)
     }
 
     /** A release with no matching press must not start or stop anything, and must not throw. */
