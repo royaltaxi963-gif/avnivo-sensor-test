@@ -19,11 +19,16 @@ Scope: offline engines only. No redesign, no online-path changes.
 | JVM unit tests (19) | done, passing |
 | Backend tests (37) | done, passing |
 | Android CI runs unit tests + builds APK | done |
+| Mic waveform follows real native amplitude (Defect A) | done |
+| Press-and-hold recording stops on release (Defect B) | done |
+| No recording-status text in the composer (Defect C) | done |
+| Stable release signing + monotonic versionCode (in-place update) | done |
 
 ## Test evidence (local)
 
-- `gradle testDebugUnitTest`: 19 tests, 0 failures
-  (`OfflineModuleStateTest`, `OfflineSpeechEngineTest`, `VerifiedModelDownloaderTest`)
+- `gradle testDebugUnitTest`: 23 tests, 0 failures
+  (`OfflineModuleStateTest`, `OfflineSpeechEngineTest`, `VerifiedModelDownloaderTest`,
+  `OfflinePcmRecorderAmplitudeTest` — silence is 0, louder speech is larger, bounded to 1).
   - `VerifiedModelDownloaderTest` runs against a real loopback HTTP server (`MiniHttpServer`),
     no network mocks: valid download, corrupt file, missing file, resume, server without Range,
     untrusted host, wrong hash, repeated download.
