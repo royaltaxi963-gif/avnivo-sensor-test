@@ -462,3 +462,37 @@ script to `sh` one line at a time, producing `Syntax error: end of file unexpect
 (expecting "fi")`. Every suite before it had already passed. `a67a49e` collapses
 the block onto a single line and a scanner now checks all script lines for
 multi-line control structures.
+
+### Branch lineage vs the protected commit (important for regression claims)
+
+`05429fee` is **not** an ancestor of this branch. The merge base is `9e0443d`
+(2026-11-16), while the protected commit is from 2026-11-18, and
+`origin/feature/offline-model-downloads-from-05429fee` carries 88 commits that are
+not in this branch's history. A plain
+`git diff 05429fee..HEAD` therefore reports 13 deletions and 6 modifications,
+including files such as `.github/workflows/offline-model-safety.yml` and
+`i18n/avnivo-dynamic-i18n.js`.
+
+Those files never existed on this branch's lineage — they are absent at the merge
+base `9e0443d` as well as at HEAD — so they are **not** deletions made here. They
+appear in the diff only because the two histories are parallel.
+
+The content still converged, which is what actually matters for the interface.
+Comparing the shipped asset directly against the protected file:
+
+| Comparison | Result |
+| --- | --- |
+| `assets/index.html` vs `05429fee:onboarding-tutorial-preview.html` | 220 insertions, 13 deletions |
+| `assets/offline-model-installer.js` vs protected | +5 / -1 |
+| `assets/offline-uzbek-download.js` vs protected | +1 / -1 |
+
+All 13 HTML "deletions" are lines re-added in modified form, and both JS diffs are
+purely additive error diagnostics around the ticket `fetch`. Feature counts line up
+with the protected file: `offline-module` 70 vs 69, `i18n` 40 vs 40, `onboarding`
+4 vs 4. The shipped HTML references only `offline-model-installer.js` and
+`offline-uzbek-download.js`, and both are present, so the protected file's
+standalone `i18n/avnivo-dynamic-i18n.js` is not a missing runtime dependency.
+
+Conclusion: the UI is preserved, but the branch is not a descendant of the protected
+commit. If a strict fast-forward from `05429fee` is required, this branch has to be
+rebased or the integration replayed on top of it.
