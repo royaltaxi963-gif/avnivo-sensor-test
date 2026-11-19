@@ -1,6 +1,11 @@
 name: AVNIVO integrated Android APK
 on:
   workflow_dispatch:
+    inputs:
+      run_large_model_verification:
+        description: 'Also verify Whisper Large V3 Turbo on the emulator (long, ~1h)'
+        type: boolean
+        default: false
   pull_request:
     paths:
       - 'android-app/**'
@@ -211,4 +216,52 @@ jobs:
         with:
           name: avnivo-emulator-logcat
           path: logcat.txt
+          if-no-files-found: warn
+  large-model-smoke:
+    # Opt-in: verifies the 574 MB Whisper Large V3 Turbo model really initializes and infers on a
+    # device. Slow (download + CPU inference), so it never gates the standard pipeline.
+    if: github.event_name == 'workflow_dispatch' && inputs.run_large_model_verification
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-integrated-debug-apk
+          path: apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-androidtest-apk
+          path: androidtest
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify Whisper Large V3 Turbo on the emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -memory 4096
+          disable-animations: true
+          script: |
+            adb wait-for-device
+            adb install -r apk/app-debug.apk
+            adb install -r androidtest/app-debug-androidTest.apk
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperLargeInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_large.txt
+            grep -q "OK (" instrument_whisper_large.txt || { echo WHISPER_LARGE_FAILED; exit 1; }
+            echo WHISPER_LARGE_OK
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avnivo-whisper-large-inference-log
+          path: instrument_whisper_large.txt
           if-no-files-found: warn

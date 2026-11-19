@@ -87,4 +87,41 @@ class OfflineWhisperInferenceTest {
             manager.close()
         }
     }
+
+    /**
+     * Same end-to-end path for the large model (~574 MB). Gated separately because it needs more
+     * RAM and much more time; it proves the large model actually initializes and infers on-device
+     * rather than merely downloading.
+     */
+    @Test
+    fun transcribesKnownEnglishSpeechWithLargeModel() {
+        assumeTrue(
+            "set -e avnivoWhisperLargeInference true to run",
+            InstrumentationRegistry.getArguments().getString("avnivoWhisperLargeInference") == "true"
+        )
+
+        val manager = OfflineModuleManager(context.filesDir) { _, _ -> }
+        try {
+            manager.download("whisper-large-v3-turbo")
+            manager.awaitIdle()
+            val status = JSONObject(manager.status("whisper-large-v3-turbo") ?: "{}")
+            assertTrue(
+                "large module must reach ready after real download + init, was: $status",
+                status.optString("state") == "ready"
+            )
+
+            val asset = InstrumentationRegistry.getInstrumentation().context.assets.open("whisper_jfk_16k.wav")
+            val audio = File(context.cacheDir, "whisper_jfk_large_16k.wav")
+            asset.use { input -> audio.outputStream().use { input.copyTo(it) } }
+            val samples = readWavSamples(audio)
+
+            val text = manager.transcribe("whisper-large-v3-turbo", samples).lowercase()
+            assertFalse("transcription must not be empty", text.isBlank())
+            val expected = listOf("country", "ask", "what", "you", "can", "do", "for")
+            val hits = expected.count { it in text }
+            assertTrue("recall $hits/${expected.size} too low for: $text", hits >= 4)
+        } finally {
+            manager.close()
+        }
+    }
 }

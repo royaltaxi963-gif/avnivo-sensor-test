@@ -97,16 +97,67 @@ Run `44429259410`, HEAD `a1065b5`:
   - Limitation: audio is fed as a bundled WAV, not captured live from the microphone. Live-mic
     capture still needs a physical device (or an emulator mic-injection harness).
 
+## Whisper integration (2026-11-19)
+
+### Why a separate native runtime
+
+The sherpa-onnx AAR only loads ONNX-format Whisper (encoder/decoder). The hosted Whisper models
+are **ggml** files (`ggml-small-q8_0.bin`, `ggml-large-v3-turbo-q5_0.bin`), which sherpa-onnx
+cannot read. A ggml-native runtime was therefore required: whisper.cpp built from source with the
+NDK, wrapped in a narrow JNI bridge.
+
+### Added components
+
+| File | Purpose |
+| --- | --- |
+| `android-app/app/src/main/cpp/CMakeLists.txt` | Builds `libavnivo_whisper.so` against whisper.cpp |
+| `android-app/app/src/main/cpp/avnivo_whisper_jni.cpp` | JNI init / transcribe / release |
+| `.../WhisperEngine.kt` | Kotlin wrapper; `prepare()`, `transcribe()`, `smokeTest()` |
+| `.../OfflineModelSpecs.kt` | Verified ids, sizes, SHA-256 per module |
+| `.../OfflineModuleManager.kt` | Per-module state machine, download, init, dispose |
+| `.../MainActivity.kt` | `AvnivoOfflineModules` JS bridge; mic routed to a ready Whisper engine |
+| `assets/index.html` | Card sync with native state; progress/ready/error callbacks |
+
+`whisper.cpp` is fetched by CI into `app/src/main/cpp/whisper.cpp` and is git-ignored. When the
+source is absent (local builds), the native module is not compiled and the app still builds.
+
+### Local evidence (this workspace)
+
+- `gradle testDebugUnitTest`: **29 tests, 0 failures** (adds `OfflineModuleManagerTest`: unknown id
+  fails closed, catalog only holds real engines, installed model reaches READY, engine failure never
+  reports READY, wrong-size file is not installed, `statusAll` covers every module).
+- `gradle assembleDebug` (x86_64): APK contains `libavnivo_whisper.so`, `libwhisper.so`,
+  `libggml*.so` alongside the sherpa-onnx and ONNX Runtime libraries.
+- `gradle assembleDebugAndroidTest`: compiles.
+
+### On-device evidence (GitHub Actions run 44439575323, HEAD `adf18b6`)
+
+x86_64 API 34 `google_apis` emulator, KVM enabled:
+
+- `OfflineEngineInstrumentedTest`: `OK (2 tests)` — sherpa-onnx runtime loads; Uzbek engine fails closed.
+- `OfflineMicGestureInstrumentedTest`: `OK (4 tests)` — WebView gesture/composer wiring intact.
+- `OfflineRealInferenceTest`: `OK (1 test)` — real 592 MB Uzbek model downloaded, initialized, transcribed.
+- `OfflineWhisperInferenceTest` (runtime layer): `OK (3 tests)` — `libavnivo_whisper` loads on the
+  device ABI and the engine fails closed without a model.
+- `OfflineWhisperInferenceTest` (real inference, 1528 s): `OK (3 tests)` — downloaded the real
+  264,464,607 B `whisper-small-q8` model through the production downloader, SHA-256 verified,
+  ggml runtime initialized, smoke test passed, and the bundled 11 s English utterance transcribed
+  with the expected words. No network is used for inference.
+
+Whisper Large V3 Turbo has its own opt-in job (`large-model-smoke`, dispatch input
+`run_large_model_verification`) because the download plus CPU inference is long; it is not part of
+the default pipeline.
+
 ## Module verification
 
 | Module | Model source | Download | Integrity | Runtime | Real inference | Offline | Android integration | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Uzbek STT | user-supplied archive, live ticket | verified (200) | SHA-256 matched | sherpa-onnx 2.0.1 NeMo CTC int8 | 9/9 word recall (Linux) and on-device emulator test OK | yes (no network at decode) | APK wiring done | VERIFIED WORKING (emulator); physical device pending |
+| Whisper Small (`whisper-small-q8`) | `multilingual-stt/whisper-small-q8_0` in the AVNIVO model bucket, ticket 200 | verified | SHA-256 matched | whisper.cpp v1.7.4 + ggml, NDK-built | on-device emulator: real transcription of a known utterance OK | yes | card + bridge + mic routing done | VERIFIED WORKING (emulator); physical device pending |
+| Whisper Large V3 Turbo (`whisper-large-v3-turbo`) | `multilingual-stt/whisper-large-v3-turbo-q5_0`, ticket 200 | verified | SHA-256 matched | same whisper.cpp runtime | not yet run (opt-in job) | runtime is offline | card + bridge done | IMPLEMENTED — DEVICE TEST PENDING |
+| NLLB-200 (`nllb-200-600m-int8`) | `multilingual-translation/nllb-200-600m-int8`, ticket 200, 8 files | verified | SHA-256 in manifest | no on-device runtime yet | not run | n/a | card + download bridge done | BLOCKED — EXTERNAL DEPENDENCY (runtime not integrated) |
 | Navoiy TTS | aisha-org/navoiy-tts (CosyVoice2 + emotion checkpoint, PyTorch) | ticket 200, 22 files | sha256 in manifest | requires PyTorch + CUDA/GPU (CosyVoice2) | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
 | MMS TTS | facebook/mms-tts (VITS, PyTorch/safetensors) | ticket 200, 6 files | sha256 in manifest | requires PyTorch VITS runtime | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
-| Whisper Small (`whisper-small-q8`) | whisper.cpp (documented plan only) | 404 | n/a | whisper.cpp not integrated | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
-| Whisper Large V3 Turbo | none hosted | 404 | n/a | not integrated | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
-| NLLB-200 (`nllb-200-600m-int8`) | none hosted | 404 | n/a | not integrated | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
 | Large Offline Translation | none identified | n/a | n/a | none | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
 
 Blocker detail (evidence, not assumption):
@@ -158,8 +209,14 @@ No model URL, checksum, license, or capability was invented anywhere in this wor
 
 ## Next exact action
 
-The offline Uzbek STT module is VERIFIED WORKING end to end on the emulator. The
-only automatic-verification gaps are live-mic audio capture on a physical device
-and a stable signing identity (blocked by missing repo-secret permission). No
-further code change is required for these; they need an operator action. Stop and
-report unless new evidence appears.
+The offline Uzbek STT and Whisper Small modules are VERIFIED WORKING end to end on the emulator.
+Remaining work, in priority order:
+
+1. Run the opt-in `large-model-smoke` job (dispatch the workflow with
+   `run_large_model_verification: true`) to move Whisper Large V3 Turbo from
+   "IMPLEMENTED — DEVICE TEST PENDING" to a verified classification.
+2. Integrate an NLLB ONNX runtime (encoder/decoder + SentencePiece tokenizer) if one can be built
+   from the packaged ONNX Runtime; until then the card stays fail-closed.
+3. Physical-device check (Samsung Galaxy S23 Ultra) for live-microphone capture and Large-model RAM
+   behaviour.
+4. Live-microphone capture path on a physical device (or emulator mic injection).
