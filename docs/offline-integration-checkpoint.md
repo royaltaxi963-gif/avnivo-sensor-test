@@ -49,7 +49,29 @@ Scope: offline engines only. No redesign, no online-path changes.
 ## CI evidence
 
 - Workflow: "AVNIVO integrated Android APK" (`.github/workflows/avnivo-integrated-android.yml`).
-- Jobs: `apk` (JVM unit tests + build) then `emulator-smoke` (needs apk).
+- Jobs: `apk` (JVM unit tests + build), `update-install` (release signing + in-place
+  update), `emulator-smoke` (install + launch + instrumented tests).
+
+### Latest run (all green)
+
+Run `44429259410`, HEAD `a1065b5`:
+
+- `apk`: PASS (23 JVM unit tests, APK built).
+- `update-install`: PASS. Two release APKs built with one identity and increasing
+  versionCode; on the emulator `v100` installs, then `adb install -r v101` reports
+  `Success`; `firstInstallTime` is unchanged (2026-11-19 00:17:42) and versionCode
+  goes 100 -> 101, so the update replaced the app in place and kept its data
+  (`UPDATE_INSTALL_OK`). Signing cert DN `CN=AVNIVO CI, O=AVNIVO`.
+- `emulator-smoke`: PASS on x86_64 API 34 google_apis.
+  - `OfflineEngineInstrumentedTest`: `OK (2 tests)` — native Sherpa runtime loads on
+    the device ABI; engine fails closed with no model.
+  - `OfflineMicGestureInstrumentedTest`: `OK (4 tests)` — the packaged interface is
+    loaded in a real WebView; recognized text is inserted into the composer, terminal
+    status/error clear the recording state without writing text, and the amplitude
+    callback is accepted.
+  - `OfflineRealInferenceTest`: `OK (1 test)` — downloads the real 592 MB `uzbek-stt`
+    model through the production downloader, initializes the native engine, and
+    transcribes the bundled 16 kHz Uzbek utterance with word recall 9/9.
 - Emulator smoke (run 44413040002, job 135186695244) — PASSED:
   - x86_64 Android API 34 google_apis emulator, KVM enabled on the runner.
   - `adb install -r app-debug.apk` succeeded.
@@ -100,19 +122,43 @@ Blocker detail (evidence, not assumption):
 
 No model URL, checksum, license, or capability was invented anywhere in this work.
 
+## Final artifact (run 44429259410, HEAD a1065b5)
+
+- Release APK artifact: `avnivo-translator-release-apk` (GitHub Actions artifact,
+  built by the `update-install` job).
+- Package `com.avnivo.translator`, versionCode 101, versionName 1.0.0, minSdk 26, targetSdk 35.
+- SHA-256 `60729f65ad14412fc7e3c32da01123a0714006984eb093504cf3578fd931fbe5`
+  (128,206,663 bytes).
+- Signed with the CI release key `CN=AVNIVO CI, O=AVNIVO`; in-place update verified on
+  the emulator. This is a GitHub Actions artifact, not a GitHub Release (no production
+  release is published without approval).
+
 ## Remaining
 
 1. Push branch, open one consolidated PR. — done (PR #28, draft).
 2. Run GitHub Actions APK workflow; download and record APK SHA-256. — done.
 3. CI emulator smoke: install + launch + crash check. — done (passed).
 4. Real on-device inference on the emulator. — done (passed).
-5. Live-microphone capture path on a physical device (or emulator mic injection). The engine and
-   WAV inference are proven on-device; only live-mic capture is unverified automatically.
-6. Integrate Navoiy/MMS TTS runtimes or report precise blockers. — classified BLOCKED with evidence.
-7. Confirm no online-path regression. — diff shows no online files changed; runtime UI parity not
-   machine-verified beyond successful launch.
+5. Mic gesture/composer wiring on-device (WebView). — done (4 tests passed).
+6. Stable release signing for frictionless in-place update. — mechanism done and
+   proven in CI (two APKs, one identity, `adb install -r` succeeds, data kept).
+   Residual gap: the published artifact is signed with a per-run ephemeral key
+   because this token cannot write repository secrets (HTTP 403 on
+   `actions/secrets`). To publish a stable identity, a repo admin must add
+   `AVNIVO_KEYSTORE_BASE64`, `AVNIVO_KEYSTORE_PASSWORD`, `AVNIVO_KEY_ALIAS`,
+   `AVNIVO_KEY_PASSWORD`; the workflow already consumes them when present.
+7. Live-microphone capture path on a physical device (or emulator mic injection).
+   The engine, WAV inference, and WebView gesture/composer wiring are proven
+   on-device; only live-mic audio capture into the engine is unverified automatically.
+8. Integrate Navoiy/MMS TTS runtimes or report precise blockers. — classified BLOCKED with evidence.
+9. Confirm no online-path regression. — `index.html` diff is offline-only (offline
+   waveform driver, gesture handling, bridge handlers); no visual/CSS/markup or
+   online-path change. Runtime UI parity is not machine-verified beyond successful launch.
 
 ## Next exact action
 
-Optionally add an emulator microphone-injection step, or record the live-mic gap as the only
-remaining unverified item, then finalize the PR report.
+The offline Uzbek STT module is VERIFIED WORKING end to end on the emulator. The
+only automatic-verification gaps are live-mic audio capture on a physical device
+and a stable signing identity (blocked by missing repo-secret permission). No
+further code change is required for these; they need an operator action. Stop and
+report unless new evidence appears.
