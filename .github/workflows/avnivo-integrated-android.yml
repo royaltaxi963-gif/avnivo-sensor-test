@@ -52,6 +52,7 @@ jobs:
       - name: Run JVM unit tests
         run: gradle --no-daemon testDebugUnitTest
       - name: Run offline translation routing tests
+        working-directory: .
         run: node --test tests/offline-translation/route.test.mjs
       - name: Upload unit test reports
         if: always()

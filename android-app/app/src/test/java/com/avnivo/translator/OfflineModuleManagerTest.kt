@@ -45,13 +45,25 @@ class OfflineModuleManagerTest {
         manager.close()
     }
 
+    @Test fun aSpecWithNoFilesIsNeverInstalled() {
+        // An empty file list must not read as "everything present": that would mark a blocked
+        // module INSTALLED at startup and let it look like a downloaded model.
+        val blocked = OfflineModelSpecs.all.getValue("navoiy-tts")
+        assertFalse(blocked.installed(File(temp.root, "navoiy-tts")))
+        assertEquals("not_installed", JSONObject(manager().status("navoiy-tts")).getString("state"))
+    }
+
     @Test fun catalogOnlyContainsRealEngines() {
-        // Whisper Small, Whisper Large and NLLB are the verified downloadable modules.
+        // The settings cards must all be backed by a native spec, and every spec that can run
+        // must be one of the verified downloadable engines.
         assertEquals(
             setOf("whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8"),
+            OfflineModelSpecs.all.values.filter { it.runnable }.map { it.id }.toSet()
+        )
+        assertEquals(
+            setOf("whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8", "navoiy-tts", "mms-tts"),
             OfflineModelSpecs.all.keys
         )
-        assertTrue(OfflineModelSpecs.all.values.all { it.files.isNotEmpty() })
     }
 
     @Test fun installedModelInitializesToReady() {
@@ -122,9 +134,8 @@ class OfflineModuleManagerTest {
         manager.close()
     }
 
-    @Test fun everyModuleHasVerifiedBytesAndHashes() {
-        for (spec in OfflineModelSpecs.all.values) {
-            assertTrue("${spec.id} must be runnable", spec.runnable)
+    @Test fun everyRunnableModuleHasVerifiedBytesAndHashes() {
+        for (spec in OfflineModelSpecs.all.values.filter { it.runnable }) {
             assertTrue("${spec.id} needs files", spec.files.isNotEmpty())
             assertTrue(
                 "${spec.id} needs a real byte size and SHA-256",
@@ -133,9 +144,34 @@ class OfflineModuleManagerTest {
         }
     }
 
-    @Test fun largeModulesDeclareARamRequirement() {
-        for (spec in OfflineModelSpecs.all.values) {
+    @Test fun everyRunnableModuleDeclaresARamRequirement() {
+        for (spec in OfflineModelSpecs.all.values.filter { it.runnable }) {
             assertTrue("${spec.id} must refuse to load without headroom", spec.requiredRamBytes > 0)
+        }
+    }
+
+    @Test fun blockedModulesExplainWhyAndShipNoFiles() {
+        val blocked = OfflineModelSpecs.all.values.filter { !it.runnable }
+        assertTrue("the PyTorch-only TTS modules must be registered", blocked.map { it.id }.containsAll(listOf("navoiy-tts", "mms-tts")))
+        for (spec in blocked) {
+            assertEquals("${spec.id} must be UNAVAILABLE", OfflineEngineKind.UNAVAILABLE, spec.engine)
+            assertTrue("${spec.id} must explain its blocker", (spec.blocker?.length ?: 0) > 20)
+            assertTrue("${spec.id} must not offer files to download", spec.files.isEmpty())
+        }
+    }
+
+    @Test fun aBlockedModuleSurfacesItsBlockerInsteadOfDownloading() {
+        val manager = manager()
+        try {
+            manager.download("navoiy-tts")
+            manager.awaitIdle()
+            assertEquals("not_installed", JSONObject(manager.status("navoiy-tts")).getString("state"))
+            assertFalse(File(temp.root, "models/navoiy-tts").exists())
+            val message = messages.first { it.first == "AvnivoOfflineModuleError" }.second
+            assertTrue("must name the module", message.startsWith("navoiy-tts|"))
+            assertTrue("must mention PyTorch", message.contains("PyTorch"))
+        } finally {
+            manager.close()
         }
     }
 

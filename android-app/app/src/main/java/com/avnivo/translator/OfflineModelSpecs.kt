@@ -12,11 +12,13 @@ internal data class OfflineModelSpec(
     val engine: OfflineEngineKind,
     val files: Map<String, Pair<Long, String>>,
     /** Bytes of RAM the loaded model needs, from the model's own size and runtime overhead. */
-    val requiredRamBytes: Long = 0L
+    val requiredRamBytes: Long = 0L,
+    /** Why this build cannot run the module. Shown verbatim instead of a generic failure. */
+    val blocker: String? = null
 ) {
     fun directory(filesDir: File): File = File(filesDir, "models/$id")
 
-    fun installed(directory: File): Boolean = files.keys.all { name ->
+    fun installed(directory: File): Boolean = files.isNotEmpty() && files.keys.all { name ->
         File(directory, name).let { it.isFile && it.length() == files.getValue(name).first }
     }
 
@@ -64,7 +66,33 @@ internal object OfflineModelSpecs {
         requiredRamBytes = 1_800_000_000L
     )
 
-    val all: Map<String, OfflineModelSpec> = listOf(WHISPER_SMALL, WHISPER_LARGE, NLLB_200).associateBy { it.id }
+    /**
+     * Modules whose hosted artifacts are PyTorch weights only, with no ONNX export and no
+     * on-device runtime in this build. They are registered so the settings card reports the real
+     * reason instead of "unknown module", and so they can never be downloaded as if they worked.
+     *
+     * Evidence: translator-api/verified_models/{navoiy-tts,mms-tts}.json contain no .onnx file.
+     * navoiy-tts ships `emotion_600h_joint.pt` (CosyVoice2, needs PyTorch + a GPU-class runtime);
+     * mms-tts ships `model.safetensors`/`pytorch_model.bin` (VITS, needs a PyTorch VITS runtime).
+     */
+    private val NAVOIY_TTS = OfflineModelSpec(
+        id = "navoiy-tts",
+        engine = OfflineEngineKind.UNAVAILABLE,
+        files = emptyMap(),
+        blocker = "Navoiy TTS faqat PyTorch (CosyVoice2) vaznlarida mavjud; ONNX eksporti va " +
+            "qurilmadagi ijro dvigateli hali yo‘q, shuning uchun yuklab olish o‘chirilgan."
+    )
+
+    private val MMS_TTS = OfflineModelSpec(
+        id = "mms-tts",
+        engine = OfflineEngineKind.UNAVAILABLE,
+        files = emptyMap(),
+        blocker = "MMS TTS faqat PyTorch VITS vaznlarida mavjud; ONNX eksporti va qurilmadagi " +
+            "ijro dvigateli hali yo‘q, shuning uchun yuklab olish o‘chirilgan."
+    )
+
+    val all: Map<String, OfflineModelSpec> =
+        listOf(WHISPER_SMALL, WHISPER_LARGE, NLLB_200, NAVOIY_TTS, MMS_TTS).associateBy { it.id }
 
     fun spec(id: String): OfflineModelSpec? = all[id]
 }

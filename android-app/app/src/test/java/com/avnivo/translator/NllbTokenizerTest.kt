@@ -160,6 +160,7 @@ class NllbTokenizerTest {
                 assertEquals("not_installed", status.getString("state"))
                 assertEquals(false, status.getBoolean("active"))
             }
+            assertEquals("every catalog card must have a native spec", 5, OfflineModelSpecs.all.size)
         } finally {
             manager.close()
         }

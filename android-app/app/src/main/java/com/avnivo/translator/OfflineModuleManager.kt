@@ -117,7 +117,10 @@ internal class OfflineModuleManager(
             return
         }
         if (!module.spec.runnable) {
-            notify("AvnivoOfflineModuleError", "$id|Bu modul uchun ijro dvigateli hali ulanmagan")
+            notify(
+                "AvnivoOfflineModuleError",
+                "$id|${module.spec.blocker ?: "Bu modul uchun ijro dvigateli hali ulanmagan"}"
+            )
             return
         }
         worker.execute {
