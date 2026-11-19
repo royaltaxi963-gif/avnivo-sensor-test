@@ -6,6 +6,10 @@ on:
         description: 'Also verify Whisper Large V3 Turbo on the emulator (long, ~1h)'
         type: boolean
         default: false
+      run_nllb_verification:
+        description: 'Also verify NLLB-200 offline translation on the emulator (long, ~1h)'
+        type: boolean
+        default: false
   pull_request:
     paths:
       - 'android-app/**'
@@ -47,6 +51,8 @@ jobs:
           test -f app/src/main/cpp/whisper.cpp/CMakeLists.txt
       - name: Run JVM unit tests
         run: gradle --no-daemon testDebugUnitTest
+      - name: Run offline translation routing tests
+        run: node --test tests/offline-translation/route.test.mjs
       - name: Upload unit test reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -217,6 +223,51 @@ jobs:
           name: avnivo-emulator-logcat
           path: logcat.txt
           if-no-files-found: warn
+  nllb-smoke:
+    # Opt-in: verifies the ~916 MB NLLB-200 INT8 model downloads, verifies, initializes ONNX
+    # Runtime through JNI and translates real sentences on a device with no network access.
+    if: github.event_name == 'workflow_dispatch' && inputs.run_nllb_verification
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-integrated-debug-apk
+          path: apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-androidtest-apk
+          path: androidtest
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify NLLB-200 translation on the emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -memory 4096 -disk-size 8192
+          disable-animations: true
+          script: |
+            adb wait-for-device
+            adb install -r apk/app-debug.apk
+            adb install -r androidtest/app-debug-androidTest.apk
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineNllbInferenceTest -e avnivoNllbInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_nllb.txt
+            grep -q "OK (" instrument_nllb.txt || { echo NLLB_FAILED; exit 1; }
+            echo NLLB_OK
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avnivo-nllb-inference-log
+          path: instrument_nllb.txt
+          if-no-files-found: warn
+
   large-model-smoke:
     # Opt-in: verifies the 574 MB Whisper Large V3 Turbo model really initializes and infers on a
     # device. Slow (download + CPU inference), so it never gates the standard pipeline.

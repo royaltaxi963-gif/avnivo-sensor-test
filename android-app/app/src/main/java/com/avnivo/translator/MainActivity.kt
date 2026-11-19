@@ -38,6 +38,8 @@ class MainActivity : Activity() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 // Re-activate a previously installed model after an app restart or process death.
                 if (modelInstalled && !busy) worker.execute { verifyEngine() }
+                // Re-initialize previously downloaded extra modules so their cards recover on restart.
+                worker.execute { moduleManager.reactivateInstalled() }
             }
         }
         web.webChromeClient = object : WebChromeClient() {
@@ -70,6 +72,30 @@ class MainActivity : Activity() {
             moduleManager.status(id) ?: org.json.JSONObject().put("id", id).put("state", "unavailable").put("active", false).toString()
         @JavascriptInterface fun statusAll(): String = moduleManager.statusAll()
         @JavascriptInterface fun download(id: String) { if (moduleManager.hasModule(id)) moduleManager.download(id) else notifyJs("AvnivoOfflineError", "Noma’lum offline modul: $id") }
+
+        /**
+         * Offline translation. Runs on the worker and answers through `AvnivoOfflineTranslation`,
+         * so a multi-second inference never blocks the WebView's JS thread.
+         */
+        @JavascriptInterface fun translate(text: String, source: String, target: String, requestId: String) {
+            worker.execute {
+                val payload = try {
+                    org.json.JSONObject()
+                        .put("requestId", requestId)
+                        .put("text", moduleManager.translate(NLLB_MODULE, text, source, target))
+                        .toString()
+                } catch (e: Exception) {
+                    org.json.JSONObject()
+                        .put("requestId", requestId)
+                        .put("error", e.message ?: "Tarjima bajarilmadi")
+                        .toString()
+                }
+                notifyJs("AvnivoOfflineTranslation", payload)
+            }
+        }
+
+        @JavascriptInterface fun supportsTranslation(source: String, target: String): Boolean =
+            moduleManager.supportsTranslation(NLLB_MODULE, source, target)
     }
 
     private fun notifyJs(function: String, value: String) {
@@ -257,5 +283,6 @@ class MainActivity : Activity() {
 
     private companion object {
         const val MIN_SAMPLES = 4800 // 0.3 s at 16 kHz: below this there is no usable speech.
+        const val NLLB_MODULE = "nllb-200-600m-int8"
     }
 }

@@ -37,6 +37,11 @@ internal class OfflineModuleManager(
 
     fun hasModule(id: String): Boolean = modules.containsKey(id)
 
+    /** Adds a spec at runtime; only used by tests to exercise non-runnable engines. */
+    internal fun registerForTest(spec: OfflineModelSpec) {
+        modules[spec.id] = Module(spec)
+    }
+
     /** Machine-readable status for one module, or null if the id is unknown (fail closed). */
     fun status(id: String): String? {
         val module = modules[id] ?: return null
@@ -64,11 +69,46 @@ internal class OfflineModuleManager(
         }
     }
 
+    /** Translates with an already-initialized NLLB engine, reusing the loaded model. */
+    fun translate(id: String, text: String, source: String, target: String): String {
+        val module = modules[id] ?: error("Unknown module: $id")
+        require(module.state.isOperational) { "Engine not ready" }
+        val engine = module.engine ?: error("Engine not initialized")
+        return synchronized(engine) {
+            when (engine) {
+                is NllbEngine -> engine.translate(text, source, target)
+                else -> error("Module is not a translator")
+            }
+        }
+    }
+
+    /** True when the initialized engine can translate this language pair. */
+    fun supportsTranslation(id: String, source: String, target: String): Boolean {
+        val engine = modules[id]?.engine as? NllbEngine ?: return false
+        return synchronized(engine) { engine.supportsLanguage(source) && engine.supportsLanguage(target) }
+    }
+
     private fun statusJson(id: String, module: Module): JSONObject = JSONObject()
         .put("id", id)
         .put("state", module.state.code)
         .put("percent", module.percent)
         .put("active", module.state.isOperational)
+
+    /**
+     * Re-initializes every module whose files are already on disk. Called after a page load so a
+     * previously installed engine becomes READY again following an app restart or process death.
+     */
+    fun reactivateInstalled() {
+        worker.execute {
+            for (module in modules.values) {
+                if (module.state.isOperational) continue
+                val directory = module.spec.directory(filesDir)
+                if (!module.spec.runnable || !module.spec.installed(directory)) continue
+                transition(module, OfflineModuleState.INSTALLED)
+                initialize(module)
+            }
+        }
+    }
 
     /** Starts (or resumes) download+verify+initialize. Reuses an already-installed model. */
     fun download(id: String) {
@@ -144,7 +184,10 @@ internal class OfflineModuleManager(
                 ?: error("Missing ggml model")
             WhisperEngine(model, language = "auto").also { it.prepare(); it.smokeTest() }
         }
-        OfflineEngineKind.NLLB_ONNX -> error("NLLB runtime not available in this build")
+        OfflineEngineKind.NLLB_ONNX -> {
+            requireRam(spec)
+            NllbEngine(directory).also { it.prepare(); it.smokeTest() }
+        }
         OfflineEngineKind.UZBEK_NEMO_CTC -> error("Uzbek engine is managed by the STT bridge")
         OfflineEngineKind.UNAVAILABLE -> error("No engine available for ${spec.id}")
     }

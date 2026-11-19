@@ -107,11 +107,12 @@ class OfflineModuleManagerTest {
         manager.close()
     }
 
-    @Test fun moduleWithoutRuntimeNeverDownloads() {
-        // NLLB has no on-device runtime in this build, so its card must not fetch ~916 MB first.
+    @Test fun unavailableEngineNeverDownloads() {
+        // A module whose engine is missing must refuse the transfer instead of fetching ~900 MB.
         val spec = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
-        assertFalse(spec.runnable)
-        val manager = manager()
+            .copy(engine = OfflineEngineKind.UNAVAILABLE)
+        val manager = OfflineModuleManager(temp.root, null) { fn, v -> synchronized(messages) { messages += fn to v } }
+        manager.registerForTest(spec)
         manager.download(spec.id)
         manager.awaitIdle()
 
@@ -121,10 +122,27 @@ class OfflineModuleManagerTest {
         manager.close()
     }
 
-    @Test fun everyRunnableModuleHasAVerifiedEngineKind() {
-        for (spec in OfflineModelSpecs.all.values.filter { it.runnable }) {
-            assertEquals(OfflineEngineKind.WHISPER_GGML, spec.engine)
-            assertTrue("${spec.id} needs a verified byte size and hash", spec.files.values.all { it.first > 0 && it.second.length == 64 })
+    @Test fun everyModuleHasVerifiedBytesAndHashes() {
+        for (spec in OfflineModelSpecs.all.values) {
+            assertTrue("${spec.id} must be runnable", spec.runnable)
+            assertTrue("${spec.id} needs files", spec.files.isNotEmpty())
+            assertTrue(
+                "${spec.id} needs a real byte size and SHA-256",
+                spec.files.values.all { it.first > 0 && it.second.matches(Regex("[0-9a-f]{64}")) }
+            )
         }
+    }
+
+    @Test fun largeModulesDeclareARamRequirement() {
+        for (spec in OfflineModelSpecs.all.values) {
+            assertTrue("${spec.id} must refuse to load without headroom", spec.requiredRamBytes > 0)
+        }
+    }
+
+    @Test fun nllbModelIsRunnableNow() {
+        val spec = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
+        assertEquals(OfflineEngineKind.NLLB_ONNX, spec.engine)
+        assertTrue(spec.files.containsKey("onnx/encoder_model_quantized.onnx"))
+        assertTrue(spec.files.containsKey("tokenizer.json"))
     }
 }

@@ -1234,6 +1234,39 @@ function setHistoryOpen(open){
  syncBackNavigation();
 }
 const PREVIEW_TRANSLATION='Tarjima sinov so‘zi';
+/* Offline mode is Uzbek <-> Russian. Translation runs in the native NLLB engine; the placeholder
+   text is only used when that engine is not installed and READY, never as a fake success. */
+const OFFLINE_LANGUAGES={left:'uzn_Latn',right:'rus_Cyrl'};
+const offlineTranslations=new Map();
+function translateOfflineText(text,language,bubble,entry){
+ const bridge=window.AvnivoOfflineModules;
+ const source=OFFLINE_LANGUAGES[language],target=OFFLINE_LANGUAGES[oppositeLanguage(language)];
+ const unavailable=()=>{typeTranslation(bubble,PREVIEW_TRANSLATION)};
+ if(!bridge||typeof bridge.translate!=='function'||!source||!target){unavailable();return}
+ let supported=false;
+ try{supported=bridge.supportsTranslation(source,target)===true}catch(e){supported=false}
+ if(!supported){unavailable();return}
+ const requestId=String(++offlineTranslationSeq);
+ bubble.textContent='Tarjima qilinmoqda…';
+ offlineTranslations.set(requestId,{bubble,entry});
+ bridge.translate(text,source,target,requestId);
+}
+let offlineTranslationSeq=0;
+window.AvnivoOfflineTranslation=function(raw){
+ let payload;
+ try{payload=JSON.parse(raw)}catch(e){return}
+ const pending=offlineTranslations.get(String(payload.requestId));
+ if(!pending)return;
+ offlineTranslations.delete(String(payload.requestId));
+ const {bubble,entry}=pending;
+ if(payload.error||typeof payload.text!=='string'||!payload.text.trim()){
+  if(bubble.isConnected){bubble.textContent='Oflayn tarjima bajarilmadi: '+(payload.error||'bo‘sh javob');bubble.classList.remove('typing')}
+  return;
+ }
+ if(entry){entry.translation=payload.text;persistHistory()}
+ if(!bubble.isConnected)return;
+ typeTranslation(bubble,payload.text);
+};
 let translationTimers=new Set();
 function clearTranslationTimers(){for(const timer of translationTimers)clearTimeout(timer);translationTimers.clear()}
 function previewTranslation(entry){return entry&&typeof entry==='object'&&entry.translation===PREVIEW_TRANSLATION}
@@ -1602,7 +1635,7 @@ function sendMessage(){
  if(online){
   translationBubble.textContent='Tarjima qilinmoqda…';
   translateOnlineText(message,sourceLocale,targetLocale,translationBubble,entry,currentHistoryId);
- }else typeTranslation(translationBubble,PREVIEW_TRANSLATION);
+ }else translateOfflineText(message,language,translationBubble,entry);
  while(messages.children.length>60)messages.firstElementChild.remove();
  scrollChatToLatest();
  input.value='';persistDraft();clearTimeout(timeout);timeout=0;resize();syncComposerMode();delay(300);

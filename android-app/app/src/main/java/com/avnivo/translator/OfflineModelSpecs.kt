@@ -21,7 +21,7 @@ internal data class OfflineModelSpec(
     }
 
     /** True only when this build can actually run the model; otherwise the card must fail closed. */
-    val runnable: Boolean get() = engine != OfflineEngineKind.UNAVAILABLE && engine != OfflineEngineKind.NLLB_ONNX
+    val runnable: Boolean get() = engine != OfflineEngineKind.UNAVAILABLE
 }
 
 internal enum class OfflineEngineKind { UZBEK_NEMO_CTC, WHISPER_GGML, NLLB_ONNX, UNAVAILABLE }
@@ -31,7 +31,9 @@ internal object OfflineModelSpecs {
     private val WHISPER_SMALL = OfflineModelSpec(
         id = "whisper-small-q8",
         engine = OfflineEngineKind.WHISPER_GGML,
-        files = mapOf("ggml-small-q8_0.bin" to (264464607L to "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f"))
+        files = mapOf("ggml-small-q8_0.bin" to (264464607L to "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f")),
+        // Quantized weights plus whisper.cpp's mel/decoder/KV buffers.
+        requiredRamBytes = 700_000_000L
     )
 
     // Verified from GCS: multilingual-stt/whisper-large-v3-turbo-q5_0/ggml-large-v3-turbo-q5_0.bin
@@ -57,7 +59,9 @@ internal object OfflineModelSpecs {
             "generation_config.json" to (189L to "1ce846259ae04c572ae1863e358534bbc376ff3d3f100b1494feda6200b51de8"),
             "tokenizer_config.json" to (544L to "ddf411c9f790d081e72de76bb8e8b714d74e160e61bc10c9bd8f56022dcd7fd7"),
             "special_tokens_map.json" to (3548L to "992bd4ed610d644d6823081937bcc91bb8878dd556cea4ae5327f2480361330e")
-        )
+        ),
+        // 600M INT8 weights (~895 MB) stay resident alongside the encoder/decoder activations.
+        requiredRamBytes = 1_800_000_000L
     )
 
     val all: Map<String, OfflineModelSpec> = listOf(WHISPER_SMALL, WHISPER_LARGE, NLLB_200).associateBy { it.id }
