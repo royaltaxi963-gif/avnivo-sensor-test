@@ -1,6 +1,9 @@
 name: Verify offline model manifests (SHA-256)
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/verify-offline-model-manifests.yml'
 permissions:
   contents: read
   id-token: write
