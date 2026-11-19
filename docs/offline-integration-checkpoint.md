@@ -387,3 +387,22 @@ it works with the network down. Commit `daf4112` adds an offline re-verification
 stage (disable wifi/data/airplane mode, assert the network is down, repeat the
 suites) to both `nllb-smoke` and `emulator-smoke`. The offline result is
 **unverified** until that stage runs.
+
+### Whisper Large V3 Turbo: verified on device (run 44573085612)
+
+`large-model-smoke` passed: `OK (4 tests)` with a suite time of **5,769 s (~96
+min)**. That duration is consistent with a real 574 MB download followed by CPU
+decoding of both models, and it is far too long for an `assumeTrue` skip (which
+takes milliseconds).
+
+The test asserts the module reaches `ready` after a real download and verify, then
+transcribes `whisper_jfk_16k.wav` and requires at least 4 of 7 expected English
+words. Both the `ready` gate and the recall assertion passed, so the large model
+really initializes and infers on device rather than only downloading.
+
+Emulator RAM note: this job used a 4 GB AVD and still passed. The module refuses
+to initialize below `requiredRamBytes` = 1,435,000,000, so the guard is what keeps
+it safe rather than the emulator being generous.
+
+This is an emulator result on x86_64. It is not physical-device verification and
+does not cover ARM memory pressure on a real phone.
