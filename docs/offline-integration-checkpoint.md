@@ -207,16 +207,73 @@ No model URL, checksum, license, or capability was invented anywhere in this wor
    waveform driver, gesture handling, bridge handlers); no visual/CSS/markup or
    online-path change. Runtime UI parity is not machine-verified beyond successful launch.
 
+## NLLB-200 offline translation (2026-11-19)
+
+### What changed
+
+The `offline-translate` settings card (`installerId: nllb-200-600m-int8`) previously failed closed
+because no on-device ONNX runtime existed. It now has one: the sherpa-onnx AAR already ships
+`libonnxruntime.so` 1.28.2, so the NLLB encoder/decoder sessions are driven through the ONNX Runtime
+C API (resolved with `dlopen`, so no second copy of the runtime is packaged).
+
+| File | Purpose |
+| --- | --- |
+| `cpp/onnxruntime/*.h` | Vendored ORT C API headers (v1.28, `ORT_API_VERSION` 28) |
+| `cpp/avnivo_nllb_jni.cpp` | Encoder run + greedy decoder loop, empty past tensors, `use_cache_branch=false` |
+| `NllbEngine.kt` | Tokenizer, language gate, `prepare()`/`translate()`/`smokeTest()` |
+| `OfflineModelSpecs.kt` | NLLB runnable, 1.8 GB RAM requirement; Whisper Small 700 MB |
+| `OfflineModuleManager.kt` | `translate()`, `supportsTranslation()`, `reactivateInstalled()` |
+| `MainActivity.kt` | `translate`/`supportsTranslation` JS bridge, answers on the worker thread |
+| `assets/index.html` | Offline sends call the native engine; placeholder only when not READY |
+
+The decoder export's KV-cache branch is broken (the merged `If` graph rejects empty past tensors),
+so each step re-runs the full decoder sequence. That is correct but quadratic in output length, hence
+the 48-token cap. The cache-branch path is deliberately pinned to `false`.
+
+### Desktop ground truth for the exact JNI algorithm
+
+`/tmp/replica.py` mirrors `avnivo_nllb_jni.cpp` step for step (same input names, same empty past
+shapes, same greedy rule, same 48-token cap) and was run against the real model files:
+
+| Pair | Input | Output |
+| --- | --- | --- |
+| uzn_Latn -> rus_Cyrl | `Salom, qalaysiz?` | `Привет, как вы?` |
+| uzn_Latn -> rus_Cyrl | `Bugun havo juda issiq.` | `Сегодня очень жарко.` |
+| uzn_Latn -> rus_Cyrl | `Men O'zbekistondan keldim.` | `Я из Узбекистана.` |
+| uzn_Latn -> rus_Cyrl | `Rahmat` | `Спасибо` |
+| uzn_Latn -> eng_Latn | `Salom, qalaysiz?` | `Hello, are you staying?` |
+| eng_Latn -> rus_Cyrl | `hello world` | `Привет, мир` |
+| rus_Cyrl -> uzn_Latn | `Здравствуйте, как дела?` | `Salom, qanday bo'ldingiz?` |
+
+All 8 model files match the sizes and SHA-256 values in `OfflineModelSpecs.kt` exactly.
+
+### Local test evidence
+
+- `gradle testDebugUnitTest`: **44 tests, 0 failures, 0 skipped**
+  - `NllbTokenizerTest` pins the Kotlin tokenizer to ids produced by the reference `tokenizers`
+    library from the same `tokenizer.json` (10 sentences, including apostrophes, Cyrillic and
+    mixed case). This caught two real bugs: the missing leading metaspace marker and the fact that
+    `uz`/`亵`/`<mask>` are in the vocabulary but are not language codes.
+  - Language gate, blank input, unknown pieces -> unk, malformed/missing tokenizer, fail-closed
+    `prepare()`, and per-module status JSON are covered.
+- `node --test tests/offline-translation/route.test.mjs`: **11 tests, 0 failures**. These execute the
+  routing block extracted from the shipped `index.html` against a stubbed bridge: real result used,
+  history persisted, placeholder only when the engine is unavailable, native errors surfaced,
+  blank results rejected, unknown/malformed payloads ignored, concurrent requests resolved
+  independently, detached bubbles safe.
+- `gradle assembleDebug`: APK contains `lib/x86_64/libavnivo_nllb.so`, `libavnivo_whisper.so` and
+  `libonnxruntime.so`.
+
+### NLLB status
+
+IMPLEMENTED — DEVICE TEST PENDING. The algorithm is verified on desktop against the real model and
+the Kotlin/native layers compile and unit-test green; the on-emulator download + init + real
+translation run is the opt-in `nllb-smoke` CI job.
+
 ## Next exact action
 
-The offline Uzbek STT and Whisper Small modules are VERIFIED WORKING end to end on the emulator.
-Remaining work, in priority order:
-
-1. Run the opt-in `large-model-smoke` job (dispatch the workflow with
-   `run_large_model_verification: true`) to move Whisper Large V3 Turbo from
-   "IMPLEMENTED — DEVICE TEST PENDING" to a verified classification.
-2. Integrate an NLLB ONNX runtime (encoder/decoder + SentencePiece tokenizer) if one can be built
-   from the packaged ONNX Runtime; until then the card stays fail-closed.
-3. Physical-device check (Samsung Galaxy S23 Ultra) for live-microphone capture and Large-model RAM
-   behaviour.
-4. Live-microphone capture path on a physical device (or emulator mic injection).
+1. Push and let `apk` + `emulator-smoke` run; then dispatch the workflow with
+   `run_nllb_verification: true` to move NLLB to VERIFIED WORKING (or capture the exact failure).
+2. Dispatch with `run_large_model_verification: true` for Whisper Large V3 Turbo.
+3. Integrate Navoiy/MMS TTS runtimes or record the precise blocker (currently BLOCKED with evidence).
+4. Physical-device check (Samsung Galaxy S23 Ultra) for live-microphone capture and Large-model RAM.
