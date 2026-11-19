@@ -345,3 +345,22 @@ compares joined fields instead.
 Device gap: this is an emulator, not the Samsung Galaxy S23 Ultra. Physical-device
 verification (real microphone, real thermal and memory pressure) remains
 unverified and is not claimed.
+
+### Whisper coverage detail
+
+Only Whisper Small is verified as real inference so far. In the run above,
+`-e avnivoWhisperInference true` passed, and that suite takes ~20 minutes
+(1,212 s), which is consistent with downloading ~265 MB and decoding audio on an
+emulator. `transcribesKnownEnglishSpeechOffline` asserts non-empty text with at
+least 4 of 7 expected English words, so this is real inference rather than a load
+check.
+
+Whisper Large V3 Turbo is gated behind a separate flag
+(`avnivoWhisperLargeInference`) and runs only in the `large-model-smoke` job. It
+requires the module to reach `ready` after a real download, then asserts real
+transcription recall on `whisper_jfk_16k.wav`. Its result is recorded separately
+below; it is **not** verified until that job passes.
+
+The first `OfflineWhisperInferenceTest` invocation (no inference flag) ran in
+0.05 s and its 4 tests are skipped by `assumeTrue`. Only the second invocation
+with `-e avnivoWhisperInference true` is evidence of inference.
