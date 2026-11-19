@@ -69,28 +69,35 @@ internal object OfflineModelSpecs {
     )
 
     /**
-     * Modules whose hosted artifacts are PyTorch weights only, with no ONNX export and no
-     * on-device runtime in this build. They are registered so the settings card reports the real
+     * Modules whose only artifacts in this project's bucket are PyTorch weights. An ONNX runtime
+     * path does exist (the bundled sherpa-onnx AAR ships OfflineTts with VITS support), but no ONNX
+     * artifact for either model is present under its allowlisted bucket prefix, so the downloader
+     * has nothing verified to fetch. They stay registered so the settings card reports the real
      * reason instead of "unknown module", and so they can never be downloaded as if they worked.
      *
-     * Evidence: translator-api/verified_models/{navoiy-tts,mms-tts}.json contain no .onnx file.
-     * navoiy-tts ships `emotion_600h_joint.pt` (CosyVoice2, needs PyTorch + a GPU-class runtime);
-     * mms-tts ships `model.safetensors`/`pytorch_model.bin` (VITS, needs a PyTorch VITS runtime).
+     * Evidence: translator-api/verified_models/{navoiy-tts,mms-tts}.json contain no .onnx file, and
+     * GET on tts/mms/rus/model.onnx and tts/uzbek/navoiy/model.onnx returns 403 (object absent).
      */
     private val NAVOIY_TTS = OfflineModelSpec(
         id = "navoiy-tts",
         engine = OfflineEngineKind.UNAVAILABLE,
         files = emptyMap(),
-        blocker = "Navoiy TTS faqat PyTorch (CosyVoice2) vaznlarida mavjud; ONNX eksporti va " +
-            "qurilmadagi ijro dvigateli hali yo‘q, shuning uchun yuklab olish o‘chirilgan."
+        blocker = "Navoiy TTS — CosyVoice2 modeli faqat PyTorch vaznlarida " +
+            "(emotion_600h_joint.pt) mavjud va ONNX eksporti yo‘q; qurilmada ishlaydigan ONNX " +
+            "nusxasi bucketda yo‘q, shuning uchun yuklab olish o‘chirilgan."
     )
 
     private val MMS_TTS = OfflineModelSpec(
         id = "mms-tts",
         engine = OfflineEngineKind.UNAVAILABLE,
         files = emptyMap(),
-        blocker = "MMS TTS faqat PyTorch VITS vaznlarida mavjud; ONNX eksporti va qurilmadagi " +
-            "ijro dvigateli hali yo‘q, shuning uchun yuklab olish o‘chirilgan."
+        // A VITS ONNX export does exist upstream and was measured synthesizing Russian offline
+        // (114 MB model.onnx + tokens.txt, ~0.3 s per sentence at 16 kHz). It is not shipped here
+        // because no such object exists under tts/mms/rus/, and the upstream weights are
+        // CC-BY-NC-4.0, so redistribution needs an owner decision first.
+        blocker = "MMS TTS — VITS ONNX eksporti mavjud va tekshirilgan, lekin bucketda " +
+            "tts/mms/rus/ ostida ONNX fayllari yo‘q (403) va model litsenziyasi CC-BY-NC-4.0 " +
+            "(notijorat), shuning uchun tarqatishdan oldin egasining qarori kerak."
     )
 
     val all: Map<String, OfflineModelSpec> =
