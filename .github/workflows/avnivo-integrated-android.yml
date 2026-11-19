@@ -14,6 +14,10 @@ on:
         description: 'Also verify NLLB-200 offline translation on the emulator (long, ~1h)'
         type: boolean
         default: false
+      run_whisper_offline_verification:
+        description: 'Also repeat the Whisper Small inference suite with the radios disabled (~15m)'
+        type: boolean
+        default: false
   pull_request:
     paths:
       - 'android-app/**'
@@ -219,6 +223,8 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Install, launch and run instrumented tests
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          WHISPER_OFFLINE: ${{ inputs.run_whisper_offline_verification }}
         with:
           api-level: 34
           arch: x86_64
@@ -262,6 +268,12 @@ jobs:
             adb shell am instrument -w -e class com.avnivo.translator.OfflineRealInferenceTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_real_offline.txt
             grep -q "OK (" instrument_real_offline.txt || { echo REAL_INFERENCE_OFFLINE_FAILED; exit 1; }
             echo OFFLINE_INFERENCE_OK
+            if [ "$WHISPER_OFFLINE" = "true" ]; then
+              echo "=== whisper offline re-verification ==="
+              adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_offline.txt
+              grep -q "OK (" instrument_whisper_offline.txt || { echo WHISPER_INFERENCE_OFFLINE_FAILED; exit 1; }
+              echo WHISPER_OFFLINE_OK
+            fi
             echo EMULATOR_SMOKE_OK
       - uses: actions/upload-artifact@v4
         if: always()
