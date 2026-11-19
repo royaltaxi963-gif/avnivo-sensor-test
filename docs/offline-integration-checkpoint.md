@@ -426,3 +426,25 @@ Translations from the offline log are identical to the online run:
 `logcat_nllb_offline.txt` contains **zero** requests to the model host, against 19
 in the online download run. So NLLB-200 translation genuinely runs without
 network access, and this is measured rather than asserted.
+
+### TTS blockers: artifact-level evidence
+
+The two TTS modules cannot run on device, and the reason is the artifacts in the
+bucket rather than missing code. Counted from `translator-api/verified_models/*.json`:
+
+| Model | `.onnx` files | PyTorch weights |
+| --- | --- | --- |
+| `nllb-200-600m-int8` (works) | 2 — `decoder_model_merged_quantized.onnx`, `encoder_model_quantized.onnx` | — |
+| `navoiy-tts` | **0** | `emotion_600h_joint.pt` |
+| `mms-tts` | **0** | `model.safetensors`, `pytorch_model.bin` |
+
+NLLB translates because its bucket prefix actually holds ONNX graphs. Neither TTS
+prefix holds one, so there is nothing the bundled sherpa-onnx `OfflineTts` (VITS)
+runtime could load. A `GET` on `tts/uzbek/navoiy/model.onnx` and
+`tts/mms/rus/model.onnx` returns 403, so the objects are absent rather than merely
+unlisted.
+
+MMS is additionally licensed CC-BY-NC-4.0, so redistributing it needs an owner
+decision independent of the hosting gap. Both modules stay registered as
+`OfflineEngineKind.UNAVAILABLE` with a blocker string, so the settings card explains
+the real reason and `download()` refuses instead of failing obscurely.
