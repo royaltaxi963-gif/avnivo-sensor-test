@@ -94,4 +94,45 @@ class OfflineMicGestureInstrumentedTest {
         )
         assertEquals("false|", value)
     }
+
+    /**
+     * The reported Samsung defect: pressing the mic started recording but releasing the finger did
+     * not stop it. This drives the real gesture path (pointerdown then pointerup on the button) with
+     * a stubbed native bridge, so it fails if release stops short of clearing the recording state.
+     */
+    @Test
+    fun releasingTheFingerEndsRecordingWithoutAResultCallback() {
+        val web = loadInterface()
+        val value = evaluate(
+            web,
+            "window.__started=0;window.__stopped=0;" +
+                "window.AvnivoOfflineSTT={start:function(){window.__started++},stop:function(){window.__stopped++}};" +
+                "var m=document.querySelector('.mic-icon');" +
+                "var s=document.querySelector('.writing-shell');" +
+                "m.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
+                "var during=s.classList.contains('hold-voice');" +
+                "m.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
+                "JSON.stringify({during:during,after:s.classList.contains('hold-voice')," +
+                "started:window.__started,stopped:window.__stopped,composer:document.querySelector('.writing-area').value})"
+        )
+        assertTrue("press must start recording: $value", value.contains("\"during\":true"))
+        assertTrue("release must stop the native recorder: $value", value.contains("\"stopped\":1"))
+        assertTrue("release must clear the recording visual: $value", value.contains("\"after\":false"))
+        assertTrue("release must not write status text: $value", value.contains("\"composer\":\"\""))
+    }
+
+    /** A release with no matching press must not start or stop anything, and must not throw. */
+    @Test
+    fun strayPointerUpIsIgnored() {
+        val web = loadInterface()
+        val value = evaluate(
+            web,
+            "window.__started=0;window.__stopped=0;" +
+                "window.AvnivoOfflineSTT={start:function(){window.__started++},stop:function(){window.__stopped++}};" +
+                "var m=document.querySelector('.mic-icon');" +
+                "m.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:7,button:0,isPrimary:true}));" +
+                "window.__started+'|'+window.__stopped"
+        )
+        assertEquals("0|0", value)
+    }
 }
