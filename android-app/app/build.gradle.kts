@@ -5,6 +5,10 @@ plugins { id("com.android.application"); id("org.jetbrains.kotlin.android") }
 val keystoreFile = System.getenv("AVNIVO_KEYSTORE_FILE")
 // Monotonic versionCode: CI overrides it per release, otherwise it defaults to the base value.
 val buildVersionCode = System.getenv("AVNIVO_VERSION_CODE")?.toIntOrNull() ?: 1
+// whisper.cpp is fetched by CI into src/main/cpp/whisper.cpp; when absent the native Whisper
+// engine is simply not compiled, so local builds without the source keep working.
+val whisperNativeSource = file("src/main/cpp/whisper.cpp")
+val buildWhisperNative = whisperNativeSource.isDirectory
 
 android {
  namespace = "com.avnivo.translator"
@@ -16,6 +20,14 @@ android {
   versionCode = buildVersionCode
   versionName = "1.0.0"
   testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  if (buildWhisperNative) {
+   ndkVersion = "27.0.12077973"
+   System.getenv("AVNIVO_ABIS")?.split(",")?.filter { it.isNotBlank() }?.let { ndk { abiFilters += it } }
+   externalNativeBuild { cmake { arguments += listOf("-DANDROID_STL=c++_shared", "-DWHISPER_BUILD_TESTS=OFF", "-DWHISPER_BUILD_EXAMPLES=OFF", "-DWHISPER_BUILD_SERVER=OFF") } }
+  }
+ }
+ if (buildWhisperNative) {
+  externalNativeBuild { cmake { path = file("src/main/cpp/CMakeLists.txt") } }
  }
  signingConfigs {
   if (keystoreFile != null) {

@@ -1057,6 +1057,15 @@ for(const module of offlineModuleCatalog){
    return;
   }
   if(module.installerId){
+   const bridge=window.AvnivoOfflineModules;
+   if(bridge&&typeof bridge.download==='function'){
+    btn.disabled=true;
+    offlineNotice.textContent='Model yuklash boshlanmoqda. Internet kerak.';
+    updateOfflineModule(module.id,'downloading',{downloadedBytes:0,totalBytes:module.bytes});
+    try{bridge.download(module.installerId)}
+    catch(e){updateOfflineModule(module.id,'error');offlineNotice.textContent=e.message}
+    return;
+   }
    const installer=window.avnivoSafeOfflineInstaller;
    if(!installer){offlineNotice.textContent='Xavfsiz yuklash dasturi ochilmadi';return}
    btn.disabled=true;
@@ -1083,6 +1092,33 @@ window.AvnivoOfflineProgress=function(raw){
   updateOfflineModule('uz-stt','downloading',{downloadedBytes:done,totalBytes:total});
   offlineNotice.textContent='O‘zbekcha model: '+offlineMb(done)+' / '+offlineMb(total);
  }
+};
+// Native module bridge (Whisper, NLLB): installer id -> settings card id, native state -> card state.
+const offlineUiIdByInstaller={};
+for(const module of offlineModuleCatalog){if(module.installerId)offlineUiIdByInstaller[module.installerId]=module.id}
+const offlineStateByInstaller={not_installed:'not_installed',downloading:'downloading',verifying:'verifying',initializing:'verifying',installed:'downloaded',ready:'ready',error:'error'};
+function syncOfflineModule(installerId,state,progress){
+ const uiId=offlineUiIdByInstaller[installerId];if(!uiId)return;
+ updateOfflineModule(uiId,offlineStateByInstaller[state]||'not_installed',progress);
+}
+window.AvnivoOfflineModuleProgress=function(raw){
+ const parts=String(raw||'').split('|'),pair=String(parts[1]||'').split('/');
+ const done=Number(pair[0]),total=Number(pair[1]);
+ syncOfflineModule(parts[0],'downloading',{downloadedBytes:done,totalBytes:total});
+};
+window.AvnivoOfflineModuleStatus=function(installerId){
+ if(window.AvnivoOfflineModules&&typeof window.AvnivoOfflineModules.status==='function'){
+  try{const info=JSON.parse(window.AvnivoOfflineModules.status(installerId));syncOfflineModule(installerId,info.state)}catch(e){}
+ }
+};
+window.AvnivoOfflineModuleReady=function(installerId){
+ syncOfflineModule(installerId,'ready');
+ offlineNotice.textContent='Modul tayyor va faol: '+installerId;
+};
+window.AvnivoOfflineModuleError=function(raw){
+ const parts=String(raw||'').split('|');
+ syncOfflineModule(parts[0],'error');
+ offlineNotice.textContent='Modul xatosi: '+(parts[1]||'noma’lum');
 };
 window.AvnivoOfflineLevel=function(value){
  // Real microphone amplitude from the native recorder drives the existing waveform.

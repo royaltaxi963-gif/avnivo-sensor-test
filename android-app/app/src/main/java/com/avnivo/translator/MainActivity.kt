@@ -50,8 +50,26 @@ class MainActivity : Activity() {
             }
         }
         web.addJavascriptInterface(Bridge(), "AvnivoOfflineSTT")
+        web.addJavascriptInterface(Modules(), "AvnivoOfflineModules")
         setContentView(web)
         web.loadUrl("file:///android_asset/index.html")
+    }
+
+    private val moduleManager by lazy { OfflineModuleManager(filesDir) { fn, v -> notifyJs(fn, v) } }
+
+    /** The ready Whisper module id, if any; recognition prefers it over the Uzbek engine. */
+    private fun readyWhisper(): String? = when {
+        moduleManager.isOperational("whisper-small-q8") -> "whisper-small-q8"
+        moduleManager.isOperational("whisper-large-v3-turbo") -> "whisper-large-v3-turbo"
+        else -> null
+    }
+
+    /** Narrow bridge for the extra offline modules (Whisper Small/Large, NLLB). */
+    inner class Modules {
+        @JavascriptInterface fun status(id: String): String =
+            moduleManager.status(id) ?: org.json.JSONObject().put("id", id).put("state", "unavailable").put("active", false).toString()
+        @JavascriptInterface fun statusAll(): String = moduleManager.statusAll()
+        @JavascriptInterface fun download(id: String) { if (moduleManager.hasModule(id)) moduleManager.download(id) else notifyJs("AvnivoOfflineError", "Noma’lum offline modul: $id") }
     }
 
     private fun notifyJs(function: String, value: String) {
@@ -132,7 +150,7 @@ class MainActivity : Activity() {
                     requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 100)
                     return@runOnUiThread
                 }
-                if (!state.isOperational) {
+                if (!state.isOperational && readyWhisper() == null) {
                     notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli hali tayyor emas. Model yuklanishi kerak.")
                     AlertDialog.Builder(this@MainActivity)
                         .setTitle("Offline o‘zbekcha ovoz tanish")
@@ -187,14 +205,25 @@ class MainActivity : Activity() {
         worker.execute {
             var engine: OfflineSpeechEngine? = null
             try {
-                engine = OfflineSpeechEngine(modelDir)
-                engine.prepare()
-                val samples = capture.capture(30) { level -> notifyJs("AvnivoOfflineLevel", level.toString()) }
-                if (samples.size < MIN_SAMPLES) {
-                    // Too short to contain speech: report no recognition rather than an error.
-                    notifyJs("AvnivoOfflineResult", "")
+                val whisperId = readyWhisper()
+                if (whisperId != null) {
+                    // Prefer a ready multilingual Whisper engine (auto language detection).
+                    val samples = capture.capture(30) { level -> notifyJs("AvnivoOfflineLevel", level.toString()) }
+                    if (samples.size < MIN_SAMPLES) {
+                        notifyJs("AvnivoOfflineResult", "")
+                    } else {
+                        notifyJs("AvnivoOfflineResult", moduleManager.transcribe(whisperId, samples))
+                    }
                 } else {
-                    notifyJs("AvnivoOfflineResult", engine.transcribe(samples))
+                    engine = OfflineSpeechEngine(modelDir)
+                    engine.prepare()
+                    val samples = capture.capture(30) { level -> notifyJs("AvnivoOfflineLevel", level.toString()) }
+                    if (samples.size < MIN_SAMPLES) {
+                        // Too short to contain speech: report no recognition rather than an error.
+                        notifyJs("AvnivoOfflineResult", "")
+                    } else {
+                        notifyJs("AvnivoOfflineResult", engine.transcribe(samples))
+                    }
                 }
             } catch (e: Exception) {
                 notifyJs("AvnivoOfflineError", e.message ?: "Offline STT xatosi")
@@ -220,6 +249,7 @@ class MainActivity : Activity() {
 
     override fun onDestroy() {
         recorder?.stop()
+        moduleManager.close()
         worker.shutdown()
         web.destroy()
         super.onDestroy()

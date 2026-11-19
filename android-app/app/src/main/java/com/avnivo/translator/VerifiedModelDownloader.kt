@@ -51,6 +51,7 @@ internal class VerifiedModelDownloader(
                 require(directory.usableSpace > spec.first + 32L * 1024 * 1024) { "Insufficient storage" }
                 val temporary = File(directory, "$name.download")
                 val destination = File(directory, name)
+                destination.parentFile?.mkdirs()
                 progress("Yuklanmoqda: $name")
                 downloadFile(url, temporary, spec.first, spec.second, bytesProgress)
                 staged.add(temporary to destination)

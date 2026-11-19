@@ -35,6 +35,11 @@ jobs:
           mkdir -p app/libs
           curl --fail --location --retry 3 --output app/libs/sherpa-onnx-2.0.1.aar https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.1/sherpa-onnx-2.0.1.aar
           test -s app/libs/sherpa-onnx-2.0.1.aar
+      - name: Fetch whisper.cpp native sources
+        run: |
+          rm -rf app/src/main/cpp/whisper.cpp
+          git clone --depth 1 --branch v1.7.4 https://github.com/ggml-org/whisper.cpp.git app/src/main/cpp/whisper.cpp
+          test -f app/src/main/cpp/whisper.cpp/CMakeLists.txt
       - name: Run JVM unit tests
         run: gradle --no-daemon testDebugUnitTest
       - name: Upload unit test reports
@@ -82,6 +87,11 @@ jobs:
           mkdir -p app/libs
           curl --fail --location --retry 3 --output app/libs/sherpa-onnx-2.0.1.aar https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.1/sherpa-onnx-2.0.1.aar
           test -s app/libs/sherpa-onnx-2.0.1.aar
+      - name: Fetch whisper.cpp native sources
+        run: |
+          rm -rf app/src/main/cpp/whisper.cpp
+          git clone --depth 1 --branch v1.7.4 https://github.com/ggml-org/whisper.cpp.git app/src/main/cpp/whisper.cpp
+          test -f app/src/main/cpp/whisper.cpp/CMakeLists.txt
       - name: Prepare signing identity
         env:
           KEYSTORE_BASE64: ${{ secrets.AVNIVO_KEYSTORE_BASE64 }}
@@ -191,6 +201,10 @@ jobs:
             grep -q "OK (" instrument_mic.txt || { echo MIC_GESTURE_TESTS_FAILED; exit 1; }
             adb shell am instrument -w -e class com.avnivo.translator.OfflineRealInferenceTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_real.txt
             grep -q "OK (" instrument_real.txt || { echo REAL_INFERENCE_FAILED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_runtime.txt
+            grep -q "OK (" instrument_whisper_runtime.txt || { echo WHISPER_RUNTIME_FAILED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper.txt
+            grep -q "OK (" instrument_whisper.txt || { echo WHISPER_INFERENCE_FAILED; exit 1; }
             echo EMULATOR_SMOKE_OK
       - uses: actions/upload-artifact@v4
         if: always()
