@@ -113,7 +113,7 @@ jobs:
             echo "SIGNING_MODE=secret" >> "$GITHUB_ENV"
             echo "AVNIVO_KEYSTORE_PASSWORD=${{ secrets.AVNIVO_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
             echo "AVNIVO_KEY_ALIAS=${{ secrets.AVNIVO_KEY_ALIAS }}" >> "$GITHUB_ENV"
-            echo "AVNIVO_KEY_PASSWORD=${{ secrets.AVNIVO_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "AVNIVO_KEY_PASSWORD=${{ secrets.AVNIVO_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
           else
             keytool -genkeypair -keystore avnivo-release.jks -alias avnivo -keyalg RSA -keysize 2048 -validity 3650 -storepass avnivo-ci -keypass avnivo-ci -dname "CN=AVNIVO CI, O=AVNIVO"
             echo "SIGNING_MODE=ephemeral" >> "$GITHUB_ENV"
@@ -126,7 +126,7 @@ jobs:
         run: |
           AVNIVO_VERSION_CODE=100 gradle --no-daemon assembleRelease
           cp app/build/outputs/apk/release/app-release.apk ../update-v100.apk
-          AVNIVO_VERSION_CODE=101 gradle --no-daemon assembleRelease
+          AVNIVO_VERSION_CODE=$((1000 + GITHUB_RUN_NUMBER)) gradle --no-daemon assembleRelease
           cp app/build/outputs/apk/release/app-release.apk ../update-v101.apk
       - name: Record signing certificate fingerprint
         run: |
