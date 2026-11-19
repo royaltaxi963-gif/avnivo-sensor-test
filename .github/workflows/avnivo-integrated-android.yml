@@ -268,12 +268,7 @@ jobs:
             adb shell am instrument -w -e class com.avnivo.translator.OfflineRealInferenceTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_real_offline.txt
             grep -q "OK (" instrument_real_offline.txt || { echo REAL_INFERENCE_OFFLINE_FAILED; exit 1; }
             echo OFFLINE_INFERENCE_OK
-            if [ "$WHISPER_OFFLINE" = "true" ]; then
-              echo "=== whisper offline re-verification ==="
-              adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_offline.txt
-              grep -q "OK (" instrument_whisper_offline.txt || { echo WHISPER_INFERENCE_OFFLINE_FAILED; exit 1; }
-              echo WHISPER_OFFLINE_OK
-            fi
+            if [ "$WHISPER_OFFLINE" = "true" ]; then echo "=== whisper offline re-verification ==="; adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_offline.txt; grep -q "OK (" instrument_whisper_offline.txt || { echo WHISPER_INFERENCE_OFFLINE_FAILED; exit 1; }; echo WHISPER_OFFLINE_OK; fi
             echo EMULATOR_SMOKE_OK
       - uses: actions/upload-artifact@v4
         if: always()
