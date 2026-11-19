@@ -406,3 +406,23 @@ it safe rather than the emulator being generous.
 
 This is an emulator result on x86_64. It is not physical-device verification and
 does not cover ARM memory pressure on a real phone.
+
+### NLLB-200 offline operation: VERIFIED (run 44590517947, commit daf4112)
+
+The offline stage added in `daf4112` ran and passed. After disabling wifi, mobile
+data and airplane mode and confirming the network was unreachable,
+`OfflineNllbInferenceTest` passed again: `OK (6 tests)` in **29.972 s**, against
+120 s for the online run. The speed-up is expected, because the model was already
+installed and only had to be loaded and run.
+
+Translations from the offline log are identical to the online run:
+
+| Input | Output | Offline latency |
+| --- | --- | --- |
+| `Salom, qalaysiz?` | `Привет, как вы?` | 4,378 ms |
+| `Bugun havo juda issiq.` | `It's very hot today.` | 4,912 ms |
+| `Rahmat` | `Спасибо` | 1,625 ms |
+
+`logcat_nllb_offline.txt` contains **zero** requests to the model host, against 19
+in the online download run. So NLLB-200 translation genuinely runs without
+network access, and this is measured rather than asserted.
