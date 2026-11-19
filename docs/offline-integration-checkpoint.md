@@ -496,3 +496,27 @@ standalone `i18n/avnivo-dynamic-i18n.js` is not a missing runtime dependency.
 Conclusion: the UI is preserved, but the branch is not a descendant of the protected
 commit. If a strict fast-forward from `05429fee` is required, this branch has to be
 rebased or the integration replayed on top of it.
+
+### Whisper Small offline re-run: VERIFIED (run 44605575156, commit a67a49e)
+
+With wifi, mobile data and airplane mode disabled and `NETWORK_DOWN` confirmed, the
+full `emulator-smoke` job passed end to end and printed `EMULATOR_SMOKE_OK`.
+
+| Suite | Online | Offline |
+| --- | --- | --- |
+| `OfflineWhisperInferenceTest` (4 tests) | 1,211.1 s | **1,184.5 s** |
+| `OfflineRealInferenceTest` (Uzbek STT, 1 test) | 91.8 s | **4.6 s** |
+
+The Whisper time barely moves between the two runs, which is what real inference on
+an already-downloaded model looks like: the decode dominates and there is no
+download left to save. A skipped `assumeTrue` would have finished in milliseconds
+instead. `transcribesKnownEnglishSpeechOffline` asserts non-empty text with at least
+4 of 7 expected words, and `logcat` recorded **0** `UnknownHostException`,
+`ConnectException` or `SocketTimeoutException` entries, so nothing tried to reach
+the network.
+
+### Final run totals (run 44605575156)
+
+`OK (2)`, `OK (6)`, `OK (1)` mic gesture, `OK (4)` Uzbek real inference,
+`OK (4)` Whisper runtime, `OK (4)` Whisper online, `OK (1)` Uzbek offline,
+`OK (4)` Whisper offline. Unit tests: 47 total, 0 failures, 5 ignored.
