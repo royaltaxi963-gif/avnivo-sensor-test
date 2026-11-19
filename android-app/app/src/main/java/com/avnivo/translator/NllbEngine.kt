@@ -159,6 +159,22 @@ internal class NllbEngine(
         loaded.set(true)
     }
 
+    /**
+     * Milliseconds the last [translate] call spent inside native inference, and the token count it
+     * decoded. Exposed so the device test can report real latency instead of inferring it from the
+     * total test duration, which also contains the model download.
+     */
+    var lastInferenceMillis: Long = 0L
+        private set
+
+    var lastDecodedTokens: Int = 0
+        private set
+
+    /** (text, milliseconds) for every translation this instance ran, newest last. */
+    private val history = mutableListOf<Pair<String, Long>>()
+
+    val inferenceHistory: List<Pair<String, Long>> get() = history
+
     fun supportsLanguage(code: String): Boolean = tokenizer.supportsLanguage(code)
 
     fun translate(text: String, source: String, target: String): String {
@@ -174,7 +190,11 @@ internal class NllbEngine(
         val targetBos = tokenizer.tokenId(target)!!
         val native = handle.get()
         check(native != 0L) { "Engine not initialized" }
+        val started = System.currentTimeMillis()
         val generated = nativeTranslate(native, sourceIds.toIntArray(), targetBos, maxNewTokens)
+        lastInferenceMillis = System.currentTimeMillis() - started
+        lastDecodedTokens = generated.size
+        history += text to lastInferenceMillis
         if (generated.isEmpty()) error("Model produced no output")
         return tokenizer.decode(generated.toList())
     }

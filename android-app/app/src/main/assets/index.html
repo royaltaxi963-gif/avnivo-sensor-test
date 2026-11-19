@@ -1984,7 +1984,12 @@ function releaseHold(event){
  if(offline){
   // Stop the native recording immediately when the finger is released; keep tap-to-send.
   holdSuppressClick=true;
-  if(wasHold){try{window.AvnivoOfflineSTT.stop()}catch(e){}}
+  if(wasHold){
+   try{window.AvnivoOfflineSTT.stop()}catch(e){}
+   // Clear the recording visual here as well: the pointercancel path already did, and relying on
+   // the native result callback alone left the mic stuck in hold-voice when no speech was decoded.
+   finishOfflineHold();
+  }
   else if(held<1100&&input.value.trim())sendMessage();
   return;
  }

@@ -82,6 +82,19 @@ class OfflineNllbInferenceTest {
                 "nllb-200-600m-int8", "Rahmat", NllbEngine.UZBEK, NllbEngine.RUSSIAN
             )
             assertFalse("repeated translation must work", again.isBlank())
+
+            val timings = manager.inferenceTimings("nllb-200-600m-int8")
+            android.util.Log.i(
+                "AvnivoNllb",
+                "real inference latency: " + timings.joinToString(", ") {
+                    "${it.first}=${it.second}ms"
+                } + " | results: $russian / $english / $again"
+            )
+            assertTrue("inference latency must be measured, got $timings", timings.isNotEmpty())
+            assertTrue(
+                "a 7-token Uzbek sentence must translate in under 60s, measured $timings",
+                timings.all { it.second in 1..60_000 }
+            )
         } finally {
             manager.close()
         }

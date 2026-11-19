@@ -88,6 +88,15 @@ internal class OfflineModuleManager(
         return synchronized(engine) { engine.supportsLanguage(source) && engine.supportsLanguage(target) }
     }
 
+    /**
+     * Per-call native inference timings for a translator module, as (text, milliseconds) pairs, so
+     * the device test can separate real inference cost from the model download it also performs.
+     */
+    fun inferenceTimings(id: String): List<Pair<String, Long>> {
+        val engine = modules[id]?.engine as? NllbEngine ?: return emptyList()
+        return synchronized(engine) { engine.inferenceHistory.toList() }
+    }
+
     private fun statusJson(id: String, module: Module): JSONObject = JSONObject()
         .put("id", id)
         .put("state", module.state.code)
