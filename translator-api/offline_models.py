@@ -24,7 +24,13 @@ OBJECTS = {
 # Only SHA256-verified, repository-reviewed manifests can enable extra models.
 # Files are deliberately not fetched from GCS at request time.
 MANIFEST_DIR = Path(__file__).resolve().parent / "verified_models"
-ALLOWED_PREFIXES = {"navoiy-tts": "tts/uzbek/navoiy/", "mms-tts": "tts/mms/rus/"}
+ALLOWED_PREFIXES = {
+    "whisper-small-q8": "multilingual-stt/whisper-small-q8_0/",
+    "whisper-large-v3-turbo": "multilingual-stt/whisper-large-v3-turbo-q5_0/",
+    "nllb-200-600m-int8": "multilingual-translation/nllb-200-600m-int8/",
+    "navoiy-tts": "tts/uzbek/navoiy/",
+    "mms-tts": "tts/mms/rus/",
+}
 
 def load_verified_models():
     models = dict(OBJECTS)

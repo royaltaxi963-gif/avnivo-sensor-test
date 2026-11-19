@@ -19,7 +19,11 @@ jobs:
         run: |
           python3 - <<'PY'
           import json,re,pathlib
-          for model,prefix,count in [('navoiy-tts','tts/uzbek/navoiy/',22),('mms-tts','tts/mms/rus/',6)]:
+          expected={'navoiy-tts':('tts/uzbek/navoiy/',22),'mms-tts':('tts/mms/rus/',6),
+                    'whisper-small-q8':('multilingual-stt/whisper-small-q8_0/',1),
+                    'whisper-large-v3-turbo':('multilingual-stt/whisper-large-v3-turbo-q5_0/',1),
+                    'nllb-200-600m-int8':('multilingual-translation/nllb-200-600m-int8/',8)}
+          for model,(prefix,count) in expected.items():
               p=pathlib.Path('translator-api/verified_models')/(model+'.json')
               data=json.loads(p.read_text())
               assert data['model_id']==model and len(data['files'])==count
@@ -51,7 +55,7 @@ jobs:
               except Exception:
                   if attempt==7:raise
                   time.sleep(5)
-          for model in ('uzbek-stt','navoiy-tts','mms-tts'):
+          for model in ('uzbek-stt','navoiy-tts','mms-tts','whisper-small-q8','whisper-large-v3-turbo','nllb-200-600m-int8'):
               try:
                   with urllib.request.urlopen(base+'/api/offline-models/'+model+'/download-ticket',timeout=30) as r:
                       data=json.load(r)
