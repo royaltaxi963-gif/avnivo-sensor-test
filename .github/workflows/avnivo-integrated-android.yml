@@ -256,17 +256,29 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -memory 4096
           disable-animations: true
           script: |
+            set +e
             adb wait-for-device
             adb install -r apk/app-debug.apk
             adb install -r androidtest/app-debug-androidTest.apk
+            adb shell cat /proc/meminfo > meminfo_nllb.txt
+            adb shell df -h /data >> meminfo_nllb.txt
+            adb logcat -c
             adb shell am instrument -w -e class com.avnivo.translator.OfflineNllbInferenceTest -e avnivoNllbInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_nllb.txt
+            adb logcat -d > logcat_nllb.txt
+            echo "=== crash / native signal ==="
+            grep -aE "FATAL|signal [0-9]|SIGSEGV|SIGABRT|Abort message|libavnivo_nllb|libonnxruntime|lowmemorykiller|OutOfMemory|am_crash|art::Runtime" logcat_nllb.txt | tail -40
+            echo "=== memory at end ==="
+            adb shell cat /proc/meminfo | head -4
             grep -q "OK (" instrument_nllb.txt || { echo NLLB_FAILED; exit 1; }
             echo NLLB_OK
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: avnivo-nllb-inference-log
-          path: instrument_nllb.txt
+          path: |
+            instrument_nllb.txt
+            logcat_nllb.txt
+            meminfo_nllb.txt
           if-no-files-found: warn
 
   large-model-smoke:

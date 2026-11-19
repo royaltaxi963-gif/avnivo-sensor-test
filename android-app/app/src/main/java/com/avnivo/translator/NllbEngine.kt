@@ -5,6 +5,7 @@ import org.json.JSONObject
 import java.io.File
 import java.text.Normalizer
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * NLLB-200 tokenizer rebuilt from the model's own `tokenizer.json`: a SentencePiece BPE with a
@@ -136,6 +137,7 @@ internal class NllbEngine(
     private val maxNewTokens: Int = 48
 ) : java.io.Closeable {
     private val loaded = AtomicBoolean(false)
+    private val handle = AtomicLong(0L)
 
     private val tokenizer: NllbTokenizer by lazy {
         NllbTokenizer.load(File(directory, "tokenizer.json")) ?: error("NLLB tokenizer is missing")
@@ -149,6 +151,11 @@ internal class NllbEngine(
         check(encoderFile.isFile) { "Missing encoder model" }
         check(decoderFile.isFile) { "Missing decoder model" }
         check(tokenizer.tokenId("<unk>") != null) { "Tokenizer vocabulary is empty" }
+        // Sessions are opened once here, not per translation, so a 916 MB model is not re-read on
+        // every request and two copies never coexist.
+        val opened = nativeCreate(encoderFile.absolutePath, decoderFile.absolutePath)
+        check(opened != 0L) { "Could not open the NLLB ONNX sessions" }
+        handle.set(opened)
         loaded.set(true)
     }
 
@@ -165,13 +172,9 @@ internal class NllbEngine(
         sourceIds += EOS_ID
 
         val targetBos = tokenizer.tokenId(target)!!
-        val generated = nativeTranslate(
-            encoderFile.absolutePath,
-            decoderFile.absolutePath,
-            sourceIds.toIntArray(),
-            targetBos,
-            maxNewTokens
-        )
+        val native = handle.get()
+        check(native != 0L) { "Engine not initialized" }
+        val generated = nativeTranslate(native, sourceIds.toIntArray(), targetBos, maxNewTokens)
         if (generated.isEmpty()) error("Model produced no output")
         return tokenizer.decode(generated.toList())
     }
@@ -184,11 +187,16 @@ internal class NllbEngine(
 
     override fun close() {
         loaded.set(false)
+        val open = handle.getAndSet(0L)
+        if (open != 0L) runCatching { nativeFree(open) }
     }
 
+    private external fun nativeCreate(encoderPath: String, decoderPath: String): Long
+
+    private external fun nativeFree(handle: Long)
+
     private external fun nativeTranslate(
-        encoderPath: String,
-        decoderPath: String,
+        handle: Long,
         sourceIds: IntArray,
         targetBosId: Int,
         maxNewTokens: Int

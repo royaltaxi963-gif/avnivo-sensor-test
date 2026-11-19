@@ -2,6 +2,10 @@
 // ONNX Runtime is resolved with dlopen so this library never duplicates (or version-conflicts with)
 // the packaged libonnxruntime.so, and needs no extra dependency.
 //
+// Sessions are created once per engine (nativeCreate) and reused by every translation. Opening them
+// per call re-read ONNX weights on each request and briefly held two full copies, which is what
+// pushed the process over the device memory limit.
+//
 // The decoder export in this model has a broken KV-cache branch: the merged `If` graph fails when
 // past tensors are empty, so each step re-runs the whole decoder sequence instead of caching. That
 // is correct but quadratic in output length, hence the output cap.
@@ -9,6 +13,7 @@
 #include <jni.h>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -56,8 +61,6 @@ struct Values {
 };
 
 struct Session {
-    OrtEnv* env = nullptr;
-    OrtSessionOptions* options = nullptr;
     OrtSession* session = nullptr;
     OrtMemoryInfo* memory = nullptr;
 
@@ -65,11 +68,38 @@ struct Session {
         const OrtApi* api = ortApi();
         if (session) api->ReleaseSession(session);
         if (memory) api->ReleaseMemoryInfo(memory);
+    }
+
+    bool open(const OrtApi* api, OrtEnv* env, OrtSessionOptions* options, const std::string& path,
+              std::string& error) {
+        OrtStatus* status = api->CreateSession(env, path.c_str(), options, &session);
+        if (status) {
+            error = takeError(api, status);
+            return false;
+        }
+        if ((status = api->CreateCpuMemoryInfo(OrtArenaAllocator, OrtMemTypeDefault, &memory))) {
+            error = takeError(api, status);
+            return false;
+        }
+        return true;
+    }
+};
+
+/** Everything a translation needs, created once and reused. */
+struct Runtime {
+    OrtEnv* env = nullptr;
+    OrtSessionOptions* options = nullptr;
+    Session encoder;
+    Session decoder;
+
+    ~Runtime() {
+        const OrtApi* api = ortApi();
         if (options) api->ReleaseSessionOptions(options);
         if (env) api->ReleaseEnv(env);
     }
 
-    bool open(const OrtApi* api, const std::string& path, std::string& error) {
+    bool open(const OrtApi* api, const std::string& encoderPath, const std::string& decoderPath,
+              std::string& error) {
         OrtStatus* status = api->CreateEnv(ORT_LOGGING_LEVEL_WARNING, "avnivo-nllb", &env);
         if (status) {
             error = takeError(api, status);
@@ -77,13 +107,12 @@ struct Session {
         }
         if ((status = api->CreateSessionOptions(&options)) ||
             (status = api->SetIntraOpNumThreads(options, 2)) ||
-            (status = api->SetSessionGraphOptimizationLevel(options, ORT_ENABLE_ALL)) ||
-            (status = api->CreateSession(env, path.c_str(), options, &session)) ||
-            (status = api->CreateCpuMemoryInfo(OrtArenaAllocator, OrtMemTypeDefault, &memory))) {
+            (status = api->SetSessionGraphOptimizationLevel(options, ORT_ENABLE_ALL))) {
             error = takeError(api, status);
             return false;
         }
-        return true;
+        return encoder.open(api, env, options, encoderPath, error) &&
+               decoder.open(api, env, options, decoderPath, error);
     }
 };
 
@@ -100,22 +129,44 @@ std::string toUtf8(JNIEnv* env, jstring value) {
 
 extern "C" {
 
+/** Opens both ONNX sessions. Returns a handle, or 0 with a pending Java exception on failure. */
+JNIEXPORT jlong JNICALL Java_com_avnivo_translator_NllbEngine_nativeCreate(JNIEnv* env, jobject /*thiz*/,
+                                                                          jstring encoderPath,
+                                                                          jstring decoderPath) {
+    const OrtApi* api = ortApi();
+    if (!api) {
+        throwJava(env, "ONNX Runtime is not available on this device");
+        return 0;
+    }
+    auto runtime = std::make_unique<Runtime>();
+    std::string error;
+    if (!runtime->open(api, toUtf8(env, encoderPath), toUtf8(env, decoderPath), error)) {
+        throwJava(env, error);
+        return 0;
+    }
+    return reinterpret_cast<jlong>(runtime.release());
+}
+
+JNIEXPORT void JNICALL Java_com_avnivo_translator_NllbEngine_nativeFree(JNIEnv* /*env*/, jobject /*thiz*/,
+                                                                       jlong handle) {
+    delete reinterpret_cast<Runtime*>(handle);
+}
+
 /**
  * Encodes `sourceIds` and greedily decodes into `targetBosId`, returning the generated token ids
  * (EOS excluded). An empty result means the model produced nothing, which callers treat as failure.
  */
 JNIEXPORT jintArray JNICALL
-Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thiz*/, jstring encoderPath,
-                                                     jstring decoderPath, jintArray sourceIds,
-                                                     jint targetBosId, jint maxNewTokens) {
+Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thiz*/, jlong handle,
+                                                     jintArray sourceIds, jint targetBosId,
+                                                     jint maxNewTokens) {
     const OrtApi* api = ortApi();
-    if (!api) {
-        throwJava(env, "ONNX Runtime is not available on this device");
+    auto* runtime = reinterpret_cast<Runtime*>(handle);
+    if (!api || !runtime || !runtime->encoder.session || !runtime->decoder.session) {
+        throwJava(env, "NLLB engine is not initialized");
         return nullptr;
     }
 
-    const std::string encoder = toUtf8(env, encoderPath);
-    const std::string decoder = toUtf8(env, decoderPath);
     const jsize sourceLength = env->GetArrayLength(sourceIds);
     if (sourceLength <= 0) {
         throwJava(env, "empty source sequence");
@@ -123,18 +174,6 @@ Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thi
     }
     std::vector<int32_t> source(static_cast<size_t>(sourceLength));
     env->GetIntArrayRegion(sourceIds, 0, sourceLength, source.data());
-
-    std::string error;
-    Session encoderSession;
-    if (!encoderSession.open(api, encoder, error)) {
-        throwJava(env, "encoder: " + error);
-        return nullptr;
-    }
-    Session decoderSession;
-    if (!decoderSession.open(api, decoder, error)) {
-        throwJava(env, "decoder: " + error);
-        return nullptr;
-    }
 
     Values values{api, {}};
     std::vector<int64_t> sourceShape{1, sourceLength};
@@ -152,8 +191,8 @@ Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thi
         return value;
     };
 
-    OrtValue* encoderIds = int64Tensor(encoderSession.memory, sourceInt64, sourceShape);
-    OrtValue* encoderMask = int64Tensor(encoderSession.memory, mask, sourceShape);
+    OrtValue* encoderIds = int64Tensor(runtime->encoder.memory, sourceInt64, sourceShape);
+    OrtValue* encoderMask = int64Tensor(runtime->encoder.memory, mask, sourceShape);
     values.items.push_back(encoderIds);
     values.items.push_back(encoderMask);
     if (!encoderIds || !encoderMask) {
@@ -165,7 +204,7 @@ Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thi
     const char* encoderOutputs[] = {"last_hidden_state"};
     OrtValue* encoderInputValues[] = {encoderIds, encoderMask};
     OrtValue* hidden = nullptr;
-    OrtStatus* status = api->Run(encoderSession.session, nullptr, encoderInputs, encoderInputValues, 2,
+    OrtStatus* status = api->Run(runtime->encoder.session, nullptr, encoderInputs, encoderInputValues, 2,
                                  encoderOutputs, 1, &hidden);
     if (status) {
         throwJava(env, "encoder run: " + takeError(api, status));
@@ -208,7 +247,7 @@ Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thi
                 OrtValue* value = nullptr;
                 if (kind == 0) {
                     // Zero-length tensor: no past decoder tokens exist on the first pass.
-                    if (api->CreateTensorWithDataAsOrtValue(decoderSession.memory, &decoderPastSentinel,
+                    if (api->CreateTensorWithDataAsOrtValue(runtime->decoder.memory, &decoderPastSentinel,
                                                             0, shape.data(), shape.size(),
                                                             ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT, &value)) {
                         throwJava(env, "could not allocate decoder cache");
@@ -218,7 +257,7 @@ Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thi
                     std::vector<float>& storage = zeroEncoder[static_cast<size_t>(layer) * 2 + kv];
                     storage.assign(encoderPastFloats, 0.0f);
                     if (api->CreateTensorWithDataAsOrtValue(
-                            decoderSession.memory, storage.data(), storage.size() * sizeof(float),
+                            runtime->decoder.memory, storage.data(), storage.size() * sizeof(float),
                             shape.data(), shape.size(), ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT, &value)) {
                         throwJava(env, "could not allocate encoder cache");
                         return nullptr;
@@ -246,11 +285,11 @@ Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thi
         std::vector<int64_t> ids(sequence.begin(), sequence.end());
         std::vector<int64_t> seqShape{1, static_cast<int64_t>(ids.size())};
 
-        OrtValue* idsValue = int64Tensor(decoderSession.memory, ids, seqShape);
-        OrtValue* maskValue = int64Tensor(decoderSession.memory, mask, sourceShape);
+        OrtValue* idsValue = int64Tensor(runtime->decoder.memory, ids, seqShape);
+        OrtValue* maskValue = int64Tensor(runtime->decoder.memory, mask, sourceShape);
         OrtValue* branchValue = nullptr;
         const bool branchFailed = api->CreateTensorWithDataAsOrtValue(
-            decoderSession.memory, &cacheBranchValue, sizeof(cacheBranchValue), branchShape.data(),
+            runtime->decoder.memory, &cacheBranchValue, sizeof(cacheBranchValue), branchShape.data(),
             branchShape.size(), ONNX_TENSOR_ELEMENT_DATA_TYPE_BOOL, &branchValue) != nullptr;
         if (!idsValue || !maskValue || branchFailed) {
             if (idsValue) api->ReleaseValue(idsValue);
@@ -266,7 +305,7 @@ Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thi
 
         OrtValue* logits = nullptr;
         const char* outputNames[] = {"logits"};
-        status = api->Run(decoderSession.session, nullptr, names.data(), inputs.data(),
+        status = api->Run(runtime->decoder.session, nullptr, names.data(), inputs.data(),
                           static_cast<int>(inputs.size()), outputNames, 1, &logits);
         if (status) {
             api->ReleaseValue(idsValue);

@@ -88,6 +88,24 @@ class OfflineNllbInferenceTest {
     }
 
     @Test
+    fun closingTheEngineReleasesItsNativeSessions() {
+        // prepare() opens two ONNX sessions and close() must free them, otherwise a re-download or a
+        // process restart would accumulate sessions until the device runs out of memory.
+        val engine = NllbEngine(File(context.cacheDir, "absent-${System.nanoTime()}"))
+        assertTrue("close() must be safe before prepare()", runCatching { engine.close() }.isSuccess)
+        val failed = try {
+            engine.prepare()
+            false
+        } catch (expected: Exception) {
+            true
+        } finally {
+            engine.close()
+        }
+        assertTrue("prepare() must fail closed when models are absent", failed)
+        assertTrue("close() must be idempotent", runCatching { engine.close() }.isSuccess)
+    }
+
+    @Test
     fun theNllbCardInTheUiMapsToThisModule() {
         // The settings card for "Offline tarjima" must be backed by a real spec, or the download
         // button would have nothing to run.
