@@ -243,12 +243,30 @@ jobs:
             grep -q "OK (" instrument_whisper_runtime.txt || { echo WHISPER_RUNTIME_FAILED; exit 1; }
             adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper.txt
             grep -q "OK (" instrument_whisper.txt || { echo WHISPER_INFERENCE_FAILED; exit 1; }
+
+            # Everything above proves the engines work, not that they work offline. Cut the radios
+            # and repeat the inference suites. Models are already installed at this point, so they
+            # are reused; if any engine tried to fetch something the run would fail here.
+            echo "=== offline re-verification ==="
+            adb shell svc wifi disable
+            adb shell svc data disable
+            adb shell cmd connectivity airplane-mode enable 2>/dev/null || true
+            sleep 5
+            adb shell ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 && { echo NETWORK_STILL_UP; exit 1; } || echo NETWORK_DOWN
+            adb logcat -c
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineRealInferenceTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_real_offline.txt
+            grep -q "OK (" instrument_real_offline.txt || { echo REAL_INFERENCE_OFFLINE_FAILED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_offline.txt
+            grep -q "OK (" instrument_whisper_offline.txt || { echo WHISPER_INFERENCE_OFFLINE_FAILED; exit 1; }
+            echo OFFLINE_INFERENCE_OK
             echo EMULATOR_SMOKE_OK
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: avnivo-emulator-logcat
-          path: logcat.txt
+          path: |
+            logcat.txt
+            instrument*.txt
           if-no-files-found: warn
   nllb-smoke:
     # Opt-in: verifies the ~916 MB NLLB-200 INT8 model downloads, verifies, initializes ONNX
@@ -299,6 +317,21 @@ jobs:
             echo "=== memory at end ==="
             adb shell cat /proc/meminfo | head -4
             grep -q "OK (" instrument_nllb.txt || { echo NLLB_FAILED; exit 1; }
+
+            # The download above proves translation works, not that it works offline. Cut every
+            # radio, then repeat the same run. The model is already installed, so it is reused and
+            # any attempt to reach the network would fail instead of being silently tolerated.
+            echo "=== offline re-verification ==="
+            adb shell svc wifi disable
+            adb shell svc data disable
+            adb shell cmd connectivity airplane-mode enable 2>/dev/null || true
+            sleep 5
+            adb shell ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 && { echo NETWORK_STILL_UP; exit 1; } || echo NETWORK_DOWN
+            adb logcat -c
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineNllbInferenceTest -e avnivoNllbInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_nllb_offline.txt
+            adb logcat -d > logcat_nllb_offline.txt
+            grep -q "OK (" instrument_nllb_offline.txt || { echo NLLB_OFFLINE_FAILED; exit 1; }
+            echo NLLB_OFFLINE_OK
             echo NLLB_OK
       - uses: actions/upload-artifact@v4
         if: always()
@@ -306,7 +339,9 @@ jobs:
           name: avnivo-nllb-inference-log
           path: |
             instrument_nllb.txt
+            instrument_nllb_offline.txt
             logcat_nllb.txt
+            logcat_nllb_offline.txt
             meminfo_nllb.txt
           if-no-files-found: warn
 
