@@ -520,3 +520,47 @@ the network.
 `OK (2)`, `OK (6)`, `OK (1)` mic gesture, `OK (4)` Uzbek real inference,
 `OK (4)` Whisper runtime, `OK (4)` Whisper online, `OK (1)` Uzbek offline,
 `OK (4)` Whisper offline. Unit tests: 47 total, 0 failures, 5 ignored.
+
+## Phase 2 — TTS: the runtime was never the blocker
+
+The previous checkpoint said both TTS modules had "0 .onnx files", which is true of
+the copies under the project's own bucket but not of the upstream distribution. The
+sherpa-onnx `tts-models` release publishes **MMS already exported to ONNX VITS**, and
+the AAR this app already ships (`sherpa-onnx-2.0.1.aar`) contains the matching
+Kotlin API: `OfflineTts`, `OfflineTtsConfig`, `OfflineTtsVitsModelConfig`
+(`model`, `tokens`, `lexicon`, `dataDir`) and `OfflineTts.generate`.
+
+So MMS needs no new native code. Evidence, run locally against
+`sherpa-onnx` 2.0.2 with the same `OfflineTtsVitsModelConfig` contract:
+
+| Property | Measured |
+| --- | --- |
+| Archive | `vits-mms-rus.tar.bz2`, 107,761,221 bytes |
+| Contents | `model.onnx`, `tokens.txt` (80 pieces), `config.json` |
+| Sample rate | 16,000 Hz |
+| Load time | 0.49 s |
+| "Привет, как дела?" | 1.23 s audio in 0.45 s (RTF 0.363) |
+| "Спасибо" | 0.75 s audio in 0.23 s (RTF 0.311) |
+| Output | peak 0.699, RMS 0.099 |
+
+The output is speech rather than noise: 25 of 61 twenty-millisecond frames are
+silent, and frame-energy standard deviation over mean is 1.06, which is the profile
+of gated speech. Flat noise sits near 0.1.
+
+### What this does not fix
+
+Two limits remain, and they are real rather than engineering gaps:
+
+1. **No Uzbek MMS voice exists.** The release ships deu, eng, fra, nan, spa, tha,
+   ukr, rus. There is no `uzb`, so MMS cannot serve the Uzbek synthesis slot — only
+   the multilingual one, and only for those eight languages.
+2. **The weights are CC-BY-NC-4.0.** Downloading to a user's own device is fine;
+   bundling or redistributing inside a commercial product is not. That is an owner
+   licensing decision, not something an agent should paper over.
+
+Navoiy TTS remains different in kind: `aisha-org/navoiy-tts` is CosyVoice2, a
+flow-matching model with a separate vocoder and a PyTorch-only release. It is not a
+VITS graph and cannot be dropped into `OfflineTtsVitsModelConfig`. Exporting it needs
+the upstream PyTorch weights plus `torch.onnx.export` over both stages, which is not
+possible from this environment (no GPU, no upstream weights, and the export is known
+to be non-trivial for flow matching).
