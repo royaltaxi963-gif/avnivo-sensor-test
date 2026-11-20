@@ -78,10 +78,11 @@ jobs:
         run: |
           # A -O0 native build still passes every functional test, just ~100x slower, so assert the
           # flag reached the compiler rather than trusting it.
-          ninja_file=$(find android-app/app/.cxx/Debug -name build.ninja | head -1)
+          ninja_file=$(find "$GITHUB_WORKSPACE/android-app/app/.cxx" -name build.ninja 2>/dev/null | head -1)
           test -n "$ninja_file" || { echo NO_NINJA_FILE; exit 1; }
-          grep -q -- "-O3" "$ninja_file" || { echo GGML_NOT_OPTIMISED; grep -m1 "FLAGS = " "$ninja_file"; exit 1; }
-          echo NATIVE_OPTIMISED
+          echo "ninja: $ninja_file"
+          grep -m1 "^  FLAGS = " "$ninja_file" || true
+          if grep -q -- "-O3" "$ninja_file"; then echo NATIVE_OPTIMISED; else echo GGML_NOT_OPTIMISED; exit 1; fi
       - uses: actions/upload-artifact@v4
         with:
           name: avnivo-translator-integrated-debug-apk
