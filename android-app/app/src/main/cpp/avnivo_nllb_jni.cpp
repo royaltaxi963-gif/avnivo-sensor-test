@@ -12,8 +12,10 @@
 #include <dlfcn.h>
 #include <jni.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <memory>
+#include <thread>
 #include <string>
 #include <vector>
 
@@ -25,6 +27,17 @@ constexpr int64_t kEosId = 2;
 constexpr int kLayers = 12;
 constexpr int kHeads = 16;
 constexpr int kHeadDim = 64;
+
+/**
+ * Same policy as the Whisper bridge: leave one core for the UI and audio threads, cap at 8 so the
+ * big cluster does not throttle. The decoder is memory-bound, so more threads than this stop
+ * paying off.
+ */
+int inferenceThreads() {
+    const unsigned hw = std::thread::hardware_concurrency();
+    if (hw == 0) return 4;
+    return static_cast<int>(std::min(8u, std::max(1u, hw - 1)));
+}
 
 const OrtApi* ortApi() {
     static const OrtApi* api = [] {
@@ -106,7 +119,7 @@ struct Runtime {
             return false;
         }
         if ((status = api->CreateSessionOptions(&options)) ||
-            (status = api->SetIntraOpNumThreads(options, 2)) ||
+            (status = api->SetIntraOpNumThreads(options, inferenceThreads())) ||
             (status = api->SetSessionGraphOptimizationLevel(options, ORT_ENABLE_ALL)) ||
             // The CPU arena and the memory-pattern planner both pre-allocate for the worst case.
             // Measured on this 600M INT8 model they add ~1 GB of resident memory, which is what got
