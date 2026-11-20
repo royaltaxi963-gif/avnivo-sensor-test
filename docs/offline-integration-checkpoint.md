@@ -594,13 +594,16 @@ The emulator is much slower than a phone, so treat them as a floor.
 
 | Engine | Input | Time | Real-time factor |
 | --- | --- | --- | --- |
-| Whisper Small Q8 | 11.0 s English speech | 85.2 s first, 85.5 s repeat | 7.75x |
-| NLLB-200 600M INT8 | "Rahmat" (short) | 0.99 s | — |
-| NLLB-200 600M INT8 | "Salom" | 1.6 s | — |
-| NLLB-200 600M INT8 | "Salom, qalaysiz?" | 3.2 s | — |
-| NLLB-200 600M INT8 | "Bugun havo juda issiq." | 3.2 s | — |
+| Whisper Small Q8 | 11.0 s English speech | 92.1 s first, 91.9 s repeat | 8.37x |
+| NLLB-200 600M INT8 | "Rahmat" (short) | 1.41 s online, 1.45 s offline | — |
+| NLLB-200 600M INT8 | "Salom" | 1.45 s online, 1.45 s offline | — |
+| NLLB-200 600M INT8 | "Salom, qalaysiz?" | 3.89 s online, 4.11 s offline | — |
+| NLLB-200 600M INT8 | "Bugun havo juda issiq." | 4.44 s online, 4.50 s offline | — |
 
-Whisper download measured 41.8 s on the same run, timed separately from the load.
+Online and offline NLLB figures come from the same commit and agree within noise, which is
+the evidence that decoding never reaches the network. Whisper was measured separately.
+
+Whisper download measured 44.9 s on the same run, timed separately from the load.
 
 ### NLLB thread count is measured, not guessed
 
