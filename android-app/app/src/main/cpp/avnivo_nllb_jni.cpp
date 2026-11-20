@@ -29,14 +29,15 @@ constexpr int kHeads = 16;
 constexpr int kHeadDim = 64;
 
 /**
- * Same policy as the Whisper bridge: leave one core for the UI and audio threads, cap at 8 so the
- * big cluster does not throttle. The decoder is memory-bound, so more threads than this stop
- * paying off.
+ * The decoder is memory-bound, so unlike Whisper it still benefits from every core it can get.
+ * The floor is 2 rather than 1: on the 2-core emulator, hardware_concurrency() - 1 = 1 thread
+ * measured 1581 ms for a short sentence against 1282 ms at 2 threads, because a single thread
+ * cannot overlap the quantized weight loads with the matmuls.
  */
 int inferenceThreads() {
     const unsigned hw = std::thread::hardware_concurrency();
-    if (hw == 0) return 4;
-    return static_cast<int>(std::min(8u, std::max(1u, hw - 1)));
+    if (hw == 0) return 2;
+    return static_cast<int>(std::min(8u, std::max(2u, hw - 1)));
 }
 
 const OrtApi* ortApi() {

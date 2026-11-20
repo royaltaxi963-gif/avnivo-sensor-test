@@ -125,12 +125,15 @@ class OfflineWhisperInferenceTest {
             val second = manager.transcribe("whisper-small-q8", samples)
             val secondSeconds = (System.nanoTime() - secondStarted) / 1e9
 
-            println(
-                "WHISPER_PERF audio=${"%.2f".format(audioSeconds)}s download=${"%.1f".format(downloadSeconds)}s " +
-                    "first=${"%.1f".format(firstSeconds)}s repeat=${"%.1f".format(secondSeconds)}s " +
-                    "first_rt=${"%.2f".format(firstSeconds / audioSeconds)}x " +
-                    "repeat_rt=${"%.2f".format(secondSeconds / audioSeconds)}x"
-            )
+            val perf = "WHISPER_PERF audio=${"%.2f".format(audioSeconds)}s " +
+                "download=${"%.1f".format(downloadSeconds)}s " +
+                "first=${"%.1f".format(firstSeconds)}s repeat=${"%.1f".format(secondSeconds)}s " +
+                "first_rt=${"%.2f".format(firstSeconds / audioSeconds)}x " +
+                "repeat_rt=${"%.2f".format(secondSeconds / audioSeconds)}x"
+            // println is dropped by am instrument unless -e log true is set, and even then it lands
+            // in logcat rather than on stdout, so log it directly and let CI read logcat.
+            println(perf)
+            android.util.Log.i("AvnivoWhisper", perf)
 
             assertFalse("first transcription must not be empty", first.isBlank())
             assertEquals("repeat inference must be deterministic", first, second)
