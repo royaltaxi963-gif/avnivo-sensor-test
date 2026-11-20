@@ -117,8 +117,49 @@ GET /api/offline-models/nllb-200-600m-int8/download-ticket  -> HTTP 200   (contr
 - No `gsutil`/`gcloud` binary and no Google credentials exist in this environment, so the 3.6 GB
   artifact cannot be uploaded from here.
 
-## Next exact action
+## Android integration — done, verified off-device
 
-Android integration: add a `MADLAD_ONNX` engine kind and model spec, a JNI bridge reusing the
-existing ORT `dlopen` pattern, and a SentencePiece tokenizer adapter. Register the model in the
-ticket manifest and allowlist. UI changes must be additive only.
+Added in commit `11dbb0b` on `integrate/offline-engines-20261118`:
+
+| Piece | File | State |
+| --- | --- | --- |
+| Unigram tokenizer + decode driver | `MadladEngine.kt` | verified, 16/16 id checks |
+| Encoder/decoder sessions | `avnivo_madlad_jni.cpp` | compiles against real ORT header |
+| Engine kind + spec + dispatch | `OfflineModelSpecs.kt`, `OfflineModuleManager.kt` | wired |
+
+Reuses the existing ORT `dlopen` resolution, so no second `libonnxruntime.so` is packaged.
+
+### Bugs found by compiling and running, not by reading
+
+1. `decode` used `replace(METASPACE, " ")` — a `Char`/`String` mismatch that does not compile.
+2. `INFINITY` used without `<cmath>`.
+3. `supportsLanguage("")` returned **true**: the vocabulary contains the bare `<2>` tag, so a
+   membership-only check accepts an empty code and builds a prompt with no language. Now guarded
+   by a tag-shape regex.
+
+### What the verification actually covered
+
+- The real Kotlin tokenizer against the real 256k-entry `tokenizer.json`: 16/16, including six
+  sentences pinned from the reference `tokenizers` library, decode round-trips, and tag lookup.
+- Prompt convention: `<2xx>` prefixes the **source** text, appears exactly once, and the decoder
+  starts from `decoder_start_token_id` alone.
+- The no-repeat 3-gram guard, as a standalone C++ unit test: 4/4, including the short-sequence
+  and no-repeat cases.
+
+### Why the module is still switched off
+
+The 3.6 GB artifact has not been uploaded, and `madlad-400-3b-int4` is not in the ticket
+allowlist, so a download would 404. The spec therefore ships an **empty file list** and a
+`blocker` that says so. `runnable` now also requires a non-empty file list, which means a spec
+with nothing to verify cannot start a download at all.
+
+Turning the module on is data, not code: upload the four artifacts, add the manifest entry with
+real byte sizes and SHA-256, and the existing downloader and engine path take over.
+
+## Remaining work
+
+1. Upload the four INT4 artifacts to the model bucket (needs credentials this sandbox lacks).
+2. Register `madlad-400-3b-int4` in `translator-api` `offline_models.py` and add its manifest.
+3. Point the existing `offline-translate-large` card at the installer **after** step 1, so the
+   button cannot 404. The card is deliberately untouched until then.
+4. On-device inference run on the emulator via `avnivo-integrated-android.yml`.

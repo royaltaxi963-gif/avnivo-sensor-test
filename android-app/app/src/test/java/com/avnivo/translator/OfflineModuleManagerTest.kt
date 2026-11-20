@@ -61,7 +61,10 @@ class OfflineModuleManagerTest {
             OfflineModelSpecs.all.values.filter { it.runnable }.map { it.id }.toSet()
         )
         assertEquals(
-            setOf("whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8", "navoiy-tts", "mms-tts"),
+            setOf(
+                "whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8",
+                "madlad-400-3b-int4", "navoiy-tts", "mms-tts"
+            ),
             OfflineModelSpecs.all.keys
         )
     }
