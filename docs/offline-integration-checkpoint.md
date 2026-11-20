@@ -155,7 +155,7 @@ the default pipeline.
 | Uzbek STT | user-supplied archive, live ticket | verified (200) | SHA-256 matched | sherpa-onnx 2.0.1 NeMo CTC int8 | 9/9 word recall (Linux) and on-device emulator test OK | yes (no network at decode) | APK wiring done | VERIFIED WORKING (emulator); physical device pending |
 | Whisper Small (`whisper-small-q8`) | `multilingual-stt/whisper-small-q8_0` in the AVNIVO model bucket, ticket 200 | verified | SHA-256 matched | whisper.cpp v1.7.4 + ggml, NDK-built | on-device emulator: real transcription of a known utterance OK | yes | card + bridge + mic routing done | VERIFIED WORKING (emulator); physical device pending |
 | Whisper Large V3 Turbo (`whisper-large-v3-turbo`) | `multilingual-stt/whisper-large-v3-turbo-q5_0`, ticket 200 | verified | SHA-256 matched | same whisper.cpp runtime | not yet run (opt-in job) | runtime is offline | card + bridge done | IMPLEMENTED — DEVICE TEST PENDING |
-| NLLB-200 (`nllb-200-600m-int8`) | `multilingual-translation/nllb-200-600m-int8`, ticket 200, 8 files | verified | SHA-256 in manifest | no on-device runtime yet | not run | n/a | card + download bridge done | BLOCKED — EXTERNAL DEPENDENCY (runtime not integrated) |
+| NLLB-200 (`nllb-200-600m-int8`) | `multilingual-translation/nllb-200-600m-int8`, ticket 200, 8 files | verified | SHA-256 in manifest | ONNX Runtime 1.32.0 via `libavnivo_nllb`, encoder+merged decoder | emulator: 6/6 tests, real uz→ru/en text (see numbers below) | yes, re-run with radios down | card + download bridge + JNI decode done | VERIFIED WORKING (emulator); physical device pending |
 | Navoiy TTS | aisha-org/navoiy-tts (CosyVoice2 + emotion checkpoint, PyTorch, Apache-2.0) | ticket 200, 22 files; no ONNX export published | sha256 in manifest | requires PyTorch + CosyVoice2 runtime; no ONNX artifact under `tts/uzbek/navoiy/` (403) | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
 | MMS TTS | facebook/mms-tts-rus, converted by sherpa-onnx to VITS ONNX (`vits-mms-rus.tar.bz2`, 107,761,221 B) | ONNX export measured: 3 Russian sentences synthesized offline, 0.27–0.41 s each, 16 kHz, rms 0.10, 65.5% energy in the 300–3400 Hz speech band | model.onnx 114,021,556 B sha256 8735fad7…34dd, tokens.txt 447 B sha256 361fb887…d23b | bundled sherpa-onnx 2.0.1 AAR ships OfflineTts + OfflineTtsVitsModelConfig | not run on device | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
 | Large Offline Translation | none identified | n/a | n/a | none | not run | n/a | not integrated | BLOCKED — EXTERNAL DEPENDENCY |
@@ -586,3 +586,41 @@ FLAGS = -g -DANDROID ... -fno-limit-debug-info  -O3 -fPIC
 Because a `-O0` build still passes every functional test, only ~100x slower, the
 workflow now greps `build.ninja` and fails on `GGML_NOT_OPTIMISED`. That guard is what
 caught attempt 1's failure to take effect, and its own path bug in turn.
+
+## Measured performance (2026-11-20, 2-core x86_64 emulator)
+
+These are real figures from `WHISPER_PERF` and `AvnivoNllb` logcat lines, not estimates.
+The emulator is much slower than a phone, so treat them as a floor.
+
+| Engine | Input | Time | Real-time factor |
+| --- | --- | --- | --- |
+| Whisper Small Q8 | 11.0 s English speech | 85.2 s first, 85.5 s repeat | 7.75x |
+| NLLB-200 600M INT8 | "Rahmat" (short) | 0.99 s | — |
+| NLLB-200 600M INT8 | "Salom" | 1.6 s | — |
+| NLLB-200 600M INT8 | "Salom, qalaysiz?" | 3.2 s | — |
+| NLLB-200 600M INT8 | "Bugun havo juda issiq." | 3.2 s | — |
+
+Whisper download measured 41.8 s on the same run, timed separately from the load.
+
+### NLLB thread count is measured, not guessed
+
+`avnivo_nllb_jni.cpp` originally pinned ONNX Runtime to 2 intra-op threads. Replacing that
+with `hardware_concurrency() - 1` regressed the 2-core emulator, because the expression
+evaluates to 1 thread there:
+
+| Decode threads | "Salom" | "Salom, qalaysiz?" | "Bugun havo juda issiq." |
+| --- | --- | --- | --- |
+| 2 (original fixed value) | 1282 ms | 4445 ms | 5484 ms |
+| 1 (`hw - 1` on 2 cores) | 1581 ms | 4684 ms | 5402 ms |
+| 2 (current floor of 2) | 1604 ms | 3200 ms | 3152 ms |
+
+The floor is therefore 2, with the cap still 8 so the big cluster does not throttle.
+The 3.2 s figures come from the same run as the 1.6 s figure and reflect a warmed process,
+so they are not directly comparable to the cold first-run numbers in the first two rows.
+
+### A skipped test used to report success
+
+`reportsWhisperLatencyAndRepeats` guards itself with `assumeTrue`, so passing a wrong
+instrumentation argument made the body skip while the suite still printed `OK`. One run
+reported `Time: 0.001` and was accepted by CI as a passing measurement. The workflow now
+requires the `WHISPER_PERF audio=` line itself instead of a bare `OK`.
