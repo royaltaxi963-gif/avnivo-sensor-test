@@ -564,3 +564,25 @@ VITS graph and cannot be dropped into `OfflineTtsVitsModelConfig`. Exporting it 
 the upstream PyTorch weights plus `torch.onnx.export` over both stages, which is not
 possible from this environment (no GPU, no upstream weights, and the export is known
 to be non-trivial for flow matching).
+
+## Phase 3 — Whisper slowness: the flag never reached the compiler
+
+Two attempts were needed, and the first one silently did nothing.
+
+Attempt 1 passed `-O3` through Gradle's `cppFlags`. AGP forwards that as
+`CMAKE_CXX_FLAGS`, which CMake emits *before* the per-config flags, so the Debug
+build type's own setting still won. The cached `CMakeCache.txt` showed the result:
+`CMAKE_C_FLAGS_DEBUG` is empty and the ggml compile line carried no `-O` flag at all,
+meaning the compiler default `-O0`. The 110-minute emulator job confirmed it
+empirically by running to its timeout instead of finishing.
+
+Attempt 2 appends `-O3` to `CMAKE_{C,CXX}_FLAGS_<CONFIG>`, which places it after the
+build-type flags. The generated ninja file now reads:
+
+```
+FLAGS = -g -DANDROID ... -fno-limit-debug-info  -O3 -fPIC
+```
+
+Because a `-O0` build still passes every functional test, only ~100x slower, the
+workflow now greps `build.ninja` and fails on `GGML_NOT_OPTIMISED`. That guard is what
+caught attempt 1's failure to take effect, and its own path bug in turn.
