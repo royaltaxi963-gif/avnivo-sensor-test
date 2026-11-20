@@ -156,6 +156,35 @@ with nothing to verify cannot start a download at all.
 Turning the module on is data, not code: upload the four artifacts, add the manifest entry with
 real byte sizes and SHA-256, and the existing downloader and engine path take over.
 
+## CI verification (run 44711789585, commit baf85c3)
+
+| Check | Result |
+| --- | --- |
+| `testDebugUnitTest` | 61 tests, 0 failures, 10 ignored |
+| `assembleDebug` / release | BUILD SUCCESSFUL |
+| `emulator-smoke` instrumented | OK, 21 tests |
+| `avnivo_madlad_jni.cpp` warnings | 0 |
+
+Two unit tests failed on the first CI run and were fixed in `a3fc297`. Both were inventory
+counts (`catalogOnlyContainsRealEngines`, `statusJsonIsWellFormedForEveryModule`) that assert
+the exact spec set and size; adding a sixth spec broke them. The runnable set is unchanged,
+which is the invariant that matters.
+
+A later NDK warning pass found ignored ONNX Runtime return values. Fixed in `baf85c3`: a failed
+`GetTensorTypeAndShape` left `logitsInfo` null and the next call dereferenced it.
+
+APK packaging, confirmed by unzipping the artifact rather than trusting the build log:
+
+```
+lib/arm64-v8a/libavnivo_madlad.so    44,800 B
+lib/armeabi-v7a/libavnivo_madlad.so  12,452 B
+lib/x86/libavnivo_madlad.so          46,536 B
+lib/x86_64/libavnivo_madlad.so       45,192 B
+```
+
+Exported symbols (`nm -D`): `nativeCreate`, `nativeFree`, `nativeTranslate` under
+`Java_com_avnivo_translator_MadladEngine_`.
+
 ## Remaining work
 
 1. Upload the four INT4 artifacts to the model bucket (needs credentials this sandbox lacks).
