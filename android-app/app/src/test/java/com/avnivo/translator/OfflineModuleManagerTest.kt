@@ -152,12 +152,39 @@ class OfflineModuleManagerTest {
 
     @Test fun blockedModulesExplainWhyAndShipNoFiles() {
         val blocked = OfflineModelSpecs.all.values.filter { !it.runnable }
-        assertTrue("the PyTorch-only TTS modules must be registered", blocked.map { it.id }.containsAll(listOf("navoiy-tts", "mms-tts")))
+        assertTrue(
+            "the PyTorch-only TTS modules must be registered",
+            blocked.map { it.id }.containsAll(listOf("navoiy-tts", "mms-tts"))
+        )
         for (spec in blocked) {
-            assertEquals("${spec.id} must be UNAVAILABLE", OfflineEngineKind.UNAVAILABLE, spec.engine)
             assertTrue("${spec.id} must explain its blocker", (spec.blocker?.length ?: 0) > 20)
             assertTrue("${spec.id} must not offer files to download", spec.files.isEmpty())
         }
+    }
+
+    /**
+     * A module can be blocked for two different reasons, and the spec must not conflate them:
+     * either no runtime exists at all (UNAVAILABLE), or the runtime is wired but its verified
+     * artifacts are not published yet (a real engine kind with no files).
+     */
+    @Test fun blockedModulesDistinguishMissingRuntimeFromUnpublishedArtifacts() {
+        for (spec in OfflineModelSpecs.all.values.filter { !it.runnable }) {
+            val hasEngine = spec.engine != OfflineEngineKind.UNAVAILABLE
+            assertEquals(
+                "${spec.id}: only an unpublished-artifact blocker may name a real engine",
+                hasEngine,
+                spec.id == "madlad-400-3b-int4"
+            )
+        }
+    }
+
+    @Test fun madladIsWiredButFailsClosedUntilArtifactsArePublished() {
+        val spec = OfflineModelSpecs.all.getValue("madlad-400-3b-int4")
+        assertEquals(OfflineEngineKind.MADLAD_ONNX, spec.engine)
+        assertFalse("must not be runnable while the bucket has no artifact", spec.runnable)
+        assertTrue("must ship no unverified files", spec.files.isEmpty())
+        assertTrue("must declare the RAM it needs once enabled", spec.requiredRamBytes > 0)
+        assertTrue("must name the missing artifact", spec.blocker!!.contains("bucket"))
     }
 
     @Test fun aBlockedModuleSurfacesItsBlockerInsteadOfDownloading() {

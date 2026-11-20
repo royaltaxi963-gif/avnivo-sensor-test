@@ -25,3 +25,9 @@ target_link_libraries(avnivo_whisper whisper log android)
 add_library(avnivo_nllb SHARED avnivo_nllb_jni.cpp)
 target_include_directories(avnivo_nllb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(avnivo_nllb log dl)
+
+# MADLAD-400 3B INT4 translation. Same dlopen-based ONNX Runtime resolution as the NLLB bridge,
+# so no second libonnxruntime.so is shipped.
+add_library(avnivo_madlad SHARED avnivo_madlad_jni.cpp)
+target_include_directories(avnivo_madlad PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(avnivo_madlad log dl)

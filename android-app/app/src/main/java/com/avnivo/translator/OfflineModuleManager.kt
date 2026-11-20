@@ -69,7 +69,7 @@ internal class OfflineModuleManager(
         }
     }
 
-    /** Translates with an already-initialized NLLB engine, reusing the loaded model. */
+    /** Translates with an already-initialized translation engine, reusing the loaded model. */
     fun translate(id: String, text: String, source: String, target: String): String {
         val module = modules[id] ?: error("Unknown module: $id")
         require(module.state.isOperational) { "Engine not ready" }
@@ -77,6 +77,7 @@ internal class OfflineModuleManager(
         return synchronized(engine) {
             when (engine) {
                 is NllbEngine -> engine.translate(text, source, target)
+                is MadladEngine -> engine.translate(text, source, target)
                 else -> error("Module is not a translator")
             }
         }
@@ -84,8 +85,14 @@ internal class OfflineModuleManager(
 
     /** True when the initialized engine can translate this language pair. */
     fun supportsTranslation(id: String, source: String, target: String): Boolean {
-        val engine = modules[id]?.engine as? NllbEngine ?: return false
-        return synchronized(engine) { engine.supportsLanguage(source) && engine.supportsLanguage(target) }
+        val engine = modules[id]?.engine
+        return synchronized(engine ?: return false) {
+            when (engine) {
+                is NllbEngine -> engine.supportsLanguage(source) && engine.supportsLanguage(target)
+                is MadladEngine -> engine.supportsLanguage(target)
+                else -> false
+            }
+        }
     }
 
     /**
@@ -93,8 +100,14 @@ internal class OfflineModuleManager(
      * the device test can separate real inference cost from the model download it also performs.
      */
     fun inferenceTimings(id: String): List<Pair<String, Long>> {
-        val engine = modules[id]?.engine as? NllbEngine ?: return emptyList()
-        return synchronized(engine) { engine.inferenceHistory.toList() }
+        val engine = modules[id]?.engine
+        return synchronized(engine ?: return emptyList()) {
+            when (engine) {
+                is NllbEngine -> engine.inferenceHistory.toList()
+                is MadladEngine -> engine.inferenceHistory.toList()
+                else -> emptyList()
+            }
+        }
     }
 
     private fun statusJson(id: String, module: Module): JSONObject = JSONObject()
@@ -199,6 +212,10 @@ internal class OfflineModuleManager(
         OfflineEngineKind.NLLB_ONNX -> {
             requireRam(spec)
             NllbEngine(directory).also { it.prepare(); it.smokeTest() }
+        }
+        OfflineEngineKind.MADLAD_ONNX -> {
+            requireRam(spec)
+            MadladEngine(directory).also { it.prepare(); it.smokeTest() }
         }
         OfflineEngineKind.UZBEK_NEMO_CTC -> error("Uzbek engine is managed by the STT bridge")
         OfflineEngineKind.UNAVAILABLE -> error("No engine available for ${spec.id}")
