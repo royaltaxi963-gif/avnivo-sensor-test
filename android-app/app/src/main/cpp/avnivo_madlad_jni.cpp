@@ -285,20 +285,26 @@ Java_com_avnivo_translator_MadladEngine_nativeTranslate(JNIEnv* env, jobject /*t
             return nullptr;
         }
 
+        // Every one of these can fail; a null logitsInfo would be dereferenced immediately below,
+        // so the failure is checked rather than assumed away.
         OrtTensorTypeAndShapeInfo* logitsInfo = nullptr;
-        api->GetTensorTypeAndShape(logits, &logitsInfo);
         size_t logitsRank = 0;
-        api->GetDimensionsCount(logitsInfo, &logitsRank);
-        std::vector<int64_t> logitsShape(logitsRank);
-        api->GetDimensions(logitsInfo, logitsShape.data(), logitsRank);
         size_t elementCount = 0;
-        api->GetTensorShapeElementCount(logitsInfo, &elementCount);
-        api->ReleaseTensorTypeAndShapeInfo(logitsInfo);
+        std::vector<int64_t> logitsShape;
+        int64_t vocab = 0;
+        bool shapeOk = api->GetTensorTypeAndShape(logits, &logitsInfo) == nullptr;
+        if (shapeOk) shapeOk = api->GetDimensionsCount(logitsInfo, &logitsRank) == nullptr;
+        if (shapeOk) {
+            logitsShape.resize(logitsRank);
+            shapeOk = api->GetDimensions(logitsInfo, logitsShape.data(), logitsRank) == nullptr;
+        }
+        if (shapeOk) shapeOk = api->GetTensorShapeElementCount(logitsInfo, &elementCount) == nullptr;
+        if (logitsInfo) api->ReleaseTensorTypeAndShapeInfo(logitsInfo);
+        if (shapeOk && logitsRank == 3) vocab = logitsShape[2];
 
         float* raw = nullptr;
-        api->GetTensorMutableData(logits, reinterpret_cast<void**>(&raw));
-        const int64_t vocab = logitsRank == 3 ? logitsShape[2] : 0;
-        if (!raw || vocab <= 0) {
+        if (shapeOk) shapeOk = api->GetTensorMutableData(logits, reinterpret_cast<void**>(&raw)) == nullptr;
+        if (!shapeOk || !raw || vocab <= 0) {
             api->ReleaseValue(logits);
             api->ReleaseValue(idsValue);
             api->ReleaseValue(maskValue);
