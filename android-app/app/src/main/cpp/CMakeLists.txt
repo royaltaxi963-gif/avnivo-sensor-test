@@ -8,7 +8,7 @@ add_subdirectory(whisper.cpp)
 set_target_properties(whisper PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(avnivo_whisper SHARED avnivo_whisper_jni.cpp)
-target_link_libraries(avnivo_whisper whisper log)
+target_link_libraries(avnivo_whisper whisper log android)
 
 # NLLB runs on the ONNX Runtime that the sherpa-onnx AAR already packages; the C API is resolved
 # with dlopen at runtime so no second copy of libonnxruntime.so is linked or shipped.

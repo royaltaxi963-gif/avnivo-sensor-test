@@ -1,11 +1,18 @@
 // JNI bridge for offline Whisper (ggml/whisper.cpp) speech recognition.
 // The model is a single GGML file; inference is fully offline on-device.
+#include <android/log.h>
 #include <jni.h>
+
+#include <algorithm>
+#include <chrono>
 #include <string>
+#include <thread>
 #include <vector>
 #include "whisper.h"
 
 namespace {
+
+constexpr const char *kLogTag = "AvnivoWhisper";
 
 struct Session {
     whisper_context *ctx = nullptr;
@@ -18,6 +25,16 @@ std::string jstringToStd(JNIEnv *env, jstring value) {
     std::string out = chars ? chars : "";
     if (chars) env->ReleaseStringUTFChars(value, chars);
     return out;
+}
+
+/**
+ * Leaves one core for the audio thread and the UI. A floor of 4 would oversubscribe a 2-core
+ * emulator and cause contention, while capping at 8 avoids thermal throttling on the big cluster.
+ */
+int inferenceThreads() {
+    const unsigned hw = std::thread::hardware_concurrency();
+    if (hw == 0) return 4;
+    return static_cast<int>(std::min(8u, std::max(1u, hw - 1)));
 }
 
 }  // namespace
@@ -53,12 +70,22 @@ Java_com_avnivo_translator_WhisperEngine_nativeTranscribe(
     params.print_special = false;
     params.translate = false;
     params.single_segment = false;
-    params.n_threads = 4;
+    params.n_threads = inferenceThreads();
     params.no_context = true;
     const std::string language = requested.empty() ? "auto" : requested;
     params.language = language.c_str();
 
-    if (whisper_full(session->ctx, params, pcm.data(), count) != 0) return env->NewStringUTF("");
+    const auto started = std::chrono::steady_clock::now();
+    const int rc = whisper_full(session->ctx, params, pcm.data(), count);
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                             std::chrono::steady_clock::now() - started)
+                             .count();
+    const double audioSeconds = static_cast<double>(count) / 16000.0;
+    __android_log_print(ANDROID_LOG_INFO, kLogTag,
+                        "inference latency=%lldms audio=%.2fs threads=%d rt_ratio=%.2fx rc=%d",
+                        static_cast<long long>(elapsed), audioSeconds, params.n_threads,
+                        audioSeconds > 0 ? (elapsed / 1000.0) / audioSeconds : 0.0, rc);
+    if (rc != 0) return env->NewStringUTF("");
 
     std::string text;
     const int segments = whisper_full_n_segments(session->ctx);

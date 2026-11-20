@@ -3,6 +3,7 @@ package com.avnivo.translator
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.json.JSONObject
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
@@ -83,6 +84,68 @@ class OfflineWhisperInferenceTest {
             val expected = listOf("country", "ask", "what", "you", "can", "do", "for")
             val hits = expected.count { it in text }
             assertTrue("recall $hits/${expected.size} too low for: $text", hits >= 4)
+        } finally {
+            manager.close()
+        }
+    }
+
+    /**
+     * Measures the Whisper path as the user experiences it: model load, first inference, then a
+     * repeat inference on the same warm engine. Emits one parseable line per phase so CI can chart
+     * the numbers instead of trusting a suite wall clock.
+     */
+    @Test
+    fun reportsWhisperLatencyAndRepeats() {
+        assumeTrue(
+            "set -e avnivoWhisperPerf true to run",
+            InstrumentationRegistry.getArguments().getString("avnivoWhisperPerf") == "true"
+        )
+
+        val asset = InstrumentationRegistry.getInstrumentation().context.assets.open("whisper_jfk_16k.wav")
+        val audio = File(context.cacheDir, "whisper_jfk_perf_16k.wav")
+        asset.use { input -> audio.outputStream().use { input.copyTo(it) } }
+        val samples = readWavSamples(audio)
+        val audioSeconds = samples.size / 16000.0
+
+        val manager = OfflineModuleManager(context.filesDir, context.applicationContext) { _, _ -> }
+        try {
+            // Time the download separately so the load figure is not polluted by network work.
+            val downloadStarted = System.nanoTime()
+            manager.download("whisper-small-q8")
+            manager.awaitIdle()
+            val downloadSeconds = (System.nanoTime() - downloadStarted) / 1e9
+            val status = JSONObject(manager.status("whisper-small-q8") ?: "{}")
+            assertTrue("module must be ready, was: $status", status.optString("state") == "ready")
+
+            val firstStarted = System.nanoTime()
+            val first = manager.transcribe("whisper-small-q8", samples)
+            val firstSeconds = (System.nanoTime() - firstStarted) / 1e9
+
+            val secondStarted = System.nanoTime()
+            val second = manager.transcribe("whisper-small-q8", samples)
+            val secondSeconds = (System.nanoTime() - secondStarted) / 1e9
+
+            println(
+                "WHISPER_PERF audio=${"%.2f".format(audioSeconds)}s download=${"%.1f".format(downloadSeconds)}s " +
+                    "first=${"%.1f".format(firstSeconds)}s repeat=${"%.1f".format(secondSeconds)}s " +
+                    "first_rt=${"%.2f".format(firstSeconds / audioSeconds)}x " +
+                    "repeat_rt=${"%.2f".format(secondSeconds / audioSeconds)}x"
+            )
+
+            assertFalse("first transcription must not be empty", first.isBlank())
+            assertEquals("repeat inference must be deterministic", first, second)
+            // Same recall bar as the functional test, so this measurement run is also a real
+            // transcription check and cannot pass on a stub.
+            val expected = listOf("country", "ask", "what", "you", "can", "do", "for")
+            val hits = expected.count { it in first.lowercase() }
+            assertTrue("recall $hits/${expected.size} too low for: $first", hits >= 4)
+
+            // An 11 s clip should not take minutes once ggml is optimised; guard against regressions
+            // back to an -O0 build without hardcoding a figure tuned to one machine.
+            assertTrue(
+                "first inference ${"%.1f".format(firstSeconds)}s is far slower than realtime",
+                firstSeconds / audioSeconds < 30.0
+            )
         } finally {
             manager.close()
         }

@@ -24,6 +24,10 @@ android {
    ndkVersion = "27.0.12077973"
    System.getenv("AVNIVO_ABIS")?.split(",")?.filter { it.isNotBlank() }?.let { ndk { abiFilters += it } }
    externalNativeBuild { cmake { arguments += listOf("-DANDROID_STL=c++_shared", "-DWHISPER_BUILD_TESTS=OFF", "-DWHISPER_BUILD_EXAMPLES=OFF", "-DWHISPER_BUILD_SERVER=OFF") } }
+   // The debug native build defaults to -O0, which made an 11 s clip take ~20 minutes
+   // (~107x realtime). ggml's hot loops need the optimiser; NEON comes from the arm64 ABI.
+   externalNativeBuild { cmake { cppFlags += listOf("-O3") } }
+
   }
  }
  if (buildWhisperNative) {
