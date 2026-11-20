@@ -74,6 +74,14 @@ jobs:
           if-no-files-found: warn
       - name: Build integrated APK
         run: gradle --no-daemon assembleDebug assembleDebugAndroidTest
+      - name: Assert ggml was compiled optimised
+        run: |
+          # A -O0 native build still passes every functional test, just ~100x slower, so assert the
+          # flag reached the compiler rather than trusting it.
+          ninja_file=$(find android-app/app/.cxx/Debug -name build.ninja | head -1)
+          test -n "$ninja_file" || { echo NO_NINJA_FILE; exit 1; }
+          grep -q -- "-O3" "$ninja_file" || { echo GGML_NOT_OPTIMISED; grep -m1 "FLAGS = " "$ninja_file"; exit 1; }
+          echo NATIVE_OPTIMISED
       - uses: actions/upload-artifact@v4
         with:
           name: avnivo-translator-integrated-debug-apk
