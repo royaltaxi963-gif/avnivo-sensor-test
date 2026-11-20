@@ -1009,10 +1009,13 @@ function updateOfflineModule(id,state,progress){
  btn.setAttribute('aria-label',ready?'Modul faol':downloaded?'Model tekshirildi, dvigatel kutilmoqda':module.name+' — yuklab olish');
  status.textContent=avnivoUiText(({not_installed:'offline.state.not_installed',downloading:'offline.state.downloading',verifying:'offline.state.verifying',downloaded:'offline.status.verifiedInactive',ready:'offline.state.ready',error:'offline.state.error'})[state],({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',downloaded:'Yuklangan · faollashtirish kutilmoqda',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state]);
  const hasProgress=progress&&Number.isFinite(progress.downloadedBytes)&&Number.isFinite(progress.totalBytes)&&progress.totalBytes>0&&progress.downloadedBytes>=0;
- progressEl.hidden=!(state==='downloading'||state==='verifying')||!hasProgress;
- if(hasProgress){
-  const done=Math.min(progress.downloadedBytes,progress.totalBytes),percent=Math.min(100,Math.floor(done/progress.totalBytes*100));
-  fill.style.width=percent+'%';pct.textContent=percent+'%';mb.textContent=offlineMb(done)+' / '+offlineMb(progress.totalBytes);
+ if(hasProgress)row.avnivoLastProgress={downloadedBytes:progress.downloadedBytes,totalBytes:progress.totalBytes};
+ else if(state==='not_installed'||state==='ready'||state==='error')row.avnivoLastProgress=null;
+ const shownProgress=hasProgress?progress:row.avnivoLastProgress;
+ progressEl.hidden=!(state==='downloading'||state==='verifying')||!shownProgress;
+ if(shownProgress){
+  const done=Math.min(shownProgress.downloadedBytes,shownProgress.totalBytes),percent=Math.min(100,Math.floor(done/shownProgress.totalBytes*100));
+  fill.style.width=percent+'%';pct.textContent=percent+'%';mb.textContent=offlineMb(done)+' / '+offlineMb(shownProgress.totalBytes);
   btn.style.setProperty('--module-progress',percent+'%');
   if(state==='downloading'||state==='verifying')btn.innerHTML='<span class="module-percent">'+percent+'%</span>';
   progressEl.querySelector('[role="progressbar"]').setAttribute('aria-valuenow',String(percent));
@@ -1108,7 +1111,7 @@ window.AvnivoOfflineModuleProgress=function(raw){
 };
 window.AvnivoOfflineModuleStatus=function(installerId){
  if(window.AvnivoOfflineModules&&typeof window.AvnivoOfflineModules.status==='function'){
-  try{const info=JSON.parse(window.AvnivoOfflineModules.status(installerId));syncOfflineModule(installerId,info.state)}catch(e){}
+  try{const info=JSON.parse(window.AvnivoOfflineModules.status(installerId));syncOfflineModule(installerId,info.state,info.progress&&Number.isFinite(info.progress.downloadedBytes)&&Number.isFinite(info.progress.totalBytes)?info.progress:null)}catch(e){}
  }
 };
 window.AvnivoOfflineModuleReady=function(installerId){
@@ -1798,7 +1801,13 @@ let holdTimer=0,holdStarted=false,holdPointer=null,holdSuppressClick=false,holdR
 let avnivoPressStartedAt=0,avnivoRecordingAt=0,avnivoCancelHold=false,avnivoHoldFinalizing=false;
 // Offline gesture state: the native recorder owns capture; JS only reflects its live amplitude.
 let offlineWaveFrame=0,offlineWaveActive=false,offlineLevel=0,avnivoOfflineCancel=false;
-function hint(message){if(document.documentElement.dataset.avnivoMode==='online'){voiceHint.hidden=true;return}voiceHint.textContent=message;voiceHint.hidden=!message}
+let avnivoHintTimeout=0;
+function hint(message){
+ clearTimeout(avnivoHintTimeout);avnivoHintTimeout=0;
+ if(document.documentElement.dataset.avnivoMode==='online'){voiceHint.hidden=true;return}
+ voiceHint.textContent=message;voiceHint.hidden=!message;
+ if(message)avnivoHintTimeout=setTimeout(()=>{voiceHint.textContent='';voiceHint.hidden=true;avnivoHintTimeout=0},3500);
+}
 function appendTranscript(base,transcript){
  const spoken=transcript.trim();
  if(!spoken)return base;
@@ -2007,8 +2016,13 @@ function releaseHold(event){
  }
 }
 mic.addEventListener('pointerup',releaseHold);
+// Android WebView may deliver the release to the document after capture is lost.
+// releaseHold is idempotent because it clears holdPointer on its first invocation.
+document.addEventListener('pointerup',releaseHold,true);
+window.addEventListener('blur',()=>{if(holdPointer!==null)cancelHeldPointer()});
 mic.addEventListener('mousedown',preserveKeyboardOnMicPress);
-mic.addEventListener('pointercancel',event=>{if(holdPointer!==event.pointerId)return;clearHoldTimer();holdPointer=null;holdSuppressClick=true;if(document.documentElement.dataset.avnivoMode==='offline'){try{window.AvnivoOfflineSTT.stop()}catch(e){}finishOfflineHold()}else if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();stopVoice();shell.classList.remove('hold-voice')}else finishHold(true)});
+function cancelHeldPointer(){if(holdPointer===null)return;clearHoldTimer();holdPointer=null;holdSuppressClick=true;if(document.documentElement.dataset.avnivoMode==='offline'){try{window.AvnivoOfflineSTT.stop()}catch(e){}finishOfflineHold()}else if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();stopVoice();shell.classList.remove('hold-voice')}else finishHold(true)}
+mic.addEventListener('pointercancel',event=>{if(holdPointer===event.pointerId)cancelHeldPointer()});
 mic.addEventListener('lostpointercapture',event=>{if(holdPointer===event.pointerId)releaseHold(event)});
 mic.addEventListener('contextmenu',event=>{if(holdTimer||holdStarted||active)event.preventDefault()});
 mic.addEventListener('click',event=>{event.preventDefault();holdSuppressClick=false});
