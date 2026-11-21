@@ -51,6 +51,9 @@ android {
 dependencies {
  implementation("androidx.core:core-ktx:1.15.0")
  implementation(files("libs/sherpa-onnx-2.0.1.aar"))
+ // Silero TTS runs a TorchScript Lite graph. Pinned to 2.1.0 because that is the only published
+ // version whose interpreter reads bytecode v8, which is what the exported .ptl carries.
+ implementation("org.pytorch:pytorch_android_lite:2.1.0")
  testImplementation("junit:junit:4.13.2")
  testImplementation("org.json:json:20240303")
  androidTestImplementation("androidx.test:runner:1.6.2")

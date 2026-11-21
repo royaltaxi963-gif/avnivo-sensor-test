@@ -69,6 +69,22 @@ internal class OfflineModuleManager(
         }
     }
 
+    /**
+     * Synthesizes Uzbek text with an already-initialized Silero engine, reusing the loaded model.
+     * Returns mono PCM at [SileroTtsEngine.SAMPLE_RATE]; the caller plays it on the manual action.
+     */
+    fun synthesize(id: String, text: String): FloatArray {
+        val module = modules[id] ?: error("Unknown module: $id")
+        require(module.state.isOperational) { "Engine not ready" }
+        val engine = module.engine ?: error("Engine not initialized")
+        return synchronized(engine) {
+            when (engine) {
+                is SileroTtsEngine -> engine.synthesize(text)
+                else -> error("Module is not a speech synthesizer")
+            }
+        }
+    }
+
     /** Translates with an already-initialized NLLB engine, reusing the loaded model. */
     fun translate(id: String, text: String, source: String, target: String): String {
         val module = modules[id] ?: error("Unknown module: $id")
@@ -199,6 +215,12 @@ internal class OfflineModuleManager(
         OfflineEngineKind.NLLB_ONNX -> {
             requireRam(spec)
             NllbEngine(directory).also { it.prepare(); it.smokeTest() }
+        }
+        OfflineEngineKind.SILERO_TTS -> {
+            requireRam(spec)
+            val model = directory.listFiles()?.firstOrNull { it.name.endsWith(".ptl") }
+                ?: error("Missing TorchScript model")
+            SileroTtsEngine(model).also { it.prepare(); it.smokeTest() }
         }
         OfflineEngineKind.UZBEK_NEMO_CTC -> error("Uzbek engine is managed by the STT bridge")
         OfflineEngineKind.UNAVAILABLE -> error("No engine available for ${spec.id}")

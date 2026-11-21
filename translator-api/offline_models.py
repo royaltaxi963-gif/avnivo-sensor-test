@@ -30,6 +30,7 @@ ALLOWED_PREFIXES = {
     "nllb-200-600m-int8": "multilingual-translation/nllb-200-600m-int8/",
     "navoiy-tts": "tts/uzbek/navoiy/",
     "mms-tts": "tts/mms/rus/",
+    "silero-tts": "tts/uzbek/silero/",
 }
 
 def load_verified_models():

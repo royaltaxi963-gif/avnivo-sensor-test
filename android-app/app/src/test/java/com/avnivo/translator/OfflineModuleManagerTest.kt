@@ -57,11 +57,11 @@ class OfflineModuleManagerTest {
         // The settings cards must all be backed by a native spec, and every spec that can run
         // must be one of the verified downloadable engines.
         assertEquals(
-            setOf("whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8"),
+            setOf("whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8", "silero-tts"),
             OfflineModelSpecs.all.values.filter { it.runnable }.map { it.id }.toSet()
         )
         assertEquals(
-            setOf("whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8", "navoiy-tts", "mms-tts"),
+            setOf("whisper-small-q8", "whisper-large-v3-turbo", "nllb-200-600m-int8", "navoiy-tts", "mms-tts", "silero-tts"),
             OfflineModelSpecs.all.keys
         )
     }
@@ -170,6 +170,63 @@ class OfflineModuleManagerTest {
             val message = messages.first { it.first == "AvnivoOfflineModuleError" }.second
             assertTrue("must name the module", message.startsWith("navoiy-tts|"))
             assertTrue("must mention PyTorch", message.contains("PyTorch"))
+        } finally {
+            manager.close()
+        }
+    }
+
+    @Test fun sileroTtsIsARunnableMitLicensedUzbekEngine() {
+        val spec = OfflineModelSpecs.all.getValue("silero-tts")
+        assertEquals(OfflineEngineKind.SILERO_TTS, spec.engine)
+        assertTrue("must ship the TorchScript artifact", spec.files.containsKey("silero_v21.ptl"))
+        val (bytes, sha) = spec.files.getValue("silero_v21.ptl")
+        assertEquals(91_988_758L, bytes)
+        assertEquals("333128fb6c7476e7fceec562f3f54980cbb6a88bbe59ff4a8e67e6cddad7a861", sha)
+        assertTrue("must declare a RAM floor", spec.requiredRamBytes > 0)
+        assertNull("a runnable engine has no blocker", spec.blocker)
+    }
+
+    @Test fun sileroEngineFailureNeverReportsReady() {
+        // The native interpreter is absent on the JVM, so this asserts the fail-closed path that a
+        // device hits when the .ptl is corrupt or the runtime refuses to load it.
+        val spec = OfflineModelSpecs.all.getValue("silero-tts")
+        placeInstalledModel(spec)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> throw IllegalStateException("interpreter rejected the model") }
+        manager.download(spec.id)
+        manager.awaitIdle()
+        val status = JSONObject(manager.status(spec.id))
+        assertEquals("installed", status.getString("state"))
+        assertFalse("a failed init must not be operational", status.getBoolean("active"))
+        assertFalse(manager.isOperational(spec.id))
+        assertTrue(messages.any { it.first == "AvnivoOfflineModuleError" && it.second.startsWith("silero-tts|") })
+        manager.close()
+    }
+
+    @Test fun sileroSynthesisRefusesAnUnreadyEngine() {
+        val manager = manager()
+        try {
+            manager.synthesize("silero-tts", "salom")
+            throw AssertionError("synthesis must not run before the engine is ready")
+        } catch (expected: IllegalStateException) {
+            assertTrue(expected.message!!.contains("not ready", ignoreCase = true))
+        } finally {
+            manager.close()
+        }
+    }
+
+    @Test fun sileroSynthesisRejectsAModuleThatIsNotASynthesizer() {
+        val spec = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(spec)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.download(spec.id)
+        manager.awaitIdle()
+        try {
+            manager.synthesize(spec.id, "salom")
+            throw AssertionError("a recognizer must not answer a synthesis request")
+        } catch (expected: IllegalStateException) {
+            assertTrue(expected.message!!.contains("not a speech synthesizer"))
         } finally {
             manager.close()
         }

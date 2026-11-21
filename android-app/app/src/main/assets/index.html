@@ -946,7 +946,7 @@ const offlineModuleCatalog=[
  {id:'multilingual-stt-large',installerId:'whisper-large-v3-turbo',name:'Ko‘p tillarni tanish — Whisper Large V3 Turbo',desc:'Kattaroq ko‘p tilli model. Muhim: ko‘proq xotira talab qiladi va ayrim telefonlarni qiynashi mumkin.',icon:'mic',bytes:574041195,sizeNote:'Model taxminan 574 MB; aniq fayl hajmi va qurilma mosligi tekshiriladi'},
  {id:'offline-translate',installerId:'nllb-200-600m-int8',name:'Offline tarjima — NLLB-200 600M INT8',desc:'Standart ko‘p tilli tarjima modeli.',icon:'translate',bytes:916816094,sizeNote:'Encoder va decoder jami taxminan 916,8 MB; qo‘shimcha fayllar alohida'},
  {id:'offline-translate-large',name:'Offline tarjima — katta model (tanlanmagan)',desc:'Yuqoriroq sifat uchun rejalashtirilgan. Muhim: katta xotira talab qiladi, ayrim telefonlarni sekinlashtirishi mumkin.',icon:'translate',bytes:null,sizeNote:'Aniq model va hajm hali tasdiqlanmagan'},
- {id:'offline-tts-navoiy',installerId:'navoiy-tts',name:'O‘zbekcha ovozli o‘qish — Navoiy',desc:'O‘zbekcha matnni ovoz chiqarib o‘qish modeli.',icon:'speaker',bytes:202000000,sizeNote:'Model taxminan 202 MB; qo‘shimcha fayllar alohida'},
+ {id:'offline-tts-navoiy',installerId:'silero-tts',name:'O‘zbekcha ovozli o‘qish — Silero',desc:'O‘zbekcha matnni qurilmada, internetsiz ovozga aylantiradi.',icon:'speaker',bytes:91988758,sizeNote:'Model 92 MB (TorchScript Lite, MIT litsenziyasi)'},
  {id:'offline-tts',installerId:'mms-tts',name:'Ko‘p tilli ovozli o‘qish — MMS',desc:'Har bir til uchun alohida ovoz modeli; 60 til rejalashtirilgan.',icon:'speaker',bytes:null,sizeNote:'Tilga qarab hajmi farqlanadi; barcha tillar yuklangani tasdiqlanmagan'}
 ];
 const offlineModuleIcons={
@@ -1131,6 +1131,14 @@ window.AvnivoOfflineModuleError=function(raw){
   for(const info of JSON.parse(bridge.statusAll()||'[]'))syncOfflineModule(info.id,info.state);
  }catch(e){}
 })();
+window.AvnivoOfflineSpeech=function(raw){
+ let info=null;try{info=JSON.parse(raw)}catch(e){return}
+ if(info&&info.error){offlineNotice.textContent='Ovoz xatosi: '+info.error}
+ // Ignore a late result from a playback the user already cancelled or replaced, so it cannot
+ // clear the button state of the utterance that is playing now.
+ if(!info||info.requestId!==String(ttsGeneration))return;
+ stopSpeaking();
+};
 window.AvnivoOfflineLevel=function(value){
  // Real microphone amplitude from the native recorder drives the existing waveform.
  if(document.documentElement.dataset.avnivoMode!=='offline')return;
@@ -1356,6 +1364,7 @@ function stopSpeaking(){
  if(ttsAudio){ttsAudio.pause();ttsAudio.removeAttribute('src');ttsAudio.load();ttsAudio=null}
  if(ttsAudioUrl){URL.revokeObjectURL(ttsAudioUrl);ttsAudioUrl=null}
  if(window.speechSynthesis)window.speechSynthesis.cancel();
+ if(window.AvnivoOfflineModules&&typeof window.AvnivoOfflineModules.stopSpeech==='function'){try{window.AvnivoOfflineModules.stopSpeech()}catch(e){}}
  if(speakingButton){speakingButton.classList.remove('is-speaking');speakingButton.removeAttribute('data-loading');speakingButton.setAttribute('aria-pressed','false');speakingButton=null}
 }
 function ttsChunks(text){
@@ -1383,6 +1392,13 @@ async function playMessage(button,bubble,language){
  speakingButton=button;button.classList.add('is-speaking');button.setAttribute('aria-pressed','true');
  const finish=()=>{if(generation===ttsGeneration)stopSpeaking()};
  if(document.documentElement.dataset.avnivoMode!=='online'){
+  // Uzbek (left) text is spoken by the native Silero engine once its model is installed and its
+  // smoke test passed. Russian (right) keeps the browser voice, which is what it already used.
+  if(language!=='right'&&window.AvnivoOfflineModules&&typeof window.AvnivoOfflineModules.isSpeechReady==='function'){
+   let nativeReady=false;
+   try{nativeReady=window.AvnivoOfflineModules.isSpeechReady()===true}catch(e){nativeReady=false}
+   if(nativeReady){try{window.AvnivoOfflineModules.speak(text,String(generation));return}catch(e){}}
+  }
   if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){finish();return}
   const utterance=new SpeechSynthesisUtterance(text);
   utterance.lang=language==='right'?'ru-RU':'uz-UZ';utterance.rate=Number(ttsRateSelect.value);

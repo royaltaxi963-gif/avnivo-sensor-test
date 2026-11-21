@@ -59,6 +59,10 @@ class MainActivity : Activity() {
 
     private val moduleManager by lazy { OfflineModuleManager(filesDir, applicationContext) { fn, v -> notifyJs(fn, v) } }
 
+    /** Synthesis and playback run here so neither the UI nor the WebView thread is ever blocked. */
+    private val ttsWorker = Executors.newSingleThreadExecutor()
+    private val ttsPlayer = SileroTtsPlayer()
+
     /** The ready Whisper module id, if any; recognition prefers it over the Uzbek engine. */
     private fun readyWhisper(): String? = when {
         moduleManager.isOperational("whisper-small-q8") -> "whisper-small-q8"
@@ -96,6 +100,41 @@ class MainActivity : Activity() {
 
         @JavascriptInterface fun supportsTranslation(source: String, target: String): Boolean =
             moduleManager.supportsTranslation(NLLB_MODULE, source, target)
+
+        /** True only when the Silero engine finished initializing and passed its smoke test. */
+        @JavascriptInterface fun isSpeechReady(): Boolean = moduleManager.isOperational(SILERO_MODULE)
+
+        /**
+         * Synthesizes and plays [text] for the existing manual playback action.
+         *
+         * Answers through `AvnivoOfflineSpeech` with `{requestId, playing}` or `{requestId, error}`
+         * once playback finishes or fails, so the WebView can clear its button state. Nothing is
+         * sent, translated or auto-played here: this only renders audio for a button the user
+         * already pressed.
+         */
+        @JavascriptInterface fun speak(text: String, requestId: String) {
+            ttsWorker.execute {
+                val result = try {
+                    val pcm = moduleManager.synthesize(SILERO_MODULE, text)
+                    org.json.JSONObject()
+                        .put("requestId", requestId)
+                        .put("playing", ttsPlayer.play(pcm))
+                        .put("seconds", pcm.size.toDouble() / SileroTtsEngine.SAMPLE_RATE)
+                        .toString()
+                } catch (e: Exception) {
+                    org.json.JSONObject()
+                        .put("requestId", requestId)
+                        .put("error", e.message ?: "Ovoz yaratilmadi")
+                        .toString()
+                }
+                notifyJs("AvnivoOfflineSpeech", result)
+            }
+        }
+
+        /** Cancels playback. Safe to call when nothing is playing. */
+        @JavascriptInterface fun stopSpeech() {
+            ttsPlayer.stop()
+        }
     }
 
     private fun notifyJs(function: String, value: String) {
@@ -275,6 +314,8 @@ class MainActivity : Activity() {
 
     override fun onDestroy() {
         recorder?.stop()
+        ttsPlayer.close()
+        ttsWorker.shutdown()
         moduleManager.close()
         worker.shutdown()
         web.destroy()
@@ -284,5 +325,6 @@ class MainActivity : Activity() {
     private companion object {
         const val MIN_SAMPLES = 4800 // 0.3 s at 16 kHz: below this there is no usable speech.
         const val NLLB_MODULE = "nllb-200-600m-int8"
+        const val SILERO_MODULE = "silero-tts"
     }
 }

@@ -26,7 +26,7 @@ internal data class OfflineModelSpec(
     val runnable: Boolean get() = engine != OfflineEngineKind.UNAVAILABLE
 }
 
-internal enum class OfflineEngineKind { UZBEK_NEMO_CTC, WHISPER_GGML, NLLB_ONNX, UNAVAILABLE }
+internal enum class OfflineEngineKind { UZBEK_NEMO_CTC, WHISPER_GGML, NLLB_ONNX, SILERO_TTS, UNAVAILABLE }
 
 internal object OfflineModelSpecs {
     // Verified from GCS: multilingual-stt/whisper-small-q8_0/ggml-small-q8_0.bin
@@ -100,8 +100,33 @@ internal object OfflineModelSpecs {
             "(notijorat), shuning uchun tarqatishdan oldin egasining qarori kerak."
     )
 
+    /**
+     * Uzbek TTS via Silero `v5_cis_base` (MIT) speaker `uzb_saida`.
+     *
+     * The upstream `.pt` package cannot be loaded by the Android runtime: it is a torch.package
+     * archive, and its bytecode must match the bundled interpreter. `silero_v21.ptl` is the
+     * TorchScript Lite export of the same weights, produced deterministically from the upstream
+     * package by CI (see .github/workflows/publish-silero-tts-model.yml). The pinned digest is the
+     * artifact's own SHA-256, so a rebuilt export must match byte for byte or the download is
+     * rejected.
+     *
+     * Provenance: https://models.silero.ai/models/tts/ru/v5_cis_base.pt
+     *   sha256 ba41b18f6a707ad93605a162998865e7c087153d2e010a26dd02229dab0e672a (91,680,514 bytes)
+     * Licence: MIT (LICENSE_CIS); `uzb_saida` is listed under "V5 CIS Base Models".
+     */
+    private val SILERO_TTS = OfflineModelSpec(
+        id = "silero-tts",
+        engine = OfflineEngineKind.SILERO_TTS,
+        files = mapOf(
+            "silero_v21.ptl" to (91_988_758L to "333128fb6c7476e7fceec562f3f54980cbb6a88bbe59ff4a8e67e6cddad7a861")
+        ),
+        // Measured 466 MB peak RSS for one synthesis on the x86_64 reference build; the guard adds
+        // headroom because the interpreter keeps the weights resident for the whole session.
+        requiredRamBytes = 600_000_000L
+    )
+
     val all: Map<String, OfflineModelSpec> =
-        listOf(WHISPER_SMALL, WHISPER_LARGE, NLLB_200, NAVOIY_TTS, MMS_TTS).associateBy { it.id }
+        listOf(WHISPER_SMALL, WHISPER_LARGE, NLLB_200, NAVOIY_TTS, MMS_TTS, SILERO_TTS).associateBy { it.id }
 
     fun spec(id: String): OfflineModelSpec? = all[id]
 }
