@@ -1032,3 +1032,41 @@ did not come from a remote service.
 
 The NLLB test logs no per-string transcript, so this checkpoint does not quote specific
 translation strings. The assertions above are what the passing tests actually enforce.
+
+## Checkpoint 2026-11-21 (skipped tests eliminated) — run 44928380510
+
+The JVM suite reported 59 tests with 5 ignored. Ignored is not passed: the five
+`NllbTokenizerTest` cases that pin token ids called `assumeTrue` and skipped whenever
+`AVNIVO_NLLB_MODEL_DIR` was unset, which it always was in CI.
+
+They now run. The `apk` job fetches `tokenizer.json` from the app's own ticket endpoint and
+asserts its SHA-256 before Gradle starts.
+
+The public mirror was the obvious shortcut and it is wrong: Hugging Face's copy of that filename
+is 17,331,176 bytes and hashes to `e316b82d...`, while the pinned ids were produced from the
+`8ac789ad...` artifact of 17,331,224 bytes. Testing against the mirror would have compared the
+tokenizer to vectors from a different file.
+
+Verified locally against the fetched artifact before committing:
+
+```console
+10/10 bodies match the pinned ids
+uzn_Latn -> 256191 (test expects 256191)
+rus_Cyrl -> 256147 (expects 256147)
+eng_Latn -> 256047 (expects 256047)
+'uzb_Cyrl' -> None   'xx_YY' -> None   'uznLatn' -> None
+unk id 3   encode(PUA) -> [256047, 248059, 3, 2]
+```
+
+Note the engine's Uzbek code is `uzn_Latn` (Northern Uzbek), not `uzb_Latn`; the latter is absent
+from this vocabulary, which is exactly the mismatch the language-mapping test exists to catch.
+
+Report after the change, parsed from the uploaded JUnit HTML:
+
+| | tests | failures | ignored |
+| --- | --- | --- | --- |
+| Before | 59 | 0 | 5 |
+| After | 59 | 0 | 0 |
+
+Duration went from 0.161s to 4.334s, consistent with the five tests doing real work instead of
+returning early.
