@@ -756,3 +756,31 @@ nothing silently fell back to a remote service.
 
 `WHISPER_PERF audio=11.00s download=35.8s first=73.6s repeat=73.6s first_rt=6.69x repeat_rt=6.69x`
 online versus `first=73.2s repeat=73.2s first_rt=6.66x` offline. Same numbers with the radios dead.
+
+## Uzbek STT and Whisper Large: transcripts captured (runs 44893497484, 44888134955)
+
+### Uzbek STT (Nemo CTC, 591 MB INT8)
+
+The suite previously printed nothing, and a skipped test prints `OK` too, so the 3.4 s offline run
+was not provably a real transcription. It now logs `UZBEK_STT_RESULT` and CI fails when the marker
+is absent or empty. Captured transcript, byte-identical online and offline:
+
+```
+UZBEK_STT_RESULT text=navoiy tts o'zbekcha matnni tabiiy va ravon ovozga aylantiradi.
+```
+
+Seven of seven expected words. Timing confirms the shape of the work: 53.0 s online (includes the
+591 MB download) versus 3.4 s offline (model reused), both followed by a matching transcript.
+
+### Whisper Large V3 Turbo memory
+
+Measured from inside the process, both passes:
+
+```
+WHISPER_LARGE_MEM heap_used_mb=4 native_alloc_mb=1246 max_heap_mb=192 recall=7/7
+```
+
+1,246 MB of native allocation against the 1,435 MB `requiredRamBytes` guard, so the guard has ~190 MB
+of headroom over observed use and refuses to start below what is actually needed. Recall is 7/7, the
+full expected set, and the Java heap stays near zero because the weights live in native memory. Same
+figures with the radios off, so no fallback path was involved.
