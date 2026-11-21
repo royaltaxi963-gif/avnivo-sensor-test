@@ -47,6 +47,13 @@ android {
  }
  compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
  kotlinOptions { jvmTarget = "17" }
+ packaging {
+  // AGP stores .so uncompressed by default. That is fine for a small native surface but not here:
+  // the four ABIs of prebuilt inference runtimes are 363 MB stored versus 116 MB deflated, measured
+  // on the built APK. Compressing them brings the universal APK back to roughly 120 MB. The
+  // libraries are extracted on install, which costs disk but nothing at runtime.
+  jniLibs { useLegacyPackaging = true }
+ }
 }
 dependencies {
  implementation("androidx.core:core-ktx:1.15.0")
