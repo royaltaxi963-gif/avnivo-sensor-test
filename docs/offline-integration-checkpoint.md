@@ -719,3 +719,40 @@ command on one line.
 
 `dumpsys meminfo` produced empty files because it runs after the instrumentation process exits.
 The test now logs `WHISPER_LARGE_MEM` from inside the process while the model is resident.
+
+## NLLB-200 and Whisper Small verified offline (run 44889828215)
+
+Both had offline passes wired but neither had ever executed. Both pass now.
+
+### NLLB-200 600M INT8 (`nllb-smoke`, first ever run)
+
+`OK (6 tests)` online in 160.7 s, then `NETWORK_DOWN`, then `OK (6 tests)` in 28.2 s.
+
+The six tests match the six `@Test` methods exactly, and no `assumeTrue` skip appears in the
+instrumentation output. The run is fast because the 916 MB model download is cached on the AVD and
+ONNX Runtime is quick on a warm session, not because work was skipped.
+
+Real translation captured from logcat, identical in both passes:
+
+```
+Salom=1468ms, Salom, qalaysiz?=4066ms, Bugun havo juda issiq.=4485ms, Rahmat=1402ms
+results: rus_Cyrl Привет, как вы? / eng_Latn It's very hot today. / rus_Cyrl Спасибо
+```
+
+Cyrillic for Russian and Latin for English, three different source sentences, per-phrase latency.
+The offline logcat contains zero `UnknownHost`, `ConnectException` or `SocketTimeout` entries, so
+nothing silently fell back to a remote service.
+
+### Whisper Small (`emulator-smoke` with `run_whisper_offline_verification`)
+
+| Phase | Result |
+| --- | --- |
+| online inference | `OK (5 tests)` 136.2 s |
+| online perf | `OK (1 test)` 183.2 s |
+| radios off | `NETWORK_DOWN` |
+| offline inference | `OK (5 tests)` 109.2 s |
+| offline perf | `OK (1 test)` 182.3 s |
+| marker | `WHISPER_OFFLINE_OK` |
+
+`WHISPER_PERF audio=11.00s download=35.8s first=73.6s repeat=73.6s first_rt=6.69x repeat_rt=6.69x`
+online versus `first=73.2s repeat=73.2s first_rt=6.66x` offline. Same numbers with the radios dead.
