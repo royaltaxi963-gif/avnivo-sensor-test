@@ -925,3 +925,54 @@ correct, because the artifact is not hosted. Nothing else regressed.
 
 Unchanged: host the artifact and redeploy the API. Then the download gate becomes the last green
 check and the module can move from IMPLEMENTED — DEVICE TEST PENDING to VERIFIED WORKING.
+
+## Checkpoint 2026-11-21 (APK size regression fixed) — run 44919840041
+
+### The regression and its cause
+
+Adding `pytorch_android_lite` for Silero pushed the universal release APK to **382,748,153 bytes**.
+Measured from the APK itself, not estimated:
+
+```console
+lib/x86          103.4 MB
+lib/x86_64        99.1 MB
+lib/arm64-v8a     91.2 MB
+lib/armeabi-v7a   69.0 MB
+```
+
+AGP stores `.so` files uncompressed, so 362.7 MB of native code was written to the archive verbatim.
+`libpytorch_jni_lite.so` alone is 57.6 MB on arm64-v8a, and it was shipped four times.
+
+### The fix
+
+`packaging { jniLibs { useLegacyPackaging = true } }` in `app/build.gradle.kts`. Recompressing the
+same 362.7 MB with zlib yields 116.1 MB, so the archive shrinks without removing anything.
+
+### Measured result
+
+| | Bytes | Note |
+| --- | --- | --- |
+| Before | 382,748,153 | all `.so` STORED |
+| After | 123,683,785 | all `.so` DEFLATED (121,739,649 B compressed) |
+
+All four ABIs are still packaged: x86 31.6 MB, x86_64 31.1 MB, arm64-v8a 27.3 MB, armeabi-v7a
+26.1 MB. No engine, architecture or asset was dropped to achieve this.
+
+`update-install` passed on the compressed build, so the packaging change does not affect signing,
+install or in-place upgrade.
+
+### Offline inference still passes on the compressed build
+
+The same run repeated the radios-off checks, so the fix is not merely cosmetic:
+
+```console
+NETWORK_DOWN
+I AvnivoUzbekStt: UZBEK_STT_RESULT text=navoiy tts o'zbekcha matnni tabiiy va ravon ovozga aylantiradi.
+I AvnivoSileroTts: seed init+synthesis=157ms samples=102000 seconds=2.125 peak=0.7822921
+SILERO_TTS_OFFLINE_OK
+OFFLINE_INFERENCE_OK
+EMULATOR_SMOKE_OK
+SILERO_TTS_DOWNLOAD_STILL_FAILING
+```
+
+The last line is the only failing gate and it is the known hosting blocker, unchanged.
