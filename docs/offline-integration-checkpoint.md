@@ -1192,3 +1192,16 @@ interface is unaffected.
 | Offline routing | 11/11 |
 | SHA-256 integrity | pass |
 | Preservation / manual-send | 5/5 and 5/5 |
+| `emulator-smoke` | failure, one gate only: `SILERO_TTS_DOWNLOAD_STILL_FAILING` |
+
+The new `reason` field is what the failing run now reports, which is the point of adding it:
+
+```console
+reason":"Model serveri HTTP 404: {"detail":"Unknown offline model"}
+```
+
+Before this change the same run could only say `state":"error"`. The message names the cause: the
+deployed API does not carry a `silero-tts` manifest. Everything else in the job is green —
+`UZBEK_STT_RESULT` with `NETWORK_DOWN`, `SILERO_TTS_OFFLINE_OK`, `WHISPER_OFFLINE_OK`,
+`OFFLINE_INFERENCE_OK`, `EMULATOR_SMOKE_OK` — so the single failing gate is distribution, not
+inference.
