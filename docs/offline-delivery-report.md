@@ -33,7 +33,7 @@ approval. The APK installs directly with `adb install` — no ZIP extraction nee
 | Large Offline Translation | none — card is a placeholder | n/a | n/a | n/a | n/a | n/a | UI retained | **BLOCKED — NO MODEL** |
 | Navoiy TTS (existing card, CosyVoice2) | CosyVoice2, PyTorch weights only (`emotion_600h_joint.pt`) | n/a | n/a | no ONNX export | n/a | n/a | UI retained | **BLOCKED — NO ONNX ARTIFACT** |
 | MMS TTS | VITS ONNX exists upstream but absent from bucket (403) | n/a | n/a | sherpa-onnx OfflineTts could run it | n/a | n/a | UI retained | **BLOCKED — LICENSE + MISSING OBJECT** |
-| `silero-tts` (new spec, Uzbek TTS runtime) | Silero `v5_cis_base`, MIT (`LICENSE_CIS`), 91.7 MB TorchScript | **fails** — not hosted | digest pinned | PyTorch Lite JNI | 2.125 s audio, peak 0.782 | pass, radios off | 4 ABIs | **IMPLEMENTED — HOSTING PENDING** |
+| `silero-tts` (new spec, Uzbek TTS runtime) | Silero `v5_cis_base` / voice `uzb_saida`, MIT (`LICENSE_CIS`), 91,988,758 B TorchScript | **fails** — not hosted | digest pinned | PyTorch Lite JNI | 2.125 s audio, peak 0.782 | pass, radios off | 4 ABIs | **IMPLEMENTED — HOSTING PENDING** |
 
 The three blocked modules are not stubs that pretend to work. `OfflineModelSpecs` registers them
 with `engine = UNAVAILABLE` and an Uzbek `blocker` string, so the existing card reports the real

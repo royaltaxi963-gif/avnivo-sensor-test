@@ -22,6 +22,7 @@ internal class OfflineModuleManager(
         @Volatile var state: OfflineModuleState = OfflineModuleState.NOT_INSTALLED
         @Volatile var percent: Int = 0
         @Volatile var engine: Closeable? = null
+        @Volatile var reason: String? = null
     }
 
     private val worker = Executors.newSingleThreadExecutor()
@@ -118,6 +119,7 @@ internal class OfflineModuleManager(
         .put("state", module.state.code)
         .put("percent", module.percent)
         .put("active", module.state.isOperational)
+        .put("reason", module.reason ?: module.spec.blocker ?: JSONObject.NULL)
 
     /**
      * Re-initializes every module whose files are already on disk. Called after a page load so a
@@ -173,6 +175,7 @@ internal class OfflineModuleManager(
                 transition(module, OfflineModuleState.INSTALLED)
                 initialize(module)
             } catch (e: Exception) {
+                module.reason = e.message ?: e::class.java.simpleName
                 transition(module, OfflineModuleState.ERROR)
                 notify("AvnivoOfflineModuleError", "$id|${e.message}")
             }
@@ -191,12 +194,15 @@ internal class OfflineModuleManager(
             val engine = engineFactory(module.spec, directory)
             module.engine?.let { runCatching { it.close() } }
             module.engine = engine
+            module.reason = null
             transition(module, OfflineModuleState.READY)
             notify("AvnivoOfflineModuleReady", module.spec.id)
         } catch (e: Exception) {
+            module.reason = "dvigatel ishga tushmadi: ${e.message}"
             transition(module, OfflineModuleState.INSTALLED)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e.message}")
         } catch (e: UnsatisfiedLinkError) {
+            module.reason = "native kutubxonasi yuklanmadi"
             transition(module, OfflineModuleState.INSTALLED)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|native kutubxonasi yuklanmadi")
         }

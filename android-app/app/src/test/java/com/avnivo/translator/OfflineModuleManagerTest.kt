@@ -98,6 +98,12 @@ class OfflineModuleManagerTest {
         assertEquals("installed", status.getString("state"))
         assertFalse(status.getBoolean("active"))
         assertFalse(manager.isOperational(spec.id))
+        // A bare "error"/"installed" state is not diagnosable in the field, so the cause travels
+        // with it.
+        assertTrue(
+            "failure reason must reach the status payload: $status",
+            status.getString("reason").contains("boom")
+        )
         manager.close()
     }
 
