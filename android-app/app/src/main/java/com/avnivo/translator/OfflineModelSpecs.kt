@@ -22,15 +22,11 @@ internal data class OfflineModelSpec(
         File(directory, name).let { it.isFile && it.length() == files.getValue(name).first }
     }
 
-    /**
-     * True only when this build can actually run the model; otherwise the card must fail closed.
-     * An empty file list also fails closed: without verified artifacts there is nothing to fetch,
-     * so the download button must report the blocker instead of starting a doomed request.
-     */
-    val runnable: Boolean get() = engine != OfflineEngineKind.UNAVAILABLE && files.isNotEmpty()
+    /** True only when this build can actually run the model; otherwise the card must fail closed. */
+    val runnable: Boolean get() = engine != OfflineEngineKind.UNAVAILABLE
 }
 
-internal enum class OfflineEngineKind { UZBEK_NEMO_CTC, WHISPER_GGML, NLLB_ONNX, MADLAD_ONNX, UNAVAILABLE }
+internal enum class OfflineEngineKind { UZBEK_NEMO_CTC, WHISPER_GGML, NLLB_ONNX, UNAVAILABLE }
 
 internal object OfflineModelSpecs {
     // Verified from GCS: multilingual-stt/whisper-small-q8_0/ggml-small-q8_0.bin
@@ -73,32 +69,6 @@ internal object OfflineModelSpecs {
     )
 
     /**
-     * Large offline translation — MADLAD-400 3B, INT4 ONNX.
-     *
-     * The INT4 graphs were exported and verified in this project from the official
-     * `google/madlad400-3b-mt` weights (Apache-2.0). Real greedy inference was measured at a
-     * 2.21 GB peak RSS and reproduced the fp32 reference output on 3 of 4 test sentences.
-     * Artifact hashes are recorded in docs/madlad-400-int4-checkpoint.md.
-     *
-     * `files` is intentionally empty: the 3.6 GB artifact has not been uploaded to the model
-     * bucket, so there is nothing for the downloader to verify against. Leaving the list empty
-     * makes [runnable] false, so the card reports the blocker instead of attempting a request
-     * that would 404. Publishing the artifact and adding its manifest entry is all that is needed
-     * to turn this module on; no code change is required.
-     */
-    private val MADLAD_400 = OfflineModelSpec(
-        id = "madlad-400-3b-int4",
-        engine = OfflineEngineKind.MADLAD_ONNX,
-        files = emptyMap(),
-        // Measured peak RSS for both INT4 sessions plus a decode pass was 2.21 GB. The guard uses
-        // that peak with headroom rather than the 3.6 GB on-disk size, which is not resident.
-        requiredRamBytes = 3_000_000_000L,
-        blocker = "Katta offline tarjima — MADLAD-400 3B INT4 modeli eksport qilindi va tekshirildi " +
-            "(2.21 GB peak RAM, fp32 bilan bir xil natija), lekin 3.6 GB artefakt hali model " +
-            "bucketiga yuklanmagan, shuning uchun yuklab olish o‘chirilgan."
-    )
-
-    /**
      * Modules whose only artifacts in this project's bucket are PyTorch weights. An ONNX runtime
      * path does exist (the bundled sherpa-onnx AAR ships OfflineTts with VITS support), but no ONNX
      * artifact for either model is present under its allowlisted bucket prefix, so the downloader
@@ -131,7 +101,7 @@ internal object OfflineModelSpecs {
     )
 
     val all: Map<String, OfflineModelSpec> =
-        listOf(WHISPER_SMALL, WHISPER_LARGE, NLLB_200, MADLAD_400, NAVOIY_TTS, MMS_TTS).associateBy { it.id }
+        listOf(WHISPER_SMALL, WHISPER_LARGE, NLLB_200, NAVOIY_TTS, MMS_TTS).associateBy { it.id }
 
     fun spec(id: String): OfflineModelSpec? = all[id]
 }
