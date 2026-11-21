@@ -125,6 +125,60 @@ class OfflineSileroTtsInferenceTest {
         assertTrue("prepare() must fail closed when the model is absent", failed)
     }
 
+    /**
+     * Runs the real runtime against an artifact that CI placed on the device, so interpreter
+     * loading, smoke synthesis and inference are proven even when the download path is unavailable.
+     *
+     * CI seeds the file only after re-deriving the pinned SHA-256, and this test re-checks the size
+     * before use, so a wrong or truncated artifact cannot pass here.
+     */
+    @Test
+    fun seededArtifactInitializesAndSynthesizes() {
+        val directory = File(context.filesDir, "models/silero-tts")
+        val model = File(directory, "silero_v21.ptl")
+        assumeTrue("set -e avnivoTtsSeed true and push the artifact to run", 
+            InstrumentationRegistry.getArguments().getString("avnivoTtsSeed") == "true")
+        assertTrue("CI must have seeded $model", model.isFile)
+        assertEquals(
+            "seeded artifact must be the pinned byte count",
+            91_988_758L,
+            model.length()
+        )
+
+        val manager = OfflineModuleManager(context.filesDir, context.applicationContext) { _, _ -> }
+        try {
+            manager.reactivateInstalled()
+            manager.awaitIdle()
+
+            val status = JSONObject(manager.status("silero-tts") ?: "{}")
+            assertEquals(
+                "a verified artifact must reach ready through the real init path: $status",
+                "ready",
+                status.optString("state")
+            )
+
+            val started = System.currentTimeMillis()
+            val samples = manager.synthesize("silero-tts", "Salom, mening ismim Avnivo.")
+            val elapsed = System.currentTimeMillis() - started
+
+            assertTrue("synthesis must return audio", samples.isNotEmpty())
+            assertTrue(
+                "expected at least 0.5 s of audio, got ${samples.size} samples",
+                samples.size > SileroTtsEngine.SAMPLE_RATE / 2
+            )
+            val peak = samples.maxOf { kotlin.math.abs(it) }
+            assertTrue("audio must not be silent, peak=$peak", peak > 0.01f)
+
+            android.util.Log.i(
+                "AvnivoSileroTts",
+                "seed init+synthesis=${elapsed}ms samples=${samples.size} " +
+                    "seconds=${samples.size.toDouble() / SileroTtsEngine.SAMPLE_RATE} peak=$peak"
+            )
+        } finally {
+            manager.close()
+        }
+    }
+
     @Test
     fun missingModelIsNotInstalledAfterRestart() {
         // A wiped download must not leave a card claiming READY.

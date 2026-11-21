@@ -18,6 +18,10 @@ on:
         description: 'Also repeat the Whisper Small inference suite with the radios disabled (~15m)'
         type: boolean
         default: false
+      run_tts_seed_verification:
+        description: 'Verify the Silero TTS runtime against a CI-exported artifact, bypassing model hosting (~10m)'
+        type: boolean
+        default: false
   pull_request:
     paths:
       - 'android-app/**'
@@ -319,6 +323,110 @@ jobs:
           path: |
             logcat.txt
             instrument*.txt
+          if-no-files-found: warn
+  tts-seed-smoke:
+    # Proves the Silero runtime itself works: the artifact is exported from the pinned upstream
+    # package, re-checked against the digest the app pins, pushed to the device and synthesized.
+    # This is deliberately independent of model hosting, so a hosting gap cannot hide a runtime bug
+    # (or the reverse). It does not replace the download test, which still needs the real ticket.
+    if: github.event_name == 'workflow_dispatch' && inputs.run_tts_seed_verification
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      UPSTREAM_URL: https://models.silero.ai/models/tts/ru/v5_cis_base.pt
+      UPSTREAM_SHA256: ba41b18f6a707ad93605a162998865e7c087153d2e010a26dd02229dab0e672a
+      UPSTREAM_BYTES: '91680514'
+      ARTIFACT_SHA256: 333128fb6c7476e7fceec562f3f54980cbb6a88bbe59ff4a8e67e6cddad7a861
+      ARTIFACT_BYTES: '91988758'
+      ARTIFACT_NAME: silero_v21.ptl
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-integrated-debug-apk
+          path: apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-androidtest-apk
+          path: androidtest
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      # torch 2.1.0 emits the bytecode v8 that pytorch_android_lite:2.1.0 can read.
+      - name: Install the pinned export toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy<2" torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
+      - name: Download and check the authoritative upstream package
+        run: |
+          set -euo pipefail
+          curl -sSL --retry 3 --max-time 900 -o v5_cis_base.pt "$UPSTREAM_URL"
+          test "$(stat -c %s v5_cis_base.pt)" = "$UPSTREAM_BYTES" || { echo "::error::upstream size changed"; exit 1; }
+          test "$(sha256sum v5_cis_base.pt | cut -d' ' -f1)" = "$UPSTREAM_SHA256" || { echo "::error::upstream digest changed"; exit 1; }
+      - name: Export the TorchScript Lite graph
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import torch, warnings
+          warnings.filterwarnings("ignore")
+          imp = torch.package.PackageImporter("v5_cis_base.pt")
+          package = imp.load_pickle("tts_models", "model")
+          model = package.packages[0].models[0].eval()
+          # uzb_saida is speaker 46 in this package; it is the only Uzbek voice and it is MIT.
+          ids = torch.tensor([[2, 30, 13, 24, 27, 25, 1]], dtype=torch.long)
+          speaker = torch.tensor([46], dtype=torch.long)
+          traced = torch.jit.trace(model, (ids, speaker), strict=False)
+          traced._save_for_lite_interpreter("silero_v21.ptl")
+          PY
+      - name: Require the export to match the digest the app pins
+        run: |
+          set -euo pipefail
+          test "$(stat -c %s $ARTIFACT_NAME)" = "$ARTIFACT_BYTES" || { echo "::error::export size differs from the pinned artifact"; exit 1; }
+          test "$(sha256sum $ARTIFACT_NAME | cut -d' ' -f1)" = "$ARTIFACT_SHA256" || { echo "::error::export digest differs from the pinned artifact"; exit 1; }
+          echo "export matches the pinned SHA-256 $ARTIFACT_SHA256" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Seed the verified artifact and synthesize on device
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            adb wait-for-device
+            adb install -r apk/app-debug.apk
+            adb install -r androidtest/app-debug-androidTest.apk
+            # The app is debuggable, so run-as can write into its private storage.
+            adb shell run-as com.avnivo.translator mkdir -p files/models/silero-tts
+            adb push "$ARTIFACT_NAME" /data/local/tmp/silero_v21.ptl
+            adb shell run-as com.avnivo.translator cp /data/local/tmp/silero_v21.ptl files/models/silero-tts/silero_v21.ptl
+            adb shell run-as com.avnivo.translator ls -l files/models/silero-tts/
+            adb logcat -c
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineSileroTtsInferenceTest#seededArtifactInitializesAndSynthesizes -e avnivoTtsSeed true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_tts_seed.txt
+            grep -q "OK (" instrument_tts_seed.txt || { echo SILERO_TTS_SEED_FAILED; exit 1; }
+            adb logcat -d | grep -a "AvnivoSileroTts" | tail -1
+            adb logcat -d | grep -qa "AvnivoSileroTts seed init+synthesis=" || { echo SILERO_TTS_SEED_NOT_SYNTHESIZED; exit 1; }
+            echo TTS_SEED_OK
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avnivo-tts-seed-evidence
+          path: |
+            instrument_tts_seed.txt
+            silero_v21.ptl
           if-no-files-found: warn
   nllb-smoke:
     # Opt-in: verifies the ~916 MB NLLB-200 INT8 model downloads, verifies, initializes ONNX
