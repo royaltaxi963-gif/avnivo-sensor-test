@@ -627,3 +627,30 @@ so they are not directly comparable to the cold first-run numbers in the first t
 instrumentation argument made the body skip while the suite still printed `OK`. One run
 reported `Time: 0.001` and was accepted by CI as a passing measurement. The workflow now
 requires the `WHISPER_PERF audio=` line itself instead of a bare `OK`.
+
+## MADLAD-400 3B INT4 was removed (2026-11-21)
+
+The user decided offline translation is NLLB-200 600M INT8 only, so MADLAD was taken out in
+one revert commit, `bd25456`, rather than by rewriting published history.
+
+Removed: `avnivo_madlad_jni.cpp`, its `libavnivo_madlad.so` CMake target, `MadladEngine.kt`,
+the `MADLAD_ONNX` engine kind and the `madlad-400-3b-int4` spec, `MadladTokenizerTest.kt`, the
+MADLAD entries in the inventory assertions, and `docs/madlad-400-int4-checkpoint.md`.
+
+Nothing shared was touched. The working tree after the revert is byte-identical to `394ff3d`,
+the commit before MADLAD work began (`git diff 394ff3d` is empty), which is a stronger
+statement than a hand-written list of removals.
+
+Verified on run `44874848035`:
+
+| Check | Result |
+| --- | --- |
+| `testDebugUnitTest` | 52 tests, 0 failures |
+| `assembleDebug` / release | BUILD SUCCESSFUL |
+| `emulator-smoke` instrumented | OK, 21 tests |
+| `libavnivo_madlad.so` in APK | absent |
+| `libavnivo_nllb.so`, `libavnivo_whisper.so` | present, all 4 ABIs |
+| `libsherpa-onnx-*` | present, 12 libs |
+
+The `offline-translate-large` card keeps its existing markup. It was never wired to an
+installer, so removing MADLAD required no HTML change at all.
