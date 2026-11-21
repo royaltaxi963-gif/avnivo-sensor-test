@@ -784,3 +784,47 @@ WHISPER_LARGE_MEM heap_used_mb=4 native_alloc_mb=1246 max_heap_mb=192 recall=7/7
 of headroom over observed use and refuses to start below what is actually needed. Recall is 7/7, the
 full expected set, and the Java heap stays near zero because the weights live in native memory. Same
 figures with the radios off, so no fallback path was involved.
+
+## Checkpoint 2026-11-21 — Silero Uzbek TTS integration
+
+Stage: implementation complete and compiling; hosted model delivery outstanding.
+
+### Completed this stage
+
+- `SileroTtsEngine` loads the TorchScript Lite graph via `pytorch_android_lite:2.1.0` and returns
+  48 kHz mono PCM. The graph's second output is per-token durations, not a sample rate.
+- `SileroTtsPlayer` plays through `AudioTrack` with cancellation and replay.
+- READY requires files, integrity, a loaded runtime and a smoke synthesis that must be audible.
+- Spec pins `silero_v21.ptl` = 91,988,758 bytes,
+  SHA-256 `333128fb6c7476e7fceec562f3f54980cbb6a88bbe59ff4a8e67e6cddad7a861`.
+- Only the existing manual playback action is wired; no UI, layout, or unrelated behaviour changed.
+- MIT licence chain verified from upstream sources, including that `uzb_saida` is speaker 46 inside
+  the published artifact (`docs/silero-tts-android-feasibility.md` §8).
+
+### Verified tests
+
+| Suite | Result |
+| --- | --- |
+| JVM unit tests (run 44911367132, job apk) | **59 tests, 0 failures, 5 ignored** |
+| New Silero JVM tests | 4 passed: MIT/runnable spec, fail-closed init, synthesis refused before READY, non-synthesizer rejected |
+| UI preservation | 5/5 |
+| Release build + signing + in-place update | passed (job update-install) |
+| On-device Silero synthesis | **FAILED — model unreachable** (§9 of the feasibility doc) |
+
+### Remaining failures and blockers
+
+1. Deployed Cloud Run revision returns `404 {"detail":"Unknown offline model"}` for `silero-tts`.
+   The manifest is on this branch but the running service predates it.
+2. The artifact is not in the bucket, so no signed URL can be produced.
+3. `publish-silero-tts-model.yml` cannot be dispatched: GitHub requires the workflow file to exist
+   on the default branch. Publishing needs it merged to `main`, or a manual export run.
+
+### Last successful commit
+
+`a96dbaf` — CI green on JVM tests, APK build, signing and in-place update.
+
+### Next exact action
+
+Run `publish-silero-tts-model.yml` with `publish: true` (needs the file on `main`), then redeploy
+the API, then re-run the emulator job. Until then this module stays
+**IMPLEMENTED — DEVICE TEST PENDING** and must not be reported as working.

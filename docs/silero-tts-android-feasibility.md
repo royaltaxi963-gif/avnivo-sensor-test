@@ -1,8 +1,9 @@
 # Silero TTS: license gate and Android runtime findings
 
 Scope: converting the validated Silero Uzbek TTS into a shippable Android offline module.
-Status: **BLOCKED — model hosting and on-device runtime not yet verified.** Nothing here is
-claimed as working on a device.
+Status: **MIT licence verified (§8). Runtime integrated and compiling; on-device synthesis not yet
+verified.** The model is not in the download bucket and the deployed API does not list it, so the
+app cannot reach READY yet. See §9 for the exact blockers.
 
 ## 1. The validated configuration cannot be shipped
 
@@ -110,3 +111,146 @@ for `choy` (0.5375 s on both paths).
 Obtain authorization and credentials to publish `silero_v21.ptl` to the model bucket with a pinned
 SHA-256, then measure RSS for one synthesis on an arm64 emulator before deciding whether
 `pytorch_android_lite` is acceptable in the APK.
+
+## 8. License verification (recorded 2026-11-21)
+
+The MIT claim for `v5_cis_base.pt` + `uzb_saida` was re-checked against upstream sources rather
+than against the earlier notes. Every claim below has a command that reproduces it.
+
+Upstream repository pinned for this check:
+`snakers4/silero-models` @ `e382298387332f2bf461fe6eadfde99104611b0c` (2026-10-15).
+
+### 8.1 The licence text is genuine MIT
+
+```console
+$ git clone --depth 1 https://github.com/snakers4/silero-models
+$ head -1 silero-models/LICENSE_CIS
+MIT License
+$ head -1 silero-models/LICENSE
+Attribution-NonCommercial-ShareAlike 4.0 International
+```
+
+The repository ships two licences: the general `LICENSE` is CC BY-NC-SA 4.0, and `LICENSE_CIS` is
+MIT. Which one applies is decided per model family in the README.
+
+### 8.2 The README assigns `v5_cis_base` to MIT, not to the NC licence
+
+```console
+$ grep -n "published under" silero-models/README.md
+143:- All of the below models are published under `MIT` [licence](.../LICENSE_CIS);
+```
+
+Line 143 sits inside the `#### V5 CIS Base Models` section (heading on line 138), which covers
+exactly the `v5_cis_base` and `v5_cis_base_nostress` families.
+
+### 8.3 `uzb_saida` is listed for `v5_cis_base` in that MIT table
+
+```console
+$ grep -n "uzb_saida" silero-models/README.md
+166:| `v5_cis_base`, `v5_cis_base_nostress` | `uzb_saida` | `uzb` (Uzbek) | ... |
+```
+
+So the MIT grant covers both the weights and the specific Uzbek voice this module uses.
+
+### 8.4 The speaker really is inside the downloaded artifact, at index 46
+
+The speaker list is not taken on trust from the README; it is read out of the published weights.
+`v5_cis_base.pt` is a `torch.package` zip whose model pickle can be deserialised without torch:
+
+```console
+$ python3 - <<'PY'
+import zipfile, pickle, io
+class Stub:
+    def __init__(self,*a,**k): pass
+    def __setstate__(self,st): self._state=st
+class U(pickle.Unpickler):
+    def find_class(self, mod, name): return type(name,(Stub,),{})
+    def persistent_load(self, pid): return Stub()
+z = zipfile.ZipFile('v5_cis_base.pt')
+st = U(io.BytesIO(z.read('kod_ii_orig_sp_restrict2/tts_models/model'))).load()._state
+print(len(st['speakers']), [(i,n) for i,n in enumerate(st['speakers']) if 'uzb' in n])
+print(st['speaker_to_package'][46])
+PY
+60 [(46, 'uzb_saida')]
+0
+```
+
+60 speakers total, exactly one Uzbek speaker, `uzb_saida` at index **46**, resolved to package `0`.
+
+This corrects an earlier ambiguity: scanning the pickle for "integer next to a name" produced both
+45 and 46 depending on the heuristic. Only real deserialisation is authoritative, and it says 46,
+which is the value the shipped spec and export script use.
+
+### 8.5 Conclusion
+
+`v5_cis_base.pt` (SHA-256 `ba41b18f…`) and the `uzb_saida` voice are MIT-licensed by the upstream
+project, and the voice is present in the published artifact at the index this code uses.
+Redistribution of the derived TorchScript artifact is therefore permitted, with the MIT notice
+carried in the module's licence field and this document.
+
+The non-MIT `v3_uz` / `v4_uz` voices remain unusable and are not referenced by any code.
+
+## 9. Hosting blockers (observed 2026-11-21, run 44911367132)
+
+The code is integrated and compiles, and the JVM suite passes, but the on-device test cannot reach
+READY. The emulator run records the exact state:
+
+```text
+Error in synthesizesUzbekSpeechOffline(...):
+org.junit.ComparisonFailure: module must reach ready only after download + verify + init + smoke test:
+{"id":"silero-tts","state":"error","percent":0,"active":false} expected:<[ready]> but was:<[error]>
+```
+
+The state is `error`, not a runtime or inference failure: the download never produced a file. Two
+independent external gaps cause it.
+
+### 9.1 The deployed API does not know the model id
+
+```console
+$ B=https://avnivo-translation-test-792624108019.europe-west1.run.app
+$ for m in uzbek-stt whisper-small-q8 nllb-200-600m-int8 navoiy-tts mms-tts silero-tts; do
+    printf '%-24s %s\n' "$m" "$(curl -s -o /dev/null -w '%{http_code}' $B/api/offline-models/$m/download-ticket)"; done
+uzbek-stt                200
+whisper-small-q8         200
+nllb-200-600m-int8       200
+navoiy-tts               200
+mms-tts                  200
+silero-tts               404
+$ curl -s $B/api/offline-models/silero-tts/download-ticket
+{"detail":"Unknown offline model"}
+```
+
+The manifest `translator-api/verified_models/silero-tts.json` and the `ALLOWED_PREFIXES` entry are
+on this branch, but the running Cloud Run revision was built before them. A redeploy is required.
+
+### 9.2 The artifact is not in the bucket
+
+Anonymous `curl` returns 403 for every object in this bucket, including ones that demonstrably
+exist, so 403 alone proves nothing. The authoritative check is the ticket endpoint above: it signs
+URLs only for objects it is told to serve, and it refuses the id outright. The publish workflow
+therefore has not run successfully.
+
+### 9.3 Why the publish workflow cannot run yet
+
+`publish-silero-tts-model.yml` is new on this branch. GitHub only exposes `workflow_dispatch` for a
+workflow that exists on the default branch:
+
+```console
+$ gh workflow run publish-silero-tts-model.yml --ref integrate/offline-engines-20261118
+HTTP 404: workflow publish-silero-tts-model.yml not found on the default branch
+```
+
+Publishing needs either that file merged to `main`, or the export run by hand with the same pinned
+toolchain. Both require a decision this branch cannot make on its own, since merging to `main` is
+explicitly out of scope without approval.
+
+### 9.4 What is already proven
+
+- The export is deterministic and reproducible; the workflow re-derives the pinned SHA-256 and
+  refuses to publish anything that differs (`ARTIFACT_SHA256` guard).
+- `pytorch_android_lite:2.1.0` reads the exported bytecode v8 graph.
+- The JVM suite passes, including the new Silero specs, the fail-closed init test and the
+  "synthesis refused before READY" test.
+
+What is *not* proven is on-device synthesis, because the app cannot obtain the model. This module is
+therefore classified **IMPLEMENTED — DEVICE TEST PENDING**, not VERIFIED WORKING.
