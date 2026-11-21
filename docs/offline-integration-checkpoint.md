@@ -1075,3 +1075,49 @@ Report after the change, parsed from the uploaded JUnit HTML:
 
 Duration went from 0.161s to 4.334s, consistent with the five tests doing real work instead of
 returning early.
+
+## Checkpoint 2026-11-21 (the 971-deletion scare was a bad comparison)
+
+An earlier diff against the "protected original" `05429fee` reported 971 deletions and a modified
+`index.html`, which looked like the UI had been damaged. It had not. The comparison was invalid.
+
+`05429fee` is not an ancestor of this branch. It exists only on
+`origin/feature/offline-model-downloads-from-05429fee` and `origin/feat/offline-model-safe-installer-20261117`,
+never on `main`. The merge base of `05429fee` and HEAD is `9e0443d`, so a two-dot diff between them
+shows that side branch's work as though this branch had deleted it. The deletions were never ours.
+
+The clone was also shallow (`grafted`), so `git merge-base` returned nothing at all until
+`git fetch --unshallow`. Measuring from an unresolvable base is what produced the false alarm.
+
+The true baseline is `origin/main` at `83f720b`, which *is* an ancestor. Against it:
+
+```console
+$ git diff --stat origin/main..HEAD | tail -1
+ 59 files changed, 20488 insertions(+), 74 deletions(-)
+
+$ git diff --name-status origin/main..HEAD -- index.html assets/ res/ onboarding-preview.html i18n/
+(no output)
+```
+
+So no web asset, stylesheet, onboarding page or i18n dictionary changed. The 74 deletions are
+inside files this work owns, and the largest block is the asset the APK actually loads.
+
+### The APK loads a different index.html
+
+`android-app/app/src/main/assets/index.html` is the interface the app ships (+211 −27). The root
+`index.html` is not packaged. Checking only the root file would have missed the real interface.
+
+Those 27 lines are rewrites, not removals. Each has a replacement on the added side:
+
+| Removed line | Replacement |
+| --- | --- |
+| `modeOnline`/`modeOffline` click handlers | re-added with the same `applyMode`, `stopVoice`, `closeOnlineLanguages` calls |
+| module card `offline-tts-navoiy` pointing at `navoiy-tts` | same card id, now `installerId:'silero-tts'`, 91,988,758 bytes |
+| Whisper cards 264,646,607 / 574,000,000 bytes | same cards with exact sizes 264,464,607 / 574,041,195 |
+| `pointercancel`, `pagehide`, `hint()`, `persistDraft();resize();syncComposerMode()` | present once or twice on the added side |
+
+Verified by test rather than by eye. `tests/offline-ui-preservation.test.cjs` reads the shipped
+asset and passes 5/5: no original CSS declaration, element id or class name is removed, and all
+seven offline modules stay wired. `tests/manual-send.test.cjs` also reads the shipped asset and
+passes 5/5, so recognition still cannot reach `sendMessage`, `translateOfflineText`,
+`translateOnlineText` or `sendOnlineAudio` without a user gesture.

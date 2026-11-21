@@ -1,7 +1,7 @@
 # AVNIVO Translator — offline engine integration report
 
 Branch `integrate/offline-engines-20261118` · PR #28 (open, draft, `mergeable=MERGEABLE`,
-`mergeStateStatus=CLEAN`) · HEAD `79404b89275e11ff18be3659db6054284219f762`
+`mergeStateStatus=CLEAN`) · HEAD `eabfbe32ee3a6ec0c05a25af789a32a0ca15ebc5`
 
 Nothing was merged into `main` and no release was published. Both need explicit approval.
 
@@ -12,11 +12,11 @@ Nothing was merged into `main` and no release was published. Both need explicit 
 | Protected original | `05429fee35166ea07e22923f8235ef2e61ee8d3a` (untouched) |
 | Branch | `integrate/offline-engines-20261118` |
 | PR | https://github.com/royaltaxi963-gif/avnivo-sensor-test/pull/28 |
-| APK workflow run | https://github.com/royaltaxi963-gif/avnivo-sensor-test/actions/runs/44895328615 |
-| APK artifact | `avnivo-translator-release-apk` → `update-v101.apk` (142,393,511 bytes) |
-| APK SHA-256 | `4d5a9727f685f898d314a9788e8e9abd1c60327eb595ed7853a1762b78117d2c` |
-| Package / version | `com.avnivo.translator` · versionName `1.0.0` |
-| Signing | `CN=AVNIVO Translator, OU=Development, O=AVNIVO, C=uz`, SHA-256 `12e7e261…eecb8e`, in-place update install `Success` |
+| APK workflow run | https://github.com/royaltaxi963-gif/avnivo-sensor-test/actions/runs/44930578157 |
+| APK artifact | `avnivo-translator-release-apk` → `update-v101.apk` (123,683,785 bytes) |
+| APK SHA-256 | `5b356cb4964626696086867ddfbea950aea919fea51199b63351e9b30a4fb49e` |
+| Package / version | `com.avnivo.translator` · versionName `1.0.0` · versionCode `1205` · minSdk 26 · targetSdk 35 |
+| Signing | `CN=AVNIVO Translator, OU=Development, O=AVNIVO, C=uz`, SHA-256 `12e7e26104c7a5110a849baec36d6916efe0b2494384749d4c733286aeeecb8e`, in-place update install `Success` |
 
 The artifact is a GitHub Actions artifact, not a Release asset. Publishing a Release was not done
 because the directive requires release criteria to pass first and forbids publishing without
@@ -75,12 +75,15 @@ offline: WHISPER_PERF audio=11.00s download=35.7s first=73.2s repeat=73.2s first
 | Preservation test | 5/5 — every original CSS selector, declaration, element id and class retained; all seven modules still wired |
 | Manual-send guard | 5/5 — STT handlers cannot send, translate or speak; mutation-injected `sendMessage()` is caught |
 | SHA-256 vectors | 13 cases pass |
-| JVM unit tests | 47 tests, 0 failures, 5 ignored (52 before, minus 5 MADLAD tests removed) |
-| Instrumented suites | emulator-smoke `OK`, NLLB `OK (6 tests)` ×2, Whisper `OK (5 tests)`, Large `OK (5 tests)` ×2 |
+| JVM unit tests | 59 tests, 0 failures, 0 ignored (the 5 previously skipped tokenizer tests now run) |
+| Instrumented suites | emulator-smoke `OK`, NLLB `OK (6 tests)` ×2, Whisper `OK (5 tests)`, Large `OK (5 tests)` ×2, TTS seed `OK (1 test)` |
 | Online functionality | untouched; no online source file was modified |
 | APK install | `Success` in-place over the previous build, same signing key |
 
-All required PR checks pass: `apk`, `test`, `update-install`, `emulator-smoke`.
+`apk`, `test`, `update-install`, `nllb-smoke` and `tts-seed-smoke` pass. `emulator-smoke` fails on
+one gate only: `SILERO_TTS_DOWNLOAD_STILL_FAILING`. Every offline inference check inside that job
+passes before the gate is reached, so the failure is the hosting blocker, not a regression. It is
+reported as failing rather than described as green.
 
 ## Remaining limitations
 
