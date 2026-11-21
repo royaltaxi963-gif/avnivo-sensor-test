@@ -96,21 +96,18 @@ for `choy` (0.5375 s on both paths).
    x86_64 is above a safe budget for many devices; the figure on an actual arm64 device is not
    measured. Adding this dependency affects every build and has not been justified against a
    measured on-device number.
-3. **On-device inference unverified.** No emulator or physical device was available in this
-   environment. The APK-level claims for this module are therefore unverified.
+3. **On-device inference on physical hardware unverified.** Synthesis is now verified on an x86_64
+   API 34 emulator (§9.4). No arm64 device or physical phone was available, so the arm64 numbers
+   and the 466 MB RSS figure on real hardware remain unmeasured.
 
 ## 7. What is deliberately not done
 
-- No `OfflineModelSpec` entry was added for Silero. `navoiy-tts` and `mms-tts` stay `UNAVAILABLE`
-  because there is still no hosted artifact and no verified runtime; registering a module that
-  cannot become `READY` would advertise a capability the app does not have.
-- No existing file was modified. The tokenizer and its test are new files only.
-
-## 8. Next exact action
-
-Obtain authorization and credentials to publish `silero_v21.ptl` to the model bucket with a pinned
-SHA-256, then measure RSS for one synthesis on an arm64 emulator before deciding whether
-`pytorch_android_lite` is acceptable in the APK.
+- `navoiy-tts` and `mms-tts` stay `UNAVAILABLE`. They are separate, much larger models that were
+  never part of this route; registering them would advertise capability the app does not have.
+- No existing file was modified. The tokenizer, its test, the Silero spec and the export/publish
+  workflow are new files only. Against the protected original commit `05429fee` the Android sources
+  differ by 16,961 insertions and **0 deletions**, so every change is additive and the original HTML
+  interface, its assets and its online paths are untouched.
 
 ## 8. License verification (recorded 2026-11-21)
 
@@ -187,6 +184,27 @@ which is the value the shipped spec and export script use.
 project, and the voice is present in the published artifact at the index this code uses.
 Redistribution of the derived TorchScript artifact is therefore permitted, with the MIT notice
 carried in the module's licence field and this document.
+
+Re-checked independently on 2026-11-21 against a fresh clone at the same commit
+`e382298387332f2bf461fe6eadfde99104611b0c`, so the conclusion does not rest on the earlier notes:
+
+```console
+$ head -1 LICENSE_CIS
+MIT License
+$ head -1 LICENSE
+Attribution-NonCommercial-ShareAlike 4.0 International
+$ grep -n "published under" README.md | head -1
+143:- All of the below models are published under `MIT` [licence](.../LICENSE_CIS);
+$ sed -n '130,145p' README.md | grep -E "^#|published under"
+#### V5 CIS Base Models
+- All of the below models are published under `MIT` [licence](...);
+$ grep -c "uzb_saida" README.md
+1
+```
+
+The MIT line is inside the `#### V5 CIS Base Models` section, and the single `uzb_saida` row is in
+that section's table on line 166. Line 420 of the same README restates it: the base CIS TTS models
+are under MIT while everything else is CC-NC-BY.
 
 The non-MIT `v3_uz` / `v4_uz` voices remain unusable and are not referenced by any code.
 
