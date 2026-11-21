@@ -654,3 +654,47 @@ Verified on run `44874848035`:
 
 The `offline-translate-large` card keeps its existing markup. It was never wired to an
 installer, so removing MADLAD required no HTML change at all.
+
+## Session 2026-11-21 (continued): manual-send guard, Whisper Large offline, device harness
+
+State at the start of this session: HEAD `b821dcb`, PR #28 open and draft, all earlier suites green.
+
+### Manual-send contract is now enforced by a test
+
+The agreed flow is speak -> text lands in the composer -> the user reviews it -> the user presses
+the arrow. Nothing enforced that. `tests/manual-send.test.cjs` reads the shipped asset and fails if
+`recognition.onend` or `recognition.onresult` ever grows a call into `sendMessage`,
+`translateOfflineText`, `translateOnlineText` or `sendOnlineAudio`.
+
+The test is meaningful, not decorative: appending `sendMessage()` to `recognition.onend` makes it
+fail. That mutation was run and then reverted.
+
+One correction worth recording. The first version asserted the send was reachable from a `click`
+handler and failed. The real wiring is `keydown` (Enter), the arrow button, and a short mic tap in
+`releaseHold`. The assertion was rewritten to the actual design instead of being loosened to pass.
+A second test pins the part that matters most: `sendMessage()` must sit in the `else` branch of
+`releaseHold`, so releasing the mic after dictation cannot post the transcript.
+
+### Whisper Large V3 Turbo: real inference confirmed, offline repeat added
+
+Run `44879495882`, job `large-model-smoke`, `OK (5 tests)` in 1,499.7 s. The suite is not a stub:
+it downloads `whisper-large-v3-turbo`, requires `state == ready`, transcribes a real 11 s JFK clip
+and demands at least 4 of 7 expected words.
+
+That run only had the network up, so a green result could not separate real offline inference from
+a cached download. The job now runs two passes: download/verify/init/infer, then the same suite with
+wifi and data disabled and `ping 8.8.8.8` required to fail. `OfflineModuleManager.download()`
+short-circuits to `INSTALLED` when the model is present, so pass 2 exercises initialization and
+inference only. Both passes record `dumpsys meminfo`.
+
+### Physical device
+
+`scripts/run-device-verification.sh` runs the same suites on a connected ARM64 phone and writes
+`instrument_*.txt`, `logcat_*.txt`, `meminfo.txt` and `device.txt` to `build/device-verification/`.
+It is untested against hardware: this environment has no `adb` and no device. S23 Ultra verification
+remains BLOCKED — DEVICE ACCESS REQUIRED.
+
+### Silero TTS
+
+Not present anywhere. No branch, no PR, no commit message, no file. Nothing to integrate and
+nothing to overwrite. Blocked on the other agent delivering a branch.
