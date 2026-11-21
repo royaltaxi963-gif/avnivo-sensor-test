@@ -1121,3 +1121,74 @@ asset and passes 5/5: no original CSS declaration, element id or class name is r
 seven offline modules stay wired. `tests/manual-send.test.cjs` also reads the shipped asset and
 passes 5/5, so recognition still cannot reach `sendMessage`, `translateOfflineText`,
 `translateOnlineText` or `sendOnlineAudio` without a user gesture.
+
+## Checkpoint 2026-11-21 (session recovery, Silero provenance, diagnostics) — run 44938053262
+
+Resumed from HEAD `eabfbe3`. Nothing was reset, no branch or PR was recreated, and the earlier
+commits were kept.
+
+### The Silero blocker is credentials, not code
+
+The pinned artifact is real and reproducible. Downloaded from the `avnivo-tts-seed-evidence`
+artifact of run 44930578157:
+
+```console
+$ sha256sum silero_v21.ptl
+333128fb6c7476e7fceec562f3f54980cbb6a88bbe59ff4a8e67e6cddad7a861  silero_v21.ptl
+$ stat -c%s silero_v21.ptl
+91988758
+```
+
+Both values match `OfflineModelSpecs.kt` and `translator-api/verified_models/silero-tts.json`
+exactly, so spec, manifest and bytes agree. On-device synthesis is proven independently of the
+download: `OfflineSileroTtsInferenceTest` reports `OK (1 test)` in 9.5 s, and the logcat line is
+`seed init+synthesis=4393ms samples=102000 seconds=2.125 peak=0.7822921`.
+
+What is missing is distribution. `download-ticket` needs GCS write access plus
+`AVNIVO_SIGNER_SERVICE_ACCOUNT` to mint a v4 signed URL, and this environment has no
+`GOOGLE_APPLICATION_CREDENTIALS`, no `gcloud`, no `gsutil`. The deployed Cloud Run service returns
+`404` for `silero-tts`, and the Render staging API (`avnivo-translator-api.onrender.com`) returns
+`404` for every `/api/offline-models/...` route because it predates them. So the artifact cannot be
+published from here. That is the exact blocker, and it is why `emulator-smoke` still fails at
+`SILERO_TTS_DOWNLOAD_STILL_FAILING`.
+
+### Licence re-verified against upstream, not against our notes
+
+Cloned `snakers4/silero-models` and checked directly:
+
+```console
+$ head -1 LICENSE_CIS
+MIT License
+$ head -1 LICENSE
+Attribution-NonCommercial-ShareAlike 4.0 International
+$ sed -n '138,143p' README.md
+#### V5 CIS Base Models
+...
+- All of the below models are published under `MIT` [licence](.../LICENSE_CIS);
+$ sed -n '166p' README.md
+| `v5_cis_base`, `v5_cis_base_nostress` | `uzb_saida` | `uzb` (Uzbek) | ... |
+```
+
+The MIT grant covers both `v5_cis_base` and the `uzb_saida` voice. The noncommercial `dilnavoz`
+weights are not used anywhere in the shipped app.
+
+### Module errors now say why
+
+`status()` used to return `state` and nothing else, so a device test could only see
+`{"id":"silero-tts","state":"error","percent":0,"active":false}` — indistinguishable between an
+unpublished model, a bad checksum and a dead interpreter. `status()` now carries a `reason` key
+sourced from the downloader's own message (for example `Model serveri HTTP 404`) and falls back to
+the spec's `blocker` for modules with no engine. `OfflineModuleManagerTest.engineFailureNeverReportsReady`
+asserts the reason reaches the payload. The WebView reads only `state` and `progress`, so the
+interface is unaffected.
+
+### Test totals, run 44938053262
+
+| Suite | Result |
+| --- | --- |
+| JVM unit tests | 59 tests, 0 failures, 0 ignored |
+| `apk` job (17 steps) | all pass, including "Assert the original interface was not altered" |
+| `update-install` | success |
+| Offline routing | 11/11 |
+| SHA-256 integrity | pass |
+| Preservation / manual-send | 5/5 and 5/5 |
