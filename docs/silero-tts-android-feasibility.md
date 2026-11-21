@@ -1,9 +1,9 @@
 # Silero TTS: license gate and Android runtime findings
 
 Scope: converting the validated Silero Uzbek TTS into a shippable Android offline module.
-Status: **MIT licence verified (§8). Runtime integrated and compiling; on-device synthesis not yet
-verified.** The model is not in the download bucket and the deployed API does not list it, so the
-app cannot reach READY yet. See §9 for the exact blockers.
+Status: **MIT licence verified (§8). Runtime integrated and verified synthesising on an emulator
+(§9.4).** The model is not in the download bucket and the deployed API does not list it, so the
+download path cannot complete yet. See §9 for the exact blockers.
 
 ## 1. The validated configuration cannot be shipped
 
@@ -226,9 +226,22 @@ on this branch, but the running Cloud Run revision was built before them. A rede
 ### 9.2 The artifact is not in the bucket
 
 Anonymous `curl` returns 403 for every object in this bucket, including ones that demonstrably
-exist, so 403 alone proves nothing. The authoritative check is the ticket endpoint above: it signs
-URLs only for objects it is told to serve, and it refuses the id outright. The publish workflow
-therefore has not run successfully.
+exist, so 403 alone proves nothing. The authoritative check is the read-only audit of the bucket
+itself (run 44913265881, which lists every object under the four model prefixes and hashes it):
+
+```console
+multilingual-stt/ objects: 2 bytes: 838505802
+multilingual-translation/ objects: 9 bytes: 916816094
+stt-uzbek/ objects: 2 bytes: 591649571
+tts/ objects: 111 bytes: 5658360536
+Verified objects: 124
+```
+
+Of the 111 objects under `tts/`, none is a Silero artifact: 88 are `tts/mms/*` and 23 are
+`tts/uzbek/navoiy/*` (the 2 GB `emotion_600h_joint.pt` Navoiy model plus its demos and sources).
+Grepping the signed manifest for `silero` returns nothing. The ticket endpoint agrees: it signs
+URLs only for objects it is told to serve, and it refuses the id outright. So the publish step has
+never run successfully, and the 403 seen earlier was not the signal — this manifest is.
 
 ### 9.3 Why the publish workflow cannot run yet
 
@@ -251,6 +264,23 @@ explicitly out of scope without approval.
 - `pytorch_android_lite:2.1.0` reads the exported bytecode v8 graph.
 - The JVM suite passes, including the new Silero specs, the fail-closed init test and the
   "synthesis refused before READY" test.
+- **On-device synthesis works** (run 44914520977, job `tts-seed-smoke`, emulator x86_64 API 34).
+  The job exports the graph from the pinned upstream package, refuses to continue unless the export
+  reproduces the pinned SHA-256, pushes it into app-private storage with `run-as`, then runs the
+  real runtime. Measured from `logcat_seed.txt`:
 
-What is *not* proven is on-device synthesis, because the app cannot obtain the model. This module is
-therefore classified **IMPLEMENTED — DEVICE TEST PENDING**, not VERIFIED WORKING.
+  ```console
+  I AvnivoSileroTts: seed init+synthesis=2512ms samples=102000 seconds=2.125 peak=0.7822921
+  OK (1 test)
+  ```
+
+  That is 2.125 s of 48 kHz audio from the Uzbek voice with a non-silent peak, reached through
+  `reactivateInstalled()` → `initialize()` → `SileroTtsEngine.prepare()` → `smokeTest()`, i.e. the
+  same path a real install takes once the file is on disk. Because the module only reaches `ready`
+  after the smoke test passes, this also proves the READY gate is not bypassed.
+
+What is still *not* proven is the download path end to end, because the artifact is not in the
+bucket and the deployed API does not list the id (§9.1, §9.2). The download test therefore still
+fails, and this module stays **IMPLEMENTED — DEVICE TEST PENDING** rather than VERIFIED WORKING.
+Seeding proves the runtime; it does not prove the downloader, the ticket, or the checksum gate on a
+real transfer, and it must not be reported as if it did.
