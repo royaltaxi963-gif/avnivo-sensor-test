@@ -698,3 +698,24 @@ remains BLOCKED — DEVICE ACCESS REQUIRED.
 
 Not present anywhere. No branch, no PR, no commit message, no file. Nothing to integrate and
 nothing to overwrite. Blocked on the other agent delivering a branch.
+
+## Whisper Large V3 Turbo: verified, including offline (run 44883724177)
+
+The two-pass job now gives evidence that was missing before.
+
+| Pass | Network | Result | Time |
+| --- | --- | --- | --- |
+| 1 | up | `OK (5 tests)` | 1,371.6 s |
+| 2 | `NETWORK_DOWN` (wifi+data off, ping to 8.8.8.8 fails) | `OK (5 tests)` | 1,294.9 s |
+
+Pass 2 being slightly faster than pass 1 rules out a hidden network round trip, and the suite
+still requires `state == ready`, a real 11 s JFK clip, and >= 4 of 7 expected words. A download-only
+"pass" is impossible because the assertions run after `transcribe()` returns.
+
+Run 44882509477 failed at 1m51s first. Root cause was mine, not the model's:
+`android-emulator-runner` executes each script line as its own shell, so the backslash continuations
+were handed to `am` as a literal argument and it printed its help text. Fixed by keeping each
+command on one line.
+
+`dumpsys meminfo` produced empty files because it runs after the instrumentation process exits.
+The test now logs `WHISPER_LARGE_MEM` from inside the process while the model is resident.
