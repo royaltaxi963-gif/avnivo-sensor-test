@@ -1,0 +1,53 @@
+{
+  "model_id": "nllb-200-600m-int8",
+  "files": [
+    {
+      "name": "config.json",
+      "object": "multilingual-translation/nllb-200-600m-int8/config.json",
+      "bytes": 873,
+      "sha256": "52f035acb54ac80e5ef7fe78d6967f8ddf8e8799f078d1a92a2c8168d8ff4a20"
+    },
+    {
+      "name": "generation_config.json",
+      "object": "multilingual-translation/nllb-200-600m-int8/generation_config.json",
+      "bytes": 189,
+      "sha256": "1ce846259ae04c572ae1863e358534bbc376ff3d3f100b1494feda6200b51de8"
+    },
+    {
+      "name": "onnx/decoder_model_merged_quantized.onnx",
+      "object": "multilingual-translation/nllb-200-600m-int8/onnx/decoder_model_merged_quantized.onnx",
+      "bytes": 475505771,
+      "sha256": "dd66608c2a4194e78f95548fa0e64f24302303698c5b09fa8e1f9e16ec00676b"
+    },
+    {
+      "name": "onnx/encoder_model_quantized.onnx",
+      "object": "multilingual-translation/nllb-200-600m-int8/onnx/encoder_model_quantized.onnx",
+      "bytes": 419120483,
+      "sha256": "5cde664eacba07a62f198857ec6c06e09572b1ebb77c8137f1fa99ac604a3a28"
+    },
+    {
+      "name": "sentencepiece.bpe.model",
+      "object": "multilingual-translation/nllb-200-600m-int8/sentencepiece.bpe.model",
+      "bytes": 4852054,
+      "sha256": "14bb8dfb35c0ffdea7bc01e56cea38b9e3d5efcdcb9c251d6b40538e1aab555a"
+    },
+    {
+      "name": "special_tokens_map.json",
+      "object": "multilingual-translation/nllb-200-600m-int8/special_tokens_map.json",
+      "bytes": 3548,
+      "sha256": "992bd4ed610d644d6823081937bcc91bb8878dd556cea4ae5327f2480361330e"
+    },
+    {
+      "name": "tokenizer.json",
+      "object": "multilingual-translation/nllb-200-600m-int8/tokenizer.json",
+      "bytes": 17331224,
+      "sha256": "8ac789ad7dabea44d41537822d48c516ba358374c51813e2cba78c006e150c94"
+    },
+    {
+      "name": "tokenizer_config.json",
+      "object": "multilingual-translation/nllb-200-600m-int8/tokenizer_config.json",
+      "bytes": 544,
+      "sha256": "ddf411c9f790d081e72de76bb8e8b714d74e160e61bc10c9bd8f56022dcd7fd7"
+    }
+  ]
+}

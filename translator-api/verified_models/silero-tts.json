@@ -1,0 +1,11 @@
+{
+  "model_id": "silero-tts",
+  "files": [
+    {
+      "name": "silero_v21.ptl",
+      "object": "tts/uzbek/silero/silero_v21.ptl",
+      "bytes": 91988758,
+      "sha256": "333128fb6c7476e7fceec562f3f54980cbb6a88bbe59ff4a8e67e6cddad7a861"
+    }
+  ]
+}

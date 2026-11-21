@@ -7,20 +7,33 @@ import java.net.URL
 import java.security.MessageDigest
 
 /** Downloads only the reviewed Uzbek STT model into app-private storage. Run off the UI thread. */
-internal class VerifiedModelDownloader(private val directory: File) {
+internal class VerifiedModelDownloader(
+    private val directory: File,
+    private val apiBase: String = DEFAULT_API_BASE,
+    private val allowedHosts: List<String> = DEFAULT_ALLOWED_HOSTS,
+    private val modelId: String = MODEL_ID,
+    private val expected: Map<String, Pair<Long, String>> = EXPECTED
+) {
     companion object {
-        private const val API = "https://avnivo-translation-test-792624108019.europe-west1.run.app/api/offline-models/uzbek-stt/download-ticket"
-        private val expected = mapOf(
+        const val DEFAULT_API_BASE = "https://avnivo-translation-test-792624108019.europe-west1.run.app"
+        val DEFAULT_ALLOWED_HOSTS = listOf(
+            "https://storage.googleapis.com/",
+            "https://avnivo-offline-models-792624108019.storage.googleapis.com/"
+        )
+        const val MODEL_ID = "uzbek-stt"
+        val EXPECTED = mapOf(
             "model.int8.onnx" to Pair(591649160L, "8bff17ef8d7da04369a559b99b71c1155a90fc604d35d84c6d4e44159c1b0873"),
             "tokens.txt" to Pair(411L, "2022129a0c61784d4a1838da59e5875f9b29d2c6ad12413cbedc98632f98710f")
         )
     }
 
+    private val ticketUrl get() = "$apiBase/api/offline-models/$modelId/download-ticket"
+
     fun download(progress: (String) -> Unit, bytesProgress: (Long, Long) -> Unit) {
         require(directory.mkdirs() || directory.isDirectory) { "Cannot create model directory" }
         progress("Model serveriga ulanmoqda…")
-        val ticket = JSONObject(readHttps(API))
-        require(ticket.getString("model_id") == "uzbek-stt") { "Unexpected model" }
+        val ticket = JSONObject(readHttps(ticketUrl))
+        require(ticket.getString("model_id") == modelId) { "Unexpected model" }
         val files = ticket.getJSONArray("files")
         require(files.length() == expected.size) { "Unexpected file count" }
         val seen = mutableSetOf<String>()
@@ -34,13 +47,11 @@ internal class VerifiedModelDownloader(private val directory: File) {
                 require(entry.getLong("bytes") == spec.first &&
                     entry.getString("sha256").equals(spec.second, ignoreCase = true)) { "Manifest mismatch" }
                 val url = entry.getString("url")
-                require(url.startsWith("https://storage.googleapis.com/") ||
-                    url.startsWith("https://avnivo-offline-models-792624108019.storage.googleapis.com/")) {
-                    "Unexpected download host"
-                }
+                require(allowedHosts.any { url.startsWith(it) }) { "Unexpected download host" }
                 require(directory.usableSpace > spec.first + 32L * 1024 * 1024) { "Insufficient storage" }
                 val temporary = File(directory, "$name.download")
                 val destination = File(directory, name)
+                destination.parentFile?.mkdirs()
                 progress("Yuklanmoqda: $name")
                 downloadFile(url, temporary, spec.first, spec.second, bytesProgress)
                 staged.add(temporary to destination)
@@ -90,7 +101,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
                         val n = input.read(buffer)
                         if (n < 0) break
                         total += n
-                        require(total <= size) { "File exceeds expected size" }
+                        if (total > size) { file.delete(); error("File exceeds expected size") }
                         digest.update(buffer, 0, n)
                         output.write(buffer, 0, n)
                         progress(total,size)
@@ -99,7 +110,7 @@ internal class VerifiedModelDownloader(private val directory: File) {
             }
             require(total == size) { "Incorrect model file size" }
             val actual = digest.digest().joinToString("") { "%02x".format(it.toInt() and 255) }
-            require(actual == hash) { "SHA-256 mismatch" }
+            if (actual != hash) { file.delete(); error("SHA-256 mismatch") }
         } finally { c.disconnect() }
     }
 }

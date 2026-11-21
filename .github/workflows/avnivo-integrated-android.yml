@@ -1,6 +1,31 @@
 name: AVNIVO integrated Android APK
 on:
   workflow_dispatch:
+    inputs:
+      run_large_model_verification:
+        description: 'Also verify Whisper Large V3 Turbo on the emulator (long, ~1h)'
+        type: boolean
+        default: false
+      publish_direct_apk:
+        description: 'Publish a public pre-release APK for direct download (requires explicit manual selection and stable signing secrets)'
+        type: boolean
+        default: false
+      run_nllb_verification:
+        description: 'Also verify NLLB-200 offline translation on the emulator (long, ~1h)'
+        type: boolean
+        default: false
+      run_whisper_offline_verification:
+        description: 'Also repeat the Whisper Small inference suite with the radios disabled (~15m)'
+        type: boolean
+        default: false
+      run_tts_seed_verification:
+        description: 'Verify the Silero TTS runtime against a CI-exported artifact, bypassing model hosting (~10m)'
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/avnivo-integrated-android.yml'
   push:
     paths:
       - 'android-app/**'
@@ -31,10 +56,561 @@ jobs:
           mkdir -p app/libs
           curl --fail --location --retry 3 --output app/libs/sherpa-onnx-2.0.1.aar https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.1/sherpa-onnx-2.0.1.aar
           test -s app/libs/sherpa-onnx-2.0.1.aar
+      - name: Fetch whisper.cpp native sources
+        run: |
+          rm -rf app/src/main/cpp/whisper.cpp
+          git clone --depth 1 --branch v1.7.4 https://github.com/ggml-org/whisper.cpp.git app/src/main/cpp/whisper.cpp
+          test -f app/src/main/cpp/whisper.cpp/CMakeLists.txt
+      - name: Fetch the NLLB tokenizer so its conformance tests can run
+        run: |
+          # The tokenizer tests compare against ids produced by the reference library from this
+          # exact file, so they need the real artifact. Without it they skip via assumeTrue, and a
+          # skip is indistinguishable from a pass in the report. Fetching it here turns 5 skipped
+          # tests into 5 executed ones.
+          #
+          # The file comes from the app's own ticket endpoint rather than a public mirror: the
+          # Hugging Face copy of this filename currently hashes to e316b82d..., not the 8ac789ad...
+          # the pinned ids were produced from, so it is a different file. The hash check below is
+          # what makes that distinction matter instead of silently testing the wrong artifact.
+          mkdir -p "$RUNNER_TEMP/nllb"
+          curl --fail --location --retry 3 --max-time 120 -o "$RUNNER_TEMP/ticket.json" \
+            https://avnivo-translation-test-792624108019.europe-west1.run.app/api/offline-models/nllb-200-600m-int8/download-ticket
+          URL=$(jq -r '.files[] | select(.name=="tokenizer.json") | .url' "$RUNNER_TEMP/ticket.json")
+          test -n "$URL" && test "$URL" != null || { echo NO_TOKENIZER_IN_TICKET; exit 1; }
+          curl --fail --location --retry 3 --max-time 900 -o "$RUNNER_TEMP/nllb/tokenizer.json" "$URL"
+          echo "8ac789ad7dabea44d41537822d48c516ba358374c51813e2cba78c006e150c94  $RUNNER_TEMP/nllb/tokenizer.json" | sha256sum -c -
+          echo "AVNIVO_NLLB_MODEL_DIR=$RUNNER_TEMP/nllb" >> "$GITHUB_ENV"
+      - name: Run JVM unit tests
+        run: gradle --no-daemon testDebugUnitTest
+      - name: Run offline translation routing tests
+        working-directory: .
+        run: node --test tests/offline-translation/route.test.mjs
+      - name: Run model integrity tests
+        working-directory: .
+        run: node --test tests/offline-sha256.test.cjs
+      - name: Assert the original interface was not altered
+        working-directory: .
+        run: node --test tests/offline-ui-preservation.test.cjs
+      - name: Assert speech recognition never auto-sends
+        working-directory: .
+        run: node --test tests/manual-send.test.cjs
+      - name: Upload unit test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-unit-test-reports
+          path: android-app/app/build/reports/tests/testDebugUnitTest
+          if-no-files-found: warn
       - name: Build integrated APK
-        run: gradle --no-daemon assembleDebug
+        run: gradle --no-daemon assembleDebug assembleDebugAndroidTest
+      - name: Assert ggml was compiled optimised
+        run: |
+          # A -O0 native build still passes every functional test, just ~100x slower, so assert the
+          # flag reached the compiler rather than trusting it.
+          ninja_file=$(find "$GITHUB_WORKSPACE/android-app/app/.cxx" -name build.ninja 2>/dev/null | head -1)
+          test -n "$ninja_file" || { echo NO_NINJA_FILE; exit 1; }
+          echo "ninja: $ninja_file"
+          grep -m1 "^  FLAGS = " "$ninja_file" || true
+          if grep -q -- "-O3" "$ninja_file"; then echo NATIVE_OPTIMISED; else echo GGML_NOT_OPTIMISED; exit 1; fi
       - uses: actions/upload-artifact@v4
         with:
           name: avnivo-translator-integrated-debug-apk
           path: android-app/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-translator-androidtest-apk
+          path: android-app/app/build/outputs/apk/androidTest/debug/*.apk
+          if-no-files-found: error
+  update-install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: android-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Android SDK
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-35" || "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-35'
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'build-tools;35.0.0'
+      - name: Fetch native Sherpa ONNX runtime
+        run: |
+          mkdir -p app/libs
+          curl --fail --location --retry 3 --output app/libs/sherpa-onnx-2.0.1.aar https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.1/sherpa-onnx-2.0.1.aar
+          test -s app/libs/sherpa-onnx-2.0.1.aar
+      - name: Fetch whisper.cpp native sources
+        run: |
+          rm -rf app/src/main/cpp/whisper.cpp
+          git clone --depth 1 --branch v1.7.4 https://github.com/ggml-org/whisper.cpp.git app/src/main/cpp/whisper.cpp
+          test -f app/src/main/cpp/whisper.cpp/CMakeLists.txt
+      - name: Prepare signing identity
+        env:
+          KEYSTORE_BASE64: ${{ secrets.AVNIVO_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            printf '%s' "$KEYSTORE_BASE64" | base64 -d > avnivo-release.jks
+            echo "SIGNING_MODE=secret" >> "$GITHUB_ENV"
+            echo "AVNIVO_KEYSTORE_PASSWORD=${{ secrets.AVNIVO_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "AVNIVO_KEY_ALIAS=${{ secrets.AVNIVO_KEY_ALIAS }}" >> "$GITHUB_ENV"
+            echo "AVNIVO_KEY_PASSWORD=${{ secrets.AVNIVO_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+          else
+            keytool -genkeypair -keystore avnivo-release.jks -alias avnivo -keyalg RSA -keysize 2048 -validity 3650 -storepass avnivo-ci -keypass avnivo-ci -dname "CN=AVNIVO CI, O=AVNIVO"
+            echo "SIGNING_MODE=ephemeral" >> "$GITHUB_ENV"
+            echo "AVNIVO_KEYSTORE_PASSWORD=avnivo-ci" >> "$GITHUB_ENV"
+            echo "AVNIVO_KEY_ALIAS=avnivo" >> "$GITHUB_ENV"
+            echo "AVNIVO_KEY_PASSWORD=avnivo-ci" >> "$GITHUB_ENV"
+          fi
+          echo "AVNIVO_KEYSTORE_FILE=$PWD/avnivo-release.jks" >> "$GITHUB_ENV"
+      - name: Build two release APKs with the same key and increasing versionCode
+        run: |
+          AVNIVO_VERSION_CODE=100 gradle --no-daemon assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk ../update-v100.apk
+          AVNIVO_VERSION_CODE=$((1000 + GITHUB_RUN_NUMBER)) gradle --no-daemon assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk ../update-v101.apk
+      - name: Record signing certificate fingerprint
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs ../update-v100.apk | tee ../cert.txt
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify in-place update installation
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot
+          disable-animations: true
+          script: |
+            adb wait-for-device
+            adb install update-v100.apk
+            adb shell am start -W -n com.avnivo.translator/.MainActivity
+            sleep 8
+            BEFORE=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 firstInstallTime); V1=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 versionCode); echo "before: $BEFORE | $V1"; [ -n "$BEFORE" ] && [ -n "$V1" ] || { echo NO_BASELINE; exit 1; }; adb install -r update-v101.apk | tee update.txt; grep -q "Success" update.txt || { echo UPDATE_FAILED; exit 1; }; AFTER=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 firstInstallTime); V2=$(adb shell dumpsys package com.avnivo.translator | tr -d '\r' | grep -m1 versionCode); echo "after: $AFTER | $V2"; [ "$BEFORE" = "$AFTER" ] || { echo FIRST_INSTALL_TIME_CHANGED; exit 1; }; [ "$V1" != "$V2" ] || { echo VERSION_CODE_NOT_INCREMENTED; exit 1; }; adb shell pm path com.avnivo.translator || { echo NOT_INSTALLED_AFTER; exit 1; }; echo UPDATE_INSTALL_OK
+      - name: Publish direct APK as prerelease (manual opt-in only)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_direct_apk }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ "${SIGNING_MODE:-}" != "secret" ]; then
+            echo "::error::Stable release signing secrets are required; refusing to publish an ephemeral-signed APK."
+            exit 1
+          fi
+          CODE=$((1000 + GITHUB_RUN_NUMBER))
+          TAG="avnivo-android-test-v${CODE}"
+          cp ../update-v101.apk "../AVNIVO-Translator-v${CODE}.apk"
+          gh release create "$TAG" "../AVNIVO-Translator-v${CODE}.apk" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "AVNIVO Translator Android test v${CODE}" \
+            --notes "Pre-release Android APK. Same stable signing identity required for in-place updates. Install only after backing up existing app data. Not a production release." \
+            --prerelease
+          echo "DIRECT_APK_URL=https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/AVNIVO-Translator-v${CODE}.apk" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avnivo-release-signing-evidence
+          path: |
+            cert.txt
+            update.txt
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avnivo-translator-release-apk
+          path: update-v101.apk
+          if-no-files-found: error
+  emulator-smoke:
+    needs: [apk, tts-seed-smoke]
+    # Ordered after the seed job so its digest-checked artifact can be used for the offline TTS
+    # check, but not skipped when seeding is off: the artifact is optional there.
+    if: always() && needs.apk.result == 'success'
+    runs-on: ubuntu-latest
+    # The offline stage re-runs the Whisper suites with the radios off, which roughly doubles the
+    # wall time. 40 minutes cancelled the job mid-offline-check, so allow the same budget as the
+    # other long verification jobs.
+    timeout-minutes: 110
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-integrated-debug-apk
+          path: apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-androidtest-apk
+          path: androidtest
+      # Optional: the digest-checked Silero artifact from tts-seed-smoke, used only to prove
+      # network-free synthesis. The job runs whether or not it is present.
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: avnivo-tts-seed-evidence
+          path: tts-artifact
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install, launch and run instrumented tests
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          WHISPER_OFFLINE: ${{ inputs.run_whisper_offline_verification }}
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot
+          disable-animations: true
+          script: |
+            adb wait-for-device
+            adb install -r apk/app-debug.apk
+            adb shell pm list packages | grep -q com.avnivo.translator || { echo NOT_INSTALLED; exit 1; }
+            adb shell am start -W -n com.avnivo.translator/.MainActivity
+            sleep 20
+            adb logcat -d > logcat.txt
+            adb shell dumpsys window | grep -i mCurrentFocus || true
+            PID=$(adb shell pidof com.avnivo.translator | tr -d '\r'); echo "app pid: $PID"; [ -n "$PID" ] || { echo APP_NOT_RUNNING; exit 1; }
+            grep -iE "FATAL EXCEPTION" logcat.txt && { echo FATAL_IN_LOGCAT; exit 1; } || true
+            adb install -r androidtest/app-debug-androidTest.apk
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineEngineInstrumentedTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument.txt
+            grep -q "OK (" instrument.txt || { echo INSTRUMENTED_TESTS_FAILED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineMicGestureInstrumentedTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_mic.txt
+            grep -q "OK (" instrument_mic.txt || { echo MIC_GESTURE_TESTS_FAILED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineRealInferenceTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_real.txt
+            grep -q "OK (" instrument_real.txt || { echo REAL_INFERENCE_FAILED; exit 1; }
+            # A skipped test also reports "OK", so require the transcript itself.
+            adb logcat -d | grep -a "UZBEK_STT_RESULT" | tail -1
+            adb logcat -d | grep -qa "UZBEK_STT_RESULT text=." || { echo UZBEK_STT_NOT_TRANSCRIBED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_runtime.txt
+            grep -q "OK (" instrument_whisper_runtime.txt || { echo WHISPER_RUNTIME_FAILED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper.txt
+            grep -q "OK (" instrument_whisper.txt || { echo WHISPER_INFERENCE_FAILED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest#reportsWhisperLatencyAndRepeats -e avnivoWhisperPerf true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_perf.txt
+            grep -q "OK (" instrument_whisper_perf.txt || { echo WHISPER_PERF_FAILED; exit 1; }
+
+            # Uzbek TTS: 92 MB model, so the real inference run is cheap enough to do inline. It
+            # downloads from the signed ticket, verifies SHA-256, loads the TorchScript Lite graph
+            # and synthesizes real speech. A skipped test also reports "OK", so the transcript is
+            # required as well.
+            #
+            # This is recorded rather than fatal on purpose: the model is not hosted yet, and an
+            # early exit here used to hide the independent offline checks below, so one external
+            # gap suppressed evidence that had nothing to do with it. The job still fails at the
+            # end if this did not pass.
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineSileroTtsInferenceTest -e avnivoTtsInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_tts.txt
+            grep -q "OK (" instrument_tts.txt || { echo SILERO_TTS_FAILED; echo failed > tts_download.status; }
+            adb logcat -d | grep -a "AvnivoSileroTts" | tail -1 || true
+            echo "tts download result: $(cat tts_download.status 2>/dev/null || echo ok)"
+            # A skipped test also reports "OK", so require the measurement itself. Without this a
+            # bad argument silently turned the whole perf run into a 0.001 s no-op that still passed.
+            adb logcat -d | grep -a "WHISPER_PERF" | tail -1
+            adb logcat -d | grep -qa "WHISPER_PERF audio=" || { echo WHISPER_PERF_NOT_MEASURED; exit 1; }
+
+            # Everything above proves the engines work, not that they work offline. Cut the radios
+            # and repeat the Uzbek STT suite. Its model is already installed, so it is reused; if
+            # the engine tried to fetch something the run would fail here. Whisper is left out
+            # because re-downloading and re-decoding it adds ~40 minutes; its offline path is
+            # covered by the opt-in large-model job.
+            echo "=== offline re-verification ==="
+            adb shell svc wifi disable
+            adb shell svc data disable
+            adb shell cmd connectivity airplane-mode enable 2>/dev/null || true
+            sleep 5
+            adb shell ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 && { echo NETWORK_STILL_UP; exit 1; } || echo NETWORK_DOWN
+            adb logcat -c
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineRealInferenceTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_real_offline.txt
+            grep -q "OK (" instrument_real_offline.txt || { echo REAL_INFERENCE_OFFLINE_FAILED; exit 1; }
+            adb logcat -d | grep -a "UZBEK_STT_RESULT" | tail -1
+            adb logcat -d | grep -qa "UZBEK_STT_RESULT text=." || { echo UZBEK_STT_OFFLINE_NOT_TRANSCRIBED; exit 1; }
+            # The TTS model is not hosted yet, so seed the artifact the seed job already verified
+            # and synthesize with the radios down. That proves the engine needs no network; it does
+            # not stand in for the download test, which stays recorded above.
+            #
+            # One line on purpose: the emulator runner executes each line through a separate
+            # `sh -c`, so a multi-line if/fi block fails with "end of file unexpected".
+            if [ -f tts-artifact/silero_v21.ptl ]; then adb shell run-as com.avnivo.translator mkdir -p files/models/silero-tts; adb push tts-artifact/silero_v21.ptl /data/local/tmp/silero_v21.ptl; adb shell run-as com.avnivo.translator cp /data/local/tmp/silero_v21.ptl files/models/silero-tts/silero_v21.ptl; adb logcat -c; adb shell am instrument -w -e class com.avnivo.translator.OfflineSileroTtsInferenceTest#seededArtifactInitializesAndSynthesizes -e avnivoTtsSeed true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_tts_offline.txt; grep -q "OK (" instrument_tts_offline.txt || { echo SILERO_TTS_OFFLINE_FAILED; exit 1; }; adb logcat -d | grep -a "AvnivoSileroTts" | tail -1; adb logcat -d | grep -qa "AvnivoSileroTts: seed init+synthesis=" || { echo SILERO_TTS_OFFLINE_NOT_SYNTHESIZED; exit 1; }; echo SILERO_TTS_OFFLINE_OK; else echo "no seeded artifact; skipping offline TTS synthesis"; fi
+            echo OFFLINE_INFERENCE_OK
+            if [ "$WHISPER_OFFLINE" = "true" ]; then echo "=== whisper offline re-verification ==="; adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_offline.txt; grep -q "OK (" instrument_whisper_offline.txt || { echo WHISPER_INFERENCE_OFFLINE_FAILED; exit 1; }; adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest#reportsWhisperLatencyAndRepeats -e avnivoWhisperPerf true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_perf_offline.txt; grep -q "OK (" instrument_whisper_perf_offline.txt || { echo WHISPER_PERF_OFFLINE_FAILED; exit 1; }; adb logcat -d | grep -a "WHISPER_PERF" | tail -1; adb logcat -d | grep -qa "WHISPER_PERF audio=" || { echo WHISPER_PERF_OFFLINE_NOT_MEASURED; exit 1; }; echo WHISPER_OFFLINE_OK; fi
+            echo EMULATOR_SMOKE_OK
+            # Recorded, not ignored: a real download regression still fails the job. A marker file
+            # is used because the runner executes each line in its own shell, so a variable would
+            # not survive to this line.
+            if [ -f tts_download.status ]; then echo "SILERO_TTS_DOWNLOAD_STILL_FAILING"; exit 1; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avnivo-emulator-logcat
+          path: |
+            logcat.txt
+            instrument*.txt
+          if-no-files-found: warn
+  tts-seed-smoke:
+    # Proves the Silero runtime itself works: the artifact is exported from the pinned upstream
+    # package, re-checked against the digest the app pins, pushed to the device and synthesized.
+    # This is deliberately independent of model hosting, so a hosting gap cannot hide a runtime bug
+    # (or the reverse). It does not replace the download test, which still needs the real ticket.
+    if: github.event_name == 'workflow_dispatch' && inputs.run_tts_seed_verification
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      UPSTREAM_URL: https://models.silero.ai/models/tts/ru/v5_cis_base.pt
+      UPSTREAM_SHA256: ba41b18f6a707ad93605a162998865e7c087153d2e010a26dd02229dab0e672a
+      UPSTREAM_BYTES: '91680514'
+      ARTIFACT_SHA256: 333128fb6c7476e7fceec562f3f54980cbb6a88bbe59ff4a8e67e6cddad7a861
+      ARTIFACT_BYTES: '91988758'
+      ARTIFACT_NAME: silero_v21.ptl
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-integrated-debug-apk
+          path: apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-androidtest-apk
+          path: androidtest
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      # torch 2.1.0 emits the bytecode v8 that pytorch_android_lite:2.1.0 can read.
+      - name: Install the pinned export toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy<2" torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
+      - name: Download and check the authoritative upstream package
+        run: |
+          set -euo pipefail
+          curl -sSL --retry 3 --max-time 900 -o v5_cis_base.pt "$UPSTREAM_URL"
+          test "$(stat -c %s v5_cis_base.pt)" = "$UPSTREAM_BYTES" || { echo "::error::upstream size changed"; exit 1; }
+          test "$(sha256sum v5_cis_base.pt | cut -d' ' -f1)" = "$UPSTREAM_SHA256" || { echo "::error::upstream digest changed"; exit 1; }
+      - name: Export the TorchScript Lite graph
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import torch, warnings
+          warnings.filterwarnings("ignore")
+          imp = torch.package.PackageImporter("v5_cis_base.pt")
+          package = imp.load_pickle("tts_models", "model")
+          model = package.packages[0].models[0].eval()
+          # uzb_saida is speaker 46 in this package; it is the only Uzbek voice and it is MIT.
+          ids = torch.tensor([[2, 30, 13, 24, 27, 25, 1]], dtype=torch.long)
+          speaker = torch.tensor([46], dtype=torch.long)
+          traced = torch.jit.trace(model, (ids, speaker), strict=False)
+          traced._save_for_lite_interpreter("silero_v21.ptl")
+          PY
+      - name: Require the export to match the digest the app pins
+        run: |
+          set -euo pipefail
+          test "$(stat -c %s $ARTIFACT_NAME)" = "$ARTIFACT_BYTES" || { echo "::error::export size differs from the pinned artifact"; exit 1; }
+          test "$(sha256sum $ARTIFACT_NAME | cut -d' ' -f1)" = "$ARTIFACT_SHA256" || { echo "::error::export digest differs from the pinned artifact"; exit 1; }
+          echo "export matches the pinned SHA-256 $ARTIFACT_SHA256" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Seed the verified artifact and synthesize on device
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            adb wait-for-device
+            adb install -r apk/app-debug.apk
+            adb install -r androidtest/app-debug-androidTest.apk
+            # The app is debuggable, so run-as can write into its private storage.
+            adb shell run-as com.avnivo.translator mkdir -p files/models/silero-tts
+            adb push "$ARTIFACT_NAME" /data/local/tmp/silero_v21.ptl
+            adb shell run-as com.avnivo.translator cp /data/local/tmp/silero_v21.ptl files/models/silero-tts/silero_v21.ptl
+            adb shell run-as com.avnivo.translator ls -l files/models/silero-tts/
+            adb logcat -c
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineSileroTtsInferenceTest#seededArtifactInitializesAndSynthesizes -e avnivoTtsSeed true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_tts_seed.txt
+            grep -q "OK (" instrument_tts_seed.txt || { echo SILERO_TTS_SEED_FAILED; exit 1; }
+            adb logcat -d > logcat_seed.txt
+            grep -a "AvnivoSileroTts" logcat_seed.txt | tail -1
+            grep -qa "AvnivoSileroTts: seed init+synthesis=" logcat_seed.txt || { echo SILERO_TTS_SEED_NOT_SYNTHESIZED; exit 1; }
+            echo TTS_SEED_OK
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avnivo-tts-seed-evidence
+          path: |
+            instrument_tts_seed.txt
+            logcat_seed.txt
+            silero_v21.ptl
+          if-no-files-found: warn
+  nllb-smoke:
+    # Opt-in: verifies the ~916 MB NLLB-200 INT8 model downloads, verifies, initializes ONNX
+    # Runtime through JNI and translates real sentences on a device with no network access.
+    if: github.event_name == 'workflow_dispatch' && inputs.run_nllb_verification
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-integrated-debug-apk
+          path: apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-androidtest-apk
+          path: androidtest
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify NLLB-200 translation on the emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          # NLLB-200 needs ~2.7 GB resident for its two ONNX sessions; on a 4 GB AVD the low-memory
+          # killer ended the process mid-run, so this job gives the emulator real headroom.
+          ram-size: 8192
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -memory 8192
+          disable-animations: true
+          script: |
+            set +e
+            adb wait-for-device
+            adb install -r apk/app-debug.apk
+            adb install -r androidtest/app-debug-androidTest.apk
+            adb shell cat /proc/meminfo > meminfo_nllb.txt
+            adb shell df -h /data >> meminfo_nllb.txt
+            adb logcat -c
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineNllbInferenceTest -e avnivoNllbInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_nllb.txt
+            adb logcat -d > logcat_nllb.txt
+            echo "=== crash / native signal ==="
+            grep -aE "FATAL|signal [0-9]|SIGSEGV|SIGABRT|Abort message|libavnivo_nllb|libonnxruntime|lowmemorykiller|OutOfMemory|am_crash|art::Runtime" logcat_nllb.txt | tail -40
+            echo "=== memory at end ==="
+            adb shell cat /proc/meminfo | head -4
+            grep -q "OK (" instrument_nllb.txt || { echo NLLB_FAILED; exit 1; }
+
+            # The download above proves translation works, not that it works offline. Cut every
+            # radio, then repeat the same run. The model is already installed, so it is reused and
+            # any attempt to reach the network would fail instead of being silently tolerated.
+            echo "=== offline re-verification ==="
+            adb shell svc wifi disable
+            adb shell svc data disable
+            adb shell cmd connectivity airplane-mode enable 2>/dev/null || true
+            sleep 5
+            adb shell ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 && { echo NETWORK_STILL_UP; exit 1; } || echo NETWORK_DOWN
+            adb logcat -c
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineNllbInferenceTest -e avnivoNllbInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_nllb_offline.txt
+            adb logcat -d > logcat_nllb_offline.txt
+            grep -q "OK (" instrument_nllb_offline.txt || { echo NLLB_OFFLINE_FAILED; exit 1; }
+            echo NLLB_OFFLINE_OK
+            echo NLLB_OK
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avnivo-nllb-inference-log
+          path: |
+            instrument_nllb.txt
+            instrument_nllb_offline.txt
+            logcat_nllb.txt
+            logcat_nllb_offline.txt
+            meminfo_nllb.txt
+          if-no-files-found: warn
+
+  large-model-smoke:
+    # Opt-in: verifies the 574 MB Whisper Large V3 Turbo model really initializes and infers on a
+    # device. Slow (download + CPU inference), so it never gates the standard pipeline.
+    if: github.event_name == 'workflow_dispatch' && inputs.run_large_model_verification
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-integrated-debug-apk
+          path: apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: avnivo-translator-androidtest-apk
+          path: androidtest
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify Whisper Large V3 Turbo on the emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -memory 4096
+          disable-animations: true
+          script: |
+            adb wait-for-device
+            adb install -r apk/app-debug.apk
+            adb install -r androidtest/app-debug-androidTest.apk
+
+            echo "=== pass 1: download, verify, initialize, infer (network up) ==="
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperLargeInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_large.txt
+            grep -q "OK (" instrument_whisper_large.txt || { echo WHISPER_LARGE_FAILED; exit 1; }
+            adb logcat -d -s AvnivoWhisperLarge > meminfo_online.txt 2>&1 || true
+            grep -a "WHISPER_LARGE_MEM" meminfo_online.txt | tail -1 || true
+
+            # The model is now installed, so OfflineModuleManager.download() short-circuits the
+            # network and only re-initializes. Cutting the radios therefore proves inference itself
+            # needs no connectivity rather than just proving the download was cached.
+            echo "=== pass 2: repeat inference with radios off ==="
+            adb shell svc wifi disable
+            adb shell svc data disable
+            sleep 8
+            adb shell ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 && { echo NETWORK_STILL_UP; exit 1; } || echo NETWORK_DOWN
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperLargeInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_large_offline.txt
+            grep -q "OK (" instrument_whisper_large_offline.txt || { echo WHISPER_LARGE_OFFLINE_FAILED; exit 1; }
+            adb logcat -d -s AvnivoWhisperLarge > meminfo_offline.txt 2>&1 || true
+            grep -a "WHISPER_LARGE_MEM" meminfo_offline.txt | tail -1 || true
+            echo WHISPER_LARGE_OK
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avnivo-whisper-large-inference-log
+          path: |
+            instrument_whisper_large.txt
+            instrument_whisper_large_offline.txt
+            meminfo_online.txt
+            meminfo_offline.txt
+          if-no-files-found: warn

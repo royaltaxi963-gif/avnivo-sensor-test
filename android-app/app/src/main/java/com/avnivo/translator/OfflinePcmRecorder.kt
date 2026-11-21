@@ -8,15 +8,21 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import java.io.Closeable
+import kotlin.math.min
+import kotlin.math.sqrt
 
-/** One-shot bounded microphone capture. Invoke capture() from a worker thread. */
+/**
+ * Gesture-controlled microphone capture. [capture] runs on a worker thread and returns as soon as
+ * [stop] is called, so recording lasts exactly as long as the user holds the microphone button.
+ * [onAmplitude] receives a 0..1 loudness value per audio buffer for the live waveform.
+ */
 class OfflinePcmRecorder(private val context: Context) : Closeable {
     @Volatile private var stopped = false
     @Volatile private var recorder: AudioRecord? = null
     private val sampleRate = 16000
 
     @SuppressLint("MissingPermission")
-    fun capture(maxSeconds: Int = 30): FloatArray {
+    fun capture(maxSeconds: Int = 30, onAmplitude: ((Float) -> Unit)? = null): FloatArray {
         require(maxSeconds in 1..120)
         check(context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
             "Microphone permission required"
@@ -44,7 +50,13 @@ class OfflinePcmRecorder(private val context: Context) : Closeable {
             while (!stopped && count < limit) {
                 val read = audio.read(buffer, 0, minOf(buffer.size, limit - count))
                 if (read < 0) error("AudioRecord read error $read")
-                for (i in 0 until read) data[count++] = buffer[i] / 32768f
+                var sum = 0.0
+                for (i in 0 until read) {
+                    val value = buffer[i] / 32768f
+                    data[count++] = value
+                    sum += value.toDouble() * value
+                }
+                if (onAmplitude != null && read > 0) onAmplitude(amplitude(sum, read))
             }
             return data.copyOf(count)
         } finally {
@@ -55,11 +67,18 @@ class OfflinePcmRecorder(private val context: Context) : Closeable {
         }
     }
 
+    /** Requests capture to end at the next buffer boundary. Safe to call from the UI thread. */
     fun stop() {
         stopped = true
-        // Do not release from UI thread while read() is active; capture() owns release.
-        try { recorder?.stop() } catch (_: Exception) {}
     }
 
     override fun close() = stop()
+
+    companion object {
+        /** Mean-square to 0..1 loudness, matching the browser waveform's amplitude scaling. */
+        fun amplitude(squaredSum: Double, sampleCount: Int): Float {
+            if (sampleCount <= 0) return 0f
+            return min(1.0, sqrt(squaredSum / sampleCount) * 9.0).toFloat()
+        }
+    }
 }
