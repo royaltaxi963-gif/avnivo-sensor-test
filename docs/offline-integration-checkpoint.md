@@ -976,3 +976,57 @@ SILERO_TTS_DOWNLOAD_STILL_FAILING
 ```
 
 The last line is the only failing gate and it is the known hosting blocker, unchanged.
+
+## Checkpoint 2026-11-21 (NLLB and Whisper Large verified) — run 44921366482
+
+Both long-form jobs had been skipped in every earlier run. They were dispatched explicitly here.
+
+### Whisper Large V3 Turbo — `large-model-smoke` success
+
+The suite ran twice, once with radios up and once with them down, 5 tests each.
+
+```console
+OK (5 tests)                                        # online
+I AvnivoWhisperLarge: WHISPER_LARGE_MEM heap_used_mb=4 native_alloc_mb=1246 max_heap_mb=192 recall=7/7
+NETWORK_DOWN
+OK (5 tests)                                        # offline
+I AvnivoWhisperLarge: WHISPER_LARGE_MEM heap_used_mb=3 native_alloc_mb=1246 max_heap_mb=192 recall=7/7
+WHISPER_LARGE_OK
+```
+
+`recall=7/7` means every expected phrase was recovered from the audio, not that the model merely
+loaded. Native allocation is 1246 MB and identical offline, so the run is bounded and repeatable.
+The job needed `-memory 4096`, which is the documented floor for this model; a device with less
+free RAM cannot run it and the spec's RAM guard refuses before loading.
+
+### NLLB-200 — `nllb-smoke` success
+
+Six tests passed twice, online and with the network cut.
+
+```console
+com.avnivo.translator.OfflineNllbInferenceTest:......   # online
+OK (6 tests)
+NETWORK_DOWN
+com.avnivo.translator.OfflineNllbInferenceTest:......
+OK (6 tests)
+NLLB_OFFLINE_OK
+NLLB_OK
+```
+
+What those assertions require, from `OfflineNllbInferenceTest`:
+
+- `libavnivo_nllb` loads on the emulator ABI.
+- `prepare()` fails closed when models are absent.
+- A Russian translation is non-blank and contains actual Cyrillic (`\u0400..\u04FF`), so an empty
+  or echoed string cannot pass.
+- The English translation is non-blank and checked against its own expectation.
+- Repeating a translation returns a non-blank result.
+- Latency is measured and non-empty, and `close()` is safe and idempotent.
+
+The network was confirmed unreachable (`NETWORK_DOWN`) before the second run, so these translations
+did not come from a remote service.
+
+### Note on what is not claimed
+
+The NLLB test logs no per-string transcript, so this checkpoint does not quote specific
+translation strings. The assertions above are what the passing tests actually enforce.
