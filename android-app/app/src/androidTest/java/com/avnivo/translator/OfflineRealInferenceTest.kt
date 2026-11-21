@@ -58,6 +58,12 @@ class OfflineRealInferenceTest {
             engine.transcribe(samples)
         }.lowercase()
 
+        // An assumption skip also prints "OK", so CI cannot tell a real run from a no-op without a
+        // marker it can grep for. Log the transcript itself.
+        val marker = "UZBEK_STT_RESULT text=${text.replace("\n", " ")}"
+        println(marker)
+        android.util.Log.i("AvnivoUzbekStt", marker)
+
         val expected = listOf("navoiy", "o'zbekcha", "matnni", "tabiiy", "ravon", "ovozga", "aylantiradi")
         val hits = expected.count { it in text }
         assertTrue("recall $hits/${expected.size} too low for: $text", hits >= expected.size - 1)
