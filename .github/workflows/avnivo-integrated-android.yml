@@ -61,6 +61,25 @@ jobs:
           rm -rf app/src/main/cpp/whisper.cpp
           git clone --depth 1 --branch v1.7.4 https://github.com/ggml-org/whisper.cpp.git app/src/main/cpp/whisper.cpp
           test -f app/src/main/cpp/whisper.cpp/CMakeLists.txt
+      - name: Fetch the NLLB tokenizer so its conformance tests can run
+        run: |
+          # The tokenizer tests compare against ids produced by the reference library from this
+          # exact file, so they need the real artifact. Without it they skip via assumeTrue, and a
+          # skip is indistinguishable from a pass in the report. Fetching it here turns 5 skipped
+          # tests into 5 executed ones.
+          #
+          # The file comes from the app's own ticket endpoint rather than a public mirror: the
+          # Hugging Face copy of this filename currently hashes to e316b82d..., not the 8ac789ad...
+          # the pinned ids were produced from, so it is a different file. The hash check below is
+          # what makes that distinction matter instead of silently testing the wrong artifact.
+          mkdir -p "$RUNNER_TEMP/nllb"
+          curl --fail --location --retry 3 --max-time 120 -o "$RUNNER_TEMP/ticket.json" \
+            https://avnivo-translation-test-792624108019.europe-west1.run.app/api/offline-models/nllb-200-600m-int8/download-ticket
+          URL=$(jq -r '.files[] | select(.name=="tokenizer.json") | .url' "$RUNNER_TEMP/ticket.json")
+          test -n "$URL" && test "$URL" != null || { echo NO_TOKENIZER_IN_TICKET; exit 1; }
+          curl --fail --location --retry 3 --max-time 900 -o "$RUNNER_TEMP/nllb/tokenizer.json" "$URL"
+          echo "8ac789ad7dabea44d41537822d48c516ba358374c51813e2cba78c006e150c94  $RUNNER_TEMP/nllb/tokenizer.json" | sha256sum -c -
+          echo "AVNIVO_NLLB_MODEL_DIR=$RUNNER_TEMP/nllb" >> "$GITHUB_ENV"
       - name: Run JVM unit tests
         run: gradle --no-daemon testDebugUnitTest
       - name: Run offline translation routing tests

@@ -996,8 +996,10 @@ WHISPER_LARGE_OK
 
 `recall=7/7` means every expected phrase was recovered from the audio, not that the model merely
 loaded. Native allocation is 1246 MB and identical offline, so the run is bounded and repeatable.
-The job needed `-memory 4096`, which is the documented floor for this model; a device with less
-free RAM cannot run it and the spec's RAM guard refuses before loading.
+The job runs the emulator with `-memory 4096`. The app's own guard for this module is
+`requiredRamBytes = 1_435_000_000` (2.5x the 574 MB quantized weights), so a device below that
+refuses to load instead of risking an OOM kill. The measured 1246 MB native allocation is
+consistent with that guard.
 
 ### NLLB-200 — `nllb-smoke` success
 
