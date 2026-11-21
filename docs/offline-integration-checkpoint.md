@@ -828,3 +828,53 @@ Stage: implementation complete and compiling; hosted model delivery outstanding.
 Run `publish-silero-tts-model.yml` with `publish: true` (needs the file on `main`), then redeploy
 the API, then re-run the emulator job. Until then this module stays
 **IMPLEMENTED — DEVICE TEST PENDING** and must not be reported as working.
+
+## Checkpoint 2026-11-21 (later) — runtime proven, blockers narrowed
+
+### Completed since the previous checkpoint
+
+- On-device Silero synthesis is now **verified**, not pending. Job `tts-seed-smoke` (run
+  44914520977) exports the graph from the pinned upstream package, refuses to continue unless the
+  export reproduces the pinned SHA-256, pushes it into app-private storage and synthesizes through
+  the real init path. Measured: `seed init+synthesis=2512ms samples=102000 seconds=2.125
+  peak=0.7822921`, `OK (1 test)`. This proves the engine and the READY gate; it does not prove the
+  downloader, the ticket or the checksum gate on a real transfer.
+- The hosting question is settled by the read-only bucket audit (run 44913265881) rather than by the
+  ambiguous 403: 124 objects verified, 111 under `tts/`, **none Silero** (88 `tts/mms`, 23
+  `tts/uzbek/navoiy`). The artifact is genuinely absent.
+- Two CI assertion bugs were fixed. The Silero logcat checks could never match because logcat writes
+  `TAG: message`, so all three (including the two guarding the download path) were dead assertions.
+- The emulator job no longer exits on the TTS download failure, so the radios-off section now runs
+  and offline Uzbek STT is verified in the same run. The download result is still fatal at the end,
+  so a real regression cannot pass silently.
+
+### Verified test results
+
+| Check | Result |
+| --- | --- |
+| JVM unit suite | passed |
+| Uzbek STT real inference (56 s) | passed |
+| Whisper Small runtime + inference (5 tests, 134 s) | passed |
+| Whisper latency/repeat perf | passed |
+| Mic gesture suite (6 tests) | passed |
+| Module state machine (2 tests) | passed |
+| Seeded Silero synthesis on device | passed (2.125 s audio) |
+| Silero download path | **FAILED — artifact not hosted** |
+
+### Remaining blockers (unchanged in substance)
+
+1. The deployed API does not list `silero-tts`, so the ticket call returns 404.
+2. The artifact is absent from the bucket (proven by manifest, not by 403).
+3. `publish-silero-tts-model.yml` cannot be dispatched from this branch; GitHub only exposes
+   `workflow_dispatch` for workflows already on the default branch.
+
+### Last successful commit
+
+`integrate/offline-engines-20261118` — see `git log -1` for the SHA; every commit is pushed and
+green on build, signing and update-install.
+
+### Next exact action
+
+Publish the artifact (merge the publish workflow to `main`, or run the same pinned export with GCP
+credentials), redeploy the API, then re-run the emulator job so the download test can replace the
+seed-based evidence. Until then the module stays **IMPLEMENTED — DEVICE TEST PENDING**.
