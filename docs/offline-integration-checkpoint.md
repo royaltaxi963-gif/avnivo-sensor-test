@@ -878,3 +878,50 @@ green on build, signing and update-install.
 Publish the artifact (merge the publish workflow to `main`, or run the same pinned export with GCP
 credentials), redeploy the API, then re-run the emulator job so the download test can replace the
 seed-based evidence. Until then the module stays **IMPLEMENTED — DEVICE TEST PENDING**.
+
+## Checkpoint 2026-11-21 (offline evidence captured) — run 44917749217
+
+### What this run proves
+
+The emulator job now reaches the radios-off section and captures independent offline evidence.
+Verbatim markers from the job log:
+
+```console
+NETWORK_DOWN
+I AvnivoUzbekStt: UZBEK_STT_RESULT text=navoiy tts o'zbekcha matnni tabiiy va ravon ovozga aylantiradi.
+I AvnivoSileroTts: seed init+synthesis=148ms samples=102000 seconds=2.125 peak=0.7822921
+SILERO_TTS_OFFLINE_OK
+OFFLINE_INFERENCE_OK
+EMULATOR_SMOKE_OK
+SILERO_TTS_DOWNLOAD_STILL_FAILING
+```
+
+So with the radios down, Uzbek STT transcribed real Uzbek speech and the Silero engine synthesized
+2.125 s of audio. The job still fails, and the only failing gate is the download gate — which is
+correct, because the artifact is not hosted. Nothing else regressed.
+
+### Test totals for this run
+
+| Suite | Result |
+| --- | --- |
+| OfflineEngineInstrumentedTest | OK (2 tests) |
+| OfflineMicGestureInstrumentedTest | OK (6 tests) |
+| OfflineRealInferenceTest (network up) | OK (1 test) |
+| OfflineRealInferenceTest (network down) | OK (1 test) |
+| OfflineWhisperInferenceTest runtime | OK (5 tests) |
+| OfflineWhisperInferenceTest inference | OK (5 tests) |
+| OfflineWhisperInferenceTest perf | OK (1 test) |
+| OfflineSileroTtsInferenceTest seeded, network down | OK (1 test) |
+| OfflineSileroTtsInferenceTest download | FAILED (2 of 6) — artifact not hosted |
+
+### Two CI defects fixed in this checkpoint
+
+1. The runner executes each script line in its own `sh -c`, so the multi-line `if/fi` I added died
+   with `end of file unexpected`. It is now one line, and every line is checked to parse alone.
+2. For the same reason a shell variable could not carry the download result to the final gate; it
+   now uses a marker file. Without this the gate would have passed or failed for the wrong reason.
+
+### Next exact action
+
+Unchanged: host the artifact and redeploy the API. Then the download gate becomes the last green
+check and the module can move from IMPLEMENTED — DEVICE TEST PENDING to VERIFIED WORKING.
