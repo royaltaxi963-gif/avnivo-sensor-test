@@ -68,6 +68,9 @@ jobs:
       - name: Assert the original interface was not altered
         working-directory: .
         run: node --test tests/offline-ui-preservation.test.cjs
+      - name: Assert speech recognition never auto-sends
+        working-directory: .
+        run: node --test tests/manual-send.test.cjs
       - name: Upload unit test reports
         if: always()
         uses: actions/upload-artifact@v4
