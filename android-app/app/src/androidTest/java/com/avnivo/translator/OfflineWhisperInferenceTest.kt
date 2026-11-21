@@ -186,6 +186,19 @@ class OfflineWhisperInferenceTest {
             val expected = listOf("country", "ask", "what", "you", "can", "do", "for")
             val hits = expected.count { it in text }
             assertTrue("recall $hits/${expected.size} too low for: $text", hits >= 4)
+
+            // dumpsys meminfo runs after the instrumentation process has exited, so it reports
+            // nothing useful. Read the numbers from inside the process instead, immediately after
+            // inference while the model is still resident: heap in use, native allocation, and the
+            // VM heap ceiling that decides whether this fits on a real phone.
+            val runtime = Runtime.getRuntime()
+            val usedMb = (runtime.totalMemory() - runtime.freeMemory()) / (1024.0 * 1024.0)
+            val nativeMb = android.os.Debug.getNativeHeapAllocatedSize() / (1024.0 * 1024.0)
+            val perf = "WHISPER_LARGE_MEM heap_used_mb=${"%.0f".format(usedMb)} " +
+                "native_alloc_mb=${"%.0f".format(nativeMb)} max_heap_mb=${runtime.maxMemory() / (1024 * 1024)} " +
+                "recall=$hits/${expected.size}"
+            println(perf)
+            android.util.Log.i("AvnivoWhisperLarge", perf)
         } finally {
             manager.close()
         }
