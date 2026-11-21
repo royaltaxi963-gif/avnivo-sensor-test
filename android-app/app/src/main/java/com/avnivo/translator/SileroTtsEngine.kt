@@ -43,13 +43,16 @@ internal class SileroTtsEngine(
         require(text.isNotBlank()) { "Nothing to synthesize" }
         require(text.length <= MAX_TEXT_CHARS) { "Text is too long for one synthesis pass" }
         val ids = SileroTtsTokenizer.tokenize(text)
-        val inputs = IValue.from(Tensor.fromBlob(ids.toLongArray(), longArrayOf(1, ids.size.toLong())))
+        val tokens = LongArray(ids.size) { ids[it].toLong() }
+        val inputs = IValue.from(Tensor.fromBlob(tokens, longArrayOf(1, tokens.size.toLong())))
         val speakers = IValue.from(Tensor.fromBlob(longArrayOf(speakerId.toLong()), longArrayOf(1)))
         val output = synchronized(this) { loaded.forward(inputs, speakers) }
         val audio = (if (output.isTuple) output.toTuple()[0] else output).toTensor()
-        val samples = audio.shape().last()
+        val samples = audio.shape().last().toInt()
         check(samples > 0) { "Model returned no audio" }
-        return audio.dataAsFloatArray.copyOf(samples)
+        // getDataAsFloatArray() returns a detached copy of the flat tensor data.
+        val pcm = audio.dataAsFloatArray
+        return if (pcm.size == samples) pcm else pcm.copyOf(samples)
     }
 
     /** Loads the model and speaks a short phrase, so READY means the graph really runs. */
