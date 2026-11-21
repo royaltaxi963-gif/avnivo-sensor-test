@@ -31,8 +31,9 @@ approval. The APK installs directly with `adb install` — no ZIP extraction nee
 | Large Multilingual STT (Whisper Large V3 Turbo) | `ggml-large-v3-turbo-q5_0.bin` 574 MB | pass | SHA-256 pinned | whisper.cpp JNI | recall 7/7 | pass, 1,246 MB native | 4 ABIs | **VERIFIED WORKING** |
 | Offline Translation (NLLB-200 600M INT8) | 2 ONNX sessions + tokenizer, 916 MB | pass | SHA-256 pinned | ONNX Runtime JNI | `Привет, как вы?` / `It's very hot today.` / `Спасибо` | pass, 0 network errors | 4 ABIs | **VERIFIED WORKING** |
 | Large Offline Translation | none — card is a placeholder | n/a | n/a | n/a | n/a | n/a | UI retained | **BLOCKED — NO MODEL** |
-| Navoiy TTS | CosyVoice2, PyTorch weights only (`emotion_600h_joint.pt`) | n/a | n/a | no ONNX export | n/a | n/a | UI retained | **BLOCKED — NO ONNX ARTIFACT** |
+| Navoiy TTS (existing card, CosyVoice2) | CosyVoice2, PyTorch weights only (`emotion_600h_joint.pt`) | n/a | n/a | no ONNX export | n/a | n/a | UI retained | **BLOCKED — NO ONNX ARTIFACT** |
 | MMS TTS | VITS ONNX exists upstream but absent from bucket (403) | n/a | n/a | sherpa-onnx OfflineTts could run it | n/a | n/a | UI retained | **BLOCKED — LICENSE + MISSING OBJECT** |
+| `silero-tts` (new spec, Uzbek TTS runtime) | Silero `v5_cis_base`, MIT (`LICENSE_CIS`), 91.7 MB TorchScript | **fails** — not hosted | digest pinned | PyTorch Lite JNI | 2.125 s audio, peak 0.782 | pass, radios off | 4 ABIs | **IMPLEMENTED — HOSTING PENDING** |
 
 The three blocked modules are not stubs that pretend to work. `OfflineModelSpecs` registers them
 with `engine = UNAVAILABLE` and an Uzbek `blocker` string, so the existing card reports the real
@@ -87,9 +88,13 @@ All required PR checks pass: `apk`, `test`, `update-install`, `emulator-smoke`.
    No Samsung Galaxy S23 Ultra was available and this environment has no `adb`, so ARM64
    performance and thermals are unverified. `scripts/run-device-verification.sh` runs the same
    suites on a connected phone; it has never been executed against hardware.
-2. **Silero TTS does not exist.** Zero occurrences in the repository, in all remote branches, and
-   in the PR list. There is nothing to integrate and nothing to overwrite. This is blocked on the
-   other agent delivering a branch.
+2. **Silero TTS is integrated but cannot reach READY in this environment.** The earlier version of
+   this report said the module did not exist; that was true of the repository then and is not true
+   now. `OfflineModelSpecs` carries a `silero-tts` spec (`SILERO_TTS` engine, MIT licence, digest
+   `ba41b18f…`, 91,680,514 bytes) and on-device synthesis is proven against a CI-exported artifact.
+   What is missing is the hosted download: the file is not in the bucket and the deployed API
+   predates the manifest entry, so the download path still fails and `emulator-smoke` reports
+   `SILERO_TTS_DOWNLOAD_STILL_FAILING`.
 3. **Three modules are blocked by missing artifacts or licensing**, not by engineering effort.
 4. **Draft PR.** Not marked ready, not merged, no Release published — all awaiting approval.
 

@@ -884,12 +884,12 @@ seed-based evidence. Until then the module stays **IMPLEMENTED — DEVICE TEST P
 ### What this run proves
 
 The emulator job now reaches the radios-off section and captures independent offline evidence.
-Verbatim markers from the job log:
+Verbatim markers from the job log of run 44919840041:
 
 ```console
 NETWORK_DOWN
 I AvnivoUzbekStt: UZBEK_STT_RESULT text=navoiy tts o'zbekcha matnni tabiiy va ravon ovozga aylantiradi.
-I AvnivoSileroTts: seed init+synthesis=148ms samples=102000 seconds=2.125 peak=0.7822921
+I AvnivoSileroTts: seed init+synthesis=4393ms samples=102000 seconds=2.125 peak=0.7822921
 SILERO_TTS_OFFLINE_OK
 OFFLINE_INFERENCE_OK
 EMULATOR_SMOKE_OK
@@ -899,6 +899,11 @@ SILERO_TTS_DOWNLOAD_STILL_FAILING
 So with the radios down, Uzbek STT transcribed real Uzbek speech and the Silero engine synthesized
 2.125 s of audio. The job still fails, and the only failing gate is the download gate — which is
 correct, because the artifact is not hosted. Nothing else regressed.
+
+The synthesis timing is reported, not guaranteed: the same one-sentence seed took 2512 ms in run
+44914520977 and 4393 ms here, so treat it as cold-start cost on a shared emulator rather than a
+benchmark. The audio itself is identical across runs (`samples=102000 seconds=2.125
+peak=0.7822921`), which is the part that matters for correctness.
 
 ### Test totals for this run
 
@@ -968,7 +973,7 @@ The same run repeated the radios-off checks, so the fix is not merely cosmetic:
 ```console
 NETWORK_DOWN
 I AvnivoUzbekStt: UZBEK_STT_RESULT text=navoiy tts o'zbekcha matnni tabiiy va ravon ovozga aylantiradi.
-I AvnivoSileroTts: seed init+synthesis=157ms samples=102000 seconds=2.125 peak=0.7822921
+I AvnivoSileroTts: seed init+synthesis=4393ms samples=102000 seconds=2.125 peak=0.7822921
 SILERO_TTS_OFFLINE_OK
 OFFLINE_INFERENCE_OK
 EMULATOR_SMOKE_OK
