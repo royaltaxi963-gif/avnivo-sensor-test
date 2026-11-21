@@ -417,9 +417,7 @@ jobs:
             adb install -r androidtest/app-debug-androidTest.apk
 
             echo "=== pass 1: download, verify, initialize, infer (network up) ==="
-            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest \
-              -e avnivoWhisperLargeInference true \
-              com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_large.txt
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperLargeInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_large.txt
             grep -q "OK (" instrument_whisper_large.txt || { echo WHISPER_LARGE_FAILED; exit 1; }
             adb shell dumpsys meminfo com.avnivo.translator > meminfo_online.txt 2>&1 || true
             grep -iE "TOTAL PSS|TOTAL RSS" meminfo_online.txt | head -2 || true
@@ -432,9 +430,7 @@ jobs:
             adb shell svc data disable
             sleep 8
             adb shell ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 && { echo NETWORK_STILL_UP; exit 1; } || echo NETWORK_DOWN
-            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest \
-              -e avnivoWhisperLargeInference true \
-              com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_large_offline.txt
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperLargeInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_large_offline.txt
             grep -q "OK (" instrument_whisper_large_offline.txt || { echo WHISPER_LARGE_OFFLINE_FAILED; exit 1; }
             adb shell dumpsys meminfo com.avnivo.translator > meminfo_offline.txt 2>&1 || true
             grep -iE "TOTAL PSS|TOTAL RSS" meminfo_offline.txt | head -2 || true
