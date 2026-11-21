@@ -208,7 +208,8 @@ class OfflineModuleManagerTest {
         try {
             manager.synthesize("silero-tts", "salom")
             throw AssertionError("synthesis must not run before the engine is ready")
-        } catch (expected: IllegalStateException) {
+        } catch (expected: IllegalArgumentException) {
+            // require() raises IllegalArgumentException; the point is that it refuses, not the type.
             assertTrue(expected.message!!.contains("not ready", ignoreCase = true))
         } finally {
             manager.close()
