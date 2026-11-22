@@ -1393,3 +1393,65 @@ the Samsung Galaxy S23 Ultra; it cannot be closed on a headless emulator.
 
 Update PR #28 with this evidence. Remaining device-pending item: confirm live capture and a real
 Chirp 2 transcript on the physical S23 Ultra.
+
+---
+
+## Stage 7 — one press, one transcript (regression fix)
+
+Commit `HEAD` on `integrate/offline-engines-20261118`. Run `45038228895` is green
+(`apk`, `update-install`, `emulator-smoke`).
+
+### What was reported
+
+1. The first Uzbek recording produced no transcript, or one that arrived too late.
+2. The second press showed the first recording's text.
+3. No processing indicator appeared between release and result.
+
+### Root cause — one chain, not three bugs
+
+| Link | Defect |
+| --- | --- |
+| Capture queued behind model work | `beginRecording` ran on `worker`, the same single-thread executor that downloads and initializes models, so a press waited for initialization and the release often arrived before the microphone opened. |
+| Empty capture on a short press | The capture loop exited the moment `stopRequested` was set, so a release at sample 0 returned an empty array, which the page reported as "no speech". |
+| No press identity | Results, amplitudes and errors carried no session, so a late result from press N landed in press N+1. That is the reported "second press shows the first text". |
+| Release cleared everything | `releaseHold` called `finishOfflineHold()`, which removed every trace of the press before decoding had a chance to show a stage. |
+| Recognizer rebuilt per press | `verifyEngine` created a new `OfflineSpeechEngine` each time and did not keep it, paying initialization on every press. |
+
+### Fix
+
+| File | Change |
+| --- | --- |
+| `MainActivity.kt` | `start(session)` / `stop(session)` adopt the page's session id; a release from an older press is ignored; capture runs on `captureWorker`, inference on `sttWorker`; `beginRecording` announces `AvnivoOfflineProcessing` before decoding; a finished capture clears only the state it still owns; the verified `uzEngine` is kept and reused; `onDestroy` closes the engines, players and executors. |
+| `OfflinePcmRecorder.kt` | The loop condition is the pure `shouldContinue(stopRequested, sampleCount, limit)`, which keeps reading to `MIN_HOLD_SAMPLES` (0.3 s) after a release so a short first press still yields audio. |
+| `assets/index.html` | Every press takes `++offlineSession` and passes it to the bridge; every `AvnivoOffline*` callback refuses a session that is not current; release enters the existing `loading` indicator instead of clearing the press; `syncComposerMode` and the greeting loop treat decoding as an active press; offline language chips show the stored pair before NLLB is installed and mark a pair unsupported only when a loaded tokenizer proves it. |
+| `assets/index.html` (online) | `releaseOnlineCapture()` closes the previous stream, tracks and `AudioContext` before every press and on every failure; the raw-audio constraints (`echoCancellation:false`, `noiseSuppression:false`, `autoGainControl:false`) are replaced with `{audio:true}`, which is the documented cause of `NotReadableError` on devices that cannot deliver an unprocessed stream. |
+| `tests/offline-stt-session.test.cjs` (new) | 14 assertions pinning the session contract on both sides of the bridge. |
+| `tests/online-capture-lifecycle.test.cjs` (new) | 8 assertions pinning the capture teardown and the compatible constraints. |
+| `tests/offline-ui-state.test.cjs` (new) | 8 assertions pinning chip persistence, greeting gating and the processing style. |
+| `OfflinePcmRecorderHoldTest.kt` (new) | 6 JVM tests over the real `shouldContinue` condition. |
+| `OfflineMicGestureInstrumentedTest.kt` | 3 new emulator tests: the first press produces its own transcript, a stale result is refused, processing is visible before the result. |
+
+### Verified result
+
+| Check | Result |
+| --- | --- |
+| JS suites | 85 pass, 0 fail |
+| Emulator: mic gesture (incl. 3 new session tests) | `OK (9 tests)` |
+| Emulator: online suite / denial / capture | `OK (8)` / `OK (1)` / `OK (1)` |
+| Emulator: real offline inference, online and offline | `OK (1)` / `OK (1)` |
+| Emulator: Whisper runtime and inference | `OK (5)` / `OK (5)` |
+| Emulator: Silero TTS online and offline | `OK (7)` / `OK (1)` |
+| Release APK | `update-v101.apk`, sha256 `14beaf965abbd58249a4f4a90cfcc703dbbe2b09264a10bebfd43f23aac5ba40` |
+| Signing | `CN=AVNIVO Translator`, SHA-256 `12e7e26104c7a5110a849baec36d6916efe0b2494384749d4c733286aeeecb8e`, streamed install `Success` |
+
+### Remaining limitation
+
+The session contract, the hold floor and the capture teardown are verified by unit tests, by
+real-WebView emulator tests and by a green build. The physical S23 Ultra is still the only place
+that can confirm a spoken Uzbek sentence becomes text on the first press, because the emulator
+has no microphone (`-noaudio`). Classification: **IMPLEMENTED — DEVICE TEST PENDING**.
+
+### Next exact action
+
+Install `update-v101.apk` on the S23 Ultra, make one short Uzbek recording, and confirm the text
+appears without a second press.
