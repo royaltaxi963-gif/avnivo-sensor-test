@@ -187,6 +187,15 @@ button:focus:not(:focus-visible),a:focus:not(:focus-visible),[role="button"]:foc
 /* Settings header occlusion: scrolled controls disappear at the title divider. */
 .settings-drawer .settings-header{position:sticky;top:0;z-index:20;isolation:isolate;background:#463223;box-shadow:0 -28px 0 0 #463223,0 1px 0 #c99c5b33}
 html[data-avnivo-mode=offline] .settings-drawer .settings-header{background:#103049;box-shadow:0 -28px 0 0 #103049,0 1px 0 #4ba7d833}
+
+/* Opt-in translated-text autoplay: mode-aware and independent of manual speaker buttons. */
+.avnivo-autoread{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 11px;border:1px solid #c99c5b66;border-radius:14px;background:#30241dcc;color:#ffe1aa;flex-shrink:0}
+.avnivo-autoread-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.avnivo-autoread-title{font-size:14px;font-weight:700}.avnivo-autoread-note{font-size:11px;line-height:1.4;color:#d1bca3}
+.avnivo-autoread-switch{position:relative;display:inline-flex;align-items:center;justify-content:flex-start;width:53px;height:30px;border-radius:99px;border:1px solid #bd9666;background:#261d18;cursor:pointer;flex-shrink:0;padding:3px;transition:background .2s,border-color .2s}
+.avnivo-autoread-switch::before{content:'';width:22px;height:22px;border-radius:50%;background:#c3ad91;box-shadow:0 1px 5px #0007;transition:transform .2s,background .2s}
+.avnivo-autoread-switch[aria-checked=true]{background:#bb873e;border-color:#e4b875}.avnivo-autoread-switch[aria-checked=true]::before{transform:translateX(22px);background:#fff4db}
+.avnivo-autoread-switch:focus-visible{outline:2px solid #ffe2a0;outline-offset:3px}
+html[data-avnivo-mode=offline] .avnivo-autoread{background:#0c2c42;border-color:#4ba7d877;color:#c5efff}html[data-avnivo-mode=offline] .avnivo-autoread-note{color:#91c6e0}html[data-avnivo-mode=offline] .avnivo-autoread-switch{background:#0a1b2b;border-color:#468fb3}html[data-avnivo-mode=offline] .avnivo-autoread-switch[aria-checked=true]{background:#1785bd;border-color:#80d9ff}html[data-avnivo-mode=offline] .avnivo-autoread-switch[aria-checked=true]::before{background:#e8faff}
 </style>
 </head>
 <body><div id="avnivo-first-launch" aria-label="Birinchi kirish"><div class="intro-colors"></div><div class="intro-brand"><div class="intro-brand-name"><span>AV</span><span>NIVO</span></div><div class="intro-subtitle"><span id="avnivo-intro-word">Tarjimon</span><span class="intro-caret"></span></div></div><div class="lang-pill" id="avnivo-choose-uz" role="button" tabindex="0" aria-expanded="false" aria-label="Til tanlash ro‘yxatini ochish"><span id="avnivo-language-word"></span><span class="lang-caret"></span></div><div id="avnivo-language-menu" role="listbox" aria-label="Mavjud tillar"><button id="avnivo-language-option" role="option" aria-selected="true" type="button">O‘zbek tili</button></div></div><div id="avnivo-tutorial-dim"></div><div id="avnivo-tutorial-spot" aria-hidden="true"></div><div id="avnivo-tutorial-label" role="dialog" aria-modal="true" aria-labelledby="avnivo-tutorial-heading" aria-describedby="avnivo-tutorial-description"><strong id="avnivo-tutorial-heading">Chatlar tarixi</strong><p id="avnivo-tutorial-description">Tarjimon bilan olib borgan suhbatlaringiz tarixi shu bo‘limda saqlanadi. Oldingi tarjima chatlarini ko‘rish, kerakli suhbatni qayta ochish va undagi xabarlarni davom ettirish uchun tarix bo‘limidan foydalanasiz. Yangi suhbat boshlash imkoniyati ham shu yerda joylashgan.</p><button type="button" id="avnivo-tutorial-next">Tushunarli</button></div>
@@ -1263,7 +1272,7 @@ function translateOfflineText(text,language,bubble,entry){
  if(!supported){unavailable();return}
  const requestId=String(++offlineTranslationSeq);
  bubble.textContent='Tarjima qilinmoqda…';
- offlineTranslations.set(requestId,{bubble,entry});
+ offlineTranslations.set(requestId,{bubble,entry,historyId:currentHistoryId});
  bridge.translate(text,source,target,requestId);
 }
 let offlineTranslationSeq=0;
@@ -1280,7 +1289,7 @@ window.AvnivoOfflineTranslation=function(raw){
  }
  if(entry){entry.translation=payload.text;persistHistory()}
  if(!bubble.isConnected)return;
- typeTranslation(bubble,payload.text);
+ typeTranslation(bubble,payload.text,()=>autoReadTranslation(bubble,'offline',pending.historyId));
 };
 let translationTimers=new Set();
 function clearTranslationTimers(){for(const timer of translationTimers)clearTimeout(timer);translationTimers.clear()}
@@ -1468,12 +1477,35 @@ async function playMessage(button,bubble,language){
  }
 }
 ttsTestButton.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode!=='online'){ttsOnlineStatus.textContent='Ovoz sinovi faqat online rejimda';return}const bubble=document.createElement('div');bubble.textContent='Salom! AVNIVO ovoz sinovi.';playMessage(ttsTestButton,bubble,'left')});
+
+// Auto-read is opt-in, persisted separately for online/offline, and never sends messages.
+const autoReadStorageKey='avnivo.translator.auto-read.v1';
+let autoReadPrefs={online:false,offline:false};
+try{const saved=JSON.parse(localStorage.getItem(autoReadStorageKey)||'{}');if(saved&&typeof saved==='object'){autoReadPrefs.online=saved.online===true;autoReadPrefs.offline=saved.offline===true}}catch(e){}
+const autoReadRow=document.createElement('div');autoReadRow.className='avnivo-autoread';
+const autoReadCopy=document.createElement('div');autoReadCopy.className='avnivo-autoread-copy';
+const autoReadTitle=document.createElement('span');autoReadTitle.className='avnivo-autoread-title';autoReadTitle.textContent='Avto o‘qish';
+const autoReadNote=document.createElement('span');autoReadNote.className='avnivo-autoread-note';autoReadNote.textContent='Faqat tayyor tarjimani ovozda o‘qish';
+autoReadCopy.append(autoReadTitle,autoReadNote);
+const autoReadSwitch=document.createElement('button');autoReadSwitch.type='button';autoReadSwitch.className='avnivo-autoread-switch';autoReadSwitch.setAttribute('role','switch');autoReadSwitch.setAttribute('aria-label','Tarjimani avtomatik ovozda o‘qish');
+autoReadRow.append(autoReadCopy,autoReadSwitch);
+document.querySelector('.settings-drawer .settings-header')?.insertAdjacentElement('afterend',autoReadRow);
+function autoReadMode(){return document.documentElement.dataset.avnivoMode==='offline'?'offline':'online'}
+function syncAutoRead(){const enabled=autoReadPrefs[autoReadMode()]===true;autoReadSwitch.setAttribute('aria-checked',String(enabled));autoReadSwitch.setAttribute('aria-label','Tarjimani avtomatik ovozda o‘qish: '+(enabled?'yoqilgan':'o‘chirilgan'))}
+autoReadSwitch.addEventListener('click',()=>{const mode=autoReadMode();autoReadPrefs[mode]=!autoReadPrefs[mode];try{localStorage.setItem(autoReadStorageKey,JSON.stringify(autoReadPrefs))}catch(e){}syncAutoRead()});
+syncAutoRead();new MutationObserver(syncAutoRead).observe(document.documentElement,{attributes:true,attributeFilter:['data-avnivo-mode']});
+function autoReadTranslation(bubble,mode,sessionId){
+ if(autoReadPrefs[mode]!==true||autoReadMode()!==mode||!bubble.isConnected||currentHistoryId!==sessionId)return;
+ const text=bubble.textContent.trim();if(!text||text===PREVIEW_TRANSLATION)return;
+ const button=bubble.closest('.message-line')?.querySelector('.speak-message');
+ if(button)playMessage(button,bubble,button.dataset.language||'left');
+}
 function attachSpeaker(bubble,language){
  const isLeft=bubble.classList.contains('message-left');
  const line=document.createElement('div');
  line.className='message-line '+(isLeft?'line-left':'line-right');
  const button=document.createElement('button');
- button.type='button';button.className='speak-message';
+ button.type='button';button.className='speak-message';button.dataset.language=language;
  button.setAttribute('aria-label','Xabarni ovoz chiqarib o‘qish');
  button.setAttribute('aria-pressed','false');
  button.innerHTML='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="speaker-core" d="M5 12h5l6-5v18l-6-5H5z"/><path class="sound-bars" d="M20 11q5 5 0 10M23 7q9 9 0 18"/></svg>';
@@ -1630,7 +1662,7 @@ async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,h
   // Persist verified translation even if user closed the page or switched chats.
   if(entry){entry.translation=data.text;persistHistory()}
   if(!bubble.isConnected)return;
-  typeTranslation(bubble,data.text);
+  typeTranslation(bubble,data.text,()=>autoReadTranslation(bubble,'online',historyId));
  }catch(error){
   if(!bubble.isConnected)return;
   bubble.textContent=error.name==='AbortError'?'Tarjima vaqti tugadi':error instanceof TypeError?'Tarjima serveriga ulanib bo‘lmadi':error.message;
