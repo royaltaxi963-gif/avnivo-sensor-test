@@ -161,3 +161,28 @@ test('12. the session fields exist so the contract compiles', () => {
   assert.match(activity, /@Volatile private var sttSession = 0/);
   assert.match(activity, /@Volatile private var openCaptureSession = 0/);
 });
+
+test('13. every native resource is released when the activity is destroyed', () => {
+  // A leaked engine or executor outlives the activity and keeps the microphone and the native
+  // recognizer alive after the user leaves, which is what produced "microphone busy" reports.
+  const destroy = functionBody(activity, 'override fun onDestroy()');
+  for (const call of [
+    'recorder?.stop()',
+    'ttsPlayer.close()',
+    'ttsWorker.shutdown()',
+    'moduleManager.close()',
+    'uzEngine?.close()',
+    'captureWorker.shutdown()',
+    'sttWorker.shutdown()',
+    'worker.shutdown()',
+    'web.destroy()',
+  ]) {
+    assert.ok(destroy.includes(call), `onDestroy must release: ${call}`);
+  }
+  assert.match(destroy, /uzEngine = null/, 'the closed engine must not stay referenced');
+  assert.match(destroy, /pendingWebAudioRequest\?\.deny\(\)/, 'a pending grant must be answered');
+});
+
+test('14. a failed engine is dropped so the next press can retry cleanly', () => {
+  assert.match(transcribeBody, /uzEngine\?\.close\(\);?\s*uzEngine = null/);
+});
