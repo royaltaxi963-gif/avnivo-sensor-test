@@ -1462,7 +1462,7 @@ has no microphone (`-noaudio`). Classification: **IMPLEMENTED — DEVICE TEST PE
 | Package | `com.avnivo.translator`, versionName `1.0.0`, versionCode `1238`, minSdk 26, targetSdk 35 |
 | In-place update | `firstInstallTime` preserved (`2026-11-22 16:21:07`), versionCode `100` → `1238`, install `Success` |
 | JS suites | 87 pass / 0 fail |
-| Emulator total | 9 + 8 + 1 + 1 + 1 + 1 + 5 + 5 + 1 + 7 + 1 + 1 + 2 = 43 instrumented tests, all `OK` |
+| Emulator total | 42 instrumented test executions, all `OK`: 9 (mic gesture) + 8 (online) + 7 (TTS) + 5 + 5 (Whisper) + 2 (engine) + 6×1 (single-test probes) |
 | Offline re-verification | `svc wifi disable` + `svc data disable`, then real STT and TTS still `OK` |
 | APK download | draft release `offline-integration-v1239` (release id `454592769`), asset `avnivo-offline-integration-v1239.apk` |
 
