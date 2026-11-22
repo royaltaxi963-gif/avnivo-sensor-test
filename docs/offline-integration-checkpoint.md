@@ -1451,6 +1451,19 @@ real-WebView emulator tests and by a green build. The physical S23 Ultra is stil
 that can confirm a spoken Uzbek sentence becomes text on the first press, because the emulator
 has no microphone (`-noaudio`). Classification: **IMPLEMENTED — DEVICE TEST PENDING**.
 
+### Final state of this stage
+
+| Item | Value |
+| --- | --- |
+| Branch | `integrate/offline-engines-20261118` |
+| Commit | `774cc2a5c03437d4a02b06e918582251b5ebe281` |
+| Android workflow | run `45039768108` — `apk`, `update-install`, `emulator-smoke` all success |
+| Release APK | `update-v101.apk`, sha256 `262c3e185a150f926b11713044af780e24099c9dfd9b036d2ddbc4e8917322d6` |
+| Package | `com.avnivo.translator`, versionName `1.0.0`, versionCode `1236`, minSdk 26, targetSdk 35 |
+| In-place update | `firstInstallTime` preserved (`2026-11-22 15:48:02`), versionCode `100` → `1236`, install `Success` |
+| JS suites | 87 pass / 0 fail |
+| Emulator total | 9 + 8 + 1 + 1 + 1 + 5 + 5 + 1 + 7 + 1 + 1 = 40 instrumented tests, all `OK` |
+
 ### Next exact action
 
 Install `update-v101.apk` on the S23 Ultra, make one short Uzbek recording, and confirm the text
