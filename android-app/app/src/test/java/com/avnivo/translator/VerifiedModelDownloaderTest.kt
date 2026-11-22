@@ -78,11 +78,11 @@ class VerifiedModelDownloaderTest {
 
     @After fun stopServer() = server.close()
 
-    private fun fileEntry(name: String, bytes: ByteArray, sha: String): JSONObject = JSONObject()
+    private fun fileEntry(name: String, bytes: ByteArray, sha: String, host: String = baseUrl): JSONObject = JSONObject()
         .put("name", name)
         .put("bytes", bytes.size)
         .put("sha256", sha)
-        .put("url", "$baseUrl/files/$name")
+        .put("url", "$host/files/$name")
 
     /** Minimal single-range HTTP server; returns 206 + Content-Range when a Range header is present. */
     private fun serveWithRange(request: MiniHttpServer.Request, payload: ByteArray): MiniHttpServer.Response {
@@ -145,9 +145,11 @@ class VerifiedModelDownloaderTest {
     @Test fun resumedDownloadReusesPartialBytes() {
         val dir = temp.newFolder("resume")
         File(dir, "model.int8.onnx.download").writeBytes(modelBytes.copyOfRange(0, 2000))
+        // Progress is reported across the whole model, so the model file starts after tokens.txt.
+        val modelWideTotal = (modelBytes.size + tokensBytes.size).toLong()
         var sawResumeProgress = false
         downloader(dir).download({ }, { done, total ->
-            if (done >= 2000 && total == modelBytes.size.toLong()) sawResumeProgress = true
+            if (done >= 2000L + tokensBytes.size && total == modelWideTotal) sawResumeProgress = true
         })
         assertTrue("resume should reuse the partial file", sawResumeProgress)
         assertArrayEquals(modelBytes, File(dir, "model.int8.onnx").readBytes())
@@ -294,8 +296,8 @@ class VerifiedModelDownloaderTest {
                 MiniHttpServer.Response(503, ByteArray(0))
             } else if (request.path == "/api/offline-models/test-model/download-ticket") {
                 val files = JSONArray()
-                    .put(fileEntry("tokens.txt", tokensBytes, tokensSha))
-                    .put(fileEntry("model.int8.onnx", modelBytes, modelSha))
+                    .put(fileEntry("tokens.txt", tokensBytes, tokensSha, flaky.baseUrl))
+                    .put(fileEntry("model.int8.onnx", modelBytes, modelSha, flaky.baseUrl))
                 MiniHttpServer.Response(
                     200,
                     JSONObject().put("model_id", "test-model").put("files", files).toString().toByteArray()
