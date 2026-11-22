@@ -183,6 +183,10 @@ html[data-avnivo-mode=online] .offline-modules{display:none}
 /* Disable the browser's blue touch flash on every interactive control. */
 html,body,button,a,input,textarea,select,[role="button"],[tabindex],*{-webkit-tap-highlight-color:transparent!important}
 button:focus:not(:focus-visible),a:focus:not(:focus-visible),[role="button"]:focus:not(:focus-visible){outline:none}
+
+/* Settings header occlusion: scrolled controls disappear at the title divider. */
+.settings-drawer .settings-header{position:sticky;top:0;z-index:20;isolation:isolate;background:#463223;box-shadow:0 -28px 0 0 #463223,0 1px 0 #c99c5b33}
+html[data-avnivo-mode=offline] .settings-drawer .settings-header{background:#103049;box-shadow:0 -28px 0 0 #103049,0 1px 0 #4ba7d833}
 </style>
 </head>
 <body><div id="avnivo-first-launch" aria-label="Birinchi kirish"><div class="intro-colors"></div><div class="intro-brand"><div class="intro-brand-name"><span>AV</span><span>NIVO</span></div><div class="intro-subtitle"><span id="avnivo-intro-word">Tarjimon</span><span class="intro-caret"></span></div></div><div class="lang-pill" id="avnivo-choose-uz" role="button" tabindex="0" aria-expanded="false" aria-label="Til tanlash ro‘yxatini ochish"><span id="avnivo-language-word"></span><span class="lang-caret"></span></div><div id="avnivo-language-menu" role="listbox" aria-label="Mavjud tillar"><button id="avnivo-language-option" role="option" aria-selected="true" type="button">O‘zbek tili</button></div></div><div id="avnivo-tutorial-dim"></div><div id="avnivo-tutorial-spot" aria-hidden="true"></div><div id="avnivo-tutorial-label" role="dialog" aria-modal="true" aria-labelledby="avnivo-tutorial-heading" aria-describedby="avnivo-tutorial-description"><strong id="avnivo-tutorial-heading">Chatlar tarixi</strong><p id="avnivo-tutorial-description">Tarjimon bilan olib borgan suhbatlaringiz tarixi shu bo‘limda saqlanadi. Oldingi tarjima chatlarini ko‘rish, kerakli suhbatni qayta ochish va undagi xabarlarni davom ettirish uchun tarix bo‘limidan foydalanasiz. Yangi suhbat boshlash imkoniyati ham shu yerda joylashgan.</p><button type="button" id="avnivo-tutorial-next">Tushunarli</button></div>
