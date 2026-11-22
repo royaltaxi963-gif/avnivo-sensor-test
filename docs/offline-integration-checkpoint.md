@@ -1542,15 +1542,25 @@ Runtime, ggml, LiteRT) also live outside the Java heap, so the VM ceiling says n
 
 | Item | Value |
 | --- | --- |
-| Commit | `f13e5e7` (fix at `ac3b55c`) |
-| Unit tests | **112**, 0 failures (was 69) |
+| Commit | `c30974f` (fix at `ac3b55c`, picker fix at `c30974f`) |
+| Unit tests | **115**, 0 failures (was 69) |
 | New unit tests | `DeviceMemoryTest` (7), `ModelIntegrityTest` (8), manager lifecycle (6) |
 | Node tests | **74**, 0 failures (was 69) |
 | New node tests | `offline-installed-state.test.cjs` (5) |
 | Instrumented | `OK (2)(9)(8)(1)(1)(1)(5)(5)(1)(7)` = 40 tests on API 34 x86_64 |
-| Workflow run | `45068250899` — `apk`, `update-install`, `emulator-smoke` success |
+| Workflow run | `45069532330` — `apk`, `update-install`, `emulator-smoke` success |
 | Interface diff | `index.html` +5/−5 lines: state map, two status maps, three i18n keys |
 | In-place update | `firstInstallTime` preserved, versionCode incremented, `Success` |
+| Release APK | 123,705,533 B, sha256 `012f7a6db87701cb220649133bdda8bdb9a7673a470ef9001096ce38b382ba89` |
+| APK contents | 56 native `.so` across `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`; `assets/index.html` present |
+| Signing | `CN=AVNIVO Translator`, cert SHA-256 `12e7e26104c7a5110a849baec36d6916efe0b2494384749d4c733286aeeecb8e` |
+
+One regression was introduced by lazy loading and caught before delivery: the translation picker
+asked whether NLLB was *operational*, and a released engine is not, so opening the language list
+after another module took the memory would have shown nothing installed. Residency and
+installation are different questions. Language queries now come from the model's own
+`tokenizer.json` (17 MB) rather than the 916 MB ONNX sessions, so the picker keeps its real
+language list while the engine is released, and the engine loads on the first translation.
 
 The emulator pass is **not** treated as device evidence. The fix removes the gate that only fails on
 a real phone, and the regression test reproduces the device's numbers, but the S23 Ultra run is
