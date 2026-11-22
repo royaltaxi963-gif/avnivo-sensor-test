@@ -1366,6 +1366,30 @@ The failure was invisible for a second reason: `hint()` returned early in online
 No colour, layout, control, icon or animation was changed. The waveform still reads
 `getByteTimeDomainData` RMS, and the four indicator states are unchanged.
 
+### Verified result
+
+Run `45014803249` (commit `cbb4034`) is green: `apk`, `update-install` and `emulator-smoke` all
+succeeded.
+
+| Check | Result |
+| --- | --- |
+| JS suites | 55 pass, 0 fail (14 new in `online-mic-permission.test.cjs`) |
+| JVM suites | 8 new in `MicPermissionPolicyTest` |
+| Emulator: full online suite | `OK (8 tests)` |
+| Emulator: denial path after `pm revoke` | `OK (1 test)` |
+| Emulator: capture probe after `pm grant` | `OK (1 test)` |
+| WebView asked for audio capture | `ONLINE_MIC_GRANTED_RESOURCES [android.webkit.resource.AUDIO_CAPTURE]` |
+| Permission refusal | absent — no `NotAllowedError`, no `SecurityError` |
+
+The capture probe reported `FAIL NotReadableError`. That is the emulator, not the permission:
+the runner starts it with `-noaudio`, so no audio input device exists. The meaningful result is
+the pair above it — the WebView reached the native gate asking for `AUDIO_CAPTURE`, and the gate
+granted it. Before the fix that same request was denied before it ever reached Android.
+
+Live capture with a real microphone therefore remains **IMPLEMENTED — DEVICE TEST PENDING** on
+the Samsung Galaxy S23 Ultra; it cannot be closed on a headless emulator.
+
 ### Next exact action
 
-Confirm run `45013588162` is green, then record the measured evidence here.
+Update PR #28 with this evidence. Remaining device-pending item: confirm live capture and a real
+Chirp 2 transcript on the physical S23 Ultra.
