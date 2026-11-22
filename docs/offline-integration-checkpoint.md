@@ -1456,11 +1456,11 @@ has no microphone (`-noaudio`). Classification: **IMPLEMENTED — DEVICE TEST PE
 | Item | Value |
 | --- | --- |
 | Branch | `integrate/offline-engines-20261118` |
-| Commit | `e14a4b4` (code at `774cc2a5c03437d4a02b06e918582251b5ebe281`) |
-| Android workflow | run `45041276627` — `apk`, `update-install`, `emulator-smoke` all success |
-| Release APK | `update-v101.apk`, sha256 `9cb68b25cc910ac901bf8f84727dd13cd77ecfbdc586846243afd31161b3a1d3` |
-| Package | `com.avnivo.translator`, versionName `1.0.0`, versionCode `1237`, minSdk 26, targetSdk 35 |
-| In-place update | `firstInstallTime` preserved (`2026-11-22 16:04:49`), versionCode `100` → `1237`, install `Success` |
+| Commit | `5153a40` (code at `774cc2a5c03437d4a02b06e918582251b5ebe281`) |
+| Android workflow | run `45042815549` — `apk`, `update-install`, `emulator-smoke` all success |
+| Release APK | `update-v101.apk`, sha256 `be61a8725311a7f3ab87718c76acddf1dcf1faf2d772ce7d7540fdbde2c4cd66` |
+| Package | `com.avnivo.translator`, versionName `1.0.0`, versionCode `1238`, minSdk 26, targetSdk 35 |
+| In-place update | `firstInstallTime` preserved (`2026-11-22 16:21:07`), versionCode `100` → `1238`, install `Success` |
 | JS suites | 87 pass / 0 fail |
 | Emulator total | 9 + 8 + 1 + 1 + 1 + 1 + 5 + 5 + 1 + 7 + 1 + 1 + 2 = 43 instrumented tests, all `OK` |
 
