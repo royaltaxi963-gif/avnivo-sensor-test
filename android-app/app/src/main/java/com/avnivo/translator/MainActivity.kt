@@ -79,8 +79,14 @@ class MainActivity : Activity() {
     private val ttsWorker = Executors.newSingleThreadExecutor()
     private val ttsPlayer = SileroTtsPlayer()
 
-    /** The ready Whisper module id, if any; recognition prefers it over the Uzbek engine. */
+    /**
+     * The ready Whisper module id, if any. Uzbek STT keeps priority: the Uzbek model is the one the
+     * device user installed for their own language, and routing their speech to a multilingual model
+     * they did not ask for produced empty transcripts. Whisper is used only when Uzbek is unavailable
+     * and a Whisper module is actually installed.
+     */
     private fun readyWhisper(): String? = when {
+        state.isOperational -> null
         moduleManager.isOperational("whisper-small-q8") -> "whisper-small-q8"
         moduleManager.isOperational("whisper-large-v3-turbo") -> "whisper-large-v3-turbo"
         else -> null
@@ -255,6 +261,16 @@ class MainActivity : Activity() {
         } catch (e: UnsatisfiedLinkError) {
             transition(OfflineModuleState.INSTALLED)
             notifyJs("AvnivoOfflineError", "Sherpa native kutubxonasi yuklanmadi")
+        } catch (e: OutOfMemoryError) {
+            // The recognizer is small, but a fragmented process can still fail here. Settle the
+            // state instead of leaving the card on "Tekshirilmoqda…".
+            uzEngine?.close(); uzEngine = null
+            transition(OfflineModuleState.ERROR)
+            notifyJs("AvnivoOfflineError", "Ovoz tanish uchun xotira yetarli emas. Boshqa modulni yoping.")
+        } catch (e: Throwable) {
+            uzEngine?.close(); uzEngine = null
+            transition(OfflineModuleState.ERROR)
+            notifyJs("AvnivoOfflineError", "Dvigatel xatosi: ${e::class.java.simpleName}")
         }
     }
 
@@ -314,14 +330,24 @@ class MainActivity : Activity() {
                     return@runOnUiThread
                 }
                 if (!state.isOperational && readyWhisper() == null) {
-                    notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli hali tayyor emas. Model yuklanishi kerak.")
-                    AlertDialog.Builder(this@MainActivity)
-                        .setTitle("Offline o\u2018zbekcha ovoz tanish")
-                        .setMessage("Ovoz tanish uchun 592 MB model yuklanishi va dvigatel tayyor bo\u2018lishi kerak. Wi-Fi tavsiya etiladi. Yuklaysizmi?")
-                        .setNegativeButton("Bekor qilish", null)
-                        .setPositiveButton("Yuklash") { _, _ -> downloadModel() }
-                        .show()
-                    return@runOnUiThread
+                    if (modelInstalled) {
+                        // Files are on disk, so the microphone must open now: the engine is
+                        // prepared on the worker during capture. Asking the user to download a
+                        // model they already have was a dead end that made every press do nothing.
+                        notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli tayyorlanmoqda…")
+                        worker.execute {
+                            if (!state.isOperational) runCatching { verifyEngine() }
+                        }
+                    } else {
+                        notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli hali tayyor emas. Model yuklanishi kerak.")
+                        AlertDialog.Builder(this@MainActivity)
+                            .setTitle("Offline o\u2018zbekcha ovoz tanish")
+                            .setMessage("Ovoz tanish uchun 592 MB model yuklanishi va dvigatel tayyor bo\u2018lishi kerak. Wi-Fi tavsiya etiladi. Yuklaysizmi?")
+                            .setNegativeButton("Bekor qilish", null)
+                            .setPositiveButton("Yuklash") { _, _ -> downloadModel() }
+                            .show()
+                        return@runOnUiThread
+                    }
                 }
                 // The page owns the session number so both sides always agree; a bridge call
                 // without one still gets a valid id.
@@ -347,6 +373,16 @@ class MainActivity : Activity() {
         transition(OfflineModuleState.DOWNLOADING)
         worker.execute {
             try {
+                // Refuse before writing anything if the phone cannot hold the model plus working
+                // space; failing halfway leaves a partial install that reads as "download error".
+                val needed = VerifiedModelDownloader.EXPECTED.values.sumOf { it.first } + 64L * 1024 * 1024
+                val free = DeviceMemory.freeBytes(filesDir)
+                if (free in 1 until needed) {
+                    throw IllegalStateException(
+                        "Disk joyi yetarli emas: ${MemorySnapshot.mb(needed)} MB kerak, " +
+                            "${MemorySnapshot.mb(free)} MB bo‘sh"
+                    )
+                }
                 VerifiedModelDownloader(modelDir).download(
                     { notifyJs("AvnivoOfflineStatus", it) },
                     { done, total ->
@@ -458,6 +494,18 @@ class MainActivity : Activity() {
             pending?.deny()
             if (pending != null) notifyJs("AvnivoOnlineMicError", "Mikrofon ruxsati berilmadi. Ilova sozlamalaridan ruxsat bering")
             else notifyJs("AvnivoOfflineError", "Mikrofon ruxsati berilmadi")
+        }
+    }
+
+    /**
+     * The system is short on memory. Release the offline engine that is not in active use so the
+     * process survives; the downloaded model is untouched and reloads on the next request.
+     */
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= TRIM_MEMORY_RUNNING_LOW) {
+            DeviceMemory.log(this, "AvnivoMemoryTrim")
+            moduleManager.onTrimMemory()
         }
     }
 

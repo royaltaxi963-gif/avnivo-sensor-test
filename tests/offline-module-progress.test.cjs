@@ -71,11 +71,11 @@ test('4. transient network faults retry with a bounded attempt count', () => {
 
 test('5. an out-of-memory initialization settles the state instead of hanging', () => {
   // The eternal "Tekshirilmoqda…" was an OOM that no catch clause handled.
-  const initialize = manager.slice(manager.indexOf('private fun initialize(module: Module, allowEvict: Boolean = true)'));
-  assert.match(initialize, /catch \(e: OutOfMemoryError\)/, 'OOM must be caught explicitly');
-  assert.match(initialize, /catch \(e: Throwable\)/, 'any other VM failure must also settle the state');
-  assert.match(initialize, /transition\(module, OfflineModuleState\.ERROR\)/, 'the failure must reach a terminal state');
-  assert.match(initialize, /xotira yetarli emas/, 'the reason must be actionable');
+  const activate = manager.slice(manager.indexOf('private fun activate(module: Module)'));
+  assert.match(activate, /catch \(e: OutOfMemoryError\)/, 'OOM must be caught explicitly');
+  assert.match(activate, /catch \(e: Throwable\)/, 'any other VM failure must also settle the state');
+  assert.match(activate, /transition\(module, OfflineModuleState\.ERROR\)/, 'the failure must reach a terminal state');
+  assert.match(activate, /xotira yetarli emas/, 'the reason must be actionable');
 });
 
 test('6. a failed engine is released instead of leaking its native handle', () => {
@@ -86,12 +86,15 @@ test('6. a failed engine is released instead of leaking its native handle', () =
   assert.match(manager, /loadVerified\(SileroTtsEngine\(model\)\)/, 'tts must use it');
 });
 
-test('7. a model that does not fit is not loaded at startup', () => {
-  // Loading every installed model on page load exhausted memory once a large model was added.
-  assert.match(manager, /private fun availableMemoryBytes\(\): Long\?/, 'the real free memory must be read');
-  assert.match(manager, /available < module\.spec\.requiredRamBytes/, 'the gate must compare against the requirement');
-  assert.match(manager, /initialize\(module, allowEvict = false\)/, 'page load must not evict a working engine');
-  assert.match(manager, /private fun evictOtherEngines\(keep: Module\)/, 'an explicit activation may make room');
+test('7. only one engine is resident, and it is loaded lazily', () => {
+  // Loading every installed model on page load exhausted memory and left every card reading
+  // "dvigatel ulanmagan". The replacement is one engine at a time, restored from disk.
+  assert.match(manager, /private fun unloadOthers\(keep: Module\)/, 'activation must release the previous engine');
+  assert.match(manager, /fun unload\(id: String\)/, 'an engine must be unloadable without losing the model');
+  assert.match(manager, /fun onTrimMemory\(\)/, 'memory pressure must release what is not in use');
+  assert.match(manager, /private fun ensureLoaded\(id: String\)/, 'a request must reload an unloaded model');
+  assert.match(manager, /activeModuleId\?\.let \{ id ->/, 'page load must restore exactly one engine');
+  assert.doesNotMatch(manager, /initialize\(module, allowEvict/, 'the old load-everything path must be gone');
 });
 
 test('8. the card shows the native reason instead of a bare spinner', () => {

@@ -1,6 +1,5 @@
 package com.avnivo.translator
 
-import android.app.ActivityManager
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
@@ -25,6 +24,12 @@ internal class OfflineModuleManager(
         @Volatile var totalBytes: Long = 0L
         @Volatile var engine: Closeable? = null
         @Volatile var reason: String? = null
+
+        /** Every file has been hashed against the manifest, not merely sized. */
+        @Volatile var verified: Boolean = false
+
+        /** Recency for eviction, so the model the user just used is the last one unloaded. */
+        @Volatile var lastUsedAt: Long = 0L
     }
 
     private val worker = Executors.newSingleThreadExecutor()
@@ -33,6 +38,9 @@ internal class OfflineModuleManager(
     init {
         OfflineModelSpecs.all.values.forEach { spec ->
             val module = Module(spec)
+            // Length is enough to know a model is a candidate for loading. Verification (SHA-256)
+            // runs on the worker before the module is reported as installed, so a truncated file
+            // is never presented as ready.
             if (spec.installed(spec.directory(filesDir))) module.state = OfflineModuleState.INSTALLED
             modules[spec.id] = module
         }
@@ -59,11 +67,32 @@ internal class OfflineModuleManager(
 
     fun isOperational(id: String): Boolean = modules[id]?.state?.isOperational == true
 
-    /** Runs recognition on an already-initialized engine. Reuses the loaded model (no reload). */
-    fun transcribe(id: String, samples: FloatArray): String {
+    /**
+     * Returns the loaded engine for [id], loading it on demand.
+     *
+     * An engine may have been released to make room for another module, or never loaded because
+     * the process restarted. Both are normal: the model is still installed, so the request must
+     * simply reload it rather than fail with "engine not initialized".
+     */
+    private fun ensureLoaded(id: String): Pair<Module, Closeable> {
         val module = modules[id] ?: error("Unknown module: $id")
-        require(module.state.isOperational) { "Engine not ready" }
-        val engine = module.engine ?: error("Engine not initialized")
+        module.engine?.let { return module to it }
+        if (!module.spec.installed(module.spec.directory(filesDir))) {
+            error("Model hali yuklab olinmagan")
+        }
+        if (!module.verified) {
+            val integrity = integrityVerifier(module.spec.directory(filesDir), module.spec)
+            module.verified = integrity.ok
+            if (!integrity.ok) error("Model buzilgan: ${integrity.reason}")
+        }
+        activate(module)
+        val engine = module.engine ?: error(module.reason ?: "Dvigatel ishga tushmadi")
+        return module to engine
+    }
+
+    /** Runs recognition on the loaded engine, loading it first if it was unloaded. */
+    fun transcribe(id: String, samples: FloatArray): String {
+        val (_, engine) = ensureLoaded(id)
         return synchronized(engine) {
             when (engine) {
                 is WhisperEngine -> engine.transcribe(samples)
@@ -73,13 +102,11 @@ internal class OfflineModuleManager(
     }
 
     /**
-     * Synthesizes Uzbek text with an already-initialized Silero engine, reusing the loaded model.
+     * Synthesizes Uzbek text with the Silero engine, loading it first if it was unloaded.
      * Returns mono PCM at [SileroTtsEngine.SAMPLE_RATE]; the caller plays it on the manual action.
      */
     fun synthesize(id: String, text: String): FloatArray {
-        val module = modules[id] ?: error("Unknown module: $id")
-        require(module.state.isOperational) { "Engine not ready" }
-        val engine = module.engine ?: error("Engine not initialized")
+        val (_, engine) = ensureLoaded(id)
         return synchronized(engine) {
             when (engine) {
                 is SileroTtsEngine -> engine.synthesize(text)
@@ -88,11 +115,9 @@ internal class OfflineModuleManager(
         }
     }
 
-    /** Translates with an already-initialized NLLB engine, reusing the loaded model. */
+    /** Translates with the NLLB engine, loading it first if it was unloaded. */
     fun translate(id: String, text: String, source: String, target: String): String {
-        val module = modules[id] ?: error("Unknown module: $id")
-        require(module.state.isOperational) { "Engine not ready" }
-        val engine = module.engine ?: error("Engine not initialized")
+        val (_, engine) = ensureLoaded(id)
         return synchronized(engine) {
             when (engine) {
                 is NllbEngine -> engine.translate(text, source, target)
@@ -102,17 +127,17 @@ internal class OfflineModuleManager(
     }
 
     /**
-     * Language codes the initialized NLLB module can actually encode, or an empty list when it is
-     * not operational. Never a hardcoded pair: the answer comes from the loaded tokenizer.
+     * Language codes the NLLB module can encode, or an empty list when its engine is not resident.
+     *
+     * Deliberately does not load the model: this is called while rendering the settings card, and
+     * pulling a 916 MB translator into memory just to draw a list would defeat lazy loading.
      */
     fun supportedLanguages(id: String): List<String> {
-        val module = modules[id] ?: return emptyList()
-        if (!module.state.isOperational) return emptyList()
-        val engine = module.engine as? NllbEngine ?: return emptyList()
+        val engine = modules[id]?.engine as? NllbEngine ?: return emptyList()
         return synchronized(engine) { engine.supportedLanguages() }
     }
 
-    /** True when the initialized engine can translate this language pair. */
+    /** True when the loaded engine can translate this language pair. */
     fun supportsTranslation(id: String, source: String, target: String): Boolean {
         val engine = modules[id]?.engine as? NllbEngine ?: return false
         return synchronized(engine) { engine.supportsLanguage(source) && engine.supportsLanguage(target) }
@@ -138,48 +163,157 @@ internal class OfflineModuleManager(
             .put("percent", module.percent)
             .put("active", module.state.isOperational)
             .put("progress", progress ?: JSONObject.NULL)
+            .put("verified", module.verified)
+            .put("resident", module.engine != null)
             .put("reason", module.reason ?: module.spec.blocker ?: JSONObject.NULL)
     }
 
     /**
-     * Re-initializes every module whose files are already on disk. Called after a page load so a
-     * previously installed engine becomes READY again following an app restart or process death.
+     * Verifies what is already on disk and loads at most one engine. Called after a page load so a
+     * previously installed module recovers following an app restart or process death.
+     *
+     * Only the module that was active when the process died is loaded; every other installed model
+     * stays INSTALLED with its files verified. Loading them all was the direct cause of the device
+     * report: Whisper Small and Whisper Large together need more than the process can hold, so the
+     * remaining modules failed their memory check and every card read "dvigatel ulanmagan".
      */
     fun reactivateInstalled() {
         worker.execute {
             for (module in modules.values) {
-                if (module.state.isOperational) continue
+                if (!module.spec.runnable) continue
                 val directory = module.spec.directory(filesDir)
-                if (!module.spec.runnable || !module.spec.installed(directory)) continue
+                if (!module.spec.installed(directory)) continue
+                val integrity = integrityVerifier(directory, module.spec)
+                module.verified = integrity.ok
+                if (!integrity.ok) {
+                    module.reason = "model buzilgan: ${integrity.reason}. Qayta yuklab oling."
+                    transition(module, OfflineModuleState.ERROR)
+                    notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+                    continue
+                }
                 transition(module, OfflineModuleState.INSTALLED)
-                // Page load must not load every installed model at once: the Uzbek, Whisper Small,
-                // Whisper Large and NLLB models together need several GB of native memory, and the
-                // resulting OOM left the largest card spinning on "Tekshirilmoqda…" forever. A
-                // model that does not fit stays INSTALLED with the reason shown on its card.
-                initialize(module, allowEvict = false)
+                module.reason = null
+                notify("AvnivoOfflineModuleStatus", module.spec.id)
+            }
+            // Restore the single engine that was active, and only that one.
+            activeModuleId?.let { id ->
+                modules[id]?.let { module ->
+                    if (module.verified) activate(module)
+                }
             }
         }
     }
 
-    /** Free memory reported by the system, or null when the platform cannot tell us. */
-    private fun availableMemoryBytes(): Long? {
-        val activityManager = appContext?.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
-            ?: return null
-        val info = ActivityManager.MemoryInfo()
-        activityManager.getMemoryInfo(info)
-        return info.availMem
+    /**
+     * Makes [module] the one loaded engine, releasing whatever was resident before.
+     *
+     * One engine at a time is a deliberate constraint, not a limitation to work around: the models
+     * are hundreds of megabytes each and Android gives one process a few gigabytes at most. Loading
+     * a second model without unloading the first is what made the device fail, so activation always
+     * frees the previous engine first and the state machine reports that honestly.
+     */
+    @Synchronized
+    private fun activate(module: Module) {
+        if (module.state.isOperational && module.engine != null) {
+            module.lastUsedAt = System.currentTimeMillis()
+            return
+        }
+        val directory = module.spec.directory(filesDir)
+        if (!module.spec.installed(directory)) {
+            transition(module, OfflineModuleState.NOT_INSTALLED)
+            return
+        }
+        unloadOthers(module)
+        val snapshot = memoryProvider(appContext)
+        if (snapshot != null && !snapshot.fits(module.spec.requiredRamBytes)) {
+            module.reason = "xotira yetarli emas: " + snapshot.describe(module.spec.requiredRamBytes) +
+                ". Boshqa modulni yoping yoki qurilmani qayta ishga tushiring."
+            transition(module, OfflineModuleState.INSTALLED)
+            notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+            return
+        }
+        transition(module, OfflineModuleState.INITIALIZING)
+        try {
+            val engine = engineFactory(module.spec, directory)
+            module.engine?.let { runCatching { it.close() } }
+            module.engine = engine
+            module.reason = null
+            module.lastUsedAt = System.currentTimeMillis()
+            rememberActive(module.spec.id)
+            transition(module, OfflineModuleState.READY)
+            DeviceMemory.log(appContext)
+            notify("AvnivoOfflineModuleReady", module.spec.id)
+        } catch (e: Exception) {
+            module.reason = "dvigatel ishga tushmadi: ${e.message}"
+            transition(module, OfflineModuleState.INSTALLED)
+            notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e.message}")
+        } catch (e: UnsatisfiedLinkError) {
+            module.reason = "native kutubxonasi yuklanmadi"
+            transition(module, OfflineModuleState.INSTALLED)
+            notify("AvnivoOfflineModuleError", "${module.spec.id}|native kutubxonasi yuklanmadi")
+        } catch (e: OutOfMemoryError) {
+            // A large model can exhaust the process inside the native loader. Report the real cause
+            // and release the handle instead of leaving the card on "Tekshirilmoqda…" forever.
+            module.engine?.let { runCatching { it.close() } }
+            module.engine = null
+            module.reason = "model uchun xotira yetarli emas (OutOfMemoryError): " +
+                memoryProvider(appContext)?.describe(module.spec.requiredRamBytes)
+            transition(module, OfflineModuleState.ERROR)
+            notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+        } catch (e: Throwable) {
+            // Any other VM-level failure must still settle the state machine instead of hanging.
+            module.engine?.let { runCatching { it.close() } }
+            module.engine = null
+            module.reason = "dvigatel ishga tushmadi: ${e::class.java.simpleName}"
+            transition(module, OfflineModuleState.ERROR)
+            notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e::class.java.simpleName}")
+        }
+    }
+
+    /** Releases every loaded engine except [keep], so only one model is ever resident. */
+    private fun unloadOthers(keep: Module) {
+        for (other in modules.values) {
+            if (other === keep) continue
+            val engine = other.engine ?: continue
+            runCatching { engine.close() }
+            other.engine = null
+            if (other.state.isOperational) transition(other, OfflineModuleState.INSTALLED)
+            notify("AvnivoOfflineModuleStatus", other.spec.id)
+        }
     }
 
     /**
-     * Releases other ready engines so [spec] can load. Only used for an explicit activation, where
-     * the user asked for this engine and it must not fail just because another model is resident.
+     * Releases the loaded engine so another module can use the memory. The model stays installed:
+     * unload only changes what is resident, never what the user has downloaded.
      */
-    private fun evictOtherEngines(keep: Module) {
-        for (other in modules.values) {
-            if (other === keep || !other.state.isOperational) continue
-            runCatching { other.engine?.close() }
-            other.engine = null
-            transition(other, OfflineModuleState.INSTALLED)
+    fun unload(id: String) {
+        worker.execute {
+            val module = modules[id] ?: return@execute
+            val engine = module.engine ?: return@execute
+            runCatching { engine.close() }
+            module.engine = null
+            if (module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
+            module.reason = "xotiradan bo‘shatildi; qayta ishlatishda avtomatik yuklanadi"
+            if (activeModuleId == id) rememberActive(null)
+            notify("AvnivoOfflineModuleStatus", id)
+        }
+    }
+
+    /**
+     * Called when the platform reports memory pressure. The engine that is not in active use is
+     * released so the process survives; the model itself is untouched.
+     */
+    fun onTrimMemory() {
+        worker.execute {
+            val keep = activeModuleId
+            for (module in modules.values) {
+                if (module.spec.id == keep) continue
+                val engine = module.engine ?: continue
+                runCatching { engine.close() }
+                module.engine = null
+                if (module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
+                notify("AvnivoOfflineModuleStatus", module.spec.id)
+            }
         }
     }
 
@@ -205,8 +339,18 @@ internal class OfflineModuleManager(
                 return@execute
             }
             if (module.spec.installed(directory)) {
+                // Files are there: prove they are intact before claiming anything about them.
+                val integrity = integrityVerifier(directory, module.spec)
+                module.verified = integrity.ok
+                if (!integrity.ok) {
+                    ModelIntegrity.invalidate(directory)
+                    module.reason = "model buzilgan: ${integrity.reason}. Qayta yuklab oling."
+                    transition(module, OfflineModuleState.ERROR)
+                    notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+                    return@execute
+                }
                 transition(module, OfflineModuleState.INSTALLED)
-                initialize(module)
+                activate(module)
                 return@execute
             }
             try {
@@ -228,8 +372,11 @@ internal class OfflineModuleManager(
                     }
                 )
                 transition(module, OfflineModuleState.VERIFYING)
+                // The downloader hashes every byte it writes; record that so the next page load
+                // does not re-hash 916 MB just to answer "is this still installed?".
+                module.verified = integrityVerifier(directory, module.spec).ok
                 transition(module, OfflineModuleState.INSTALLED)
-                initialize(module)
+                activate(module)
             } catch (e: Exception) {
                 module.reason = e.message ?: e::class.java.simpleName
                 transition(module, OfflineModuleState.ERROR)
@@ -238,82 +385,38 @@ internal class OfflineModuleManager(
         }
     }
 
-    /**
-     * Loads the native runtime and runs a smoke inference; only then promotes to READY.
-     *
-     * [allowEvict] is true for an explicit activation, where a competing engine may be released so
-     * the requested model fits. It is false on page load, where an unaffordable model must simply
-     * report why instead of unloading a different working engine.
-     */
-    private fun initialize(module: Module, allowEvict: Boolean = true) {
-        val directory = module.spec.directory(filesDir)
-        if (!module.spec.installed(directory)) {
-            transition(module, OfflineModuleState.NOT_INSTALLED)
-            return
-        }
-        val available = availableMemoryBytes()
-        if (available != null && module.spec.requiredRamBytes > 0 && available < module.spec.requiredRamBytes) {
-            if (allowEvict) {
-                evictOtherEngines(module)
-            }
-            val after = availableMemoryBytes()
-            if (after != null && after < module.spec.requiredRamBytes) {
-                module.reason = "xotira yetarli emas: ${module.spec.requiredRamBytes / 1024 / 1024} MB kerak, " +
-                    "${after / 1024 / 1024} MB mavjud"
-                transition(module, OfflineModuleState.INSTALLED)
-                notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
-                return
-            }
-        }
-        transition(module, OfflineModuleState.INITIALIZING)
-        try {
-            val engine = engineFactory(module.spec, directory)
-            module.engine?.let { runCatching { it.close() } }
-            module.engine = engine
-            module.reason = null
-            transition(module, OfflineModuleState.READY)
-            notify("AvnivoOfflineModuleReady", module.spec.id)
-        } catch (e: Exception) {
-            module.reason = "dvigatel ishga tushmadi: ${e.message}"
-            transition(module, OfflineModuleState.INSTALLED)
-            notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e.message}")
-        } catch (e: UnsatisfiedLinkError) {
-            module.reason = "native kutubxonasi yuklanmadi"
-            transition(module, OfflineModuleState.INSTALLED)
-            notify("AvnivoOfflineModuleError", "${module.spec.id}|native kutubxonasi yuklanmadi")
-        } catch (e: OutOfMemoryError) {
-            // A large model can exhaust the heap inside the native loader. Leaving the module in
-            // INITIALIZING made the card spin on "Tekshirilmoqda…" forever; report the real cause.
-            module.reason = "model uchun xotira yetarli emas (OutOfMemoryError)"
-            transition(module, OfflineModuleState.ERROR)
-            notify(
-                "AvnivoOfflineModuleError",
-                "${module.spec.id}|Model uchun xotira yetarli emas: ${module.spec.requiredRamBytes / 1024 / 1024} MB kerak"
-            )
-        } catch (e: Throwable) {
-            // Any other VM-level failure must still settle the state machine instead of hanging.
-            module.reason = "dvigatel ishga tushmadi: ${e::class.java.simpleName}"
-            transition(module, OfflineModuleState.ERROR)
-            notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e::class.java.simpleName}")
-        }
-    }
-
     /** Overridable so JVM tests can exercise the lifecycle without the native runtime. */
     internal var engineFactory: (OfflineModelSpec, File) -> Closeable = ::buildEngine
 
+    /** Overridable so tests can present the memory picture of a specific phone. */
+    internal var memoryProvider: (Context?) -> MemorySnapshot? = DeviceMemory::snapshot
+
+    /** Overridable so lifecycle tests can use stand-in model files; the real path hashes bytes. */
+    internal var integrityVerifier: (File, OfflineModelSpec) -> ModelIntegrity.Result =
+        ModelIntegrity::verify
+
+    /**
+     * The module whose engine is currently resident. Restored from disk on construction so a
+     * restart reloads exactly one engine instead of every installed model.
+     */
+    @Volatile internal var activeModuleId: String? = appContext
+        ?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        ?.getString(KEY_ACTIVE, null)
+
+    private fun rememberActive(id: String?) {
+        activeModuleId = id
+        appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)?.edit()
+            ?.putString(KEY_ACTIVE, id)?.apply()
+    }
+
     private fun buildEngine(spec: OfflineModelSpec, directory: File): Closeable = when (spec.engine) {
         OfflineEngineKind.WHISPER_GGML -> {
-            requireRam(spec)
             val model = directory.listFiles()?.firstOrNull { it.name.endsWith(".bin") }
                 ?: error("Missing ggml model")
             loadVerified(WhisperEngine(model, language = "auto"))
         }
-        OfflineEngineKind.NLLB_ONNX -> {
-            requireRam(spec)
-            loadVerified(NllbEngine(directory))
-        }
+        OfflineEngineKind.NLLB_ONNX -> loadVerified(NllbEngine(directory))
         OfflineEngineKind.SILERO_TTS -> {
-            requireRam(spec)
             val model = directory.listFiles()?.firstOrNull { it.name.endsWith(".ptl") }
                 ?: error("Missing TorchScript model")
             loadVerified(SileroTtsEngine(model))
@@ -338,29 +441,17 @@ internal class OfflineModuleManager(
         return engine
     }
 
-    /**
-     * Refuses to load a model that cannot fit, so a large model reports a clear error instead of
-     * being killed by the low-memory killer mid-inference.
-     */
-    private fun requireRam(spec: OfflineModelSpec) {
-        if (spec.requiredRamBytes <= 0) return
-        val activityManager = appContext?.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
-        val available = activityManager?.let { am ->
-            val info = ActivityManager.MemoryInfo()
-            am.getMemoryInfo(info)
-            info.availMem
-        } ?: return
-        require(available >= spec.requiredRamBytes) {
-            "Not enough memory: needs ${spec.requiredRamBytes / 1024 / 1024} MB, ${available / 1024 / 1024} MB available"
-        }
-    }
-
     fun close() {
         modules.values.forEach {
             it.engine?.let { engine -> runCatching { engine.close() } }
             it.engine = null
         }
         worker.shutdown()
+    }
+
+    private companion object {
+        const val PREFS = "avnivo.offline"
+        const val KEY_ACTIVE = "active.module"
     }
 
     /** Blocks until all queued work finishes. Used by tests and shutdown paths. */

@@ -23,6 +23,9 @@ class OfflineModuleManagerTest {
     private val messages = mutableListOf<Pair<String, String>>()
 
     private fun manager() = OfflineModuleManager(temp.root) { fn, v -> synchronized(messages) { messages += fn to v } }
+        // The stand-in files are the right length but not the right bytes, so the digest check is
+        // replaced here. ModelIntegrityTest covers the real hashing path with real content.
+        .also { it.integrityVerifier = { _, _ -> ModelIntegrity.Result(true) } }
 
     private fun placeInstalledModel(spec: OfflineModelSpec) {
         val dir = spec.directory(temp.root).apply { mkdirs() }
@@ -396,9 +399,9 @@ class OfflineModuleManagerTest {
         manager.close()
     }
 
-    @Test fun reactivationNeverEvictsAWorkingEngine() {
-        // Page load must not unload another ready engine just to make room: that would drop a
-        // module the user already activated. Only an explicit activation may evict.
+    @Test fun activatingASecondModuleUnloadsTheFirst() {
+        // One engine at a time is the constraint that keeps the process alive. Activating a second
+        // module must release the first instead of holding both and pushing the device into OOM.
         val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
         val tts = OfflineModelSpecs.all.getValue("silero-tts")
         placeInstalledModel(small)
@@ -408,17 +411,136 @@ class OfflineModuleManagerTest {
         manager.engineFactory = { spec, _ -> FakeEngine().also { engines[spec.id] = it } }
 
         manager.download(small.id)
-        manager.download(tts.id)
         manager.awaitIdle()
         assertTrue(manager.isOperational(small.id))
-        assertTrue(manager.isOperational(tts.id))
+
+        manager.download(tts.id)
+        manager.awaitIdle()
+
+        assertTrue("the requested module must be the active one", manager.isOperational(tts.id))
+        assertFalse("the previous module must be released", manager.isOperational(small.id))
+        assertTrue("the previous engine must actually be closed", engines.getValue(small.id).closed)
+        assertFalse("the new engine must be live", engines.getValue(tts.id).closed)
+        manager.close()
+    }
+
+    @Test fun unloadingKeepsTheModuleInstalled() {
+        // Unload frees memory; it must never make the user download the model again.
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(small)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+
+        manager.download(small.id)
+        manager.awaitIdle()
+        assertTrue(manager.isOperational(small.id))
+
+        manager.unload(small.id)
+        manager.awaitIdle()
+
+        val status = JSONObject(manager.status(small.id))
+        assertEquals("installed", status.getString("state"))
+        assertFalse("nothing may be resident after an unload", status.getBoolean("resident"))
+        assertFalse(status.getBoolean("active"))
+        manager.close()
+    }
+
+    @Test fun anUnloadedModuleReloadsOnTheNextRequest() {
+        // A request after an unload must load the model again, not fail with "not initialized".
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(small)
+        val manager = manager()
+        var builds = 0
+        manager.engineFactory = { _, _ -> builds += 1; FakeEngine() }
+
+        manager.download(small.id)
+        manager.awaitIdle()
+        manager.unload(small.id)
+        manager.awaitIdle()
+        assertEquals(1, builds)
+
+        manager.download(small.id)
+        manager.awaitIdle()
+        assertEquals("the model must be loaded again on demand", 2, builds)
+        assertTrue(manager.isOperational(small.id))
+        manager.close()
+    }
+
+    @Test fun aLoadThatExceedsTheBudgetIsRefusedWithRealNumbers() {
+        // The device numbers from the report: 12 GB phone, 1768 MB free, and a model that needs
+        // more than its share of a small device. The refusal must name the numbers, not hang.
+        val large = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
+        placeInstalledModel(large)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.memoryProvider = {
+            MemorySnapshot(
+                totalMem = 2_000L * 1024 * 1024,
+                availMem = 300L * 1024 * 1024,
+                lowMemory = false,
+                appPssBytes = 0,
+                nativeHeapBytes = 0,
+                vmHeapMax = 256L * 1024 * 1024
+            )
+        }
+
+        manager.download(large.id)
+        manager.awaitIdle()
+
+        val status = JSONObject(manager.status(large.id))
+        assertEquals("installed", status.getString("state"))
+        assertFalse(status.getBoolean("active"))
+        assertTrue("the card must explain the refusal: $status", status.getString("reason").contains("xotira"))
+        manager.close()
+    }
+
+    @Test fun theReportedDeviceIsNoLongerRefused() {
+        // Regression for the exact S23 Ultra report: 12 GB physical RAM, 1768 MB system-free,
+        // NLLB needs 2765 MiB. It must now activate instead of reporting a memory error.
+        val nllb = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
+        placeInstalledModel(nllb)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.memoryProvider = {
+            MemorySnapshot(
+                totalMem = 12_000L * 1024 * 1024,
+                availMem = 1_768L * 1024 * 1024,
+                lowMemory = false,
+                appPssBytes = 0,
+                nativeHeapBytes = 0,
+                vmHeapMax = 256L * 1024 * 1024
+            )
+        }
+
+        manager.download(nllb.id)
+        manager.awaitIdle()
+
+        val status = JSONObject(manager.status(nllb.id))
+        assertEquals("the reported device must reach ready: $status", "ready", status.getString("state"))
+        assertTrue(status.getBoolean("active"))
+        manager.close()
+    }
+
+    @Test fun reactivationLoadsOnlyTheActiveModule() {
+        // After a restart every installed model is verified, but only the one that was active is
+        // loaded. Loading all of them is what produced "dvigatel ulanmagan" on every card.
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        val tts = OfflineModelSpecs.all.getValue("silero-tts")
+        placeInstalledModel(small)
+        placeInstalledModel(tts)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.activeModuleId = tts.id
 
         manager.reactivateInstalled()
         manager.awaitIdle()
 
-        assertTrue("page load must keep the small engine ready", manager.isOperational(small.id))
-        assertTrue("page load must keep the tts engine ready", manager.isOperational(tts.id))
-        assertFalse("no engine may be closed by a page load", engines.values.any { it.closed })
+        assertTrue("the remembered module must be loaded", manager.isOperational(tts.id))
+        assertEquals(
+            "the other installed module must stay installed, not ready",
+            "installed",
+            JSONObject(manager.status(small.id)).getString("state")
+        )
         manager.close()
     }
 }
