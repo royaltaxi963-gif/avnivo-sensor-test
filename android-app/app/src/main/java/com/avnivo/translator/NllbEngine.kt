@@ -32,6 +32,17 @@ internal class NllbTokenizer private constructor(
     fun supportsLanguage(code: String): Boolean =
         LANGUAGE_CODE.matches(code) && (tokenId(code) ?: 0) in LANGUAGE_ID_RANGE
 
+    /**
+     * Every language code the loaded vocabulary actually carries, sorted. Read from the file rather
+     * than assumed, so the UI can never offer a code this model cannot encode.
+     */
+    val languageCodes: List<String> by lazy {
+        vocabulary.entries
+            .filter { (piece, id) -> LANGUAGE_CODE.matches(piece) && id in LANGUAGE_ID_RANGE }
+            .map { it.key }
+            .sorted()
+    }
+
     fun encode(text: String): List<Int> {
         cache[text]?.let { return it }
         // SentencePiece always prepends the word marker, so the first word is a word start too.
@@ -176,6 +187,9 @@ internal class NllbEngine(
     val inferenceHistory: List<Pair<String, Long>> get() = history
 
     fun supportsLanguage(code: String): Boolean = tokenizer.supportsLanguage(code)
+
+    /** Language codes backed by this model's own tokenizer, not a hardcoded list. */
+    fun supportedLanguages(): List<String> = tokenizer.languageCodes
 
     fun translate(text: String, source: String, target: String): String {
         require(text.isNotBlank()) { "Nothing to translate" }

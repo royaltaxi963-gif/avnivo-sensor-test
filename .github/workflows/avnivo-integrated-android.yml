@@ -85,6 +85,9 @@ jobs:
       - name: Run offline translation routing tests
         working-directory: .
         run: node --test tests/offline-translation/route.test.mjs
+      - name: Run language synchronisation and gating tests
+        working-directory: .
+        run: node --test tests/offline-language-sync.test.mjs
       - name: Run model integrity tests
         working-directory: .
         run: node --test tests/offline-sha256.test.cjs

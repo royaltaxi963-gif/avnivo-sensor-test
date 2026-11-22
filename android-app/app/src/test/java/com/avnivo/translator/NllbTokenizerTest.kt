@@ -88,6 +88,42 @@ class NllbTokenizerTest {
         }
     }
 
+    @Test fun languageCodesComeFromTheLoadedVocabulary() {
+        val tokenizer = requireModel()
+        val codes = tokenizer.languageCodes
+        // The UI is driven by this list, so it must be the vocabulary's own set and nothing else.
+        assertTrue("tokenizer must expose a substantial language set", codes.size >= 200)
+        assertEquals("codes must be sorted", codes.sorted(), codes)
+        assertEquals("codes must be unique", codes.size, codes.toSet().size)
+        assertTrue(NllbEngine.UZBEK in codes)
+        assertTrue(NllbEngine.RUSSIAN in codes)
+        assertTrue(NllbEngine.ENGLISH in codes)
+        // Every code offered to the UI must pass the same gate the engine applies at translate time.
+        for (code in codes) {
+            assertTrue("$code is offered but rejected by supportsLanguage", tokenizer.supportsLanguage(code))
+        }
+    }
+
+    @Test fun languageCodesExcludeNonLanguagePieces() {
+        val tokenizer = requireModel()
+        val codes = tokenizer.languageCodes.toSet()
+        // `uz` is an ordinary piece and `<mask>` is an added token: neither is a language.
+        assertFalse("uz" in codes)
+        assertFalse("<mask>" in codes)
+        assertFalse("<unk>" in codes)
+        assertFalse("uzb_Cyrl" in codes)
+        assertTrue(codes.all { it.matches(Regex("[a-z]{3}_[A-Z][a-z]{3}")) })
+    }
+
+    @Test fun everyLanguageCodeHasAnIdInsideTheLanguageBlock() {
+        val tokenizer = requireModel()
+        for (code in tokenizer.languageCodes) {
+            val id = tokenizer.tokenId(code)
+            assertNotNull("$code has no id", id)
+            assertTrue("$code id $id is outside the language block", id!! in 256001..256202)
+        }
+    }
+
     @Test fun unknownPiecesFallBackToUnk() {
         val tokenizer = requireModel()
         val unk = tokenizer.tokenId("<unk>")

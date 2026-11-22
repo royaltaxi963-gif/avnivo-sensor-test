@@ -99,6 +99,17 @@ internal class OfflineModuleManager(
         }
     }
 
+    /**
+     * Language codes the initialized NLLB module can actually encode, or an empty list when it is
+     * not operational. Never a hardcoded pair: the answer comes from the loaded tokenizer.
+     */
+    fun supportedLanguages(id: String): List<String> {
+        val module = modules[id] ?: return emptyList()
+        if (!module.state.isOperational) return emptyList()
+        val engine = module.engine as? NllbEngine ?: return emptyList()
+        return synchronized(engine) { engine.supportedLanguages() }
+    }
+
     /** True when the initialized engine can translate this language pair. */
     fun supportsTranslation(id: String, source: String, target: String): Boolean {
         val engine = modules[id]?.engine as? NllbEngine ?: return false

@@ -11,14 +11,15 @@ const here = dirname(fileURLToPath(import.meta.url))
 const html = readFileSync(join(here, '../../android-app/app/src/main/assets/index.html'), 'utf8')
 
 const START = 'const PREVIEW_TRANSLATION='
-const END = 'typeTranslation(bubble,payload.text);\n};'
+const END = "typeTranslation(bubble,payload.text,()=>autoReadTranslation(bubble,'offline',pending.historyId));\n};"
+const AUTO_READ = () => {}
 const startIndex = html.indexOf(START)
 const endIndex = html.indexOf(END)
 assert.ok(startIndex > 0 && endIndex > startIndex, 'offline translation block must exist in index.html')
 const source = html.slice(startIndex, endIndex + END.length)
 
 // The block only touches these, so a small harness is enough to run it for real.
-function load({ bridge }) {
+function load({ bridge, ...options }) {
   const typed = []
   const persisted = []
   const sandbox = {
@@ -27,8 +28,17 @@ function load({ bridge }) {
     oppositeLanguage: language => (language === 'right' ? 'left' : 'right'),
     typeTranslation: (bubble, text) => { typed.push(text); bubble.textContent = text },
     persistHistory: () => { persisted.push(true) },
-    window: { AvnivoOfflineModules: bridge },
+    window: { AvnivoOfflineModules: withState(bridge, options.supported) },
     translateOnlineText: () => assert.fail('offline path must never call the online endpoint'),
+    // The block declares offlineChoice, offlineLanguagesReady and supportedOfflineCode itself; the
+    // only lever a test has is the native bridge, which is exactly what production reads too.
+    supportedOfflineCode: (code, supported) => (code && supported && supported.includes(code) ? code : null),
+    avnivoUiText: (_key, fallback) => fallback,
+    autoReadTranslation: () => {},
+    syncLanguageChips: () => {},
+    currentHistoryId: 'h1',
+    localStorage: { getItem: () => null, setItem: () => {} },
+    console,
   }
   const factory = new Function(
     ...Object.keys(sandbox),
@@ -37,12 +47,24 @@ function load({ bridge }) {
        fire: raw => window.AvnivoOfflineTranslation(raw),
        pending: () => offlineTranslations.size,
        placeholder: PREVIEW_TRANSLATION,
+       choice: offlineChoice,
        typed, persisted
      }`
   )
-  return factory(...Object.values(sandbox))
+  const api = factory(...Object.values(sandbox))
+  const pair = options.pair ?? { left: 'uzn_Latn', right: 'rus_Cyrl' }
+  Object.assign(api.choice, pair)
+  return api
 }
 
+/** The picker's truth comes from the bridge; give it the same shape the Kotlin side returns. */
+function withState(bridge, supported) {
+  if (!bridge) return undefined
+  const languages = supported ?? ['uzn_Latn', 'rus_Cyrl']
+  return { ...bridge, offlineTranslationState: () => JSON.stringify({ ready: true, languages, status: { state: 'ready' } }) }
+}
+
+const NOT_READY = 'Offline tarjima moduli yuklab olinmagan.'
 const bubble = () => ({ textContent: '', classList: { remove() {} }, isConnected: true })
 
 test('uses the real engine result, not the placeholder', () => {
@@ -78,20 +100,21 @@ test('persists the verified translation into history', () => {
   assert.equal(api.persisted.length, 1)
 })
 
-test('falls back to the placeholder when no bridge exists', () => {
+test('refuses with a reason when no bridge exists', () => {
   const api = load({ bridge: undefined })
   const el = bubble()
   api.translateOfflineText('Salom', 'left', el, null)
-  assert.equal(el.textContent, api.placeholder)
+  assert.equal(el.textContent, NOT_READY)
+  assert.equal(api.pending(), 0)
 })
 
-test('falls back to the placeholder when the engine cannot translate the pair', () => {
+test('refuses with a reason when the engine cannot translate the pair', () => {
   const api = load({
     bridge: { supportsTranslation: () => false, translate: () => assert.fail('must not call translate') },
   })
   const el = bubble()
   api.translateOfflineText('Salom', 'left', el, null)
-  assert.equal(el.textContent, api.placeholder)
+  assert.equal(el.textContent, NOT_READY)
 })
 
 test('a throwing supportsTranslation is treated as unsupported', () => {
@@ -103,7 +126,7 @@ test('a throwing supportsTranslation is treated as unsupported', () => {
   })
   const el = bubble()
   api.translateOfflineText('Salom', 'left', el, null)
-  assert.equal(el.textContent, api.placeholder)
+  assert.equal(el.textContent, NOT_READY)
 })
 
 test('surfaces a native error instead of faking a translation', () => {

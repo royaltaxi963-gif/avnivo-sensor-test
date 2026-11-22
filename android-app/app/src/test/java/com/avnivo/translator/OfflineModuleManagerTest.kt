@@ -107,6 +107,41 @@ class OfflineModuleManagerTest {
         manager.close()
     }
 
+    @Test fun supportedLanguagesIsEmptyUntilTheModuleIsOperational() {
+        // The picker must never be fed a list before the engine is really up. A model that is
+        // merely present on disk, or one whose engine threw, still yields nothing.
+        val spec = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
+        val manager = manager()
+        assertEquals(emptyList<String>(), manager.supportedLanguages(spec.id))
+
+        placeInstalledModel(spec)
+        val fresh = manager()
+        assertEquals("installed", JSONObject(fresh.status(spec.id)).getString("state"))
+        assertEquals(emptyList<String>(), fresh.supportedLanguages(spec.id))
+
+        fresh.engineFactory = { _, _ -> throw IllegalStateException("boom") }
+        fresh.download(spec.id)
+        fresh.awaitIdle()
+        assertFalse(fresh.isOperational(spec.id))
+        assertEquals(emptyList<String>(), fresh.supportedLanguages(spec.id))
+        manager.close()
+        fresh.close()
+    }
+
+    @Test fun supportedLanguagesFailsClosedForUnknownAndForeignModules() {
+        val manager = manager()
+        assertEquals(emptyList<String>(), manager.supportedLanguages("does-not-exist"))
+        // A non-NLLB engine must not be asked for a language list it cannot produce.
+        val whisper = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(whisper)
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.download(whisper.id)
+        manager.awaitIdle()
+        assertTrue(manager.isOperational(whisper.id))
+        assertEquals(emptyList<String>(), manager.supportedLanguages(whisper.id))
+        manager.close()
+    }
+
     @Test fun wrongSizeIsNotInstalled() {
         val spec = OfflineModelSpecs.all.getValue("whisper-small-q8")
         val dir = spec.directory(temp.root).apply { mkdirs() }

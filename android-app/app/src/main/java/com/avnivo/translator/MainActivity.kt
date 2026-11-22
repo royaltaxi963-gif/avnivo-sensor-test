@@ -101,6 +101,21 @@ class MainActivity : Activity() {
         @JavascriptInterface fun supportsTranslation(source: String, target: String): Boolean =
             moduleManager.supportsTranslation(NLLB_MODULE, source, target)
 
+        /**
+         * The offline picker's only source of truth. `ready` is false unless the module passed
+         * download, SHA-256 verification, native init and the smoke inference, and `languages` is
+         * read from that loaded tokenizer, so an uninstalled module can never offer a fake list.
+         */
+        @JavascriptInterface fun offlineTranslationState(): String {
+            val ready = moduleManager.isOperational(NLLB_MODULE)
+            val status = moduleManager.status(NLLB_MODULE)
+            return org.json.JSONObject()
+                .put("ready", ready)
+                .put("languages", org.json.JSONArray(moduleManager.supportedLanguages(NLLB_MODULE)))
+                .put("status", status?.let { org.json.JSONObject(it) } ?: org.json.JSONObject())
+                .toString()
+        }
+
         /** True only when the Silero engine finished initializing and passed its smoke test. */
         @JavascriptInterface fun isSpeechReady(): Boolean = moduleManager.isOperational(SILERO_MODULE)
 
