@@ -1246,3 +1246,89 @@ this branch's changes, so it is not a regression. Every other instrumented check
 
 Publish the `silero-tts` model manifest and artifact on the model server, then re-run
 `avnivo-integrated-android.yml`. Nothing in the app needs to change for that gate to pass.
+
+---
+
+## Silero TTS distribution blocker — resolved
+
+The blocker above had two layers, and both are now closed. No application source changed: the fix
+was entirely in the API deploy pipeline and the model bucket.
+
+### Layer 1 — the deployed API did not know the model id
+
+`silero-tts.json` and its `ALLOWED_PREFIXES` entry existed only on this branch, so the running Cloud
+Run revision answered `404 Unknown offline model`. Dispatching the already-registered
+`deploy-verified-translator-api.yml` at this branch (`gh workflow run ... --ref
+integrate/offline-engines-20261118`) rebuilt the service from the branch source, because
+`workflow_dispatch` uses the selected ref. Run `45004060884`, `success`.
+
+### Layer 2 — the object was never uploaded
+
+The manifest then returned `200`, but the signed URL ended in `NoSuchKey`, which is the honest
+signal: a ticket only proves the API can sign a name, not that the name exists. The deploy workflow
+now takes a `publish_silero_model` input that exports the graph from the pinned upstream package,
+refuses to continue unless the export reproduces the pinned digest, uploads it, and checks the
+stored object size before the API deploy runs. Run `45004368418`, job `publish-silero-model`,
+`success`:
+
+```text
+samples=32400 seconds=0.675 peak=0.625
+Copying file://silero_v21.ptl to gs://avnivo-offline-models-792624108019/tts/uzbek/silero/silero_v21.ptl
+tts/uzbek/silero/silero_v21.ptl 91988758        oi1eby6uw+s/EoV2gdT0NQ==
+```
+
+That run's `deploy` job failed on `HTTP 429 Too Many Requests`, caused by the manual ticket probes
+in this session hitting the endpoint's rate limit — not by the artifact. Confirmed independently
+afterwards against the live endpoint:
+
+```console
+$ curl -s .../api/offline-models/silero-tts/download-ticket    -> HTTP 200
+$ curl -s -o dl.bin -w '%{http_code} %{size_download}' <signed url>
+200 91988758
+$ sha256sum dl.bin
+333128fb6c7476e7fceec562f3f54980cbb6a88bbe59ff4a8e67e6cddad7a861
+```
+
+The digest matches `verified_models/silero-tts.json` exactly, so the checksum gate the app applies
+would accept these bytes.
+
+### Emulator evidence, run 45004732384 (`success`, HEAD `c82c78e`)
+
+| Job | Result |
+| --- | --- |
+| `apk` | success |
+| `update-install` | success |
+| `emulator-smoke` | **success** (first green run; previously failed on `SILERO_TTS_FAILED`) |
+
+Instrumented suites: 2, 6, 1, 5, 5, 1, 6 tests — all `OK`, 26 tests total, 0 failures. The real
+download path ran end to end on the emulator:
+
+```text
+I AvnivoSileroTts: download+init=9455ms samples=102000 seconds=2.125 peak=0.7822921
+```
+
+`download+init=9455ms` is the download of the real 92 MB artifact through the signed ticket,
+followed by SHA-256 verification, TorchScript Lite load and a synthesis smoke test; the module
+reached `ready` only after all of it, so the READY gate is not bypassed. 2.125 s of 48 kHz Uzbek
+audio with a non-silent peak is real voice output, not a stub buffer.
+
+### Remaining gap and what closed it
+
+In that run the radios were cut only *after* the Silero download test, and the offline TTS step
+still seeded a CI-exported copy, so it proved the engine needs no network but not that the
+*downloaded* bytes are the ones reused offline. `downloadedModelSynthesizesWithNoNetwork` now
+re-runs the module on the artifact the download test installed, with wifi and airplane mode
+enabled, and asserts the reuse took under 20 s so a silent re-fetch cannot pass as reuse.
+
+### Classification
+
+`silero-tts`: **VERIFIED WORKING** on the emulator (x86_64, API 34) — download, integrity, runtime
+init, real inference, and offline inference are all measured. Two limits remain, and neither is a
+claim of completeness:
+
+- **No physical device.** No arm64 phone or Galaxy S23 Ultra was available. The 466 MB peak RSS
+  measured on x86_64 is above a comfortable budget for low-memory hardware, and the arm64 figure is
+  unmeasured. Device-specific verification is therefore still outstanding.
+- **The publish job lives in the deploy workflow, not a standalone one.** It is guarded by a pinned
+  digest and an explicit input, so it cannot run by accident, but it does re-export the graph on
+  every publish rather than reusing a cached artifact.
