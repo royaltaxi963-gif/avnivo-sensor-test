@@ -1524,8 +1524,41 @@ network. A skipped test reports `OK` too, so the workflow greps the measurement 
 | Native libraries | 56 `.so` across `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64` |
 | Classification | Uzbek STT, Whisper Small, Whisper Large, NLLB-200, Silero TTS: **VERIFIED WORKING** on emulator. Physical S23 Ultra: **IMPLEMENTED — DEVICE TEST PENDING**. |
 
+### Stage: device-report fix — memory gate and single-engine activation
+
+The S23 Ultra reported five symptoms. They were one defect.
+
+| Device report (v1247) | Cause | Fix |
+| --- | --- | --- |
+| `xotira yetarli emas: 2765 MB kerak, 1768 MB mavjud` | `activate()` compared `spec.requiredRamBytes` against `ActivityManager.availMem` (whole-system free RAM) | `DeviceMemory` budget from **physical** RAM; refuse only on real pressure |
+| NLLB → «O'rnatish xatosi» | Same gate: 2765 > 1768 can never pass on a healthy phone | Same fix; `2765 MB` is NLLB's `requiredRamBytes` |
+| STT / Whisper Large / Silero → «Yuklab olingan va tasdiqlangan · dvigatel ulanmagan» | `reactivateInstalled()` loaded *every* installed model at once; the later ones failed the memory check | One resident engine; `INSTALLED` is its own honest state |
+| Modules stuck / not activating | `INSTALLED` → `READY` never happened after a failed load | `activate()` retries on demand; `ensureLoaded()` reloads an unloaded model |
+| Emulator green, device red | Emulator has far more free RAM, so the gate never fired in CI | Regression test pins the exact 12 GB / 1768 MB / 2765 MB numbers |
+
+`availMem` is system-wide free memory and Android deliberately keeps it low by filling unused RAM
+with page cache, so gating a native allocation on it can never succeed. Native allocations (ONNX
+Runtime, ggml, LiteRT) also live outside the Java heap, so the VM ceiling says nothing either.
+
+| Item | Value |
+| --- | --- |
+| Commit | `f13e5e7` (fix at `ac3b55c`) |
+| Unit tests | **112**, 0 failures (was 69) |
+| New unit tests | `DeviceMemoryTest` (7), `ModelIntegrityTest` (8), manager lifecycle (6) |
+| Node tests | **74**, 0 failures (was 69) |
+| New node tests | `offline-installed-state.test.cjs` (5) |
+| Instrumented | `OK (2)(9)(8)(1)(1)(1)(5)(5)(1)(7)` = 40 tests on API 34 x86_64 |
+| Workflow run | `45068250899` — `apk`, `update-install`, `emulator-smoke` success |
+| Interface diff | `index.html` +5/−5 lines: state map, two status maps, three i18n keys |
+| In-place update | `firstInstallTime` preserved, versionCode incremented, `Success` |
+
+The emulator pass is **not** treated as device evidence. The fix removes the gate that only fails on
+a real phone, and the regression test reproduces the device's numbers, but the S23 Ultra run is
+still required before any module is called verified on hardware.
+
 ### Next exact action
 
-Install the current build on the S23 Ultra and repeat the three reported flows: press the mic once
-for Uzbek STT, start the NLLB download and watch the bar move past 0%, and activate Whisper Large
-to confirm it settles instead of spinning.
+Install the v1248 build on the S23 Ultra, then confirm: NLLB activates instead of reporting
+`xotira yetarli emas`; each installed card reads «O'rnatilgan · ishlatilganda yuklanadi» rather
+than «dvigatel ulanmagan»; and a second module activates after the first is released. Capture
+`adb logcat -s AvnivoMemory AvnivoOfflineModule*` for the real `total/avail/pss/budget` numbers.
