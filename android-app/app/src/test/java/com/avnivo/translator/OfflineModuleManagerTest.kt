@@ -247,15 +247,42 @@ class OfflineModuleManagerTest {
         manager.close()
     }
 
-    @Test fun sileroSynthesisRefusesAnUnreadyEngine() {
+    @Test fun sileroSynthesisRefusesAModelThatIsNotInstalled() {
+        // Nothing is on disk, so synthesis must refuse with an actionable reason. It must never
+        // quietly fall through to another engine or return silence as if it had spoken.
         val manager = manager()
         try {
             manager.synthesize("silero-tts", "salom")
-            throw AssertionError("synthesis must not run before the engine is ready")
-        } catch (expected: IllegalArgumentException) {
-            // require() raises IllegalArgumentException; the point is that it refuses, not the type.
-            assertTrue(expected.message!!.contains("not ready", ignoreCase = true))
+            throw AssertionError("synthesis must not run without a model")
+        } catch (expected: IllegalStateException) {
+            assertTrue(
+                "the refusal must say the model is missing: ${expected.message}",
+                expected.message!!.contains("yuklab olinmagan")
+            )
         } finally {
+            manager.close()
+        }
+    }
+
+    @Test fun sileroSynthesisRefusesACorruptModel() {
+        // The files exist at the right size but the digest does not match, so the engine must not
+        // be built at all: a truncated model can crash inside the native runtime.
+        val spec = OfflineModelSpecs.all.getValue("silero-tts")
+        placeInstalledModel(spec)
+        val manager = manager()
+        manager.integrityVerifier = { _, _ -> ModelIntegrity.Result(false, "SHA-256 mos kelmadi") }
+        var builds = 0
+        manager.engineFactory = { _, _ -> builds += 1; FakeEngine() }
+        try {
+            manager.synthesize(spec.id, "salom")
+            throw AssertionError("synthesis must not run on a corrupt model")
+        } catch (expected: IllegalStateException) {
+            assertTrue(
+                "the refusal must name the integrity failure: ${expected.message}",
+                expected.message!!.contains("buzilgan")
+            )
+        } finally {
+            assertEquals("a corrupt model must never reach the native loader", 0, builds)
             manager.close()
         }
     }
