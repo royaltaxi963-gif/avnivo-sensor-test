@@ -1515,9 +1515,13 @@ network. A skipped test reports `OK` too, so the workflow greps the measurement 
 | Item | Value |
 | --- | --- |
 | Branch | `integrate/offline-engines-20261118` |
-| Commit | `c60da37` |
+| Commit | `c60da37` (checkpoint doc updated at `8d2bfad`) |
 | Workflow run (standard) | `45054670635` — `apk`, `update-install`, `emulator-smoke` success |
 | Workflow run (opt-in heavy) | `45055769600` — `nllb-smoke` and `large-model-smoke` success |
+| Release APK | `avnivo-offline-integration-v1247.apk`, 123,695,965 B, sha256 `db7a51d88fcaac3c4c22eb601e7000aca10ac51aa81e9f4b26c03cc5b8e877ad` |
+| Package | `com.avnivo.translator`, versionName `1.0.0`, versionCode `1247`, minSdk 26, targetSdk 35 |
+| In-place update | `firstInstallTime` preserved, versionCode `100` → `1247`, `Success` |
+| Native libraries | 56 `.so` across `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64` |
 | Classification | Uzbek STT, Whisper Small, Whisper Large, NLLB-200, Silero TTS: **VERIFIED WORKING** on emulator. Physical S23 Ultra: **IMPLEMENTED — DEVICE TEST PENDING**. |
 
 ### Next exact action
