@@ -1205,3 +1205,44 @@ deployed API does not carry a `silero-tts` manifest. Everything else in the job 
 `UZBEK_STT_RESULT` with `NETWORK_DOWN`, `SILERO_TTS_OFFLINE_OK`, `WHISPER_OFFLINE_OK`,
 `OFFLINE_INFERENCE_OK`, `EMULATOR_SMOKE_OK` — so the single failing gate is distribution, not
 inference.
+
+## Language synchronisation and offline module gating (commit `e157fc2`)
+
+The offline picker had a hardcoded Uzbek→Russian pair, so it could offer a language the
+downloaded tokenizer does not carry, and it read `ready` from a state that could be set before
+verification. Fixed at the source of truth, not in the UI.
+
+| Item | Status |
+| --- | --- |
+| `NllbTokenizer.languageCodes` read from the loaded vocabulary | done |
+| `NllbEngine.supportedLanguages()` | done |
+| `OfflineModuleManager.supportedLanguages(id)` gated on `isOperational` and engine type | done |
+| `MainActivity.offlineTranslationState()` bridge (`ready` + `languages` + `status`) | done |
+| Separate persisted pair per mode (`avnivo.offline.language-pair.v1`) | done |
+| Bidirectional mode transfer, incompatible side left blank | done |
+| Both sides must resolve before offline send | done |
+| Long-press timing unchanged at 1100 ms | verified |
+| `route.test.mjs` anchor repaired (red since `500b5bb`, pre-existing) | done |
+
+### Test totals, run 44994754881
+
+| Suite | Result |
+| --- | --- |
+| `NllbTokenizerTest` (real tokenizer, not skipped) | 14 tests, 0 failures, 0 ignored |
+| `OfflineModuleManagerTest` | 19 tests, 0 failures |
+| `offline-language-sync.test.mjs` (new) | 19 pass, 0 fail |
+| `offline-translation/route.test.mjs` | 11 pass, 0 fail |
+| `apk` job | success, APK built |
+| `update-install` | success |
+| `emulator-smoke` | failure, one gate only: `SILERO_TTS_DOWNLOAD_STILL_FAILING` |
+
+The single failing gate is the same distribution blocker recorded above: the deployed API returns
+`HTTP 404 {"detail":"Unknown offline model"}` for `silero-tts`. It reproduces on `18ace66`, before
+this branch's changes, so it is not a regression. Every other instrumented check passed in this run:
+`UZBEK_STT_RESULT text=navoiy tts o'zbekcha matnni tabiiy va ravon ovozga aylantiradi.` with
+`NETWORK_DOWN`, `OFFLINE_INFERENCE_OK`, Whisper runtime/inference/perf, and the mic gesture suite.
+
+### Next exact action
+
+Publish the `silero-tts` model manifest and artifact on the model server, then re-run
+`avnivo-integrated-android.yml`. Nothing in the app needs to change for that gate to pass.
