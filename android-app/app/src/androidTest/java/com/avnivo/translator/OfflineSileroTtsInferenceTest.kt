@@ -179,6 +179,62 @@ class OfflineSileroTtsInferenceTest {
         }
     }
 
+    /**
+     * Proves the second half of the install story: once the real download has completed, synthesis
+     * works with the radios down and does not touch the network again.
+     *
+     * CI runs this after disabling wifi and airplane mode, so a passing result means the model came
+     * from app-private storage. `download()` is called again on purpose: it must reuse the verified
+     * files on disk instead of re-fetching them, which is what makes a restart cheap.
+     */
+    @Test
+    fun downloadedModelSynthesizesWithNoNetwork() {
+        assumeTrue("set -e avnivoTtsOffline true to run",
+            InstrumentationRegistry.getArguments().getString("avnivoTtsOffline") == "true")
+
+        val directory = File(context.filesDir, "models/silero-tts")
+        val model = File(directory, "silero_v21.ptl")
+        assertTrue(
+            "the download test must have left a verified artifact at $model",
+            model.isFile && model.length() == 91_988_758L
+        )
+
+        val manager = OfflineModuleManager(context.filesDir, context.applicationContext) { _, _ -> }
+        try {
+            val started = System.currentTimeMillis()
+            manager.download("silero-tts")
+            manager.awaitIdle()
+            val reuseMs = System.currentTimeMillis() - started
+
+            val status = JSONObject(manager.status("silero-tts") ?: "{}")
+            assertEquals(
+                "an installed model must reach ready again without a download: $status",
+                "ready",
+                status.optString("state")
+            )
+            assertTrue("must be operational", status.optBoolean("active"))
+            // A re-download would spend seconds on 92 MB; reuse only loads the graph.
+            assertTrue("reuse took ${reuseMs}ms, which looks like a re-download", reuseMs < 20_000)
+
+            val samples = manager.synthesize("silero-tts", "Internet o'chirilgan holda ham ishlaydi.")
+            assertTrue("synthesis must return audio", samples.isNotEmpty())
+            assertTrue(
+                "expected at least 0.5 s of audio, got ${samples.size} samples",
+                samples.size > SileroTtsEngine.SAMPLE_RATE / 2
+            )
+            val peak = samples.maxOf { kotlin.math.abs(it) }
+            assertTrue("audio must not be silent, peak=$peak", peak > 0.01f)
+
+            android.util.Log.i(
+                "AvnivoSileroTts",
+                "offline reuse=${reuseMs}ms samples=${samples.size} " +
+                    "seconds=${samples.size.toDouble() / SileroTtsEngine.SAMPLE_RATE} peak=$peak"
+            )
+        } finally {
+            manager.close()
+        }
+    }
+
     @Test
     fun missingModelIsNotInstalledAfterRestart() {
         // A wiped download must not leave a card claiming READY.
