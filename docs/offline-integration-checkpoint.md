@@ -1463,6 +1463,11 @@ has no microphone (`-noaudio`). Classification: **IMPLEMENTED — DEVICE TEST PE
 | In-place update | `firstInstallTime` preserved (`2026-11-22 16:21:07`), versionCode `100` → `1238`, install `Success` |
 | JS suites | 87 pass / 0 fail |
 | Emulator total | 9 + 8 + 1 + 1 + 1 + 1 + 5 + 5 + 1 + 7 + 1 + 1 + 2 = 43 instrumented tests, all `OK` |
+| Offline re-verification | `svc wifi disable` + `svc data disable`, then real STT and TTS still `OK` |
+| APK download | draft release `offline-integration-v1239` (release id `454592769`), asset `avnivo-offline-integration-v1239.apk` |
+
+The release is a **draft** on purpose: it gives a one-file download instead of a ZIP artifact,
+while keeping the "no production release without approval" rule intact.
 
 ### Next exact action
 
