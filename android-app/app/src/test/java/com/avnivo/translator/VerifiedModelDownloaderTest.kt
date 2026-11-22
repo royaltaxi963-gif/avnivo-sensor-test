@@ -290,7 +290,9 @@ class VerifiedModelDownloaderTest {
 
     @Test fun aTransientServerFaultIsRetried() {
         var failures = 0
-        val flaky = MiniHttpServer { request ->
+        // Declared first so the handler can build absolute file URLs for this same server.
+        lateinit var flaky: MiniHttpServer
+        flaky = MiniHttpServer { request ->
             if (request.path.startsWith("/files/") && failures < 2) {
                 failures += 1
                 MiniHttpServer.Response(503, ByteArray(0))
