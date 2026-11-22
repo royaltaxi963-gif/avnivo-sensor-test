@@ -21,6 +21,8 @@ internal class OfflineModuleManager(
     private class Module(val spec: OfflineModelSpec) {
         @Volatile var state: OfflineModuleState = OfflineModuleState.NOT_INSTALLED
         @Volatile var percent: Int = 0
+        @Volatile var downloadedBytes: Long = 0L
+        @Volatile var totalBytes: Long = 0L
         @Volatile var engine: Closeable? = null
         @Volatile var reason: String? = null
     }
@@ -125,12 +127,19 @@ internal class OfflineModuleManager(
         return synchronized(engine) { engine.inferenceHistory.toList() }
     }
 
-    private fun statusJson(id: String, module: Module): JSONObject = JSONObject()
-        .put("id", id)
-        .put("state", module.state.code)
-        .put("percent", module.percent)
-        .put("active", module.state.isOperational)
-        .put("reason", module.reason ?: module.spec.blocker ?: JSONObject.NULL)
+    private fun statusJson(id: String, module: Module): JSONObject {
+        val progress = if (module.totalBytes > 0) JSONObject()
+            .put("downloadedBytes", module.downloadedBytes)
+            .put("totalBytes", module.totalBytes)
+        else null
+        return JSONObject()
+            .put("id", id)
+            .put("state", module.state.code)
+            .put("percent", module.percent)
+            .put("active", module.state.isOperational)
+            .put("progress", progress ?: JSONObject.NULL)
+            .put("reason", module.reason ?: module.spec.blocker ?: JSONObject.NULL)
+    }
 
     /**
      * Re-initializes every module whose files are already on disk. Called after a page load so a
@@ -143,8 +152,34 @@ internal class OfflineModuleManager(
                 val directory = module.spec.directory(filesDir)
                 if (!module.spec.runnable || !module.spec.installed(directory)) continue
                 transition(module, OfflineModuleState.INSTALLED)
-                initialize(module)
+                // Page load must not load every installed model at once: the Uzbek, Whisper Small,
+                // Whisper Large and NLLB models together need several GB of native memory, and the
+                // resulting OOM left the largest card spinning on "Tekshirilmoqda…" forever. A
+                // model that does not fit stays INSTALLED with the reason shown on its card.
+                initialize(module, allowEvict = false)
             }
+        }
+    }
+
+    /** Free memory reported by the system, or null when the platform cannot tell us. */
+    private fun availableMemoryBytes(): Long? {
+        val activityManager = appContext?.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+            ?: return null
+        val info = ActivityManager.MemoryInfo()
+        activityManager.getMemoryInfo(info)
+        return info.availMem
+    }
+
+    /**
+     * Releases other ready engines so [spec] can load. Only used for an explicit activation, where
+     * the user asked for this engine and it must not fail just because another model is resident.
+     */
+    private fun evictOtherEngines(keep: Module) {
+        for (other in modules.values) {
+            if (other === keep || !other.state.isOperational) continue
+            runCatching { other.engine?.close() }
+            other.engine = null
+            transition(other, OfflineModuleState.INSTALLED)
         }
     }
 
@@ -163,6 +198,12 @@ internal class OfflineModuleManager(
         }
         worker.execute {
             val directory = module.spec.directory(filesDir)
+            if (module.state.isOperational) {
+                // A ready engine is already the finished result; rebuilding it would drop a working
+                // decoder for no reason and briefly report a state that is not true.
+                notify("AvnivoOfflineModuleReady", module.spec.id)
+                return@execute
+            }
             if (module.spec.installed(directory)) {
                 transition(module, OfflineModuleState.INSTALLED)
                 initialize(module)
@@ -179,7 +220,11 @@ internal class OfflineModuleManager(
                     { notify("AvnivoOfflineStatus", it) },
                     { done, total ->
                         module.percent = if (total > 0) ((done * 100) / total).toInt().coerceIn(0, 100) else 0
-                        notify("AvnivoOfflineProgress", "$id|$done/$total")
+                        module.downloadedBytes = done
+                        module.totalBytes = total
+                        // Must match the handler the settings card listens on, otherwise progress
+                        // never reaches the module that is downloading and the card sits at 0%.
+                        notify("AvnivoOfflineModuleProgress", "$id|$done/$total")
                     }
                 )
                 transition(module, OfflineModuleState.VERIFYING)
@@ -193,12 +238,32 @@ internal class OfflineModuleManager(
         }
     }
 
-    /** Loads the native runtime and runs a smoke inference; only then promotes to READY. */
-    private fun initialize(module: Module) {
+    /**
+     * Loads the native runtime and runs a smoke inference; only then promotes to READY.
+     *
+     * [allowEvict] is true for an explicit activation, where a competing engine may be released so
+     * the requested model fits. It is false on page load, where an unaffordable model must simply
+     * report why instead of unloading a different working engine.
+     */
+    private fun initialize(module: Module, allowEvict: Boolean = true) {
         val directory = module.spec.directory(filesDir)
         if (!module.spec.installed(directory)) {
             transition(module, OfflineModuleState.NOT_INSTALLED)
             return
+        }
+        val available = availableMemoryBytes()
+        if (available != null && module.spec.requiredRamBytes > 0 && available < module.spec.requiredRamBytes) {
+            if (allowEvict) {
+                evictOtherEngines(module)
+            }
+            val after = availableMemoryBytes()
+            if (after != null && after < module.spec.requiredRamBytes) {
+                module.reason = "xotira yetarli emas: ${module.spec.requiredRamBytes / 1024 / 1024} MB kerak, " +
+                    "${after / 1024 / 1024} MB mavjud"
+                transition(module, OfflineModuleState.INSTALLED)
+                notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+                return
+            }
         }
         transition(module, OfflineModuleState.INITIALIZING)
         try {
@@ -216,6 +281,20 @@ internal class OfflineModuleManager(
             module.reason = "native kutubxonasi yuklanmadi"
             transition(module, OfflineModuleState.INSTALLED)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|native kutubxonasi yuklanmadi")
+        } catch (e: OutOfMemoryError) {
+            // A large model can exhaust the heap inside the native loader. Leaving the module in
+            // INITIALIZING made the card spin on "Tekshirilmoqda…" forever; report the real cause.
+            module.reason = "model uchun xotira yetarli emas (OutOfMemoryError)"
+            transition(module, OfflineModuleState.ERROR)
+            notify(
+                "AvnivoOfflineModuleError",
+                "${module.spec.id}|Model uchun xotira yetarli emas: ${module.spec.requiredRamBytes / 1024 / 1024} MB kerak"
+            )
+        } catch (e: Throwable) {
+            // Any other VM-level failure must still settle the state machine instead of hanging.
+            module.reason = "dvigatel ishga tushmadi: ${e::class.java.simpleName}"
+            transition(module, OfflineModuleState.ERROR)
+            notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e::class.java.simpleName}")
         }
     }
 
@@ -227,20 +306,36 @@ internal class OfflineModuleManager(
             requireRam(spec)
             val model = directory.listFiles()?.firstOrNull { it.name.endsWith(".bin") }
                 ?: error("Missing ggml model")
-            WhisperEngine(model, language = "auto").also { it.prepare(); it.smokeTest() }
+            loadVerified(WhisperEngine(model, language = "auto"))
         }
         OfflineEngineKind.NLLB_ONNX -> {
             requireRam(spec)
-            NllbEngine(directory).also { it.prepare(); it.smokeTest() }
+            loadVerified(NllbEngine(directory))
         }
         OfflineEngineKind.SILERO_TTS -> {
             requireRam(spec)
             val model = directory.listFiles()?.firstOrNull { it.name.endsWith(".ptl") }
                 ?: error("Missing TorchScript model")
-            SileroTtsEngine(model).also { it.prepare(); it.smokeTest() }
+            loadVerified(SileroTtsEngine(model))
         }
         OfflineEngineKind.UZBEK_NEMO_CTC -> error("Uzbek engine is managed by the STT bridge")
         OfflineEngineKind.UNAVAILABLE -> error("No engine available for ${spec.id}")
+    }
+
+    /** Prepares and smoke-tests an engine, releasing it if either step fails. */
+    private fun <T : Closeable> loadVerified(engine: T): T {
+        try {
+            when (engine) {
+                is WhisperEngine -> { engine.prepare(); engine.smokeTest() }
+                is NllbEngine -> { engine.prepare(); engine.smokeTest() }
+                is SileroTtsEngine -> { engine.prepare(); engine.smokeTest() }
+                else -> error("Unsupported engine type")
+            }
+        } catch (t: Throwable) {
+            runCatching { engine.close() }
+            throw t
+        }
+        return engine
     }
 
     /**
@@ -276,7 +371,11 @@ internal class OfflineModuleManager(
     private fun transition(module: Module, next: OfflineModuleState) {
         if (!module.state.canTransitionTo(next)) return
         module.state = next
-        if (next != OfflineModuleState.DOWNLOADING) module.percent = 0
+        if (next != OfflineModuleState.DOWNLOADING) {
+            module.percent = 0
+            module.downloadedBytes = 0L
+            module.totalBytes = 0L
+        }
         notify("AvnivoOfflineModuleStatus", module.spec.id)
     }
 }

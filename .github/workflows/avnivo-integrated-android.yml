@@ -109,6 +109,9 @@ jobs:
       - name: Assert offline interface state is visible and persisted
         working-directory: .
         run: node --test tests/offline-ui-state.test.cjs
+      - name: Assert module download progress and failure reasons reach the cards
+        working-directory: .
+        run: node --test tests/offline-module-progress.test.cjs
       - name: Upload unit test reports
         if: always()
         uses: actions/upload-artifact@v4

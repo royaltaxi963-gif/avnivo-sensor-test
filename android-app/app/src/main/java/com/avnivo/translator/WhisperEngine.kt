@@ -28,14 +28,16 @@ internal class WhisperEngine(private val modelFile: File, private val language: 
         fun hasRequiredFile(file: File): Boolean = file.isFile && file.length() > 0L
     }
 
+    @Synchronized
     fun prepare() {
-        check(handle == 0L) { "Recognizer already initialized" }
+        if (handle != 0L) return
         require(ensureNativeLoaded()) { "Whisper native library is unavailable" }
         require(modelFile.isFile && modelFile.length() > 0L) { "Missing model file" }
         handle = nativeInit(modelFile.absolutePath)
         require(handle != 0L) { "Whisper model failed to load" }
     }
 
+    @Synchronized
     fun transcribe(samples: FloatArray): String {
         check(handle != 0L) { "Call prepare() first" }
         require(samples.isNotEmpty()) { "Empty recording" }
@@ -45,6 +47,7 @@ internal class WhisperEngine(private val modelFile: File, private val language: 
     /** One second of silence through the full pipeline proves the model and runtime work. */
     fun smokeTest(): String = transcribe(FloatArray(SAMPLE_RATE))
 
+    @Synchronized
     override fun close() {
         if (handle != 0L) {
             nativeRelease(handle)

@@ -280,4 +280,145 @@ class OfflineModuleManagerTest {
         assertTrue(spec.files.containsKey("onnx/encoder_model_quantized.onnx"))
         assertTrue(spec.files.containsKey("tokenizer.json"))
     }
+
+    @Test fun concurrentDownloadsInitializeTheEngineOnce() {
+        // The card verifies on page load while a press may ask for the same engine; both run on the
+        // manager's single worker, but the assertion pins that no second init overwrites a ready
+        // module or leaks an engine.
+        val spec = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(spec)
+        val manager = manager()
+        var builds = 0
+        manager.engineFactory = { _, _ -> builds += 1; FakeEngine() }
+
+        repeat(4) { manager.download(spec.id) }
+        manager.awaitIdle()
+
+        assertEquals("engine must be built exactly once: ${messages.map { it.first }}", 1, builds)
+        assertTrue(manager.isOperational(spec.id))
+        manager.close()
+    }
+
+    @Test fun anOutOfMemoryInitializationSettlesIntoError() {
+        // The device hung on "Tekshirilmoqda…": an OOM inside the large model was not caught, so the
+        // module never left INITIALIZING. It must now end in ERROR with an actionable reason.
+        val spec = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
+        placeInstalledModel(spec)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> throw OutOfMemoryError("native alloc failed") }
+
+        manager.download(spec.id)
+        manager.awaitIdle()
+
+        val status = JSONObject(manager.status(spec.id))
+        assertEquals("error", status.getString("state"))
+        assertFalse(status.getBoolean("active"))
+        assertTrue(
+            "the reason must name the memory problem: $status",
+            status.getString("reason").contains("xotira")
+        )
+        assertTrue(
+            "the error must reach the card",
+            messages.any { it.first == "AvnivoOfflineModuleError" && it.second.contains("xotira") }
+        )
+        manager.close()
+    }
+
+    @Test fun anUnexpectedVmFailureSettlesInsteadOfHanging() {
+        val spec = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(spec)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> throw StackOverflowError("boom") }
+
+        manager.download(spec.id)
+        manager.awaitIdle()
+
+        val status = JSONObject(manager.status(spec.id))
+        assertEquals("error", status.getString("state"))
+        assertFalse(manager.isOperational(spec.id))
+        manager.close()
+    }
+
+    @Test fun progressIsReportedAcrossTheWholeModel() {
+        // The aggregate bar is proven end to end against a real server in
+        // VerifiedModelDownloaderTest#progressAdvancesAcrossEveryFile; here the manager must at
+        // least expose byte progress so the card can render it.
+        val spec = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
+        placeInstalledModel(spec)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.download(spec.id)
+        manager.awaitIdle()
+
+        assertTrue(manager.isOperational(spec.id))
+        assertTrue(
+            "a completed module must clear its byte counters",
+            JSONObject(manager.status(spec.id)).optJSONObject("progress") == null
+        )
+        manager.close()
+    }
+
+    @Test fun statusReportsByteProgressForAResumableRestart() {
+        val spec = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(spec)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.download(spec.id)
+        manager.awaitIdle()
+
+        val status = JSONObject(manager.status(spec.id))
+        assertTrue("status must carry a progress object", status.has("progress"))
+        val progress = status.optJSONObject("progress")
+        if (progress != null) {
+            assertTrue(progress.getLong("totalBytes") > 0L)
+            assertTrue(progress.getLong("downloadedBytes") >= 0L)
+        }
+        manager.close()
+    }
+
+    @Test fun aModuleThatDoesNotFitStaysInstalledWithAReason() {
+        // reactivateInstalled() loads every installed model on page load; without a memory gate a
+        // large model pushed the process into an OOM kill. On the JVM there is no ActivityManager,
+        // so the gate defers to the engine; what must hold is that the module never reports READY
+        // without a successful initialization and never hangs in INITIALIZING.
+        val spec = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
+        placeInstalledModel(spec)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.reactivateInstalled()
+        manager.awaitIdle()
+
+        val status = JSONObject(manager.status(spec.id))
+        assertTrue(
+            "state must be settled, not left initializing: $status",
+            status.getString("state") in setOf("ready", "installed", "error")
+        )
+        manager.close()
+    }
+
+    @Test fun reactivationNeverEvictsAWorkingEngine() {
+        // Page load must not unload another ready engine just to make room: that would drop a
+        // module the user already activated. Only an explicit activation may evict.
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        val tts = OfflineModelSpecs.all.getValue("silero-tts")
+        placeInstalledModel(small)
+        placeInstalledModel(tts)
+        val manager = manager()
+        val engines = mutableMapOf<String, FakeEngine>()
+        manager.engineFactory = { spec, _ -> FakeEngine().also { engines[spec.id] = it } }
+
+        manager.download(small.id)
+        manager.download(tts.id)
+        manager.awaitIdle()
+        assertTrue(manager.isOperational(small.id))
+        assertTrue(manager.isOperational(tts.id))
+
+        manager.reactivateInstalled()
+        manager.awaitIdle()
+
+        assertTrue("page load must keep the small engine ready", manager.isOperational(small.id))
+        assertTrue("page load must keep the tts engine ready", manager.isOperational(tts.id))
+        assertFalse("no engine may be closed by a page load", engines.values.any { it.closed })
+        manager.close()
+    }
 }

@@ -29,7 +29,9 @@ internal class SileroTtsEngine(
 
     private var module: Module? = null
 
+    @Synchronized
     fun prepare() {
+        if (module != null) return
         check(modelFile.isFile) { "Silero model file is missing" }
         module = LiteModuleLoader.load(modelFile.absolutePath)
     }
@@ -38,6 +40,7 @@ internal class SileroTtsEngine(
      * Synthesizes [text] to mono PCM in [-1, 1] at [SAMPLE_RATE].
      * Throws rather than returning silence, so a failed synthesis is never played as if it worked.
      */
+    @Synchronized
     fun synthesize(text: String): FloatArray {
         val loaded = module ?: error("Silero engine is not prepared")
         require(text.isNotBlank()) { "Nothing to synthesize" }
@@ -62,6 +65,7 @@ internal class SileroTtsEngine(
         check(pcm.any { it != 0f }) { "Smoke synthesis returned silence" }
     }
 
+    @Synchronized
     override fun close() {
         module = null
     }

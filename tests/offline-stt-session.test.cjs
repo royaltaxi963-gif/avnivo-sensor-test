@@ -150,11 +150,34 @@ test('10. an unusable recording reports its measured reason', () => {
 
 test('11. the recognizer is reused instead of rebuilt on every press', () => {
   // Rebuilding a NeMo recognizer costs seconds; paying it per press made the first result late.
+  // Startup verification and a press can both need the decoder, so they share one accessor.
   assert.match(activity, /private var uzEngine: OfflineSpeechEngine\? = null/);
   const verifyBody = functionBody(activity, 'private fun verifyEngine()');
-  assert.match(verifyBody, /val engine = uzEngine \?: OfflineSpeechEngine/, 'a verified engine must be kept');
-  assert.match(transcribeBody, /uzEngine \?: OfflineSpeechEngine/, 'recognition must reuse it');
+  assert.match(verifyBody, /val engine = readyUzbekEngine\(\)/, 'verification must use the shared accessor');
+  assert.match(transcribeBody, /readyUzbekEngine\(\)\.transcribe/, 'recognition must reuse it');
+
+  const accessor = functionBody(activity, 'private fun readyUzbekEngine()');
+  assert.match(activity, /@Synchronized\s*\n\s*private fun readyUzbekEngine\(\)/, 'concurrent callers must serialize on one instance');
+  assert.match(accessor, /isPrepared/, 'an already loaded decoder must be returned, not re-prepared');
   assert.match(activity, /uzEngine\?\.close\(\);\s*uzEngine = null/, 'a failed engine must be dropped');
+});
+
+test('11b. engine preparation is idempotent and thread safe', () => {
+  // The device reported "Recognizer already initialized": prepare() was called a second time on a
+  // cached engine. It must be a no-op instead, and every entry point must be serialized.
+  const engine = fs.readFileSync(path.join(main, 'OfflineSpeechEngine.kt'), 'utf8');
+  const prepare = functionBody(engine, 'fun prepare()');
+  assert.match(prepare, /if \(recognizer != null\) return/, 'a second prepare must be a no-op');
+  assert.doesNotMatch(prepare, /check\(recognizer == null\)/, 'the throwing guard must be gone');
+  assert.match(engine, /@Synchronized\s*\n\s*fun prepare\(\)/, 'prepare must be synchronized');
+  assert.match(engine, /@Synchronized\s*\n\s*fun transcribe\(/, 'decode must be synchronized');
+  assert.match(engine, /@Synchronized\s*\n\s*override fun close\(\)/, 'close must be synchronized');
+  assert.match(engine, /val isPrepared/, 'callers need a non-throwing readiness check');
+
+  const whisper = fs.readFileSync(path.join(main, 'WhisperEngine.kt'), 'utf8');
+  const whisperPrepare = functionBody(whisper, 'fun prepare()');
+  assert.match(whisperPrepare, /if \(handle != 0L\) return/, 'whisper prepare must be idempotent too');
+  assert.doesNotMatch(whisperPrepare, /Recognizer already initialized/, 'the throwing guard must be gone');
 });
 
 test('12. the session fields exist so the contract compiles', () => {

@@ -199,6 +199,134 @@ class VerifiedModelDownloaderTest {
         assertArrayEquals(first, File(dir, "model.int8.onnx").readBytes())
     }
 
+    @Test fun progressAdvancesAcrossEveryFile() {
+        // The card draws one bar for the whole model. Reporting per-file totals made an 8-file
+        // model restart at 0% eight times, which is what "stuck at 0%" looked like on the device.
+        val dir = temp.newFolder("aggregate")
+        val total = (modelBytes.size + tokensBytes.size).toLong()
+        val seen = mutableListOf<Pair<Long, Long>>()
+        downloader(dir).download({ }, { done, reported -> seen += done to reported })
+
+        assertTrue("progress must be reported", seen.isNotEmpty())
+        assertTrue(
+            "every report must use the model-wide total: $seen",
+            seen.all { it.second == total }
+        )
+        val firsts = seen.map { it.first }
+        assertEquals("progress must start at zero", 0L, firsts.first())
+        assertTrue(
+            "progress must never move backwards: $firsts",
+            firsts.zipWithNext().all { (a, b) -> b >= a }
+        )
+        assertEquals("progress must finish at the total", total, firsts.last())
+    }
+
+    @Test fun anAlreadyVerifiedFileIsNotDownloadedAgain() {
+        // A resumed install must keep what it already verified instead of refetching every file.
+        val dir = temp.newFolder("reuse")
+        downloader(dir).download({ }, { _, _ -> })
+        val installed = File(dir, "tokens.txt")
+        val stamp = installed.lastModified()
+
+        val messages = mutableListOf<String>()
+        downloader(dir).download({ messages += it }, { _, _ -> })
+
+        assertTrue(
+            "a verified file must be reported as reused: $messages",
+            messages.any { it.contains("Allaqachon yuklangan: tokens.txt") }
+        )
+        assertEquals("a reused file must not be rewritten", stamp, installed.lastModified())
+        assertArrayEquals(tokensBytes, installed.readBytes())
+    }
+
+    @Test fun aTruncatedInstalledFileIsReplaced() {
+        // Reuse must be proven by digest and size, never by the file merely existing.
+        val dir = temp.newFolder("truncated")
+        downloader(dir).download({ }, { _, _ -> })
+        File(dir, "tokens.txt").writeBytes(tokensBytes.copyOfRange(0, 3))
+
+        downloader(dir).download({ }, { _, _ -> })
+        assertArrayEquals(tokensBytes, File(dir, "tokens.txt").readBytes())
+    }
+
+    @Test fun aFullyVerifiedTemporaryFileIsInstalledWithoutRefetching() {
+        // A run that verified a file but died before installing it must not pay for the transfer
+        // again. This is the case that made a resumed 916 MB install restart from zero.
+        val dir = temp.newFolder("promote")
+        downloader(dir).download({ }, { _, _ -> })
+        val installed = File(dir, "model.int8.onnx")
+        val temporary = File(dir, "model.int8.onnx.download")
+        assertTrue("the fixture must move the file aside", installed.renameTo(temporary))
+
+        val messages = mutableListOf<String>()
+        downloader(dir).download({ messages += it }, { _, _ -> })
+
+        assertTrue(
+            "the verified temp must be promoted: $messages",
+            messages.any { it.contains("Tekshirildi, o‘rnatilmoqda: model.int8.onnx") }
+        )
+        assertArrayEquals(modelBytes, installed.readBytes())
+        assertFalse("the temp must not survive installation", temporary.exists())
+        assertFalse(
+            "the promoted file must not be fetched again: $messages",
+            messages.any { it.contains("Yuklanmoqda: model.int8.onnx") }
+        )
+    }
+
+    @Test fun aCorruptTemporaryFileIsNotPromoted() {
+        // Promotion must be gated by the digest, otherwise a partial download could be installed.
+        val dir = temp.newFolder("corrupt-temp")
+        downloader(dir).download({ }, { _, _ -> })
+        val installed = File(dir, "tokens.txt")
+        val temporary = File(dir, "tokens.txt.download")
+        assertTrue(installed.renameTo(temporary))
+        temporary.writeBytes(tokensBytes.copyOfRange(0, 2))
+
+        downloader(dir).download({ }, { _, _ -> })
+        assertArrayEquals(tokensBytes, installed.readBytes())
+    }
+
+    @Test fun aTransientServerFaultIsRetried() {
+        var failures = 0
+        val flaky = MiniHttpServer { request ->
+            if (request.path.startsWith("/files/") && failures < 2) {
+                failures += 1
+                MiniHttpServer.Response(503, ByteArray(0))
+            } else if (request.path == "/api/offline-models/test-model/download-ticket") {
+                val files = JSONArray()
+                    .put(fileEntry("tokens.txt", tokensBytes, tokensSha))
+                    .put(fileEntry("model.int8.onnx", modelBytes, modelSha))
+                MiniHttpServer.Response(
+                    200,
+                    JSONObject().put("model_id", "test-model").put("files", files).toString().toByteArray()
+                )
+            } else {
+                val payload = when (request.path.substringAfterLast('/')) {
+                    "model.int8.onnx" -> modelBytes
+                    "tokens.txt" -> tokensBytes
+                    else -> null
+                }
+                if (payload == null) MiniHttpServer.Response(404, ByteArray(0))
+                else serveWithRange(request, payload)
+            }
+        }
+        flaky.start()
+        try {
+            val dir = temp.newFolder("retry")
+            VerifiedModelDownloader(
+                directory = dir,
+                apiBase = flaky.baseUrl,
+                allowedHosts = listOf("${flaky.baseUrl}/files/"),
+                modelId = "test-model",
+                expected = expected()
+            ).download({ }, { _, _ -> })
+            assertArrayEquals(modelBytes, File(dir, "model.int8.onnx").readBytes())
+            assertTrue("the server must have been hit more than once", failures == 2)
+        } finally {
+            flaky.close()
+        }
+    }
+
     private fun assertArrayEquals(expected: ByteArray, actual: ByteArray) =
         assertEquals(expected.toList(), actual.toList())
 }

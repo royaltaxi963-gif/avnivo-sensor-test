@@ -157,7 +157,9 @@ internal class NllbEngine(
     private val encoderFile: File get() = File(directory, "onnx/encoder_model_quantized.onnx")
     private val decoderFile: File get() = File(directory, "onnx/decoder_model_merged_quantized.onnx")
 
+    @Synchronized
     fun prepare() {
+        if (loaded.get()) return
         require(ensureNativeLoaded()) { "NLLB native library is unavailable" }
         check(encoderFile.isFile) { "Missing encoder model" }
         check(decoderFile.isFile) { "Missing decoder model" }
@@ -219,6 +221,7 @@ internal class NllbEngine(
         check(output.isNotEmpty()) { "Smoke translation returned nothing" }
     }
 
+    @Synchronized
     override fun close() {
         loaded.set(false)
         val open = handle.getAndSet(0L)

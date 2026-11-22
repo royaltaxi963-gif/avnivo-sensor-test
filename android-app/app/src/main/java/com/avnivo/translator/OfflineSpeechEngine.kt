@@ -24,8 +24,18 @@ class OfflineSpeechEngine(private val modelDirectory: File) : Closeable {
                 File(directory, TOKENS_FILE).let { it.isFile && it.length() > 0L }
     }
 
+    /** True once [prepare] has succeeded and the native decoder is loaded. */
+    @get:Synchronized
+    val isPrepared: Boolean get() = recognizer != null
+
+    /**
+     * Loads the native decoder. Idempotent and thread-safe: the settings card verifies the engine
+     * on startup while a press may initialize the same engine on the recognition thread, and both
+     * must end up sharing one decoder instead of failing with "already initialized".
+     */
+    @Synchronized
     fun prepare() {
-        check(recognizer == null) { "Recognizer already initialized" }
+        if (recognizer != null) return
         val model = File(modelDirectory, MODEL_FILE)
         val tokens = File(modelDirectory, TOKENS_FILE)
         require(model.isFile && model.length() > 0L) { "Missing $MODEL_FILE" }
@@ -42,6 +52,12 @@ class OfflineSpeechEngine(private val modelDirectory: File) : Closeable {
         recognizer = OfflineRecognizer(assetManager = null, config = config)
     }
 
+    /**
+     * Runs one decoding pass. Synchronized because the startup smoke test and a user recording can
+     * reach the same decoder from different threads, and one recognizer must not decode two
+     * streams at once.
+     */
+    @Synchronized
     fun transcribe(samples: FloatArray): String {
         val decoder = checkNotNull(recognizer) { "Call prepare() first" }
         require(samples.isNotEmpty()) { "Empty recording" }
@@ -62,6 +78,7 @@ class OfflineSpeechEngine(private val modelDirectory: File) : Closeable {
      */
     fun smokeTest(): String = transcribe(FloatArray(SAMPLE_RATE))
 
+    @Synchronized
     override fun close() {
         recognizer?.release()
         recognizer = null

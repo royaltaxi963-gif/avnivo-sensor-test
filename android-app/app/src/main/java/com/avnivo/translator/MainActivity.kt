@@ -244,10 +244,7 @@ class MainActivity : Activity() {
         transition(OfflineModuleState.INITIALIZING)
         notifyJs("AvnivoOfflineStatus", "Dvigatel ishga tushirilmoqda…")
         try {
-            // The engine that passes the smoke test is kept: rebuilding a NeMo recognizer costs
-            // seconds, and paying that on every press is what made the first result feel lost.
-            val engine = uzEngine ?: OfflineSpeechEngine(modelDir).also { uzEngine = it }
-            engine.prepare()
+            val engine = readyUzbekEngine()
             engine.smokeTest()
             transition(OfflineModuleState.READY)
             notifyJs("AvnivoOfflineEngineReady", "O‘zbekcha ovoz tanish dvigateli tayyor")
@@ -259,6 +256,20 @@ class MainActivity : Activity() {
             transition(OfflineModuleState.INSTALLED)
             notifyJs("AvnivoOfflineError", "Sherpa native kutubxonasi yuklanmadi")
         }
+    }
+
+    /**
+     * The single place the Uzbek decoder is created. Concurrent callers (startup verification and a
+     * press that needs recognition) share one instance and one initialization; a decoder that is
+     * already loaded is returned as is instead of being rebuilt or re-prepared.
+     */
+    @Synchronized
+    private fun readyUzbekEngine(): OfflineSpeechEngine {
+        uzEngine?.let { if (it.isPrepared) return it }
+        val engine = OfflineSpeechEngine(modelDir)
+        engine.prepare()
+        uzEngine = engine
+        return engine
     }
 
     inner class Bridge {
@@ -406,11 +417,7 @@ class MainActivity : Activity() {
                 val text = if (whisperId != null) {
                     moduleManager.transcribe(whisperId, samples)
                 } else {
-                    val engine = uzEngine ?: OfflineSpeechEngine(modelDir).also {
-                        it.prepare()
-                        uzEngine = it
-                    }
-                    engine.transcribe(samples)
+                    readyUzbekEngine().transcribe(samples)
                 }
                 logStt(session, "transcribed", "engine=${whisperId ?: "uzbek-stt"} chars=${text.length} text=${text.take(80)}")
                 if (text.isBlank()) {
