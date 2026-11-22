@@ -17,7 +17,8 @@ import kotlin.math.sqrt
  * [onAmplitude] receives a 0..1 loudness value per audio buffer for the live waveform.
  */
 class OfflinePcmRecorder(private val context: Context) : Closeable {
-    @Volatile private var stopped = false
+    @Volatile private var stopRequested = false
+    @Volatile private var recordingStarted = false
     @Volatile private var recorder: AudioRecord? = null
     private val sampleRate = 16000
 
@@ -45,9 +46,12 @@ class OfflinePcmRecorder(private val context: Context) : Closeable {
         try {
             check(audio.state == AudioRecord.STATE_INITIALIZED) { "AudioRecord init failed" }
             audio.startRecording()
+            recordingStarted = true
             val buffer = ShortArray(1600)
             val limit = sampleRate * maxSeconds
-            while (!stopped && count < limit) {
+            // A release that lands before the microphone opens must not throw the utterance away:
+            // keep capturing up to MIN_HOLD_SAMPLES so the first press still yields real audio.
+            while (shouldContinue(stopRequested, count, limit)) {
                 val read = audio.read(buffer, 0, minOf(buffer.size, limit - count))
                 if (read < 0) error("AudioRecord read error $read")
                 var sum = 0.0
@@ -60,21 +64,38 @@ class OfflinePcmRecorder(private val context: Context) : Closeable {
             }
             return data.copyOf(count)
         } finally {
-            stopped = true
+            stopRequested = true
             try { if (audio.recordingState == AudioRecord.RECORDSTATE_RECORDING) audio.stop() } catch (_: Exception) {}
             audio.release()
             recorder = null
         }
     }
 
-    /** Requests capture to end at the next buffer boundary. Safe to call from the UI thread. */
+    /**
+     * Requests capture to end at the next buffer boundary. Safe to call from the UI thread, and
+     * safe to call before [capture] has opened the microphone.
+     */
     fun stop() {
-        stopped = true
+        stopRequested = true
     }
+
+    /** True once the microphone is actually open, so a release can be matched to a live capture. */
+    fun isCapturing(): Boolean = recordingStarted && !stopRequested
 
     override fun close() = stop()
 
     companion object {
+        /** 0.3 s floor, matching [MainActivity.MIN_SAMPLES]: below this there is no usable speech. */
+        const val MIN_HOLD_SAMPLES = 4800
+
+        /**
+         * The capture loop condition. After a release the loop keeps reading until the minimum
+         * hold is reached, so a release that lands before the microphone opens still yields real
+         * audio instead of an empty array.
+         */
+        fun shouldContinue(stopRequested: Boolean, sampleCount: Int, limit: Int): Boolean =
+            (!stopRequested || sampleCount < MIN_HOLD_SAMPLES) && sampleCount < limit
+
         /** Mean-square to 0..1 loudness, matching the browser waveform's amplitude scaling. */
         fun amplitude(squaredSum: Double, sampleCount: Int): Float {
             if (sampleCount <= 0) return 0f

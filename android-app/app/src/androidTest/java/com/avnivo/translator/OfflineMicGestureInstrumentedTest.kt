@@ -118,6 +118,73 @@ class OfflineMicGestureInstrumentedTest {
         assertEquals("press must start recording: $value", "true|false|1|1|", value)
     }
 
+    /**
+     * The acceptance criterion: one press, one transcript.
+     *
+     * Drives the real gesture with a stubbed bridge, then delivers that press's result. The text
+     * must appear after the first press alone, with no second attempt.
+     */
+    @Test
+    fun theFirstPressProducesItsOwnTranscript() {
+        val web = loadInterface()
+        val value = evaluate(
+            web,
+            "window.AvnivoOfflineSTT={start:function(s){window.__s=s},stop:function(){}};" +
+                "var m=document.querySelector('.mic-icon');" +
+                "m.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
+                "var session=window.__s;" +
+                "m.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
+                "window.AvnivoOfflineResult('birinchi yozuv',session);" +
+                "document.querySelector('.writing-area').value"
+        )
+        assertEquals("birinchi yozuv", value)
+    }
+
+    /**
+     * The reported defect: the second press showed the first recording's text. A result stamped
+     * with an older session must be refused, and the newer press must keep the composer clean.
+     */
+    @Test
+    fun aStaleResultCannotLandInANewerPress() {
+        val web = loadInterface()
+        val value = evaluate(
+            web,
+            "window.AvnivoOfflineSTT={start:function(s){window.__s=s},stop:function(){}};" +
+                "var m=document.querySelector('.mic-icon');" +
+                "m.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
+                "var first=window.__s;" +
+                "m.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
+                "m.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:2,button:0,isPrimary:true}));" +
+                "var second=window.__s;" +
+                "m.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:2,button:0,isPrimary:true}));" +
+                "window.AvnivoOfflineResult('eski natija',first);" +
+                "var afterStale=document.querySelector('.writing-area').value;" +
+                "window.AvnivoOfflineResult('yangi natija',second);" +
+                "afterStale+'|'+document.querySelector('.writing-area').value"
+        )
+        assertEquals("the stale result must be dropped: $value", "|yangi natija", value)
+    }
+
+    /** The processing stage must be visible between release and result, not skipped. */
+    @Test
+    fun processingIsVisibleBetweenReleaseAndResult() {
+        val web = loadInterface()
+        val value = evaluate(
+            web,
+            "window.AvnivoOfflineSTT={start:function(s){window.__s=s},stop:function(){}};" +
+                "var m=document.querySelector('.mic-icon');" +
+                "m.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
+                "var session=window.__s;" +
+                "m.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1,button:0,isPrimary:true}));" +
+                "var indicator=document.querySelector('.online-stt-status');" +
+                "var during=indicator.dataset.state;" +
+                "var shown=getComputedStyle(indicator).display;" +
+                "window.AvnivoOfflineResult('tayyor',session);" +
+                "during+'|'+shown"
+        )
+        assertEquals("loading|flex", value)
+    }
+
     /** A release with no matching press must not start or stop anything, and must not throw. */
     @Test
     fun strayPointerUpIsIgnored() {

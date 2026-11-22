@@ -16,14 +16,31 @@ import java.util.concurrent.Executors
 /** The real main AVNIVO interface with its own in-process offline recognizer. */
 class MainActivity : Activity() {
     private lateinit var web: WebView
+    /** Model download and module activation. Never used for capture: it can run for minutes. */
     private val worker = Executors.newSingleThreadExecutor()
+    /** Microphone capture runs alone so a release is never queued behind other work. */
+    private val captureWorker = Executors.newSingleThreadExecutor()
+    /** Recognition runs here so a recording is transcribed as soon as it ends. */
+    private val sttWorker = Executors.newSingleThreadExecutor()
     private val modelDir get() = File(filesDir, "models/uzbek-stt")
     private var recorder: OfflinePcmRecorder? = null
     private var busy = false
 
+    /** Reused across recordings: rebuilding the NeMo recognizer costs seconds per press. */
+    private var uzEngine: OfflineSpeechEngine? = null
+
     @Volatile private var state = OfflineModuleState.NOT_INSTALLED
     @Volatile private var percent = 0
     @Volatile private var recording = false
+
+    /**
+     * Bumped on every press. A capture and its inference carry the value they started with, so a
+     * late result from an earlier press can never be inserted into a later one.
+     */
+    @Volatile private var sttSession = 0
+
+    /** The session whose capture is currently open, or 0 when nothing is being recorded. */
+    @Volatile private var openCaptureSession = 0
 
     /** The WebView capture request waiting on the Android permission dialog, if any. */
     private var pendingWebAudioRequest: PermissionRequest? = null
@@ -151,9 +168,15 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun notifyJs(function: String, value: String) {
+    /**
+     * Calls a page bridge function. When [session] is non-zero the page receives it as a second
+     * argument, so a result from an earlier press can be rejected instead of landing in a later one.
+     */
+    private fun notifyJs(function: String, value: String, session: Int = 0) {
         val escaped = org.json.JSONObject.quote(value)
-        runOnUiThread { web.evaluateJavascript("window.$function && window.$function($escaped)", null) }
+        val call = if (session > 0) "window.$function && window.$function($escaped,$session)"
+                   else "window.$function && window.$function($escaped)"
+        runOnUiThread { web.evaluateJavascript(call, null) }
     }
 
     /**
@@ -221,13 +244,15 @@ class MainActivity : Activity() {
         transition(OfflineModuleState.INITIALIZING)
         notifyJs("AvnivoOfflineStatus", "Dvigatel ishga tushirilmoqda…")
         try {
-            OfflineSpeechEngine(modelDir).use { engine ->
-                engine.prepare()
-                engine.smokeTest()
-            }
+            // The engine that passes the smoke test is kept: rebuilding a NeMo recognizer costs
+            // seconds, and paying that on every press is what made the first result feel lost.
+            val engine = uzEngine ?: OfflineSpeechEngine(modelDir).also { uzEngine = it }
+            engine.prepare()
+            engine.smokeTest()
             transition(OfflineModuleState.READY)
             notifyJs("AvnivoOfflineEngineReady", "O‘zbekcha ovoz tanish dvigateli tayyor")
         } catch (e: Exception) {
+            uzEngine?.close(); uzEngine = null
             transition(OfflineModuleState.INSTALLED)
             notifyJs("AvnivoOfflineError", "Dvigatelni ishga tushirish xatosi: ${e.message}")
         } catch (e: UnsatisfiedLinkError) {
@@ -260,10 +285,19 @@ class MainActivity : Activity() {
                 }
             }
         }
-        /** Begins a gesture-controlled recording session. Ignored if one is already running. */
-        @JavascriptInterface fun start() {
+        /**
+         * Opens a new capture session. A press is only refused while another capture is still
+         * open: a previous recording that is still being transcribed must not block the next one,
+         * because that is exactly what made the first result appear only on the second attempt.
+         */
+        @JavascriptInterface fun start(session: Int = 0) {
             runOnUiThread {
-                if (recording || busy) return@runOnUiThread
+                val open = openCaptureSession
+                if (open != 0) {
+                    // Report which session owns the microphone instead of silently ignoring the press.
+                    notifyJs("AvnivoOfflineStatus", "Yozib olish allaqachon davom etmoqda.", open)
+                    return@runOnUiThread
+                }
                 if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
                     return@runOnUiThread
@@ -271,18 +305,27 @@ class MainActivity : Activity() {
                 if (!state.isOperational && readyWhisper() == null) {
                     notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli hali tayyor emas. Model yuklanishi kerak.")
                     AlertDialog.Builder(this@MainActivity)
-                        .setTitle("Offline o‘zbekcha ovoz tanish")
-                        .setMessage("Ovoz tanish uchun 592 MB model yuklanishi va dvigatel tayyor bo‘lishi kerak. Wi-Fi tavsiya etiladi. Yuklaysizmi?")
+                        .setTitle("Offline o\u2018zbekcha ovoz tanish")
+                        .setMessage("Ovoz tanish uchun 592 MB model yuklanishi va dvigatel tayyor bo\u2018lishi kerak. Wi-Fi tavsiya etiladi. Yuklaysizmi?")
                         .setNegativeButton("Bekor qilish", null)
                         .setPositiveButton("Yuklash") { _, _ -> downloadModel() }
                         .show()
                     return@runOnUiThread
                 }
-                beginRecording()
+                // The page owns the session number so both sides always agree; a bridge call
+                // without one still gets a valid id.
+                val current = if (session > 0) session else ++sttSession
+                sttSession = maxOf(sttSession, current)
+                openCaptureSession = current
+                recording = true
+                beginRecording(current)
             }
         }
-        /** Ends the active recording at the next buffer boundary (finger released). */
-        @JavascriptInterface fun stop() {
+
+        /** Ends the open capture at the next buffer boundary (finger released). */
+        @JavascriptInterface fun stop(session: Int = 0) {
+            // A release that belongs to an earlier press must not cut the current one short.
+            if (session > 0 && openCaptureSession != 0 && session != openCaptureSession) return
             recorder?.stop()
         }
     }
@@ -312,50 +355,84 @@ class MainActivity : Activity() {
 
     /**
      * Records until [Bridge.stop] is called (finger released), streaming the live amplitude to the
-     * existing waveform, then transcribes and returns the recognized text to the interface.
+     * existing waveform, then transcribes that exact audio and returns the text to the interface.
+     *
+     * Capture runs on its own thread and starts immediately. Inference runs on a second thread
+     * afterwards, so a press never waits behind model loading or another recognition, and the
+     * release of one recording is all that is ever needed to transcribe it.
      */
-    private fun beginRecording() {
-        if (busy || recording) return
-        busy = true
-        recording = true
+    private fun beginRecording(session: Int) {
         val capture = OfflinePcmRecorder(this)
         recorder = capture
-        worker.execute {
-            var engine: OfflineSpeechEngine? = null
+        captureWorker.execute {
             try {
-                val whisperId = readyWhisper()
-                if (whisperId != null) {
-                    // Prefer a ready multilingual Whisper engine (auto language detection).
-                    val samples = capture.capture(30) { level -> notifyJs("AvnivoOfflineLevel", level.toString()) }
-                    if (samples.size < MIN_SAMPLES) {
-                        notifyJs("AvnivoOfflineResult", "")
-                    } else {
-                        notifyJs("AvnivoOfflineResult", moduleManager.transcribe(whisperId, samples))
-                    }
-                } else {
-                    engine = OfflineSpeechEngine(modelDir)
-                    engine.prepare()
-                    val samples = capture.capture(30) { level -> notifyJs("AvnivoOfflineLevel", level.toString()) }
-                    if (samples.size < MIN_SAMPLES) {
-                        // Too short to contain speech: report no recognition rather than an error.
-                        notifyJs("AvnivoOfflineResult", "")
-                    } else {
-                        notifyJs("AvnivoOfflineResult", engine.transcribe(samples))
-                    }
+                val samples = capture.capture(30) { level ->
+                    notifyJs("AvnivoOfflineLevel", level.toString(), session)
                 }
+                // The finger is up: tell the page to show processing before any decoding starts.
+                notifyJs("AvnivoOfflineProcessing", "Matnga aylantirilmoqda…", session)
+                logStt(session, "captured", "samples=${samples.size} seconds=${"%.3f".format(samples.size / 16_000.0)}")
+                transcribeCaptured(session, samples)
             } catch (e: Exception) {
-                notifyJs("AvnivoOfflineError", e.message ?: "Offline STT xatosi")
-            } catch (e: UnsatisfiedLinkError) {
-                notifyJs("AvnivoOfflineError", "Sherpa native kutubxonasi yuklanmadi")
+                logStt(session, "capture-failed", e.message ?: e::class.java.simpleName)
+                notifyJs("AvnivoOfflineError", "Yozib olish xatosi: ${e.message}", session)
             } finally {
                 capture.close()
-                engine?.close()
-                recorder = null
-                recording = false
-                busy = false
-                notifyJs("AvnivoOfflineLevel", "0")
+                // Only tear down state this session still owns: a newer press may already have
+                // opened its own capture, and clearing it here would deafen that press.
+                if (recorder === capture) recorder = null
+                if (openCaptureSession == session) {
+                    openCaptureSession = 0
+                    recording = false
+                }
+                notifyJs("AvnivoOfflineLevel", "0", session)
             }
         }
+    }
+
+    /** Runs the recognizer for one finished capture and reports the result for that session only. */
+    private fun transcribeCaptured(session: Int, samples: FloatArray) {
+        if (samples.size < MIN_SAMPLES) {
+            // Too short to contain speech. Say so, with the measured length, instead of returning a
+            // blank result that looks like a failed transcription.
+            logStt(session, "too-short", "samples=${samples.size} min=$MIN_SAMPLES")
+            notifyJs("AvnivoOfflineStatus", "Ovoz juda qisqa (${samples.size / 16} ms). Mikrofonni bosib, gapiring.", session)
+            notifyJs("AvnivoOfflineResult", "", session)
+            return
+        }
+        sttWorker.execute {
+            val whisperId = readyWhisper()
+            try {
+                val text = if (whisperId != null) {
+                    moduleManager.transcribe(whisperId, samples)
+                } else {
+                    val engine = uzEngine ?: OfflineSpeechEngine(modelDir).also {
+                        it.prepare()
+                        uzEngine = it
+                    }
+                    engine.transcribe(samples)
+                }
+                logStt(session, "transcribed", "engine=${whisperId ?: "uzbek-stt"} chars=${text.length} text=${text.take(80)}")
+                if (text.isBlank()) {
+                    notifyJs("AvnivoOfflineStatus", "Nutq aniqlanmadi. Qaytadan urinib ko‘ring.", session)
+                }
+                notifyJs("AvnivoOfflineResult", text, session)
+            } catch (e: UnsatisfiedLinkError) {
+                logStt(session, "native-failed", "UnsatisfiedLinkError")
+                uzEngine = null
+                notifyJs("AvnivoOfflineError", "Sherpa native kutubxonasi yuklanmadi", session)
+            } catch (e: Exception) {
+                logStt(session, "inference-failed", e.message ?: e::class.java.simpleName)
+                // A recognizer that threw may be in an unknown state; rebuild it next time.
+                uzEngine?.close(); uzEngine = null
+                notifyJs("AvnivoOfflineError", e.message ?: "Offline STT xatosi", session)
+            }
+        }
+    }
+
+    /** Session-tagged diagnostic line, so a stale or dropped segment can be traced in logcat. */
+    private fun logStt(session: Int, stage: String, detail: String) {
+        android.util.Log.i("AvnivoOfflineStt", "session=$session stage=$stage $detail")
     }
 
     override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, results: IntArray) {
@@ -384,6 +461,10 @@ class MainActivity : Activity() {
         ttsPlayer.close()
         ttsWorker.shutdown()
         moduleManager.close()
+        uzEngine?.close()
+        uzEngine = null
+        captureWorker.shutdown()
+        sttWorker.shutdown()
         worker.shutdown()
         web.destroy()
         super.onDestroy()

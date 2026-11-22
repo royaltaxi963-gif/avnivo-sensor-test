@@ -59,6 +59,10 @@ html[data-avnivo-mode=offline] .voice-trace{left:40px;right:55px}
 html[data-avnivo-mode=offline] .online-stt-status{color:#7cd5ff}
 html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,
 html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{display:flex;opacity:1;transform:translateY(-50%) scale(1);animation:avnivo-offline-record-pulse 1.15s ease-in-out infinite}
+/* The offline press continues past the finger release: decoding is a visible stage, not a gap. */
+html[data-avnivo-mode=offline] .online-stt-status[data-state=loading]{display:flex;opacity:1;transform:translateY(-50%) scale(1);animation:avnivo-record-blink .7s ease-in-out infinite}
+html[data-avnivo-mode=offline] .online-stt-status[data-state=error]{display:flex;opacity:1;transform:translateY(-50%) scale(1);color:#ff515c;animation:none}
+@media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .online-stt-status[data-state=loading]{animation:none}}
 @keyframes avnivo-offline-record-pulse{0%,100%{opacity:.58;filter:drop-shadow(0 0 1px #4ab9f4)}50%{opacity:1;filter:drop-shadow(0 0 8px #75d9ff)}}
 @media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{animation:none}}
 
@@ -888,15 +892,19 @@ function syncLanguageChips(){
    button.removeAttribute('data-unsupported');
    continue;
   }
+  /* The stored pair is always shown, even before the NLLB model is installed. Hiding it made the
+     chips look empty on every restart, which read as if the choice had been lost. The chip is only
+     marked unsupported when a loaded tokenizer proves it cannot be encoded; translation refuses
+     with a reason in that case, so the label never over-promises. */
   const supported=offlineLanguagesReady();
-  const code=supportedOfflineCode(offlineChoice[side],supported);
+  const stored=offlineChoice[side];
+  const code=supported?supportedOfflineCode(stored,supported):stored;
   const name=offlineDisplayName(code);
   button.querySelector('.language-name').textContent=name;
   button.querySelector('.language-code').textContent=code?code.split('_')[0].toUpperCase():'';
   button.setAttribute('aria-label',name||avnivoUiText('offline.language.empty','Til tanlanmagan'));
-  /* The chip is visibly blank when nothing usable is selected, so the user cannot read an
-     unsupported language as an active choice. */
-  if(code)button.removeAttribute('data-unsupported');else button.setAttribute('data-unsupported','true');
+  const unusable=Boolean(stored)&&supported!==null&&!code;
+  if(unusable)button.setAttribute('data-unsupported','true');else button.removeAttribute('data-unsupported');
  }
 }
 /* Carries a selection across a mode change when the other mode can honour it, and leaves the
@@ -1263,9 +1271,11 @@ window.AvnivoOfflineSpeech=function(raw){
  if(!info||info.requestId!==String(ttsGeneration))return;
  stopSpeaking();
 };
-window.AvnivoOfflineLevel=function(value){
+window.AvnivoOfflineLevel=function(value,session){
  // Real microphone amplitude from the native recorder drives the existing waveform.
  if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ // A late level from a previous press must not move the current waveform.
+ if(session!==undefined&&Number(session)!==offlineSession)return;
  const parsed=Number(value);
  offlineLevel=Number.isFinite(parsed)?Math.max(0,Math.min(1,parsed)):0;
 };
@@ -1282,7 +1292,19 @@ window.AvnivoOnlineMicGranted=function(){
  // The grant only unblocks getUserMedia; the page re-runs capture on the next press.
  hint('');
 };
-window.AvnivoOfflineStatus=function(message){
+/* The finger is up and the native recorder has the audio. Show processing immediately, before any
+   decoding happens, so the indicator reflects the real stage instead of waiting for the text. */
+window.AvnivoOfflineProcessing=function(message,session){
+ if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ if(session!==undefined&&Number(session)!==offlineSession)return;
+ offlineProcessingSession=offlineSession;
+ stopOfflineWave();
+ shell.classList.remove('hold-voice');
+ offlineStateName('loading');
+ offlineNotice.textContent=String(message||'Matnga aylantirilmoqda…');
+};
+window.AvnivoOfflineStatus=function(message,session){
+ if(session!==undefined&&Number(session)!==offlineSession)return;
  offlineNotice.textContent=String(message||'');
  // Never promote to ready from a status string: only a verified engine may activate the module.
  // A native status that is not a recording start ends the gesture: restore the composer state.
@@ -1294,27 +1316,35 @@ window.AvnivoOfflineEngineReady=function(message){
  finishOfflineHold();
  updateOfflineModule('uz-stt','ready');
 };
-window.AvnivoOfflineError=function(message){
+window.AvnivoOfflineError=function(message,session){
+ if(session!==undefined&&Number(session)!==offlineSession)return;
  const error=String(message||'Noma’lum xatolik');
  offlineNotice.textContent='Offline STT: '+error;
  // Native session ended (or failed): restore the composer visual state and report via diagnostics.
  finishOfflineHold();
+ offlineProcessingSession=0;
+ offlineStateName('error');
  hint('Offline STT: '+error);
  updateOfflineModule('uz-stt','error');
  const row=offlineList.querySelector('[data-module-id="uz-stt"]');
  if(row){
-  const status=row.querySelector('.offline-module-state');
+  const status=row.querySelector('.online-stt-status, .offline-module-state');
   if(status){status.textContent='Yuklash xatosi: '+error;status.title=error}
  }
 };
-window.AvnivoOfflineResult=function(text){
+window.AvnivoOfflineResult=function(text,session){
  if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ // The guard that makes the first recording win: a result is only accepted for the press that is
+ // still current, so an earlier recording can never overwrite a newer one.
+ if(session!==undefined&&Number(session)!==offlineSession)return;
  finishOfflineHold();
+ offlineProcessingSession=0;
  const spoken=String(text||'').trim();
- if(!spoken){hint('Nutq aniqlanmadi');return}
+ if(!spoken){offlineStateName('error');hint('Nutq aniqlanmadi');return}
  // Only real recognized speech is inserted into the composer; no lifecycle text is added.
  input.value=appendTranscript(input.value,spoken);
  persistDraft();resize();syncComposerMode();
+ offlineStateName('done');
 };
 if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.moduleStatus){
  try{
@@ -1823,7 +1853,10 @@ function syncComposerMode(){
  mic.setAttribute('aria-pressed',String(active));
  mic.disabled=typing&&!active&&!input.value.trim();
  updateBrandVisibility();
- label.hidden=typing||messages.children.length>0||active||shell.classList.contains('hold-voice');
+ // A press that is still being decoded is an active press: the greeting must not come back
+ // mid-transcription, which is what made the interface look idle while the engine was working.
+ const busyVoice=active||shell.classList.contains('hold-voice')||offlineProcessingSession===offlineSession&&offlineProcessingSession!==0;
+ label.hidden=typing||messages.children.length>0||busyVoice;
 }
 const ONLINE_TRANSLATION_ENDPOINT='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate';
 async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,historyId){
@@ -1933,18 +1966,37 @@ async function stopVoice(){
  analyser=null;samples=null;level=0;idleWave();
  if(!input.value){clearTimeout(timeout);timeout=0;delay(300)}
 }
+/**
+ * Releases the microphone and audio graph of a previous press. Called before opening a new stream
+ * so two capture sessions can never overlap; idempotent, so the error paths can call it too.
+ */
+async function releaseOnlineCapture(){
+ requestToken++;
+ if(onlineRecorder&&onlineRecorder.state!=='inactive'){try{onlineRecorder.stop()}catch(e){}}
+ onlineRecorder=null;
+ if(mediaStream){mediaStream.getTracks().forEach(track=>{try{track.stop()}catch(e){}});mediaStream=null}
+ if(audioContext){const context=audioContext;audioContext=null;try{await context.close()}catch(e){}}
+ analyser=null;samples=null;level=0;
+}
 async function startVoice(){
  if(document.documentElement.dataset.avnivoMode==='offline'){
   if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
   // Native bridge reports real state (permission, model readiness, runtime errors) via AvnivoOffline*.
-  try{window.AvnivoOfflineSTT.start()}
+  try{window.AvnivoOfflineSTT.start(offlineSession)}
   catch(e){hint('Offline STT xatosi: '+(e&&e.message||e))}
   return;
  }
  if(!navigator.mediaDevices?.getUserMedia){hint('Bu qurilmada mikrofon API mavjud emas');return}
+ // A second capture while the first stream is still open is the main cause of NotReadableError on
+ // Samsung: the platform hands the microphone to one session only. Release everything first, then
+ // take the token, so this press is not invalidated by its own teardown.
+ await releaseOnlineCapture();
  const token=++requestToken;
  try{
-  const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  // Default processing is requested on purpose. Forcing echoCancellation/noiseSuppression/
+  // autoGainControl to false asks for a raw stream, which many devices cannot provide alongside
+  // another audio client and which then fails as NotReadableError before capture even starts.
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true});
   if(token!==requestToken){stream.getTracks().forEach(track=>track.stop());return}
   const Context=window.AudioContext||window.webkitAudioContext;
   if(!Context){stream.getTracks().forEach(track=>track.stop());hint('AudioContext mavjud emas: waveform ishlamaydi');return}
@@ -1975,6 +2027,9 @@ async function startVoice(){
   shell.classList.remove('hold-voice');
   onlineState('error');
   hint(message);
+  // A failed capture can still hold the device; release it so the next press is not blocked by
+  // this attempt, which is what produced a permanent NotReadableError after one bad start.
+  await releaseOnlineCapture();
   console.warn('Microphone unavailable',name||error);
  }
 }
@@ -2066,6 +2121,13 @@ let holdTimer=0,holdStarted=false,holdPointer=null,holdSuppressClick=false,holdR
 let avnivoPressStartedAt=0,avnivoRecordingAt=0,avnivoCancelHold=false,avnivoHoldFinalizing=false;
 // Offline gesture state: the native recorder owns capture; JS only reflects its live amplitude.
 let offlineWaveFrame=0,offlineWaveActive=false,offlineLevel=0,avnivoOfflineCancel=false;
+/* Offline session tracking. The native bridge stamps every callback with the press it belongs to,
+   so a late result from an earlier recording can never be inserted into a later one. */
+let offlineSession=0,offlineProcessingSession=0;
+function offlineStateName(state){
+ // Drives the same left-hand indicator the online path uses: recording, processing, done, error.
+ onlineStatus.dataset.state=state;
+}
 let avnivoHintTimeout=0;
 function hint(message){
  clearTimeout(avnivoHintTimeout);avnivoHintTimeout=0;
@@ -2152,15 +2214,23 @@ function finishHold(cancel=false){
 function beginHold(){
  if(document.documentElement.dataset.avnivoMode==='offline'){
   if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
+  // Every press is a new session. Native callbacks carry this number back, so this recording's
+  // result is accepted and any earlier one that is still in flight is discarded.
+  const session=++offlineSession;
+  offlineProcessingSession=0;
   // The native bridge owns capture start/stop, permission prompts and error reporting. Reuse the
   // existing recording appearance/animation; the waveform follows the native amplitude callback.
   shell.classList.add('hold-voice');shell.classList.remove('text-mode');
   mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label','Yozishni tugatish uchun bosing');
   avnivoOfflineCancel=false;
   clearTimeout(timeout);timeout=0;label.hidden=true;
+  offlineStateName('recording');
   offlineLevel=0;offlineWaveActive=true;cancelAnimationFrame(offlineWaveFrame);offlineWaveFrame=requestAnimationFrame(offlineWaveFrameStep);
-  try{window.AvnivoOfflineSTT.start()}
-  catch(e){stopOfflineWave();shell.classList.remove('hold-voice');mic.setAttribute('aria-pressed','false');hint('Offline STT xatosi: '+(e&&e.message||e))}
+  try{window.AvnivoOfflineSTT.start(session)}
+  catch(e){
+   stopOfflineWave();shell.classList.remove('hold-voice');mic.setAttribute('aria-pressed','false');
+   offlineStateName('error');hint('Offline STT xatosi: '+(e&&e.message||e));
+  }
   return;
  }
  if(active||holdStarted)return;
@@ -2259,10 +2329,19 @@ function releaseHold(event){
   // Stop the native recording immediately when the finger is released; keep tap-to-send.
   holdSuppressClick=true;
   if(wasHold){
-   try{window.AvnivoOfflineSTT.stop()}catch(e){}
-   // Clear the recording visual here as well: the pointercancel path already did, and relying on
-   // the native result callback alone left the mic stuck in hold-voice when no speech was decoded.
-   finishOfflineHold();
+   try{window.AvnivoOfflineSTT.stop(offlineSession)}catch(e){}
+   // The recording is over, so its waveform stops now, but the press is not finished: decoding is
+   // about to start. Showing the processing indicator here is what makes one press enough — the
+   // earlier code cleared every trace of the press and looked like nothing had happened.
+   stopOfflineWave();
+   shell.classList.remove('hold-voice');
+   mic.setAttribute('aria-pressed','false');
+   if(offlineProcessingSession!==offlineSession){
+    offlineProcessingSession=offlineSession;
+    offlineStateName('loading');
+    offlineNotice.textContent='Matnga aylantirilmoqda…';
+   }
+   syncComposerMode();
   }
   else if(held<1100&&input.value.trim())sendMessage();
   return;
@@ -2286,7 +2365,7 @@ mic.addEventListener('pointerup',releaseHold);
 document.addEventListener('pointerup',releaseHold,true);
 window.addEventListener('blur',()=>{if(holdPointer!==null)cancelHeldPointer()});
 mic.addEventListener('mousedown',preserveKeyboardOnMicPress);
-function cancelHeldPointer(){if(holdPointer===null)return;clearHoldTimer();holdPointer=null;holdSuppressClick=true;if(document.documentElement.dataset.avnivoMode==='offline'){try{window.AvnivoOfflineSTT.stop()}catch(e){}finishOfflineHold()}else if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();stopVoice();shell.classList.remove('hold-voice')}else finishHold(true)}
+function cancelHeldPointer(){if(holdPointer===null)return;clearHoldTimer();holdPointer=null;holdSuppressClick=true;if(document.documentElement.dataset.avnivoMode==='offline'){try{window.AvnivoOfflineSTT.stop(offlineSession)}catch(e){}finishOfflineHold();offlineProcessingSession=0;offlineStateName('idle')}else if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();stopVoice();shell.classList.remove('hold-voice')}else finishHold(true)}
 mic.addEventListener('pointercancel',event=>{if(holdPointer===event.pointerId)cancelHeldPointer()});
 mic.addEventListener('lostpointercapture',event=>{if(holdPointer===event.pointerId)releaseHold(event)});
 mic.addEventListener('contextmenu',event=>{if(holdTimer||holdStarted||active)event.preventDefault()});

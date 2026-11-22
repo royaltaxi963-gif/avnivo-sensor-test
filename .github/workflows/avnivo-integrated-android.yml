@@ -100,6 +100,15 @@ jobs:
       - name: Assert the online microphone asks for permission and never fails silently
         working-directory: .
         run: node --test tests/online-mic-permission.test.cjs
+      - name: Assert one press produces one transcript
+        working-directory: .
+        run: node --test tests/offline-stt-session.test.cjs
+      - name: Assert the online capture lifecycle releases the microphone
+        working-directory: .
+        run: node --test tests/online-capture-lifecycle.test.cjs
+      - name: Assert offline interface state is visible and persisted
+        working-directory: .
+        run: node --test tests/offline-ui-state.test.cjs
       - name: Upload unit test reports
         if: always()
         uses: actions/upload-artifact@v4
