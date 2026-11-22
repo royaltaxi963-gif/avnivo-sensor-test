@@ -1473,3 +1473,55 @@ while keeping the "no production release without approval" rule intact.
 
 Install `update-v101.apk` on the S23 Ultra, make one short Uzbek recording, and confirm the text
 appears without a second press.
+
+---
+
+## Stage: three reported S23 Ultra failures fixed
+
+Three symptoms were reported from the physical device. Each turned out to be a contract bug
+between two components that were each individually correct.
+
+| Symptom | Root cause | Fix |
+| --- | --- | --- |
+| Uzbek STT: `Recognizer already initialized` | `verifyEngine()` re-called `prepare()` on the cached engine, and `prepare()` guarded itself with `check()`. | `prepare()` idempotent + `@Synchronized`; one shared `readyUzbekEngine()` accessor. |
+| NLLB download frozen at 0% | Manager emitted on `AvnivoOfflineProgress`; the cards listen on `AvnivoOfflineModuleProgress`. Payload dropped. | Correct channel, plus byte progress inside `statusJson` so a restart restores the bar. |
+| NLLB bar restarted at 0% | Progress was per file; NLLB has 8 files. | Aggregated across the whole model; verified files reused; verified `.download` temporaries promoted. |
+| Whisper Large: "Tekshirilmoqda…" forever | `initialize()` caught `Exception`/`UnsatisfiedLinkError` only, so an `OutOfMemoryError` escaped and left `INITIALIZING` with no exit. | Catch `Throwable`, settle into `ERROR` with an actionable reason, release the leaked native handle, and refuse to load an unaffordable model at page load. |
+
+Also made `NllbEngine.prepare()` and `SileroTtsEngine.prepare()` idempotent and synchronized, for
+the same reason: a repeated call used to open a second ONNX session / LiteRT module and leak it.
+
+### Verified results for this stage
+
+| Check | Result |
+| --- | --- |
+| Node suites (8) | 69 pass / 0 fail |
+| New `offline-module-progress.test.cjs` | 11 pass / 0 fail, wired into CI |
+| JVM unit tests (CI, run `45054670635`) | 91 tests, green after 2 test-expectation fixes |
+| NLLB real inference (run `45055769600`, job `nllb-smoke`) | `OK (6 tests)` online and `OK (6 tests)` with wifi + data disabled |
+| NLLB translation output | `Salom=1429ms … results: rus_Cyrl Привет, как вы? / eng_Latn It's very hot today. / rus_Cyrl Спасибо` |
+| Whisper Large V3 Turbo (job `large-model-smoke`) | `OK (5 tests)` online and `OK (5 tests)` offline; `native_alloc_mb=1246`, `recall=7/7` |
+| Uzbek STT on emulator | `UZBEK_STT_RESULT text=navoiy tts o'zbekcha matnni tabiiy va ravon ovozga aylantiradi.` |
+| Whisper Small perf | `audio=11.00s first=52.6s repeat=52.5s first_rt=4.78x` |
+| Silero TTS | `samples=102000 seconds=2.125 peak=0.7822921`; offline reuse `samples=140400` |
+| Interface preservation | `offline-ui-preservation` 5/5; index.html diff is additive only (1 CSS rule, 1 element, 1 handler guard) |
+
+`recall=7/7` and `native_alloc_mb=1246` are the evidence that Whisper Large really ran: the model
+was resident in native memory and reproduced all seven reference phrases, both with and without a
+network. A skipped test reports `OK` too, so the workflow greps the measurement line itself.
+
+### Final state of this stage
+
+| Item | Value |
+| --- | --- |
+| Branch | `integrate/offline-engines-20261118` |
+| Commit | `c60da37` |
+| Workflow run (standard) | `45054670635` — `apk`, `update-install`, `emulator-smoke` success |
+| Workflow run (opt-in heavy) | `45055769600` — `nllb-smoke` and `large-model-smoke` success |
+| Classification | Uzbek STT, Whisper Small, Whisper Large, NLLB-200, Silero TTS: **VERIFIED WORKING** on emulator. Physical S23 Ultra: **IMPLEMENTED — DEVICE TEST PENDING**. |
+
+### Next exact action
+
+Install the current build on the S23 Ultra and repeat the three reported flows: press the mic once
+for Uzbek STT, start the NLLB download and watch the bar move past 0%, and activate Whisper Large
+to confirm it settles instead of spinning.
