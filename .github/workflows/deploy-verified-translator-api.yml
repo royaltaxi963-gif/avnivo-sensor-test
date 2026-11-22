@@ -1,11 +1,96 @@
 name: Deploy verified Translator API to Cloud Run
 on:
   workflow_dispatch:
+    inputs:
+      publish_silero_model:
+        description: 'Export the MIT Silero Uzbek graph and upload it to the private bucket before deploying'
+        type: boolean
+        default: false
 permissions:
   contents: read
   id-token: write
 jobs:
+  # The API only advertises a model whose manifest is present, so the object it points at has to
+  # exist first. Exporting from the pinned upstream package and re-checking the pinned digest keeps
+  # this from publishing anything other than the artifact the app already expects.
+  publish-silero-model:
+    if: ${{ inputs.publish_silero_model }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      UPSTREAM_URL: https://models.silero.ai/models/tts/ru/v5_cis_base.pt
+      UPSTREAM_SHA256: ba41b18f6a707ad93605a162998865e7c087153d2e010a26dd02229dab0e672a
+      UPSTREAM_BYTES: '91680514'
+      ARTIFACT_SHA256: 333128fb6c7476e7fceec562f3f54980cbb6a88bbe59ff4a8e67e6cddad7a861
+      ARTIFACT_BYTES: '91988758'
+      ARTIFACT_NAME: silero_v21.ptl
+      BUCKET: avnivo-offline-models-792624108019
+      OBJECT: tts/uzbek/silero/silero_v21.ptl
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      # torch 2.1.0 emits the bytecode v8 that org.pytorch:pytorch_android_lite:2.1.0 can read.
+      - name: Install the pinned export toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy<2" torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
+      - name: Download and check the authoritative upstream package
+        run: |
+          set -euo pipefail
+          curl -sSL --retry 3 --max-time 900 -o v5_cis_base.pt "$UPSTREAM_URL"
+          test "$(stat -c %s v5_cis_base.pt)" = "$UPSTREAM_BYTES" || { echo "::error::upstream size changed"; exit 1; }
+          test "$(sha256sum v5_cis_base.pt | cut -d' ' -f1)" = "$UPSTREAM_SHA256" || { echo "::error::upstream digest changed"; exit 1; }
+      - name: Export the TorchScript Lite graph
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import torch, warnings
+          warnings.filterwarnings("ignore")
+          imp = torch.package.PackageImporter("v5_cis_base.pt")
+          package = imp.load_pickle("tts_models", "model")
+          model = package.packages[0].models[0].eval()
+          ids = torch.tensor([[2, 30, 13, 24, 27, 25, 1]], dtype=torch.long)
+          speaker = torch.tensor([46], dtype=torch.long)
+          traced = torch.jit.trace(model, (ids, speaker), strict=False)
+          traced._save_for_lite_interpreter("silero_v21.ptl")
+          PY
+      - name: Prove the export reproduces the pinned artifact
+        run: |
+          set -euo pipefail
+          test "$(stat -c %s "$ARTIFACT_NAME")" = "$ARTIFACT_BYTES" || { echo "::error::export is not byte-identical (size)"; exit 1; }
+          test "$(sha256sum "$ARTIFACT_NAME" | cut -d' ' -f1)" = "$ARTIFACT_SHA256" || { echo "::error::export is not byte-identical (digest)"; exit 1; }
+      - name: Confirm the graph really synthesizes Uzbek
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import torch, warnings
+          warnings.filterwarnings("ignore")
+          m = torch.jit.load("silero_v21.ptl")
+          ids = torch.tensor([[2, 30, 13, 24, 27, 25, 1]], dtype=torch.long)
+          with torch.no_grad():
+              audio = m(ids, torch.tensor([46], dtype=torch.long))[0]
+          samples = audio.shape[-1]
+          print(f"samples={samples} seconds={samples / 48000:.3f} peak={float(audio.abs().max()):.3f}")
+          assert samples > 4800 and float(audio.abs().max()) > 0.01, "model returned no usable audio"
+          PY
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Upload the verified artifact and prove the object is servable
+        run: |
+          set -euo pipefail
+          gcloud storage cp "$ARTIFACT_NAME" "gs://${BUCKET}/${OBJECT}" --content-type=application/octet-stream
+          gcloud storage objects describe "gs://${BUCKET}/${OBJECT}" --format="value(name,size,md5_hash)"
+          test "$(gcloud storage objects describe "gs://${BUCKET}/${OBJECT}" --format='value(size)')" = "$ARTIFACT_BYTES" || {
+            echo "::error::uploaded object size does not match the pinned artifact"; exit 1; }
   deploy:
+    needs: publish-silero-model
+    # A skipped publisher must not stop a plain API deploy, but a failed one must.
+    if: ${{ always() && !cancelled() && (needs.publish-silero-model.result == 'success' || needs.publish-silero-model.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -22,7 +107,8 @@ jobs:
           expected={'navoiy-tts':('tts/uzbek/navoiy/',22),'mms-tts':('tts/mms/rus/',6),
                     'whisper-small-q8':('multilingual-stt/whisper-small-q8_0/',1),
                     'whisper-large-v3-turbo':('multilingual-stt/whisper-large-v3-turbo-q5_0/',1),
-                    'nllb-200-600m-int8':('multilingual-translation/nllb-200-600m-int8/',8)}
+                    'nllb-200-600m-int8':('multilingual-translation/nllb-200-600m-int8/',8),
+                    'silero-tts':('tts/uzbek/silero/',1)}
           for model,(prefix,count) in expected.items():
               p=pathlib.Path('translator-api/verified_models')/(model+'.json')
               data=json.loads(p.read_text())
@@ -55,7 +141,7 @@ jobs:
               except Exception:
                   if attempt==7:raise
                   time.sleep(5)
-          for model in ('uzbek-stt','navoiy-tts','mms-tts','whisper-small-q8','whisper-large-v3-turbo','nllb-200-600m-int8'):
+          for model in ('uzbek-stt','navoiy-tts','mms-tts','whisper-small-q8','whisper-large-v3-turbo','nllb-200-600m-int8','silero-tts'):
               try:
                   with urllib.request.urlopen(base+'/api/offline-models/'+model+'/download-ticket',timeout=30) as r:
                       data=json.load(r)
