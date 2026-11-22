@@ -1332,3 +1332,40 @@ claim of completeness:
 - **The publish job lives in the deploy workflow, not a standalone one.** It is guarded by a pinned
   digest and an explicit input, so it cannot run by accident, but it does re-export the graph on
   every publish rather than reusing a cached artifact.
+
+---
+
+## Online microphone regression — root cause and fix
+
+Reported on the installed APK: pressing the microphone produced no permission dialog, no OS
+microphone indicator, no waveform, no processing animation, and no transcript.
+
+### One cause behind all five symptoms
+
+`onPermissionRequest` was added for the offline bridge and answered every WebView capture request
+with `request.deny()` whenever `RECORD_AUDIO` was not already granted. It never asked Android for
+the permission. The protected original had no `WebChromeClient` at all, so WebView had never been
+able to capture audio in this app. With no grant, `getUserMedia` rejected, so the stream never
+existed and the waveform, indicator and Chirp 2 request could not start.
+
+The failure was invisible for a second reason: `hint()` returned early in online mode, and
+`startVoice`'s catch block only wrote `console.warn`. Nothing reached the user.
+
+### Changed files
+
+| File | Change |
+| --- | --- |
+| `MicPermissionPolicy.kt` (new) | Pure-Kotlin decision: bundled origin only, audio resource only, never a widened grant. |
+| `MainActivity.kt` | `onPermissionRequest` delegates to the policy, requests the missing permission, keeps the pending request and answers it in `onRequestPermissionsResult`; reports a blocked permission with the settings path. |
+| `assets/index.html` | `hint()` no longer swallows online messages; `startVoice` names `NotAllowedError` / `NotFoundError` / `NotReadableError` and restores the gesture state; Chirp 2 failures are shown; `AvnivoOnlineMicError` / `AvnivoOnlineMicGranted` bridge callbacks added. |
+| `MicPermissionPolicyTest.kt` (new) | 8 JVM tests over the grant rules. |
+| `OnlineMicInstrumentedTest.kt` (new) | 9 emulator tests: manifest permission, four indicator states, visibility, denial reporting, hint visibility, waveform amplitude from real samples, composer insert without send, offline bridge intact, live capture. |
+| `tests/online-mic-permission.test.cjs` (new) | 14 assertions pinning the native gate and the JS error reporting. |
+| `avnivo-integrated-android.yml` | Runs the new JS suite, and on the emulator exercises grant, revoke and capture with a required `ONLINE_MIC_CAPTURE_OK` marker. |
+
+No colour, layout, control, icon or animation was changed. The waveform still reads
+`getByteTimeDomainData` RMS, and the four indicator states are unchanged.
+
+### Next exact action
+
+Confirm run `45013588162` is green, then record the measured evidence here.
