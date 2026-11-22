@@ -124,22 +124,30 @@ class MainActivity : Activity() {
             moduleManager.supportsTranslation(NLLB_MODULE, source, target)
 
         /**
-         * The offline picker's only source of truth. `ready` is false unless the module passed
-         * download, SHA-256 verification, native init and the smoke inference, and `languages` is
-         * read from that loaded tokenizer, so an uninstalled module can never offer a fake list.
+         * The offline picker's only source of truth.
+         *
+         * `ready` means the model is installed and verified — not that its 916 MB engine is
+         * currently resident. Loading is lazy, so an installed model that was released to make
+         * room for another module still answers with its real language list, and the engine loads
+         * on the first translation. `active` reports residency separately for diagnostics.
          */
         @JavascriptInterface fun offlineTranslationState(): String {
-            val ready = moduleManager.isOperational(NLLB_MODULE)
+            val installed = moduleManager.isInstalled(NLLB_MODULE)
+            val resident = moduleManager.isOperational(NLLB_MODULE)
             val status = moduleManager.status(NLLB_MODULE)
             return org.json.JSONObject()
-                .put("ready", ready)
+                .put("ready", installed)
+                .put("active", resident)
                 .put("languages", org.json.JSONArray(moduleManager.supportedLanguages(NLLB_MODULE)))
                 .put("status", status?.let { org.json.JSONObject(it) } ?: org.json.JSONObject())
                 .toString()
         }
 
-        /** True only when the Silero engine finished initializing and passed its smoke test. */
-        @JavascriptInterface fun isSpeechReady(): Boolean = moduleManager.isOperational(SILERO_MODULE)
+        /**
+         * True when the Silero model is installed, so the speak button works from the first press
+         * whether or not the engine is already resident.
+         */
+        @JavascriptInterface fun isSpeechReady(): Boolean = moduleManager.isInstalled(SILERO_MODULE)
 
         /**
          * Synthesizes and plays [text] for the existing manual playback action.

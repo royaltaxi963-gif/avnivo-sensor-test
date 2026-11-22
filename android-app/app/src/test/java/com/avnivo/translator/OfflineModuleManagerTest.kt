@@ -570,4 +570,46 @@ class OfflineModuleManagerTest {
         )
         manager.close()
     }
+
+    @Test fun aReleasedTranslatorStillReportsInstalledAndItsLanguages() {
+        // Lazy loading must not break the picker. After NLLB is released for another module it is
+        // still installed, so the language list must remain available without pulling 916 MB of
+        // ONNX sessions back into memory just to draw a list.
+        val nllb = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
+        placeInstalledModel(nllb)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+
+        manager.download(nllb.id)
+        manager.awaitIdle()
+        manager.unload(nllb.id)
+        manager.awaitIdle()
+
+        assertFalse("nothing is resident after an unload", manager.isOperational(nllb.id))
+        assertTrue("the model is still installed", manager.isInstalled(nllb.id))
+        manager.close()
+    }
+
+    @Test fun aCorruptModelIsNotReportedAsInstalled() {
+        // isInstalled gates the translation picker and the speak button, so a model that failed its
+        // digest must report false instead of offering an engine that cannot load.
+        val nllb = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
+        placeInstalledModel(nllb)
+        val manager = manager()
+        manager.integrityVerifier = { _, _ -> ModelIntegrity.Result(false, "SHA-256 mos kelmadi") }
+
+        manager.download(nllb.id)
+        manager.awaitIdle()
+
+        assertFalse("a corrupt model must not be offered", manager.isInstalled(nllb.id))
+        assertEquals("error", JSONObject(manager.status(nllb.id)).getString("state"))
+        manager.close()
+    }
+
+    @Test fun aMissingModuleIsNeverInstalled() {
+        val manager = manager()
+        assertFalse(manager.isInstalled("whisper-small-q8"))
+        assertFalse(manager.isInstalled("does-not-exist"))
+        manager.close()
+    }
 }

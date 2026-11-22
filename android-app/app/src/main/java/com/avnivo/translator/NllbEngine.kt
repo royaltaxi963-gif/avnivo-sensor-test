@@ -193,6 +193,12 @@ internal class NllbEngine(
     /** Language codes backed by this model's own tokenizer, not a hardcoded list. */
     fun supportedLanguages(): List<String> = tokenizer.languageCodes
 
+    /**
+     * The tokenizer this engine already holds, or null when its file is unreadable. Lets the caller
+     * answer language questions from the resident copy instead of parsing the file a second time.
+     */
+    fun tokenizerOrNull(): NllbTokenizer? = runCatching { tokenizer }.getOrNull()
+
     fun translate(text: String, source: String, target: String): String {
         require(text.isNotBlank()) { "Nothing to translate" }
         require(supportsLanguage(source)) { "Unsupported source language: $source" }

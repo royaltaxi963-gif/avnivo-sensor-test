@@ -127,20 +127,53 @@ internal class OfflineModuleManager(
     }
 
     /**
-     * Language codes the NLLB module can encode, or an empty list when its engine is not resident.
+     * Language codes the NLLB module can encode, read from the model's own tokenizer.
      *
-     * Deliberately does not load the model: this is called while rendering the settings card, and
-     * pulling a 916 MB translator into memory just to draw a list would defeat lazy loading.
+     * Deliberately does not load the 916 MB ONNX sessions: this is called while rendering the
+     * translation picker, and pulling the translator into memory just to list languages would
+     * defeat lazy loading. The tokenizer is a 17 MB JSON file, so reading it is cheap — and it
+     * keeps the picker working after the engine has been released for another module.
      */
-    fun supportedLanguages(id: String): List<String> {
-        val engine = modules[id]?.engine as? NllbEngine ?: return emptyList()
-        return synchronized(engine) { engine.supportedLanguages() }
+    fun supportedLanguages(id: String): List<String> = tokenizerFor(id)?.languageCodes.orEmpty()
+
+    /**
+     * True when the module can translate this language pair. Answered from the model's tokenizer,
+     * so it stays correct while the engine is released for another module.
+     */
+    fun supportsTranslation(id: String, source: String, target: String): Boolean {
+        val tokenizer = tokenizerFor(id) ?: return false
+        return tokenizer.supportsLanguage(source) && tokenizer.supportsLanguage(target)
     }
 
-    /** True when the loaded engine can translate this language pair. */
-    fun supportsTranslation(id: String, source: String, target: String): Boolean {
-        val engine = modules[id]?.engine as? NllbEngine ?: return false
-        return synchronized(engine) { engine.supportsLanguage(source) && engine.supportsLanguage(target) }
+    /**
+     * True when the model is on disk and has not been rejected, whether or not its engine is
+     * currently resident. A module whose files failed verification sits in ERROR and reports false,
+     * so a corrupt model is never offered as usable.
+     */
+    fun isInstalled(id: String): Boolean {
+        val module = modules[id] ?: return false
+        if (module.state == OfflineModuleState.ERROR) return false
+        return module.spec.runnable && module.spec.installed(module.spec.directory(filesDir))
+    }
+
+    /**
+     * The NLLB tokenizer, preferring the loaded engine's copy and otherwise parsing the file once.
+     * Cached because the picker asks for it on every render and parsing 17 MB of JSON repeatedly
+     * would make opening a language list noticeably slow.
+     */
+    @Volatile private var cachedTokenizer: NllbTokenizer? = null
+
+    private fun tokenizerFor(id: String): NllbTokenizer? {
+        val engine = modules[id]?.engine
+        if (engine is NllbEngine) return synchronized(engine) { engine.tokenizerOrNull() } ?: cachedTokenizer
+        cachedTokenizer?.let { return it }
+        val module = modules[id] ?: return null
+        if (!module.spec.installed(module.spec.directory(filesDir))) return null
+        val loaded = runCatching {
+            NllbTokenizer.load(File(module.spec.directory(filesDir), "tokenizer.json"))
+        }.getOrNull() ?: return null
+        cachedTokenizer = loaded
+        return loaded
     }
 
     /**
