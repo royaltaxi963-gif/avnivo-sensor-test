@@ -97,6 +97,9 @@ jobs:
       - name: Assert speech recognition never auto-sends
         working-directory: .
         run: node --test tests/manual-send.test.cjs
+      - name: Assert the online microphone asks for permission and never fails silently
+        working-directory: .
+        run: node --test tests/online-mic-permission.test.cjs
       - name: Upload unit test reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -290,6 +293,25 @@ jobs:
             grep -q "OK (" instrument.txt || { echo INSTRUMENTED_TESTS_FAILED; exit 1; }
             adb shell am instrument -w -e class com.avnivo.translator.OfflineMicGestureInstrumentedTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_mic.txt
             grep -q "OK (" instrument_mic.txt || { echo MIC_GESTURE_TESTS_FAILED; exit 1; }
+            # Online microphone: permission grant/deny/revoke, indicator states, waveform, transcript.
+            adb shell pm grant com.avnivo.translator android.permission.RECORD_AUDIO
+            adb shell am instrument -w -e class com.avnivo.translator.OnlineMicInstrumentedTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_online.txt
+            grep -q "OK (" instrument_online.txt || { echo ONLINE_MIC_TESTS_FAILED; exit 1; }
+            grep -q "failures=0" instrument_online.txt || { echo ONLINE_MIC_HAS_FAILURES; exit 1; }
+            echo ONLINE_MIC_GRANTED_OK
+            adb shell pm revoke com.avnivo.translator android.permission.RECORD_AUDIO
+            adb shell am instrument -w -e class com.avnivo.translator.OnlineMicInstrumentedTest#aDeniedPermissionIsReportedToTheUser com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_online_deny.txt
+            grep -q "OK (" instrument_online_deny.txt || { echo ONLINE_MIC_DENY_PATH_FAILED; exit 1; }
+            echo ONLINE_MIC_REVOKED_OK
+            # Prove the WebView actually reaches the capture API with the grant in place, and that
+            # the platform reports a live capture device. A denied permission would show
+            # NotAllowedError here, so this distinguishes "granted" from "grant recorded but unused".
+            adb shell pm grant com.avnivo.translator android.permission.RECORD_AUDIO
+            adb shell am instrument -w -e class com.avnivo.translator.OnlineMicInstrumentedTest#webViewReachesTheCaptureApiWithTheGrant com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_online_capture.txt
+            grep -q "OK (" instrument_online_capture.txt || { echo WEBVIEW_CAPTURE_FAILED; exit 1; }
+            adb logcat -d | grep -a "ONLINE_MIC_CAPTURE" | tail -1
+            adb logcat -d | grep -qa "ONLINE_MIC_CAPTURE_OK" || { echo WEBVIEW_CAPTURE_NOT_PROVEN; exit 1; }
+            echo ONLINE_MIC_CAPTURE_OK
             adb shell am instrument -w -e class com.avnivo.translator.OfflineRealInferenceTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_real.txt
             grep -q "OK (" instrument_real.txt || { echo REAL_INFERENCE_FAILED; exit 1; }
             # A skipped test also reports "OK", so require the transcript itself.

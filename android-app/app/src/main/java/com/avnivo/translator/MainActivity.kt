@@ -25,6 +25,9 @@ class MainActivity : Activity() {
     @Volatile private var percent = 0
     @Volatile private var recording = false
 
+    /** The WebView capture request waiting on the Android permission dialog, if any. */
+    private var pendingWebAudioRequest: PermissionRequest? = null
+
     /** Files present. Necessary but not sufficient for READY; the engine must also initialize. */
     private val modelInstalled get() = OfflineSpeechEngine.hasRequiredFiles(modelDir)
 
@@ -44,11 +47,7 @@ class MainActivity : Activity() {
         }
         web.webChromeClient = object : WebChromeClient() {
             override fun onPermissionRequest(request: PermissionRequest) {
-                runOnUiThread {
-                    if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
-                        request.grant(request.resources.filter { it == PermissionRequest.RESOURCE_AUDIO_CAPTURE }.toTypedArray())
-                    else request.deny()
-                }
+                runOnUiThread { handleWebPermissionRequest(request) }
             }
         }
         web.addJavascriptInterface(Bridge(), "AvnivoOfflineSTT")
@@ -157,6 +156,45 @@ class MainActivity : Activity() {
         runOnUiThread { web.evaluateJavascript("window.$function && window.$function($escaped)", null) }
     }
 
+    /**
+     * Grants `getUserMedia` only to this app's own bundled page, and only after the Android runtime
+     * permission is actually held. WebView asks once per capture; when the permission is missing it
+     * is requested and the same request is answered in [onRequestPermissionsResult].
+     */
+    private fun handleWebPermissionRequest(request: PermissionRequest) {
+        val allowed = MicPermissionPolicy.grantableResources(
+            request.origin?.scheme, request.origin?.host, request.resources.toList()
+        )
+        if (allowed == null) {
+            request.deny()
+            if (request.resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+                notifyJs("AvnivoOnlineMicError", "Mikrofon faqat ilova sahifasidan ishlatiladi")
+            }
+            return
+        }
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            request.grant(allowed.toTypedArray())
+            return
+        }
+        // WebView cancels a request that is answered later, so keep the latest one and answer it
+        // from the permission callback instead of granting optimistically.
+        pendingWebAudioRequest?.deny()
+        pendingWebAudioRequest = request
+        val permanentlyDenied = !shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) &&
+            getPreferences(MODE_PRIVATE).getBoolean(KEY_MIC_REQUESTED, false)
+        if (permanentlyDenied) {
+            pendingWebAudioRequest = null
+            request.deny()
+            notifyJs(
+                "AvnivoOnlineMicError",
+                "Mikrofon ruxsati bloklangan. Sozlamalar → Ilovalar → AVNIVO → Ruxsatlar bo‘limidan yoqing"
+            )
+            return
+        }
+        getPreferences(MODE_PRIVATE).edit().putBoolean(KEY_MIC_REQUESTED, true).apply()
+        requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
+    }
+
     /** Applies a state transition, rejecting illegal jumps (e.g. DOWNLOADING -> READY). */
     private fun transition(next: OfflineModuleState): Boolean {
         if (!state.canTransitionTo(next)) return false
@@ -227,7 +265,7 @@ class MainActivity : Activity() {
             runOnUiThread {
                 if (recording || busy) return@runOnUiThread
                 if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 100)
+                    requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
                     return@runOnUiThread
                 }
                 if (!state.isOperational && readyWhisper() == null) {
@@ -322,12 +360,26 @@ class MainActivity : Activity() {
 
     override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(code, permissions, results)
-        if (code == 100 && results.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-            notifyJs("AvnivoOfflineHint", "Mikrofon ruxsati berildi. Yozish uchun mikrofonni bosing va ushlab turing.")
-        else if (code == 100) notifyJs("AvnivoOfflineError", "Mikrofon ruxsati berilmadi")
+        if (code != REQUEST_RECORD_AUDIO) return
+        val granted = results.firstOrNull() == PackageManager.PERMISSION_GRANTED
+        val pending = pendingWebAudioRequest
+        pendingWebAudioRequest = null
+        if (granted) {
+            // The WebView may have cancelled while the dialog was open; granting a dead request is
+            // harmless, and the page re-asks on the next press if it did.
+            pending?.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+            if (pending != null) notifyJs("AvnivoOnlineMicGranted", "")
+            else notifyJs("AvnivoOfflineHint", "Mikrofon ruxsati berildi. Yozish uchun mikrofonni bosing va ushlab turing.")
+        } else {
+            pending?.deny()
+            if (pending != null) notifyJs("AvnivoOnlineMicError", "Mikrofon ruxsati berilmadi. Ilova sozlamalaridan ruxsat bering")
+            else notifyJs("AvnivoOfflineError", "Mikrofon ruxsati berilmadi")
+        }
     }
 
     override fun onDestroy() {
+        pendingWebAudioRequest?.deny()
+        pendingWebAudioRequest = null
         recorder?.stop()
         ttsPlayer.close()
         ttsWorker.shutdown()
@@ -341,5 +393,7 @@ class MainActivity : Activity() {
         const val MIN_SAMPLES = 4800 // 0.3 s at 16 kHz: below this there is no usable speech.
         const val NLLB_MODULE = "nllb-200-600m-int8"
         const val SILERO_MODULE = "silero-tts"
+        const val REQUEST_RECORD_AUDIO = 100
+        const val KEY_MIC_REQUESTED = "avnivo.mic.requested.v1"
     }
 }

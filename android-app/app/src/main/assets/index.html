@@ -1272,6 +1272,16 @@ window.AvnivoOfflineLevel=function(value){
 window.AvnivoOfflineHint=function(message){
  hint(String(message||''));
 };
+// Native answers for the online capture path: a denied grant must be visible, not silent.
+window.AvnivoOnlineMicError=function(message){
+ shell.classList.remove('hold-voice');
+ onlineState('error');
+ hint(String(message||'Mikrofon ruxsati berilmadi'));
+};
+window.AvnivoOnlineMicGranted=function(){
+ // The grant only unblocks getUserMedia; the page re-runs capture on the next press.
+ hint('');
+};
 window.AvnivoOfflineStatus=function(message){
  offlineNotice.textContent=String(message||'');
  // Never promote to ready from a status string: only a verified engine may activate the module.
@@ -1931,13 +1941,13 @@ async function startVoice(){
   catch(e){hint('Offline STT xatosi: '+(e&&e.message||e))}
   return;
  }
- if(!navigator.mediaDevices?.getUserMedia){return}
+ if(!navigator.mediaDevices?.getUserMedia){hint('Bu qurilmada mikrofon API mavjud emas');return}
  const token=++requestToken;
  try{
   const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
   if(token!==requestToken){stream.getTracks().forEach(track=>track.stop());return}
   const Context=window.AudioContext||window.webkitAudioContext;
-  if(!Context){stream.getTracks().forEach(track=>track.stop());return}
+  if(!Context){stream.getTracks().forEach(track=>track.stop());hint('AudioContext mavjud emas: waveform ishlamaydi');return}
   const ctx=new Context();await ctx.resume();
   if(token!==requestToken){stream.getTracks().forEach(track=>track.stop());await ctx.close();return}
   const source=ctx.createMediaStreamSource(stream),a=ctx.createAnalyser();
@@ -1952,7 +1962,21 @@ async function startVoice(){
   shell.classList.add('voice-active');shell.classList.remove('text-mode');updateBrandVisibility();
   frame=requestAnimationFrame(draw);
   stream.getAudioTracks()[0]?.addEventListener('ended',()=>{if(active)stopVoice()},{once:true});
- }catch(error){if(token===requestToken){mic.setAttribute('aria-label','Mikrofonga ruxsat berilmadi');console.warn('Microphone unavailable',error)}}
+ }catch(error){
+  if(token!==requestToken)return;
+  // Name the real cause instead of failing silently: NotAllowedError is a permission refusal,
+  // NotFoundError means no capture device, and anything else is a genuine capture failure.
+  const name=error&&error.name||'';
+  const message=name==='NotAllowedError'?'Mikrofon ruxsati berilmadi. Ilova sozlamalaridan ruxsat bering'
+   :name==='NotFoundError'?'Mikrofon topilmadi'
+   :name==='NotReadableError'?'Mikrofon boshqa ilova tomonidan band'
+   :'Mikrofonni ochib bo‘lmadi: '+(error&&error.message||name||error);
+  mic.setAttribute('aria-label','Mikrofonga ruxsat berilmadi');
+  shell.classList.remove('hold-voice');
+  onlineState('error');
+  hint(message);
+  console.warn('Microphone unavailable',name||error);
+ }
 }
 
 const voiceHint=document.querySelector('.voice-hint');
@@ -2025,7 +2049,10 @@ async function sendOnlineAudio(blob,locale,session){
   }else onlineState('error');
  }catch(e){
   if(session!==onlineSession||document.documentElement.dataset.avnivoMode!=='online')return;
-  console.warn('Chirp 2 recognition failed:',e);onlineState('error');
+  // A failed transcription must reach the user; a silent console line is not a report.
+  if(e&&e.name==='AbortError')hint('Ovozni matnga aylantirish bekor qilindi yoki vaqti tugadi');
+  else hint('Ovozni matnga aylantirish xatosi: '+(e&&e.message||e));
+  console.warn('Chirp 2 recognition failed:',e&&e.name||e);onlineState('error');
  }finally{clearTimeout(timer);if(onlineAbort===ctrl)onlineAbort=null}
 }
 function cancelOnlineRecording(){
@@ -2042,7 +2069,7 @@ let offlineWaveFrame=0,offlineWaveActive=false,offlineLevel=0,avnivoOfflineCance
 let avnivoHintTimeout=0;
 function hint(message){
  clearTimeout(avnivoHintTimeout);avnivoHintTimeout=0;
- if(document.documentElement.dataset.avnivoMode==='online'){voiceHint.hidden=true;return}
+ // Online mode used to swallow every hint, which hid microphone and Chirp 2 failures completely.
  voiceHint.textContent=message;voiceHint.hidden=!message;
  if(message)avnivoHintTimeout=setTimeout(()=>{voiceHint.textContent='';voiceHint.hidden=true;avnivoHintTimeout=0},3500);
 }
