@@ -520,8 +520,8 @@ class MainActivity : Activity() {
                 logStt(
                     session,
                     "transcribed",
-                    "engine=${route.engine.moduleId} whisper_lang=${route.whisperLanguage ?: "-"} " +
-                        "chars=${text.length} text=${text.take(80)}"
+                    "engine=${route.engine.moduleId} source=${route.sourceLanguage ?: "-"} " +
+                        "whisper_lang=${route.whisperLanguage ?: "-"} chars=${text.length} text=${text.take(80)}"
                 )
                 sttSessions.close(session)
                 sttController.complete(session)

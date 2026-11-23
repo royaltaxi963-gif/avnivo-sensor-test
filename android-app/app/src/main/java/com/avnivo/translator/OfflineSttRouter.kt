@@ -14,7 +14,8 @@ internal object WhisperLanguageMap {
 internal data class SttRoute(
     val engine: OfflineSttEngine,
     val whisperLanguage: String?,
-    val unsupportedReason: String? = null
+    val unsupportedReason: String? = null,
+    val sourceLanguage: String? = null
 )
 
 /**
@@ -38,17 +39,18 @@ internal object OfflineSttRouter {
     fun route(sourceLanguage: String?): SttRoute {
         require(!sourceLanguage.isNullOrBlank()) { "Manba tili tanlanmagan" }
         val engine = engineFor(sourceLanguage)
-        if (engine == OfflineSttEngine.UZBEK_STT) return SttRoute(engine, null)
+        if (engine == OfflineSttEngine.UZBEK_STT) return SttRoute(engine, null, sourceLanguage = sourceLanguage)
         val whisper = WhisperLanguageMap.codeFor(sourceLanguage)
         return if (whisper == null) {
             SttRoute(
                 engine,
                 null,
                 "Whisper Small bu tilni qo‘llab-quvvatlamaydi: $sourceLanguage. " +
-                    "Til offline tarjimada qoladi, lekin nutqni tanish uchun mos STT modeli yo‘q."
+                    "Til offline tarjimada qoladi, lekin nutqni tanish uchun mos STT modeli yo‘q.",
+                sourceLanguage = sourceLanguage
             )
         } else {
-            SttRoute(engine, whisper)
+            SttRoute(engine, whisper, sourceLanguage = sourceLanguage)
         }
     }
 }

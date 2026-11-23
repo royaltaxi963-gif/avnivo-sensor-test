@@ -2,6 +2,7 @@ package com.avnivo.translator
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Test
@@ -94,5 +95,33 @@ class OfflineRealInferenceTest {
         // Report the real number instead of claiming perfection: a hypothesis that does not match
         // the reference must produce a positive error rate.
         assertTrue("WER must stay below 1.0, measured $wer for: $text", wer < 1.0)
+    }
+
+    /**
+     * The product rule sends English source audio to the Uzbek STT engine. That is a routing rule,
+     * not a claim that the Uzbek model understands English, so this test logs the real transcript
+     * and does not score it. It fails only if the engine cannot produce any transcript at all.
+     */
+    @Test
+    fun englishSourceUsesUzbekSttAndLogsTheRealTranscript() {
+        assumeTrue(
+            "set -e avnivoRealInference true to run",
+            InstrumentationRegistry.getArguments().getString("avnivoRealInference") == "true"
+        )
+        assertEquals(OfflineSttEngine.UZBEK_STT, OfflineSttRouter.engineFor("eng_Latn"))
+        val modelDir = File(context.filesDir, "models/uzbek-stt")
+        if (!OfflineSpeechEngine.hasRequiredFiles(modelDir)) {
+            VerifiedModelDownloader(modelDir).download({}, { _, _ -> })
+        }
+        assertTrue("model files must be present after download", OfflineSpeechEngine.hasRequiredFiles(modelDir))
+        val asset = InstrumentationRegistry.getInstrumentation().context.assets.open("whisper_jfk_16k.wav")
+        val audio = File(context.cacheDir, "jfk_english_for_uzbek_stt_16k.wav")
+        asset.use { input -> audio.outputStream().use { input.copyTo(it) } }
+        val samples = readWavSamples(audio)
+        val text = OfflineSpeechEngine(modelDir).use { it.transcribe(samples) }.trim()
+        val marker = "UZBEK_STT_ENGLISH_ROUTE engine=uzbek-stt accuracy=not-scored chars=${text.length} text=${text.take(120)}"
+        println(marker)
+        android.util.Log.i("AvnivoUzbekStt", marker)
+        assertTrue("the Uzbek engine must produce some transcript, not a silent empty result", text.isNotBlank())
     }
 }
