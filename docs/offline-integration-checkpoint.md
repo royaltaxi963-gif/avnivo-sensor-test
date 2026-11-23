@@ -1572,3 +1572,43 @@ Install the v1248 build on the S23 Ultra, then confirm: NLLB activates instead o
 `xotira yetarli emas`; each installed card reads «O'rnatilgan · ishlatilganda yuklanadi» rather
 than «dvigatel ulanmagan»; and a second module activates after the first is released. Capture
 `adb logcat -s AvnivoMemory AvnivoOfflineModule*` for the real `total/avail/pss/budget` numbers.
+
+## Stage: NLLB language-marker leak and TTS voice routing (S23 Ultra report)
+
+The S23 Ultra reported that every NLLB translation began with a technical marker (`rus_Cyrl`) and
+that a Russian message could be read with the Uzbek voice. Both were routing defects, not model
+quality problems.
+
+| Symptom | Root cause | Fix |
+| --- | --- | --- |
+| Translation starts with `rus_Cyrl` / `eng_Latn` | The JNI decoder forced the target language token into its **output** array. That token is decoder input, so it decoded to a literal marker. | `avnivo_nllb_jni.cpp` no longer pushes the step-0 forced token into `generated`; `NllbTokenizer.decode` also skips language-code pieces. |
+| Russian read with the Uzbek voice | `playMessage` chose a voice from the message **side** (`right` meant `ru-RU`, `left` meant `uz-UZ`). With any other pair, or when Russian sat on the left, the Uzbek-only Silero engine was called for Russian. | Route by each message's own NLLB code. Silero is used only for `uzn_Latn`; other languages use a browser voice for their own locale, and a known voice list with no match refuses instead of speaking the wrong language. |
+| A message's voice changed when the picker changed | The voice came from the current pair, not from the message. | `attachSpeaker` stamps `data-code`; `saveChatMessage` stores `sourceCode`/`targetCode`; history restore reuses them. |
+
+The translated string is also sanitised in `index.html` before it reaches the bubble, so an older
+native library or a future model revision cannot reintroduce the marker. Each `🔊` reads its own
+bubble text: the source button reads the original, the translation button reads the translation.
+
+### Verified results for this stage
+
+| Check | Result |
+| --- | --- |
+| JVM unit tests | **116**, 0 failures, 0 ignored (was 115). `NllbTokenizerTest` ran 15 with the real tokenizer, including the new `decodeDropsLanguageTokensThatAreNotPartOfTheSentence`. |
+| Node suites (12) | **107** pass / 0 fail. New `offline-tts-routing.test.mjs` (8) covers marker stripping, locale mapping, Uzbek-only native gating and per-message code stamping. |
+| Interface preservation | `offline-ui-preservation` 5/5; `index.html` diff is additive: +75/−19 lines, all in the translation/TTS script, no CSS or element changes. |
+| Instrumented (API 34 x86_64) | 42 tests across 12 suites, all `OK` (`OK (2)(9)(8)(1)(1)(1)(5)(5)(1)(7)(1)(1)`). |
+| Offline modules on emulator | `UZBEK_STT_RESULT text=navoiy tts o'zbekcha matnni tabiiy va ravon ovozga aylantiradi.`; `AvnivoSileroTts: offline reuse=596ms samples=140400 seconds=2.925 peak=0.5980808`; `SILERO_TTS_OFFLINE_OK`, `OFFLINE_INFERENCE_OK`, `EMULATOR_SMOKE_OK`. |
+| Workflow run | `45102003961` (`push`) and `45102008322` (`pull_request`) — `apk`, `update-install`, `emulator-smoke` success. Heavy opt-in jobs skipped as designed. |
+| In-place update | `firstInstallTime` preserved (2026-11-23 02:49:54), versionCode `100` → `1259`, `Success`, `UPDATE_INSTALL_OK`. |
+| Release APK | `update-v101.apk`, 123,706,557 B, sha256 `5c8f815578ea51fe888d1076eaf324e9fbe6e2471e86336e4b1ac4229f1f44ea`. |
+| Signing | `CN=AVNIVO Translator`, cert SHA-256 `12e7e26104c7a5110a849baec36d6916efe0b2494384749d4c733286aeeecb8e` (same stable identity). |
+
+### Next exact action
+
+Install `update-v101.apk` (versionCode 1259) on the S23 Ultra and confirm, with an offline
+Uzbek→Russian pair: the translation bubble starts with the Russian sentence and no `rus_Cyrl`
+prefix; the source `🔊` uses the Silero Uzbek voice; the translation `🔊` uses a Russian voice and
+never the Uzbek one. If the device has no Russian TTS voice, the button title must read
+«Bu til uchun ovoz o‘rnatilmagan: ru» and it must stay silent rather than speak Russian in Uzbek.
+Capture `adb logcat -s AvnivoNllb AvnivoSileroTts` while doing it.
+
