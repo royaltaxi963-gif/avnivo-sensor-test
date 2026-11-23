@@ -1663,3 +1663,47 @@ recordings each produce their own text on the first press; the processing indica
 immediately after release; 10 offline/online switches keep the module card visible; 5 forced
 memory-pressure cycles recover on the next press; and a Russian translation is never read with the
 Uzbek voice. Capture `adb logcat -s AvnivoUzbekStt AvnivoSileroTts` during the run.
+
+## Recovery checkpoint 2026-11-23 19:20 UTC: Whisper Large pass 1 and module lifecycle
+
+The session that started after the sandbox error resumed from commit `efc6a2f` without recreating
+history. It committed `5522b91` (Whisper lifecycle and native diagnostics), `02f536c` (deletion
+regression assertion) and `2f242cf` (run the lifecycle instrumentation in standard CI). PR #28
+stayed draft; `main` was not touched.
+
+### Exact result of the opt-in Whisper Large run
+
+Run `45227554823` (`workflow_dispatch`, commit `02f536c`) reached pass 1 and passed it:
+
+| Evidence | Value |
+| --- | --- |
+| Pass 1 instrumentation | `OfflineWhisperInferenceTest` — **OK (10 tests)**, 3,753.261 s |
+| Native metadata | `WHISPER_LARGE_NATIVE vocab=51866 audio_ctx=1500 text_ctx=448 multilingual=1 type=large` |
+| Memory after inference | `WHISPER_LARGE_MEM heap_used_mb=4 native_alloc_mb=1246 max_heap_mb=192 recall=7/7` |
+| Pass 1 scope | download, SHA-256 verification, activation, real inference, and the Small→Large→Small switching test |
+
+Pass 2 (same suite with Wi-Fi and mobile data disabled) started at 18:34 UTC and was still in its
+first test at 19:19 UTC, when the job's `timeout-minutes: 110` cancelled it. The job log contains
+`##[error]The operation was canceled`, not a test failure. Artifact `14853424014` contains the
+completed pass 1 result and `instrument_whisper_large_offline.txt` with a single progress dot.
+This is a CI wall-clock limit, not an activation or inference regression.
+
+### Standard CI and artifacts
+
+Run `45241271615` on `2f242cf` is **success** (`apk`, `update-install`, `emulator-smoke`). The
+emulator ran `OfflineModuleCardInstrumentedTest` — **OK (11 tests)** and the new
+`OfflineModuleLifecycleInstrumentedTest` — **OK (2 tests)**. `OfflineWhisperInferenceTest` passed
+with **OK (10 tests)**, and the existing Small, TTS, real-inference, online-microphone and stress
+suites all passed.
+
+Release artifact `avnivo-translator-release-apk` (artifact `14851023761`) contains
+`update-v101.apk`, **123,740,501 bytes**, SHA-256
+`6d420d0f1f28c4cb3629d523437e54d4f2333a03719dabed7643ec4967e150b9`.
+
+### Remaining work
+
+Device acceptance on the S23 Ultra is still required: install the artifact, confirm Large is the
+only resident engine after activation, switch Small→Large→Small with real speech, delete one
+module and leave the other intact, and confirm the Russian translation is never spoken by the
+Uzbek Silero voice. The pass 2 offline repeat is also still pending; it needs a longer job timeout
+or a narrower class filter so it does not exceed 110 minutes.
