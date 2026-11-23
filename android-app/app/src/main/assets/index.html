@@ -1439,6 +1439,43 @@ function nllbCodeForLocale(locale){
  const base=locale.split('-')[0];
  return NLLB_BY_BASE[base]||null;
 }
+/* NLLB occasionally emits its language token as literal text. The native decoder no longer returns
+   it, but a stray marker must never reach the bubble or the speaker, so strip any language-code
+   shaped word from the translated string. */
+const NLLB_LANGUAGE_MARKER=/\b[a-z]{3}_[A-Za-z]{4}\b/g;
+function stripLanguageMarkers(text){
+ return String(text==null?'':text)
+  .replace(NLLB_LANGUAGE_MARKER,' ')
+  .replace(/^[ \t]+|[ \t]+$/g,'')
+  .replace(/[ \t]{2,}/g,' ');
+}
+/* NLLB code -> the locale a speech engine expects. Derived from the same tables the picker uses,
+   so every code the UI can show maps back to a voice language. */
+const SPEECH_LOCALE_BY_NLLB=(()=>{
+ const map={};
+ for(const [base,code] of Object.entries(NLLB_BY_BASE))if(!map[code])map[code]=base;
+ for(const [locale,code] of Object.entries(NLLB_BY_LOCALE))map[code]=locale;
+ return map;
+})();
+function speechLocaleForNllb(code){
+ if(typeof code!=='string'||!code)return null;
+ return SPEECH_LOCALE_BY_NLLB[code]||code.split('_')[0]||null;
+}
+/* The bundled Silero voice speaks Uzbek only. Routing any other language to it is what made a
+   Russian message come out in an Uzbek voice. */
+function isUzbekNllb(code){return code==='uzn_Latn'||speechLocaleForNllb(code)==='uz'}
+/* undefined: the engine has not listed voices yet, so `lang` is the only signal. null: the engine
+   listed its voices and none matches, so speaking would use a wrong-language voice. */
+function speechVoiceForLocale(locale){
+ if(!locale||!('speechSynthesis' in window)||typeof window.speechSynthesis.getVoices!=='function')return undefined;
+ let voices=[];
+ try{voices=window.speechSynthesis.getVoices()||[]}catch(e){voices=[]}
+ if(!voices.length)return undefined;
+ const tag=String(locale).toLowerCase(),base=tag.split('-')[0];
+ return voices.find(voice=>String(voice.lang||'').toLowerCase()===tag)
+     ||voices.find(voice=>String(voice.lang||'').toLowerCase().split('-')[0]===base)
+     ||null;
+}
 /* The picker's truth comes from the native side: `ready` is only true after download, SHA-256,
    native init and a smoke inference, and `languages` is that tokenizer's own vocabulary. */
 function offlineTranslationState(){
@@ -1510,13 +1547,14 @@ window.AvnivoOfflineTranslation=function(raw){
  if(!pending)return;
  offlineTranslations.delete(String(payload.requestId));
  const {bubble,entry}=pending;
- if(payload.error||typeof payload.text!=='string'||!payload.text.trim()){
+ const clean=stripLanguageMarkers(payload.text);
+ if(payload.error||typeof payload.text!=='string'||!clean){
   if(bubble.isConnected){bubble.textContent='Oflayn tarjima bajarilmadi: '+(payload.error||'bo‘sh javob');bubble.classList.remove('typing')}
   return;
  }
- if(entry){entry.translation=payload.text;persistHistory()}
+ if(entry){entry.translation=clean;persistHistory()}
  if(!bubble.isConnected)return;
- typeTranslation(bubble,payload.text,()=>autoReadTranslation(bubble,'offline',pending.historyId));
+ typeTranslation(bubble,clean,()=>autoReadTranslation(bubble,'offline',pending.historyId));
 };
 let translationTimers=new Set();
 function clearTranslationTimers(){for(const timer of translationTimers)clearTimeout(timer);translationTimers.clear()}
@@ -1632,16 +1670,26 @@ async function playMessage(button,bubble,language){
  speakingButton=button;button.classList.add('is-speaking');button.setAttribute('aria-pressed','true');
  const finish=()=>{if(generation===ttsGeneration)stopSpeaking()};
  if(document.documentElement.dataset.avnivoMode!=='online'){
-  // Uzbek (left) text is spoken by the native Silero engine once its model is installed and its
-  // smoke test passed. Russian (right) keeps the browser voice, which is what it already used.
-  if(language!=='right'&&window.AvnivoOfflineModules&&typeof window.AvnivoOfflineModules.isSpeechReady==='function'){
+  // Route by the bubble's own language, not by its side. The left/right sides hold whatever the
+  // user picked, so "left means Uzbek, right means Russian" is wrong for every other pair. The
+  // bundled Silero engine speaks Uzbek only; every other language must use a voice of its own.
+  const code=button.dataset.code||offlineChoice[language]||null;
+  if(isUzbekNllb(code)&&window.AvnivoOfflineModules&&typeof window.AvnivoOfflineModules.isSpeechReady==='function'){
    let nativeReady=false;
    try{nativeReady=window.AvnivoOfflineModules.isSpeechReady()===true}catch(e){nativeReady=false}
    if(nativeReady){try{window.AvnivoOfflineModules.speak(text,String(generation));return}catch(e){}}
   }
-  if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){finish();return}
+  const speechLocale=speechLocaleForNllb(code);
+  if(!speechLocale||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
+   button.title='Bu til uchun oflayn ovoz mavjud emas';finish();return;
+  }
   const utterance=new SpeechSynthesisUtterance(text);
-  utterance.lang=language==='right'?'ru-RU':'uz-UZ';utterance.rate=Number(ttsRateSelect.value);
+  utterance.lang=speechLocale;utterance.rate=Number(ttsRateSelect.value);
+  const speechVoice=speechVoiceForLocale(speechLocale);
+  // null means the engine listed its voices and none speaks this language. Speaking anyway would
+  // read, for example, Russian with whatever default voice is installed.
+  if(speechVoice===null){button.title='Bu til uchun ovoz o‘rnatilmagan: '+speechLocale;finish();return}
+  if(speechVoice)utterance.voice=speechVoice;
   utterance.onend=finish;utterance.onerror=finish;
   try{speechSynthesis.speak(utterance)}catch(e){finish()}
   return;
@@ -1727,12 +1775,14 @@ function autoReadTranslation(bubble,mode,sessionId){
  const button=bubble.closest('.message-line')?.querySelector('.speak-message');
  if(button)playMessage(button,bubble,button.dataset.language||'left');
 }
-function attachSpeaker(bubble,language){
+function attachSpeaker(bubble,language,code){
  const isLeft=bubble.classList.contains('message-left');
  const line=document.createElement('div');
  line.className='message-line '+(isLeft?'line-left':'line-right');
  const button=document.createElement('button');
  button.type='button';button.className='speak-message';button.dataset.language=language;
+ // The code the message was written in, so a later language change cannot redirect its voice.
+ if(code)button.dataset.code=code;
  button.setAttribute('aria-label','Xabarni ovoz chiqarib o‘qish');
  button.setAttribute('aria-pressed','false');
  button.innerHTML='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="speaker-core" d="M5 12h5l6-5v18l-6-5H5z"/><path class="sound-bars" d="M20 11q5 5 0 10M23 7q9 9 0 18"/></svg>';
@@ -1754,23 +1804,23 @@ function restoreHistory(session){
  clearTranslationTimers();
  for(const entry of session.messages.slice(-30)){
   const source=renderChatBubble(entry,firstLanguage);
-  messages.append(attachSpeaker(source,messageData(entry,firstLanguage).language));
+  messages.append(attachSpeaker(source,messageData(entry,firstLanguage).language,entry.sourceCode));
   if(typeof entry.translation==='string'&&entry.translation.length>0){
    const language=entry.language==='right'?'right':'left';
    const translationBubble=renderChatBubble({text:entry.translation,language:oppositeLanguage(language)},firstLanguage);
    translationBubble.classList.add('translation-preview');
-   messages.append(attachSpeaker(translationBubble,oppositeLanguage(language)));
+   messages.append(attachSpeaker(translationBubble,oppositeLanguage(language),entry.targetCode));
   }
  }
  scrollChatToLatest();
  if(typeof updateBrandVisibility==='function')updateBrandVisibility();
  label.hidden=Boolean(input.value)||messages.children.length>0;
 }
-function saveChatMessage(message,language,translation){
+function saveChatMessage(message,language,translation,sourceCode,targetCode){
  let session=historySessions.find(x=>x.id===currentHistoryId);
  if(!session){session={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,8),title:'O‘zbek tili = русский язык',firstLanguage:language,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),messages:[]};historySessions.unshift(session);historyDrafts[session.id]=historyDrafts.new||'';delete historyDrafts.new;currentHistoryId=session.id;persistActiveChat()}
  if(!session.firstLanguage)session.firstLanguage=language;
- session.messages.push({text:message,language,translation});session.messages=session.messages.slice(-200);session.updatedAt=new Date().toISOString();
+ session.messages.push({text:message,language,translation,sourceCode:sourceCode||null,targetCode:targetCode||null});session.messages=session.messages.slice(-200);session.updatedAt=new Date().toISOString();
  historySessions.sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt));historySessions=historySessions.slice(0,100);persistHistory();
 }
 historyToggle.addEventListener('click',()=>setHistoryOpen(!historyOpen));
@@ -1889,10 +1939,12 @@ async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,h
   }
   const data=await response.json();
   if(data.model!=='general/translation-llm'||data.source!==source[1]||data.target!==target[1]||typeof data.text!=='string')throw Error('Tarjima javobida til kodlari mos kelmadi');
+  const translated=stripLanguageMarkers(data.text);
+  if(!translated)throw Error('Tarjima bo‘sh qaytdi');
   // Persist verified translation even if user closed the page or switched chats.
-  if(entry){entry.translation=data.text;persistHistory()}
+  if(entry){entry.translation=translated;persistHistory()}
   if(!bubble.isConnected)return;
-  typeTranslation(bubble,data.text,()=>autoReadTranslation(bubble,'online',historyId));
+  typeTranslation(bubble,translated,()=>autoReadTranslation(bubble,'online',historyId));
  }catch(error){
   if(!bubble.isConnected)return;
   bubble.textContent=error.name==='AbortError'?'Tarjima vaqti tugadi':error instanceof TypeError?'Tarjima serveriga ulanib bo‘lmadi':error.message;
@@ -1917,18 +1969,22 @@ function sendMessage(){
  const language=languageRow.dataset.selected==='right'?'right':'left';
  let session=historySessions.find(x=>x.id===currentHistoryId);
  const firstLanguage=session?.firstLanguage||language;
- const sourceBubble=renderChatBubble({text:message,language},firstLanguage);
- messages.appendChild(attachSpeaker(sourceBubble,language));
  const online=document.documentElement.dataset.avnivoMode==='online';
+ // Pin each bubble to the language it is actually written in, so its voice never drifts when the
+ // picker changes later. Online uses its own locale; offline uses the NLLB code.
+ const sourceCode=online?null:(offlineChoice[language]||null);
+ const targetCode=online?null:(offlineChoice[oppositeLanguage(language)]||null);
+ const sourceBubble=renderChatBubble({text:message,language},firstLanguage);
+ messages.appendChild(attachSpeaker(sourceBubble,language,sourceCode));
  const sourceLocale=online?onlineChoice[language]:null;
  const targetLocale=online?onlineChoice[oppositeLanguage(language)]:null;
- saveChatMessage(message,language,online?'':PREVIEW_TRANSLATION);
+ saveChatMessage(message,language,online?'':PREVIEW_TRANSLATION,sourceCode,targetCode);
  const savedSession=historySessions.find(x=>x.id===currentHistoryId);
  const entry=savedSession?.messages[savedSession.messages.length-1];
  if(online&&entry){entry.sourceLocale=sourceLocale;entry.targetLocale=targetLocale;persistHistory()}
  const translationBubble=renderChatBubble({text:'',language:oppositeLanguage(language)},firstLanguage);
  translationBubble.classList.add('translation-preview');
- messages.appendChild(attachSpeaker(translationBubble,oppositeLanguage(language)));
+ messages.appendChild(attachSpeaker(translationBubble,oppositeLanguage(language),targetCode));
  if(online){
   translationBubble.textContent='Tarjima qilinmoqda…';
   translateOnlineText(message,sourceLocale,targetLocale,translationBubble,entry,currentHistoryId);

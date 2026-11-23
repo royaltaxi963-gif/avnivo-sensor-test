@@ -88,6 +88,10 @@ internal class NllbTokenizer private constructor(
         val builder = StringBuilder()
         for (id in ids) {
             val piece = reverse[id] ?: continue
+            // Language codes are special tokens the decoder is seeded with, never part of the
+            // translated sentence. Skipping them here keeps a stray "rus_Cyrl" out of the output
+            // even if a model revision or an older native library emits one.
+            if (LANGUAGE_CODE.matches(piece)) continue
             builder.append(piece)
         }
         return builder.toString()

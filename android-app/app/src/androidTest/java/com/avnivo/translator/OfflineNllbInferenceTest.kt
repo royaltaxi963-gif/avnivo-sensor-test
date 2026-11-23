@@ -67,6 +67,8 @@ class OfflineNllbInferenceTest {
             )
             assertFalse("translation must not be empty", russian.isBlank())
             assertTrue("expected Cyrillic Russian output, got: $russian", russian.any { it in '\u0400'..'\u04FF' })
+            // The decoder is seeded with rus_Cyrl; it must not leak into the visible translation.
+            assertFalse("language marker leaked into the translation: $russian", Regex("[a-z]{3}_[A-Za-z]{4}").containsMatchIn(russian))
 
             val english = manager.translate(
                 "nllb-200-600m-int8", "Bugun havo juda issiq.", NllbEngine.UZBEK, NllbEngine.ENGLISH

@@ -376,7 +376,10 @@ Java_com_avnivo_translator_NllbEngine_nativeTranslate(JNIEnv* env, jobject /*thi
         api->ReleaseValue(branchValue);
 
         if (next == kEosId) break;
-        generated.push_back(next);
+        // Step 0 forces the target language token to open the decoder sequence. It is decoder
+        // *input*, not model output, so it must not be returned: doing so decoded to a literal
+        // "rus_Cyrl"-style marker at the front of every translation.
+        if (step != 0) generated.push_back(next);
         sequence.push_back(next);
     }
 

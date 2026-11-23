@@ -63,6 +63,21 @@ class NllbTokenizerTest {
         }
     }
 
+    @Test fun decodeDropsLanguageTokensThatAreNotPartOfTheSentence() {
+        val tokenizer = requireModel()
+        val sentence = tokenizer.encode("Salom, qalaysiz?")
+        val markers = listOf(
+            tokenizer.tokenId(NllbEngine.RUSSIAN)!!,
+            tokenizer.tokenId(NllbEngine.ENGLISH)!!
+        )
+        // The decoder is seeded with the target language token; it is input, not translated text.
+        assertEquals(
+            "a language token must never appear in the decoded translation",
+            "Salom, qalaysiz?",
+            tokenizer.decode(markers + sentence + markers)
+        )
+    }
+
     @Test fun recognisesTheLanguageTokensTheAppExposes() {
         val tokenizer = requireModel()
         assertNotNull(tokenizer.tokenId(NllbEngine.UZBEK))

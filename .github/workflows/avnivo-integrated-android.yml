@@ -85,6 +85,9 @@ jobs:
       - name: Run offline translation routing tests
         working-directory: .
         run: node --test tests/offline-translation/route.test.mjs
+      - name: Assert translation markers are stripped and TTS voices match the message language
+        working-directory: .
+        run: node --test tests/offline-tts-routing.test.mjs
       - name: Run language synchronisation and gating tests
         working-directory: .
         run: node --test tests/offline-language-sync.test.mjs

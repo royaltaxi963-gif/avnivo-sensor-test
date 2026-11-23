@@ -11,7 +11,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const html = readFileSync(join(here, '../../android-app/app/src/main/assets/index.html'), 'utf8')
 
 const START = 'const PREVIEW_TRANSLATION='
-const END = "typeTranslation(bubble,payload.text,()=>autoReadTranslation(bubble,'offline',pending.historyId));\n};"
+const END = "typeTranslation(bubble,clean,()=>autoReadTranslation(bubble,'offline',pending.historyId));\n};"
 const AUTO_READ = () => {}
 const startIndex = html.indexOf(START)
 const endIndex = html.indexOf(END)
