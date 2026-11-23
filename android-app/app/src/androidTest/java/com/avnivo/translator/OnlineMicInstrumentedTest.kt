@@ -58,10 +58,13 @@ class OnlineMicInstrumentedTest {
             view.webChromeClient = object : WebChromeClient() {
                 override fun onPermissionRequest(request: PermissionRequest) {
                     val requested = request.resources.toList()
+                    android.util.Log.i("AvnivoOnlineMic", "ONLINE_MIC_REQUEST $requested")
                     grantCalls.set(grantCalls.get() + requested)
                     val allowed = MicPermissionPolicy.grantableResources(
                         request.origin?.scheme, request.origin?.host, requested
                     )
+                    val decision = if (allowed == null) "deny" else "grant " + allowed.joinToString(",")
+                    android.util.Log.i("AvnivoOnlineMic", "ONLINE_MIC_DECISION $decision")
                     if (allowed == null) request.deny() else request.grant(allowed.toTypedArray())
                 }
             }
