@@ -65,7 +65,7 @@ class UzbekSttControllerTest {
 
     @Test
     fun notInstalledWithoutModel() {
-        val h = Harness(installed = false)
+        val h = Harness(initialInstalled = false)
         val failed = try {
             h.controller.ensureReady()
             false
@@ -302,7 +302,7 @@ class UzbekSttControllerTest {
 
     @Test
     fun downloadStatesFollowTheEvidence() {
-        val h = Harness(installed = false)
+        val h = Harness(initialInstalled = false)
         h.controller.markDownloading()
         assertEquals(OfflineModuleState.DOWNLOADING, h.controller.state)
         h.controller.markVerifying()
