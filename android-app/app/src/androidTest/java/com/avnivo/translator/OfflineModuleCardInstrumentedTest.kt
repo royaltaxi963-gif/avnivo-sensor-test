@@ -204,4 +204,63 @@ class OfflineModuleCardInstrumentedTest {
             evaluate(web, "localStorage.getItem('avnivo.offline.language-pair.v1')||''").contains("rus_Cyrl")
         )
     }
+
+    @Test
+    fun installedCardExposesDeleteAndActivationSeparately() {
+        val web = loadInterface()
+        val value = evaluate(
+            web,
+            "window.__status={id:'whisper-small-q8',state:'installed',percent:0,active:false,progress:null,verified:true,resident:false,reason:null};" +
+                "window.AvnivoOfflineModuleStatus('whisper-small-q8');" +
+                "var r=document.querySelector('[data-module-id=\"multilingual-stt\"]');" +
+                "var d=r.querySelector('.offline-module-delete'),b=r.querySelector('.offline-module-action');" +
+                "[d.hidden,d.disabled,b.getAttribute('aria-label'),b.disabled].join('|')"
+        )
+        assertEquals("false|false|Model o‘rnatilgan — faollashtirish uchun bosing|false", value)
+    }
+
+    @Test
+    fun deleteCallsTheNativeBridgeOnlyAfterConfirmation() {
+        val web = loadInterface()
+        evaluate(
+            web,
+            "window.__deleted='';" +
+                "window.AvnivoOfflineModules={statusAll:function(){return '[]'},status:function(){return JSON.stringify({id:'whisper-small-q8',state:'installed',verified:true,active:false,progress:null,reason:null})},download:function(){},delete:function(id){window.__deleted=id},activate:function(){}};" +
+                "window.confirm=function(){return true};" +
+                "window.__status={id:'whisper-small-q8',state:'installed',percent:0,active:false,progress:null,verified:true,resident:false,reason:null};" +
+                "window.AvnivoOfflineModuleStatus('whisper-small-q8');'ok'"
+        )
+        evaluate(web, "document.querySelector('[data-module-id=\"multilingual-stt\"] .offline-module-delete').click();'ok'")
+        assertEquals("whisper-small-q8", evaluate(web, "window.__deleted"))
+    }
+
+    @Test
+    fun aDeletedEventReturnsTheCardToNotInstalled() {
+        val web = loadInterface()
+        val value = evaluate(
+            web,
+            "window.__status={id:'whisper-small-q8',state:'installed',percent:0,active:false,progress:null,verified:true,resident:false,reason:null};" +
+                "window.AvnivoOfflineModuleStatus('whisper-small-q8');" +
+                "window.AvnivoOfflineModuleDeleted('whisper-small-q8');" +
+                "var r=document.querySelector('[data-module-id=\"multilingual-stt\"]');" +
+                "[r.querySelector('.offline-module-state').textContent," +
+                "r.querySelector('.offline-module-delete').hidden," +
+                "r.querySelector('.offline-module-action').getAttribute('aria-label')].join('|')"
+        )
+        assertEquals("Yuklanmagan|true|Ko‘p tillarni tanish — Whisper Small Q8 — yuklab olish", value)
+    }
+
+    @Test
+    fun activeToggleCallsNativeDeactivate() {
+        val web = loadInterface()
+        evaluate(
+            web,
+            "window.__deactivated='';" +
+                "window.AvnivoOfflineModules={statusAll:function(){return '[]'},status:function(){return JSON.stringify({id:'whisper-small-q8',state:'ready',verified:true,active:true,progress:null,reason:null})},download:function(){},deactivate:function(id){window.__deactivated=id},activate:function(){}};" +
+                "window.__status={id:'whisper-small-q8',state:'ready',percent:0,active:true,progress:null,verified:true,resident:true,reason:null};" +
+                "window.AvnivoOfflineModuleStatus('whisper-small-q8');'ok'"
+        )
+        evaluate(web, "document.querySelector('.offline-active-switch').click();'ok'")
+        assertEquals("whisper-small-q8", evaluate(web, "window.__deactivated"))
+    }
 }

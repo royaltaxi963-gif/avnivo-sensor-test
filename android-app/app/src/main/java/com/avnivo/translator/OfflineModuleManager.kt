@@ -76,6 +76,23 @@ internal class OfflineModuleManager(
     fun isOperational(id: String): Boolean = modules[id]?.state?.isOperational == true
 
     /**
+     * The Whisper module the user selected and left active, or null when no Whisper engine is
+     * selected. STT routing uses this instead of guessing Small: selecting Large must never
+     * silently fall back to Small (or vice versa), and deactivating a module clears the choice.
+     */
+    fun selectedWhisperEngine(): OfflineSttEngine? = when (activeModuleId) {
+        "whisper-small-q8" -> OfflineSttEngine.WHISPER_SMALL_Q8
+        "whisper-large-v3-turbo" -> OfflineSttEngine.WHISPER_LARGE_V3_TURBO
+        else -> null
+    }
+
+    fun selectedWhisperModuleId(): String? = selectedWhisperEngine()?.moduleId
+
+    /** Native model metadata, available only after a successful whisper.cpp load. */
+    fun engineDescription(id: String): String? =
+        (modules[id]?.engine as? WhisperEngine)?.modelDescription
+
+    /**
      * Returns the loaded engine for [id], loading it on demand.
      *
      * An engine may have been released to make room for another module, or never loaded because
@@ -206,6 +223,8 @@ internal class OfflineModuleManager(
             .put("state", module.state.code)
             .put("percent", module.percent)
             .put("active", module.state.isOperational)
+            .put("installed", isInstalled(id))
+            .put("selected", activeModuleId == id && module.state.isOperational)
             .put("progress", progress ?: JSONObject.NULL)
             .put("verified", module.verified)
             .put("resident", module.engine != null)
@@ -280,8 +299,19 @@ internal class OfflineModuleManager(
             transition(module, OfflineModuleState.NOT_INSTALLED)
             return
         }
+        // A failed load must not leave the previous module selected: routing would then silently
+        // use Small after the user chose Large (or vice versa). Clear first, then set the winner.
+        if (activeModuleId != module.spec.id) rememberActive(null)
         unloadOthers(module)
         val snapshot = memoryProvider(appContext)
+        lifecycleLog(
+            "ACTIVATE_START id=${module.spec.id} bytes=${module.spec.files.values.sumOf { it.first }} " +
+                "required_mb=${MemorySnapshot.mb(module.spec.requiredRamBytes)} " +
+                "budget_mb=${snapshot?.let { MemorySnapshot.mb(it.modelBudgetBytes) } ?: -1} " +
+                "total_mb=${snapshot?.let { MemorySnapshot.mb(it.totalMem) } ?: -1} " +
+                "avail_mb=${snapshot?.let { MemorySnapshot.mb(it.availMem) } ?: -1} " +
+                "low=${snapshot?.lowMemory ?: false}"
+        )
         if (snapshot != null && !snapshot.fits(module.spec.requiredRamBytes)) {
             module.reason = "xotira yetarli emas: " + snapshot.describe(module.spec.requiredRamBytes) +
                 ". Boshqa modulni yoping yoki qurilmani qayta ishga tushiring."
@@ -299,17 +329,29 @@ internal class OfflineModuleManager(
             rememberActive(module.spec.id)
             transition(module, OfflineModuleState.READY)
             DeviceMemory.log(appContext)
+            val nativeAllocated = if (appContext != null) {
+                runCatching { android.os.Debug.getNativeHeapAllocatedSize() }.getOrDefault(0L)
+            } else 0L
+            lifecycleLog(
+                "ACTIVATE_READY id=${module.spec.id} native_mb=${MemorySnapshot.mb(nativeAllocated)} " +
+                    "engine=${engine::class.java.simpleName}"
+            )
             notify("AvnivoOfflineModuleReady", module.spec.id)
         } catch (e: Exception) {
             module.engine?.let { runCatching { it.close() } }
             module.engine = null
             module.reason = "dvigatel ishga tushmadi: ${e.message}"
+            lifecycleLog(
+                "ACTIVATE_FAILED id=${module.spec.id} type=${e::class.java.simpleName} message=${e.message}",
+                e
+            )
             transition(module, OfflineModuleState.INSTALLED)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e.message}")
         } catch (e: UnsatisfiedLinkError) {
             module.engine?.let { runCatching { it.close() } }
             module.engine = null
             module.reason = "native kutubxonasi yuklanmadi"
+            lifecycleLog("ACTIVATE_FAILED id=${module.spec.id} UnsatisfiedLinkError", e)
             transition(module, OfflineModuleState.INSTALLED)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|native kutubxonasi yuklanmadi")
         } catch (e: OutOfMemoryError) {
@@ -319,6 +361,7 @@ internal class OfflineModuleManager(
             module.engine = null
             module.reason = "model uchun xotira yetarli emas (OutOfMemoryError): " +
                 memoryProvider(appContext)?.describe(module.spec.requiredRamBytes)
+            lifecycleLog("ACTIVATE_FAILED id=${module.spec.id} OutOfMemoryError", e)
             transition(module, OfflineModuleState.ERROR)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
         } catch (e: Throwable) {
@@ -326,6 +369,7 @@ internal class OfflineModuleManager(
             module.engine?.let { runCatching { it.close() } }
             module.engine = null
             module.reason = "dvigatel ishga tushmadi: ${e::class.java.simpleName}"
+            lifecycleLog("ACTIVATE_FAILED id=${module.spec.id} ${e::class.java.simpleName}", e)
             transition(module, OfflineModuleState.ERROR)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e::class.java.simpleName}")
         }
@@ -340,6 +384,130 @@ internal class OfflineModuleManager(
             other.engine = null
             if (other.state.isOperational) transition(other, OfflineModuleState.INSTALLED)
             notify("AvnivoOfflineModuleStatus", other.spec.id)
+        }
+    }
+
+    /**
+     * Activates an already-installed module without touching the network. This is the explicit
+     * activation path used by the card: it verifies local bytes if needed, loads the native engine,
+     * and only reports READY after the engine factory's own smoke test succeeds. It never starts a
+     * download and never falls back to another module.
+     */
+    fun activate(id: String) {
+        val module = modules[id] ?: run {
+            notify("AvnivoOfflineModuleError", "$id|Noma’lum offline modul")
+            return
+        }
+        worker.execute { verifyAndActivate(module) }
+    }
+
+    /** Verifies local files when necessary, then runs the normal activation state machine. */
+    private fun verifyAndActivate(module: Module) {
+        if (!module.spec.runnable) {
+            notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.spec.blocker ?: "Dvigatel mavjud emas"}")
+            return
+        }
+        val directory = module.spec.directory(filesDir)
+        if (!module.spec.installed(directory)) {
+            module.reason = "model fayllari topilmadi"
+            transition(module, OfflineModuleState.NOT_INSTALLED)
+            notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+            return
+        }
+        if (!module.verified) {
+            transition(module, OfflineModuleState.VERIFYING)
+            val integrity = integrityVerifier(directory, module.spec)
+            module.verified = integrity.ok
+            if (!integrity.ok) {
+                module.reason = "model buzilgan: ${integrity.reason}. Qayta yuklab oling."
+                transition(module, OfflineModuleState.ERROR)
+                notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+                return
+            }
+        }
+        module.reason = null
+        if (!module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
+        activate(module)
+    }
+
+    /**
+     * User-requested deactivation. This is deliberately separate from [delete]: it releases only
+     * the resident engine, leaves the verified files and stamp on disk, and clears the persisted
+     * selection so a restart does not silently reload the module.
+     */
+    fun deactivate(id: String) {
+        worker.execute {
+            val module = modules[id] ?: return@execute
+            val engine = module.engine
+            if (engine != null) runCatching { engine.close() }
+            module.engine = null
+            if (module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
+            module.reason = null
+            if (activeModuleId == id) rememberActive(null)
+            notify("AvnivoOfflineModuleStatus", id)
+        }
+    }
+
+    /**
+     * Permanently removes one module's files. The worker serializes this with inference and
+     * activation, and the method refuses while a download or initialization is in flight. Only
+     * this spec's directory, its known files, its temporary `.download` parts and its integrity
+     * stamp are touched; another module's directory is never traversed.
+     */
+    fun delete(id: String) {
+        val module = modules[id] ?: run {
+            notify("AvnivoOfflineModuleDeleteError", "$id|Noma’lum offline modul")
+            return
+        }
+        worker.execute {
+            if (module.state == OfflineModuleState.DOWNLOADING ||
+                module.state == OfflineModuleState.VERIFYING ||
+                module.state == OfflineModuleState.INITIALIZING) {
+                notify(
+                    "AvnivoOfflineModuleDeleteError",
+                    "$id|Yuklash yoki ishga tushirish tugashini kuting; model hozir o‘chirilmaydi."
+                )
+                return@execute
+            }
+            val directory = module.spec.directory(filesDir)
+            runCatching { module.engine?.close() }
+            module.engine = null
+            if (module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
+            if (activeModuleId == id) rememberActive(null)
+            ModelIntegrity.invalidate(directory)
+            var failure: String? = null
+            for (name in module.spec.files.keys) {
+                val file = File(directory, name)
+                if (file.exists() && !file.delete()) failure = "faylni o‘chirib bo‘lmadi: $name"
+                val partial = File(directory, "$name.download")
+                if (partial.exists() && !partial.delete() && failure == null) {
+                    failure = "vaqtinchalik faylni o‘chirib bo‘lmadi: ${partial.name}"
+                }
+            }
+            directory.listFiles()?.forEach { file ->
+                if ((file.name.endsWith(".download") || file.name.endsWith(".tmp")) &&
+                    file.exists() && !file.delete() && failure == null) {
+                    failure = "vaqtinchalik faylni o‘chirib bo‘lmadi: ${file.name}"
+                }
+            }
+            val remaining = module.spec.files.keys.filter { File(directory, it).exists() }
+            if (remaining.isNotEmpty() && failure == null) {
+                failure = "fayllar qoldi: ${remaining.joinToString()}"
+            }
+            if (failure != null) {
+                module.verified = false
+                module.reason = "o‘chirish muvaffaqiyatsiz: $failure"
+                transition(module, OfflineModuleState.ERROR)
+                notify("AvnivoOfflineModuleDeleteError", "$id|${module.reason}")
+                return@execute
+            }
+            // A directory is only removed after every known file is gone. Unknown files, if any,
+            // are left in place rather than deleting a path that might belong to another module.
+            if (directory.isDirectory && directory.listFiles()?.isEmpty() == true) directory.delete()
+            module.verified = false
+            module.reason = null
+            transition(module, OfflineModuleState.NOT_INSTALLED)
+            notify("AvnivoOfflineModuleDeleted", id)
         }
     }
 
@@ -466,6 +634,15 @@ internal class OfflineModuleManager(
         }
     }
 
+    /** Android logging is unavailable in JVM tests, so lifecycle diagnostics are device-only. */
+    private fun lifecycleLog(message: String, error: Throwable? = null) {
+        if (appContext == null) return
+        runCatching {
+            if (error == null) android.util.Log.i("AvnivoModuleLifecycle", message)
+            else android.util.Log.e("AvnivoModuleLifecycle", message, error)
+        }
+    }
+
     /** Overridable so JVM tests can exercise the lifecycle without the native runtime. */
     internal var engineFactory: (OfflineModelSpec, File) -> Closeable = ::buildEngine
 
@@ -498,8 +675,12 @@ internal class OfflineModuleManager(
 
     private fun buildEngine(spec: OfflineModelSpec, directory: File): Closeable = when (spec.engine) {
         OfflineEngineKind.WHISPER_GGML -> {
-            val model = directory.listFiles()?.firstOrNull { it.name.endsWith(".bin") }
+            // Use the spec's exact file name. Picking the first *.bin in the directory could load a
+            // stale or unrelated file if a previous interrupted download left one behind.
+            val modelName = spec.files.keys.firstOrNull { it.endsWith(".bin") }
                 ?: error("Missing ggml model")
+            val model = File(directory, modelName)
+            if (!model.isFile) error("Missing ggml model: $modelName")
             loadVerified(WhisperEngine(model, language = "auto"))
         }
         OfflineEngineKind.NLLB_ONNX -> loadVerified(NllbEngine(directory))

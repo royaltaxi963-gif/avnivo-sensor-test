@@ -225,4 +225,42 @@ class OfflineSttRouterRulesTest {
         assertEquals("ru", router.routeFor(7)?.whisperLanguage)
         assertEquals(OfflineSttEngine.WHISPER_SMALL_Q8, router.routeFor(7)?.engine)
     }
+
+    @Test
+    fun selectedLargeWhisperRoutesNonUzbekSourcesAndUzbekStillUsesUzbekStt() {
+        val large = OfflineSttEngine.WHISPER_LARGE_V3_TURBO
+        assertEquals(OfflineSttEngine.UZBEK_STT, OfflineSttRouter.engineFor("uzn_Latn", large))
+        assertEquals(OfflineSttEngine.UZBEK_STT, OfflineSttRouter.engineFor("eng_Latn", large))
+        val route = OfflineSttRouter.route("rus_Cyrl", large)
+        assertEquals(large, route.engine)
+        assertEquals("ru", route.whisperLanguage)
+        assertNull(route.unsupportedReason)
+    }
+
+    @Test
+    fun selectedLargeIsNotSilentlyReplacedBySmallWhenUnavailable() {
+        val router = OfflineSttSessionRouter(
+            uzbekAvailable = { true },
+            whisperAvailable = { false },
+            whisperEngine = { OfflineSttEngine.WHISPER_LARGE_V3_TURBO }
+        )
+        val result = router.open(1, "hin_Deva")
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull()?.message?.contains("Whisper Large V3 Turbo") == true)
+        assertNull("no fallback engine may become resident", router.residentEngine())
+        assertNull(router.routeFor(1))
+    }
+
+    @Test
+    fun selectedLargeIsTheOnlyWhisperEngineInTheSession() {
+        val router = OfflineSttSessionRouter(
+            uzbekAvailable = { true },
+            whisperAvailable = { true },
+            whisperEngine = { OfflineSttEngine.WHISPER_LARGE_V3_TURBO }
+        )
+        val opened = router.open(1, "ben_Beng").getOrThrow()
+        assertEquals(OfflineSttEngine.WHISPER_LARGE_V3_TURBO, opened.route.engine)
+        assertEquals("bn", opened.route.whisperLanguage)
+        router.close(1)
+    }
 }

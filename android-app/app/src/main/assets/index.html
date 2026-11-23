@@ -137,6 +137,11 @@ html[data-avnivo-mode=offline] .settings-description{display:none}
 .offline-module-action{width:32px;height:32px}
 .offline-module-progress{margin-top:6px}
 .offline-module-action.is-verified{background:#315c7d;color:#c7efff}
+.offline-module-delete{-webkit-tap-highlight-color:transparent;touch-action:manipulation;border:1px solid #6e4b4b;border-radius:9px;width:27px;height:27px;background:#3b2527;color:#ffb9b0;display:grid;place-items:center;padding:0;cursor:pointer}
+.offline-module-delete svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.offline-module-delete[hidden]{display:none}
+.offline-module-delete:focus-visible{outline:2px solid #ffb9b0;outline-offset:2px}
+.offline-module-delete[disabled]{cursor:wait;opacity:.6}
 /* Keep Online AI voice controls separate from Offline model downloads. */
 .avnivo-online-tts-settings{padding:0 15px 24px}
 html[data-avnivo-mode=offline] .avnivo-online-tts-settings{display:none}
@@ -1110,7 +1115,8 @@ const offlineModuleIcons={
  translate:'<path d="M4 5h11M9 3v2m4 0c-.5 5-3 8-8 11M5 9c1 3 4 6 8 8M15 21l4-10 4 10m-7-4h6"/>',
  speaker:'<path d="M4 10h4l5-4v12l-5-4H4zM17 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/>',
  download:'<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
- check:'<path d="m5 12 4 4L19 6"/>'
+ check:'<path d="m5 12 4 4L19 6"/>',
+ trash:'<path d="M4 7h16M9 7V4h6v3m-8 0 1 14h8l1-14M10 11v6m4-6v6"/>'
 };
 const offlineSvg=name=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+offlineModuleIcons[name]+'</svg>';
 const offlineList=document.querySelector('.offline-modules-list');
@@ -1139,11 +1145,18 @@ function renderOfflineActiveList(){
   toggle.setAttribute('aria-label',module.name+' — '+(enabled?'o‘chirish':'yoqish'));
   toggle.addEventListener('click',()=>{
    if(!isOfflineActive(offlineState.get(module.id)))return;
-   const next=offlineEnabled.get(module.id)===false;
-   offlineEnabled.set(module.id,next);
-   try{localStorage.setItem('avnivo.offline.enabled.'+module.id,String(next))}catch(e){}
-   window.dispatchEvent(new CustomEvent('avnivo:offline-module-toggle',{detail:{id:module.id,enabled:next}}));
-   renderOfflineActiveList();
+   const bridge=module.serverModelId?window.AvnivoOfflineSTT:window.AvnivoOfflineModules;
+   const lifecycleId=module.installerId||module.serverModelId;
+   if(!lifecycleId||!bridge||typeof bridge.deactivate!=='function')return;
+   // Native deactivation is the only thing that changes the truth; the row disappears when the
+   // module reports INSTALLED, not because the page guessed.
+   toggle.disabled=true;toggle.textContent='O‘chirilmoqda…';
+   try{
+    if(module.serverModelId)bridge.deactivate();
+    else bridge.deactivate(lifecycleId);
+   }catch(e){
+    toggle.disabled=false;toggle.textContent='Yoqilgan';offlineNotice.textContent='O‘chirish xatosi: '+e.message;
+   }
   });
   row.append(name,toggle);offlineActiveList.append(row);
  }
@@ -1157,18 +1170,26 @@ function updateOfflineModule(id,state,progress){
  const row=offlineList.querySelector('[data-module-id="'+id+'"]');if(!row)return false;
  offlineState.set(id,state);
  const btn=row.querySelector('.offline-module-action'),status=row.querySelector('.offline-module-state');
+ const del=row.querySelector('.offline-module-delete');
  const progressEl=row.querySelector('.offline-module-progress');
  const fill=row.querySelector('.offline-module-fill');
  const pct=row.querySelector('.offline-module-percent'),mb=row.querySelector('.offline-module-mb');
  const ready=isOfflineActive(state),downloaded=state==='downloaded',installed=state==='installed',initializing=state==='initializing';
- if(ready&&!offlineEnabled.has(id)){let saved=null;try{saved=localStorage.getItem('avnivo.offline.enabled.'+id)}catch(e){}offlineEnabled.set(id,saved!=='false')}
+ if(ready){offlineEnabled.set(id,true);try{localStorage.setItem('avnivo.offline.enabled.'+id,'true')}catch(e){}}
  btn.classList.toggle('is-ready',ready);
  btn.classList.toggle('is-verified',downloaded||installed||initializing);
  btn.classList.toggle('is-downloading',state==='downloading'||state==='verifying');
  btn.disabled=state==='downloading'||state==='verifying'||initializing;
+ if(ready)btn.disabled=true;
  btn.innerHTML=offlineSvg(ready||downloaded||installed||initializing?'check':'download');
- btn.setAttribute('aria-label',ready?'Modul faol':downloaded||installed?'Model o‘rnatilgan — faollashtirish uchun bosing':initializing?'Modul ishga tushirilmoqda':module.name+' — yuklab olish');
+ btn.setAttribute('aria-label',ready?'Modul faol':downloaded||installed?'Model o‘rnatilgan — faollashtirish uchun bosing':initializing?'Modul ishga tushirilmoqda':state==='error'?'Qayta urinish':module.name+' — yuklab olish');
  status.textContent=avnivoUiText(offlineStateKeys[state],offlineStateFallbacks[state]);
+ if(del){
+  const removable=installed||ready||state==='recording'||state==='transcribing'||state==='error';
+  del.hidden=!removable;
+  del.disabled=state==='downloading'||state==='verifying'||initializing;
+  del.setAttribute('aria-label',module.name+' — modelni o‘chirish');
+ }
  const reasonEl=row.querySelector('.offline-module-reason');
  if(reasonEl&&state!=='error'){reasonEl.hidden=true;reasonEl.textContent=''}
  const hasProgress=progress&&Number.isFinite(progress.downloadedBytes)&&Number.isFinite(progress.totalBytes)&&progress.totalBytes>0&&progress.downloadedBytes>=0;
@@ -1196,7 +1217,9 @@ for(const module of offlineModuleCatalog){
  const status=document.createElement('p');status.className='offline-module-state';status.textContent=avnivoUiText('offline.state.not_installed','Yuklanmagan');
  // Diagnosis line, hidden until the native side reports a concrete reason.
  const reason=document.createElement('p');reason.className='offline-module-reason';reason.hidden=true;
- const meta=document.createElement('div');meta.className='offline-module-meta';meta.append(size,status);copy.append(name,desc,meta,reason);
+ const meta=document.createElement('div');meta.className='offline-module-meta';
+ const del=document.createElement('button');del.type='button';del.className='offline-module-delete';del.hidden=true;del.innerHTML=offlineSvg('trash');del.setAttribute('aria-label',module.name+' — modelni o‘chirish');
+ meta.append(size,status,del);copy.append(name,desc,meta,reason);
  const btn=document.createElement('button');btn.type='button';btn.className='offline-module-action';btn.innerHTML=offlineSvg('download');btn.setAttribute('aria-label',module.name+' — yuklab olish');
  const progress=document.createElement('div');progress.className='offline-module-progress';progress.hidden=true;
  progress.innerHTML='<div class="offline-module-progress-label"><span class="offline-module-percent">0%</span><span class="offline-module-mb">0 MB</span></div><div class="offline-module-track" role="progressbar" aria-label="Yuklash jarayoni" aria-valuemin="0" aria-valuemax="100"><div class="offline-module-fill"></div></div>';
@@ -1205,9 +1228,15 @@ for(const module of offlineModuleCatalog){
   btn.classList.remove('is-tapped');void btn.offsetWidth;btn.classList.add('is-tapped');
   if(module.serverModelId && window.AvnivoOfflineSTT){
    try{
-    offlineNotice.textContent='Android offline modeli yuklanmoqda. Internet kerak.';
-    updateOfflineModule(module.id,'downloading',{downloadedBytes:0,totalBytes:module.bytes});
-    window.AvnivoOfflineSTT.download();
+    if(offlineState.get(module.id)==='installed'&&typeof window.AvnivoOfflineSTT.activate==='function'){
+     offlineNotice.textContent='Model o‘rnatilgan. Dvigatel ishga tushirilmoqda…';
+     updateOfflineModule(module.id,'initializing');
+     window.AvnivoOfflineSTT.activate();
+    }else{
+     offlineNotice.textContent='Android offline modeli yuklanmoqda. Internet kerak.';
+     updateOfflineModule(module.id,'downloading',{downloadedBytes:0,totalBytes:module.bytes});
+     window.AvnivoOfflineSTT.download();
+    }
    }catch(e){updateOfflineModule(module.id,'error');offlineNotice.textContent=e.message}
    return;
   }
@@ -1231,8 +1260,10 @@ for(const module of offlineModuleCatalog){
     btn.disabled=true;
     offlineNotice.textContent=alreadyInstalled?'Model o‘rnatilgan. Dvigatel yuklanmoqda…':'Model yuklash boshlanmoqda. Internet kerak.';
     updateOfflineModule(module.id,alreadyInstalled?'initializing':'downloading',alreadyInstalled?null:{downloadedBytes:0,totalBytes:module.bytes});
-    try{bridge.download(module.installerId)}
-    catch(e){updateOfflineModule(module.id,'error');offlineNotice.textContent=e.message}
+    try{
+     if(alreadyInstalled&&typeof bridge.activate==='function')bridge.activate(module.installerId);
+     else bridge.download(module.installerId);
+    }catch(e){updateOfflineModule(module.id,'error');offlineNotice.textContent=e.message}
     return;
    }
    const installer=window.avnivoSafeOfflineInstaller;
@@ -1250,6 +1281,23 @@ for(const module of offlineModuleCatalog){
   offlineNotice.textContent=module.name+': yuklash manbasi hali ulanmagan. Yuklash boshlanmadi.';
  });
  btn.addEventListener('animationend',()=>btn.classList.remove('is-tapped'));
+ del.addEventListener('click',()=>{
+  const current=offlineState.get(module.id);
+  if(!['installed','ready','recording','transcribing','error'].includes(current))return;
+  if(!window.confirm(module.name+': model fayllari butunlay o‘chiriladi. Davom etilsinmi?'))return;
+  del.disabled=true;
+  offlineNotice.textContent='O‘chirish tasdiqlandi. Faqat shu modul fayllari o‘chiriladi…';
+  if(module.serverModelId&&window.AvnivoOfflineSTT&&typeof window.AvnivoOfflineSTT.delete==='function'){
+   try{window.AvnivoOfflineSTT.delete()}catch(e){del.disabled=false;offlineNotice.textContent='O‘chirish xatosi: '+e.message}
+   return;
+  }
+  const bridge=window.AvnivoOfflineModules;
+  if(module.installerId&&bridge&&typeof bridge.delete==='function'){
+   try{bridge.delete(module.installerId)}catch(e){del.disabled=false;offlineNotice.textContent='O‘chirish xatosi: '+e.message}
+   return;
+  }
+  del.disabled=false;offlineNotice.textContent='Bu modul uchun o‘chirish mexanizmi mavjud emas.';
+ });
  row.append(mark,copy,btn,progress);offlineList.append(row);offlineState.set(module.id,'not_installed');
 }
 // The future verified installer must supply actual byte counts; no simulated progress.
@@ -1264,7 +1312,7 @@ window.AvnivoOfflineProgress=function(raw){
 };
 // Native module bridge (Whisper, NLLB): installer id -> settings card id, native state -> card state.
 const offlineUiIdByInstaller={};
-for(const module of offlineModuleCatalog){if(module.installerId)offlineUiIdByInstaller[module.installerId]=module.id}
+for(const module of offlineModuleCatalog){if(module.installerId)offlineUiIdByInstaller[module.installerId]=module.id;if(module.serverModelId)offlineUiIdByInstaller[module.serverModelId]=module.id}
 const offlineStateByInstaller={not_installed:'not_installed',downloading:'downloading',verifying:'verifying',initializing:'initializing',installed:'installed',ready:'ready',error:'error'};
 function syncOfflineModule(installerId,state,progress){
  const uiId=offlineUiIdByInstaller[installerId];if(!uiId)return;
@@ -1303,6 +1351,21 @@ window.AvnivoOfflineModuleError=function(raw){
  const note=row&&row.querySelector('.offline-module-reason');
  if(note&&parts[1]){note.textContent=parts[1];note.hidden=false}
  offlineNotice.textContent='Modul xatosi: '+(parts[1]||'noma’lum');
+};
+window.AvnivoOfflineModuleDeleted=function(installerId){
+ const uiId=offlineUiIdByInstaller[installerId];if(!uiId)return;
+ updateOfflineModule(uiId,'not_installed');
+ const row=offlineList.querySelector('[data-module-id="'+uiId+'"]');
+ const note=row&&row.querySelector('.offline-module-reason');if(note){note.textContent='';note.hidden=true}
+ offlineNotice.textContent='Model fayllari o‘chirildi. Qayta o‘rnatish uchun yuklash belgisini bosing.';
+};
+window.AvnivoOfflineModuleDeleteError=function(raw){
+ const parts=String(raw||'').split('|');
+ const uiId=offlineUiIdByInstaller[parts[0]],row=uiId&&offlineList.querySelector('[data-module-id="'+uiId+'"]');
+ const note=row&&row.querySelector('.offline-module-reason');
+ if(note&&parts[1]){note.textContent=parts[1];note.hidden=false}
+ const del=row&&row.querySelector('.offline-module-delete');if(del)del.disabled=false;
+ offlineNotice.textContent='O‘chirish xatosi: '+(parts[1]||'noma’lum');
 };
 // Reconcile the cards with the real native state on load (e.g. after an app restart).
 function syncInstalledModules(){

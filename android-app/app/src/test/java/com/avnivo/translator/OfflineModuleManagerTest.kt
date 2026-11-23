@@ -827,4 +827,185 @@ class OfflineModuleManagerTest {
             manager.close()
         }
     }
+
+    @Test fun activationOfAnInstalledModuleNeverDownloads() {
+        val spec = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(spec)
+        val manager = manager()
+        var builds = 0
+        manager.engineFactory = { _, _ -> builds += 1; FakeEngine() }
+        manager.downloaderFactory = { _, _, _ -> error("activation must not touch the network") }
+
+        manager.activate(spec.id)
+        manager.awaitIdle()
+
+        val status = JSONObject(manager.status(spec.id))
+        assertEquals("ready", status.getString("state"))
+        assertTrue(status.getBoolean("active"))
+        assertEquals(1, builds)
+        manager.close()
+    }
+
+    @Test fun smallAndLargeAreMutuallyExclusiveAndKeepTheirFiles() {
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        val large = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
+        placeInstalledModel(small)
+        placeInstalledModel(large)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+
+        manager.activate(small.id)
+        manager.awaitIdle()
+        assertEquals(OfflineSttEngine.WHISPER_SMALL_Q8, manager.selectedWhisperEngine())
+
+        manager.activate(large.id)
+        manager.awaitIdle()
+        assertEquals(OfflineSttEngine.WHISPER_LARGE_V3_TURBO, manager.selectedWhisperEngine())
+        assertTrue("large must be operational", manager.isOperational(large.id))
+        assertFalse("small must not run in parallel", manager.isOperational(small.id))
+        assertEquals("installed", JSONObject(manager.status(small.id)).getString("state"))
+        assertTrue("small files must survive large activation", small.installed(small.directory(temp.root)))
+
+        manager.activate(small.id)
+        manager.awaitIdle()
+        assertEquals(OfflineSttEngine.WHISPER_SMALL_Q8, manager.selectedWhisperEngine())
+        assertTrue("small must be operational again", manager.isOperational(small.id))
+        assertFalse("large must not run in parallel", manager.isOperational(large.id))
+        assertEquals("installed", JSONObject(manager.status(large.id)).getString("state"))
+        assertTrue("large files must survive small activation", large.installed(large.directory(temp.root)))
+        manager.close()
+    }
+
+    @Test fun twentyWhisperSwitchesLeaveExactlyOneEngineAndBothModels() {
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        val large = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
+        placeInstalledModel(small)
+        placeInstalledModel(large)
+        val manager = manager()
+        var builds = 0
+        manager.engineFactory = { _, _ -> builds += 1; FakeEngine() }
+
+        repeat(20) { index ->
+            val target = if (index % 2 == 0) small else large
+            manager.activate(target.id)
+            manager.awaitIdle()
+            assertEquals("switch ${index + 1} must select ${target.id}", 1, listOf(small, large).count { manager.isOperational(it.id) })
+            assertEquals("switch ${index + 1} must persist ${target.id}", target.id, manager.selectedWhisperEngine()?.moduleId)
+        }
+
+        assertEquals(20, builds)
+        assertTrue(small.installed(small.directory(temp.root)))
+        assertTrue(large.installed(large.directory(temp.root)))
+        manager.close()
+    }
+
+    @Test fun deactivationKeepsFilesAndClearsThePersistedChoice() {
+        val spec = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(spec)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.activate(spec.id)
+        manager.awaitIdle()
+        assertTrue(manager.isOperational(spec.id))
+
+        manager.deactivate(spec.id)
+        manager.awaitIdle()
+
+        assertEquals("installed", JSONObject(manager.status(spec.id)).getString("state"))
+        assertFalse(manager.isOperational(spec.id))
+        assertNull(manager.selectedWhisperEngine())
+        assertTrue(spec.installed(spec.directory(temp.root)))
+
+        manager.activate(spec.id)
+        manager.awaitIdle()
+        assertTrue("reactivation must not need a download", manager.isOperational(spec.id))
+        manager.close()
+    }
+
+    @Test fun deletingOneModuleLeavesTheOtherModuleUntouched() {
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        val large = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
+        placeInstalledModel(small)
+        placeInstalledModel(large)
+        val manager = manager()
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.activate(small.id)
+        manager.awaitIdle()
+
+        manager.delete(small.id)
+        manager.awaitIdle()
+
+        assertEquals("not_installed", JSONObject(manager.status(small.id)).getString("state"))
+        assertFalse(small.installed(small.directory(temp.root)))
+        assertFalse(manager.isInstalled(small.id))
+        assertNull(manager.selectedWhisperEngine())
+        assertTrue("large files must survive", large.installed(large.directory(temp.root)))
+        assertEquals("installed", JSONObject(manager.status(large.id)).getString("state"))
+        assertTrue(messages.any { it.first == "AvnivoOfflineModuleDeleted" && it.second == small.id })
+        manager.close()
+    }
+
+    @Test fun aDeletedModuleCanBeInstalledAndActivatedAgain() {
+        val (spec, content) = testSpec()
+        placeContent(spec, content)
+        val manager = realManager()
+        manager.registerForTest(spec)
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.downloaderFactory = { _, _, _ -> downloaderThatWrites(spec.id, content) }
+
+        manager.activate(spec.id)
+        manager.awaitIdle()
+        assertTrue(manager.isOperational(spec.id))
+        manager.delete(spec.id)
+        manager.awaitIdle()
+        assertFalse(manager.isInstalled(spec.id))
+
+        manager.download(spec.id)
+        manager.awaitIdle()
+        assertTrue("reinstall must verify and activate again", manager.isOperational(spec.id))
+        assertTrue(manager.isInstalled(spec.id))
+        manager.close()
+    }
+
+    @Test fun deleteNeverTouchesAnotherModulesDirectory() {
+        val (spec, content) = testSpec(id = "delete-target")
+        val (other, otherContent) = testSpec(id = "delete-neighbour")
+        placeContent(spec, content)
+        placeContent(other, otherContent)
+        val manager = realManager()
+        manager.registerForTest(spec)
+        manager.registerForTest(other)
+
+        manager.delete(spec.id)
+        manager.awaitIdle()
+
+        assertFalse(File(spec.directory(temp.root), "model.bin").exists())
+        assertTrue("neighbour file must survive", File(other.directory(temp.root), "model.bin").isFile)
+        assertEquals(otherContent, File(other.directory(temp.root), "model.bin").readText())
+        manager.close()
+    }
+
+    @Test fun aFailedLargeLoadDoesNotSilentlySelectSmall() {
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        val large = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
+        placeInstalledModel(small)
+        placeInstalledModel(large)
+        val manager = manager()
+        manager.engineFactory = { spec, _ ->
+            if (spec.id == large.id) throw IllegalStateException("large rejected")
+            FakeEngine()
+        }
+
+        manager.activate(small.id)
+        manager.awaitIdle()
+        assertEquals(OfflineSttEngine.WHISPER_SMALL_Q8, manager.selectedWhisperEngine())
+
+        manager.activate(large.id)
+        manager.awaitIdle()
+        assertNull("a failed Large load must clear the choice, not fall back", manager.selectedWhisperEngine())
+        assertFalse("Small must not be left operational after the failed switch", manager.isOperational(small.id))
+        assertEquals("installed", JSONObject(manager.status(large.id)).getString("state"))
+        assertTrue(JSONObject(manager.status(large.id)).getString("reason").contains("large rejected"))
+        manager.close()
+    }
 }

@@ -72,13 +72,21 @@ internal class VerifiedModelDownloader(
                 // A previous run downloaded and verified this file but stopped before installing
                 // it. Promoting it now avoids re-downloading hundreds of megabytes.
                 progress("Tekshirildi, o‘rnatilmoqda: $name")
-                require(temporary.renameTo(destination)) { "Cannot install model" }
+                if (!temporary.renameTo(destination)) {
+                    // renameTo refuses to replace an existing destination on Android. A stale
+                    // partial file with the wrong size must not block a verified download.
+                    destination.delete()
+                    require(temporary.renameTo(destination)) { "Cannot install model" }
+                }
             } else {
                 progress("Yuklanmoqda: $name")
                 downloadFile(url, temporary, spec.first, spec.second) { done, _ ->
                     bytesProgress(base + done, totalBytes)
                 }
-                require(temporary.renameTo(destination)) { "Cannot install model" }
+                if (!temporary.renameTo(destination)) {
+                    destination.delete()
+                    require(temporary.renameTo(destination)) { "Cannot install model" }
+                }
             }
             completedBytes += spec.first
             bytesProgress(completedBytes, totalBytes)

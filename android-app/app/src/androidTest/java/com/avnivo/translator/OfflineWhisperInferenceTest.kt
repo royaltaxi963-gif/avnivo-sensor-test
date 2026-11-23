@@ -90,6 +90,9 @@ class OfflineWhisperInferenceTest {
                 status.optString("state") == "ready"
             )
             assertTrue("the SHA-256 stamp must exist after verification: $status", status.optBoolean("verified"))
+            val nativeInfo = manager.engineDescription("whisper-small-q8").orEmpty()
+            assertTrue("whisper.cpp must expose loaded model metadata, got: $nativeInfo", nativeInfo.contains("vocab="))
+            android.util.Log.i("AvnivoWhisperSmall", "WHISPER_SMALL_NATIVE $nativeInfo")
 
             val progress = synchronized(events) {
                 events.filter { it.first == "AvnivoOfflineModuleProgress" }.map { it.second }
@@ -367,6 +370,7 @@ class OfflineWhisperInferenceTest {
         )
 
         val manager = OfflineModuleManager(context.filesDir, context.applicationContext) { _, _ -> }
+        val spec = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
         try {
             manager.download("whisper-large-v3-turbo")
             manager.awaitIdle()
@@ -375,6 +379,10 @@ class OfflineWhisperInferenceTest {
                 "large module must reach ready after real download + init, was: $status",
                 status.optString("state") == "ready"
             )
+            assertTrue("large model bytes must match the manifest", spec.installed(spec.directory(context.filesDir)))
+            val nativeInfo = manager.engineDescription("whisper-large-v3-turbo").orEmpty()
+            assertTrue("whisper.cpp must expose loaded Large metadata, got: $nativeInfo", nativeInfo.contains("vocab="))
+            android.util.Log.i("AvnivoWhisperLarge", "WHISPER_LARGE_NATIVE $nativeInfo")
 
             val asset = InstrumentationRegistry.getInstrumentation().context.assets.open("whisper_jfk_16k.wav")
             val audio = File(context.cacheDir, "whisper_jfk_large_16k.wav")
@@ -449,6 +457,49 @@ class OfflineWhisperInferenceTest {
                 "AvnivoWhisper",
                 "WHISPER_SMALL_LANG lang=bn chars=${bnText.length} text=${bnText.take(120)}"
             )
+        } finally {
+            manager.close()
+        }
+    }
+
+    /**
+     * Real Small -> Large -> Small switching, with an inference after each activation. This is
+     * intentionally part of the opt-in large job: it proves the second model is not merely
+     * downloaded, and that selecting one model releases the other instead of leaving two native
+     * contexts resident.
+     */
+    @Test
+    fun switchesSmallLargeSmallWithRealInference() {
+        assumeTrue(
+            "set -e avnivoWhisperLargeInference true to run",
+            InstrumentationRegistry.getArguments().getString("avnivoWhisperLargeInference") == "true"
+        )
+        val manager = OfflineModuleManager(context.filesDir, context.applicationContext) { _, _ -> }
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        val large = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
+        try {
+            val samples = assetSamples("whisper_jfk_16k.wav", "whisper_jfk_switch_16k.wav")
+            assertTrue("expected non-trivial audio", samples.size > 16000)
+
+            manager.download(small.id)
+            manager.awaitIdle()
+            assertEquals("small must be ready first", "ready", JSONObject(manager.status(small.id) ?: "{}").optString("state"))
+            assertFalse("small transcript must not be empty", manager.transcribe(small.id, samples).isBlank())
+
+            manager.download(large.id)
+            manager.awaitIdle()
+            assertEquals("large must be ready after switching", "ready", JSONObject(manager.status(large.id) ?: "{}").optString("state"))
+            assertFalse("large transcript must not be empty", manager.transcribe(large.id, samples).isBlank())
+            assertEquals("small must be installed but not active", "installed", JSONObject(manager.status(small.id) ?: "{}").optString("state"))
+            assertTrue("small files must remain after large activation", small.installed(small.directory(context.filesDir)))
+
+            manager.download(small.id)
+            manager.awaitIdle()
+            assertEquals("small must be ready after switching back", "ready", JSONObject(manager.status(small.id) ?: "{}").optString("state"))
+            assertFalse("small transcript after switching back must not be empty", manager.transcribe(small.id, samples).isBlank())
+            assertEquals("large must be installed but not active", "installed", JSONObject(manager.status(large.id) ?: "{}").optString("state"))
+            assertTrue("large files must remain after switching back", large.installed(large.directory(context.filesDir)))
+            android.util.Log.i("AvnivoWhisper", "WHISPER_SWITCH small_large_small=ok")
         } finally {
             manager.close()
         }

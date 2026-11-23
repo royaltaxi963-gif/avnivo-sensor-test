@@ -128,6 +128,9 @@ jobs:
       - name: Assert Whisper Small card state and real progress
         working-directory: .
         run: node --test tests/offline-whisper-small-state.test.cjs
+      - name: Assert Whisper Small/Large selection, activation and deletion
+        working-directory: .
+        run: node --test tests/offline-whisper-module-management.test.cjs
       - name: Upload unit test reports
         if: always()
         uses: actions/upload-artifact@v4

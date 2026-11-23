@@ -60,7 +60,13 @@ class MainActivity : Activity() {
      */
     private val sttSessions = OfflineSttSessionRouter(
         uzbekAvailable = { modelInstalled },
-        whisperAvailable = { moduleManager.isInstalled("whisper-small-q8") }
+        whisperAvailable = {
+            val selected = moduleManager.selectedWhisperModuleId()
+            selected != null && moduleManager.isInstalled(selected)
+        },
+        whisperEngine = {
+            moduleManager.selectedWhisperEngine() ?: OfflineSttEngine.WHISPER_SMALL_Q8
+        }
     )
 
     /** The engine currently decoding, so a different engine cannot start a parallel inference. */
@@ -118,6 +124,40 @@ class MainActivity : Activity() {
         @JavascriptInterface fun offlineLanguageRegistry(): String = NllbLanguageRegistry.json()
         @JavascriptInterface fun statusAll(): String = moduleManager.statusAll()
         @JavascriptInterface fun download(id: String) { if (moduleManager.hasModule(id)) moduleManager.download(id) else notifyJs("AvnivoOfflineError", "Noma’lum offline modul: $id") }
+
+        /** Explicit activation of an installed module; no network and no fallback. */
+        @JavascriptInterface fun activate(id: String) {
+            if (rejectWhileOfflineBusy(id, "faollashtirish")) return
+            if (moduleManager.hasModule(id)) moduleManager.activate(id)
+            else notifyJs("AvnivoOfflineModuleError", "$id|Noma’lum offline modul")
+        }
+
+        /** Releases the resident engine but keeps the verified model files for later activation. */
+        @JavascriptInterface fun deactivate(id: String) {
+            if (rejectWhileOfflineBusy(id, "o‘chirish")) return
+            if (moduleManager.hasModule(id)) moduleManager.deactivate(id)
+            else notifyJs("AvnivoOfflineModuleError", "$id|Noma’lum offline modul")
+        }
+
+        /** Permanently deletes one module; activation and deletion are separate operations. */
+        @JavascriptInterface fun delete(id: String) {
+            if (rejectWhileOfflineBusy(id, "o‘chirish")) return
+            if (moduleManager.hasModule(id)) moduleManager.delete(id)
+            else notifyJs("AvnivoOfflineModuleDeleteError", "$id|Noma’lum offline modul")
+        }
+
+        /**
+         * A recording or a running decode owns the recognizer. Rejecting lifecycle changes here
+         * prevents a card action from closing the engine under an in-flight session.
+         */
+        private fun rejectWhileOfflineBusy(id: String, action: String): Boolean {
+            if (!sttController.isRecording && transcribingEngine == null && !busy) return false
+            notifyJs(
+                "AvnivoOfflineModuleDeleteError",
+                "$id|Yozuv yoki nutq tanish davom etmoqda; $action bekor qilindi. Avval uni yakunlang."
+            )
+            return true
+        }
 
         /**
          * Offline translation. Runs on the worker and answers through `AvnivoOfflineTranslation`,
@@ -306,6 +346,66 @@ class MainActivity : Activity() {
                 }
             }
         }
+        /** Explicitly loads the already-installed Uzbek recognizer without downloading it. */
+        @JavascriptInterface fun activate() {
+            runOnUiThread {
+                if (busy) {
+                    notifyJs("AvnivoOfflineStatus", "Oldingi jarayon tugashini kuting.")
+                } else if (!modelInstalled) {
+                    notifyJs("AvnivoOfflineError", "O‘zbek STT modeli yuklab olinmagan.")
+                } else if (sttController.isOperational) {
+                    notifyJs("AvnivoOfflineStatus", "Model allaqachon yuklangan.")
+                } else {
+                    notifyJs("AvnivoOfflineStatus", "O‘zbek STT dvigateli ishga tushirilmoqda…")
+                    worker.execute { verifyEngine() }
+                }
+            }
+        }
+
+        /** Releases the Uzbek recognizer but leaves the model files for the next activation. */
+        @JavascriptInterface fun deactivate() {
+            runOnUiThread {
+                if (sttController.isRecording || transcribingEngine != null) {
+                    notifyJs("AvnivoOfflineStatus", "Yozuv yoki nutq tanish davom etmoqda; keyinroq urinib ko‘ring.")
+                    return@runOnUiThread
+                }
+                worker.execute {
+                    if (!sttController.releaseForMemory()) {
+                        notifyJs("AvnivoOfflineStatus", "O‘zbek STT dvigateli allaqachon bo‘shatilgan.")
+                    }
+                }
+            }
+        }
+
+        /**
+         * Deletes only the Uzbek STT model directory. The recognizer is closed first, and the card
+         * is returned to "Yuklanmagan" only after the directory is really gone.
+         */
+        @JavascriptInterface fun delete() {
+            runOnUiThread {
+                if (sttController.isRecording || transcribingEngine != null || busy) {
+                    notifyJs(
+                        "AvnivoOfflineModuleDeleteError",
+                        "uzbek-stt|Yozuv yoki nutq tanish davom etmoqda; o‘chirish bekor qilindi."
+                    )
+                    return@runOnUiThread
+                }
+                worker.execute {
+                    sttController.close()
+                    val removed = runCatching { modelDir.deleteRecursively() }.getOrDefault(false)
+                    sttController.refreshInstalled()
+                    if (!modelDir.exists() && removed) {
+                        notifyJs("AvnivoOfflineModuleDeleted", "uzbek-stt")
+                    } else {
+                        notifyJs(
+                            "AvnivoOfflineModuleDeleteError",
+                            "uzbek-stt|model fayllarini o‘chirib bo‘lmadi; qayta urinib ko‘ring."
+                        )
+                    }
+                }
+            }
+        }
+
         /** Backward-compatible entry point; new pages use [startWithLanguage]. */
         @JavascriptInterface fun start(session: Int = 0) =
             startForLanguage(session, OfflineSttRouter.UZBEK)
@@ -356,6 +456,7 @@ class MainActivity : Activity() {
                     // to release and the model files must stay untouched.
                     OfflineSttEngine.UZBEK_STT -> sttController.releaseForMemory()
                     OfflineSttEngine.WHISPER_SMALL_Q8 -> moduleManager.unload("whisper-small-q8")
+                    OfflineSttEngine.WHISPER_LARGE_V3_TURBO -> moduleManager.unload("whisper-large-v3-turbo")
                     null -> Unit
                 }
                 if (route.engine == OfflineSttEngine.UZBEK_STT && modelInstalled && !sttController.isOperational) {
@@ -514,8 +615,9 @@ class MainActivity : Activity() {
             try {
                 val text = when (route.engine) {
                     OfflineSttEngine.UZBEK_STT -> sttController.transcribe(session, samples)
-                    OfflineSttEngine.WHISPER_SMALL_Q8 ->
-                        moduleManager.transcribe(OfflineSttEngine.WHISPER_SMALL_Q8.moduleId, samples, route.whisperLanguage)
+                    OfflineSttEngine.WHISPER_SMALL_Q8,
+                    OfflineSttEngine.WHISPER_LARGE_V3_TURBO ->
+                        moduleManager.transcribe(route.engine.moduleId, samples, route.whisperLanguage)
                 }
                 logStt(
                     session,

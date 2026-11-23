@@ -7,6 +7,10 @@ import java.io.File
 internal class WhisperEngine(private val modelFile: File, private val language: String) : Closeable {
     private var handle: Long = 0L
 
+    /** Model metadata returned by whisper.cpp after a successful load, for device diagnostics. */
+    @Volatile var modelDescription: String? = null
+        private set
+
     companion object {
         const val SAMPLE_RATE = 16000
 
@@ -32,9 +36,25 @@ internal class WhisperEngine(private val modelFile: File, private val language: 
     fun prepare() {
         if (handle != 0L) return
         require(ensureNativeLoaded()) { "Whisper native library is unavailable" }
-        require(modelFile.isFile && modelFile.length() > 0L) { "Missing model file" }
+        require(modelFile.isFile && modelFile.length() > 0L) {
+            "Missing model file: ${modelFile.name} (${modelFile.length()} bytes)"
+        }
         handle = nativeInit(modelFile.absolutePath)
-        require(handle != 0L) { "Whisper model failed to load" }
+        require(handle != 0L) {
+            "Whisper model failed to load: ${modelFile.name} (${modelFile.length()} bytes)"
+        }
+        try {
+            val info = nativeModelInfo(handle)
+            require(info.isNotBlank()) { "Whisper loaded without model metadata" }
+            modelDescription = info
+            android.util.Log.i(
+                "AvnivoWhisper",
+                "WHISPER_MODEL_LOADED file=${modelFile.name} bytes=${modelFile.length()} info=$info"
+            )
+        } catch (t: Throwable) {
+            close()
+            throw t
+        }
     }
 
     @Synchronized
@@ -46,8 +66,19 @@ internal class WhisperEngine(private val modelFile: File, private val language: 
         return nativeTranscribe(handle, samples, languageOverride ?: language)
     }
 
-    /** One second of silence through the full pipeline proves the model and runtime work. */
-    fun smokeTest(): String = transcribe(FloatArray(SAMPLE_RATE))
+    /**
+     * One second of silence through the full pipeline proves the model and runtime work. The JNI
+     * layer throws when whisper_full returns a non-zero status, so a successful smoke test means
+     * the decoder really ran, not merely that the file was mapped.
+     */
+    fun smokeTest(): String {
+        val text = transcribe(FloatArray(SAMPLE_RATE))
+        android.util.Log.i(
+            "AvnivoWhisper",
+            "WHISPER_SMOKE_OK file=${modelFile.name} chars=${text.length} info=${modelDescription ?: "-"}"
+        )
+        return text
+    }
 
     @Synchronized
     override fun close() {
@@ -55,9 +86,11 @@ internal class WhisperEngine(private val modelFile: File, private val language: 
             nativeRelease(handle)
             handle = 0L
         }
+        modelDescription = null
     }
 
     private external fun nativeInit(modelPath: String): Long
+    private external fun nativeModelInfo(handle: Long): String
     private external fun nativeTranscribe(handle: Long, samples: FloatArray, language: String): String
     private external fun nativeRelease(handle: Long)
 }

@@ -3,7 +3,16 @@ package com.avnivo.translator
 /** The two offline recognizers the app may use. Only one is active in a recording session. */
 internal enum class OfflineSttEngine(val moduleId: String) {
     UZBEK_STT("uzbek-stt"),
-    WHISPER_SMALL_Q8("whisper-small-q8")
+    WHISPER_SMALL_Q8("whisper-small-q8"),
+    WHISPER_LARGE_V3_TURBO("whisper-large-v3-turbo");
+
+    val isWhisper: Boolean get() = this != UZBEK_STT
+    val displayName: String
+        get() = when (this) {
+            UZBEK_STT -> "O‘zbek STT"
+            WHISPER_SMALL_Q8 -> "Whisper Small Q8"
+            WHISPER_LARGE_V3_TURBO -> "Whisper Large V3 Turbo"
+        }
 }
 
 /** NLLB codes are not Whisper codes; every translation goes through this explicit map. */
@@ -21,7 +30,7 @@ internal data class SttRoute(
 /**
  * The user's fixed routing rule:
  *   source == Uzbek or English -> Uzbek STT
- *   every other NLLB source     -> Whisper Small Q8
+ *   every other NLLB source     -> the Whisper module the user selected (Small or Large)
  * The target language never participates. This is intentionally separate from the NLLB registry:
  * an STT engine's language coverage must not remove or reorder offline translation languages.
  */
@@ -29,23 +38,31 @@ internal object OfflineSttRouter {
     const val UZBEK = "uzn_Latn"
     const val ENGLISH = "eng_Latn"
 
-    fun engineFor(sourceLanguage: String?): OfflineSttEngine =
-        if (sourceLanguage == UZBEK || sourceLanguage == ENGLISH) {
+    fun engineFor(
+        sourceLanguage: String?,
+        whisperEngine: OfflineSttEngine = OfflineSttEngine.WHISPER_SMALL_Q8
+    ): OfflineSttEngine {
+        val selected = whisperEngine.takeIf { it.isWhisper } ?: OfflineSttEngine.WHISPER_SMALL_Q8
+        return if (sourceLanguage == UZBEK || sourceLanguage == ENGLISH) {
             OfflineSttEngine.UZBEK_STT
         } else {
-            OfflineSttEngine.WHISPER_SMALL_Q8
+            selected
         }
+    }
 
-    fun route(sourceLanguage: String?): SttRoute {
+    fun route(
+        sourceLanguage: String?,
+        whisperEngine: OfflineSttEngine = OfflineSttEngine.WHISPER_SMALL_Q8
+    ): SttRoute {
         require(!sourceLanguage.isNullOrBlank()) { "Manba tili tanlanmagan" }
-        val engine = engineFor(sourceLanguage)
+        val engine = engineFor(sourceLanguage, whisperEngine)
         if (engine == OfflineSttEngine.UZBEK_STT) return SttRoute(engine, null, sourceLanguage = sourceLanguage)
         val whisper = WhisperLanguageMap.codeFor(sourceLanguage)
         return if (whisper == null) {
             SttRoute(
                 engine,
                 null,
-                "Whisper Small bu tilni qo‘llab-quvvatlamaydi: $sourceLanguage. " +
+                "${engine.displayName} bu tilni qo‘llab-quvvatlamaydi: $sourceLanguage. " +
                     "Til offline tarjimada qoladi, lekin nutqni tanish uchun mos STT modeli yo‘q.",
                 sourceLanguage = sourceLanguage
             )
@@ -62,7 +79,9 @@ internal object OfflineSttRouter {
  */
 internal class OfflineSttSessionRouter(
     private val uzbekAvailable: () -> Boolean,
-    private val whisperAvailable: () -> Boolean
+    private val whisperAvailable: () -> Boolean,
+    /** The Whisper module selected in offline settings; never silently falls back. */
+    private val whisperEngine: () -> OfflineSttEngine = { OfflineSttEngine.WHISPER_SMALL_Q8 }
 ) {
     data class Opened(val session: Int, val route: SttRoute, val previous: OfflineSttEngine?)
 
@@ -77,19 +96,21 @@ internal class OfflineSttSessionRouter(
         if (activeSession != 0 && activeSession != session) {
             return Result.failure(IllegalStateException("Oldingi yozuv sessiyasi hali yopilmagan"))
         }
-        val route = runCatching { OfflineSttRouter.route(sourceLanguage) }
+        val route = runCatching { OfflineSttRouter.route(sourceLanguage, whisperEngine()) }
             .getOrElse { return Result.failure(it) }
         if (route.unsupportedReason != null) {
             return Result.failure(IllegalArgumentException(route.unsupportedReason))
         }
         val available = when (route.engine) {
             OfflineSttEngine.UZBEK_STT -> uzbekAvailable()
-            OfflineSttEngine.WHISPER_SMALL_Q8 -> whisperAvailable()
+            else -> whisperAvailable()
         }
         if (!available) {
-            val name = if (route.engine == OfflineSttEngine.UZBEK_STT) "O‘zbek STT" else "Whisper Small Q8"
             return Result.failure(
-                IllegalStateException("$name modeli yuklab olinmagan. Avtomatik yuklab olish boshlanmadi.")
+                IllegalStateException(
+                    "${route.engine.displayName} modeli yuklab olinmagan yoki yoqilmagan. " +
+                        "Avtomatik yuklab olish yoki boshqa modelga o‘tish boshlanmadi."
+                )
             )
         }
         val previous = residentEngine?.takeIf { it != route.engine }

@@ -138,7 +138,8 @@ test('13. READY clears a stale reason and ERROR renders its own reason', () => {
 
 test('14. READY still requires the real whisper.cpp load and smoke inference', () => {
   assert.match(engine, /nativeInit\(modelFile\.absolutePath\)/);
-  assert.match(engine, /fun smokeTest\(\): String = transcribe\(FloatArray\(SAMPLE_RATE\)\)/);
+  assert.match(engine, /fun smokeTest\(\): String/);
+  assert.match(engine, /transcribe\(FloatArray\(SAMPLE_RATE\)\)/);
   assert.match(manager, /loadVerified\(WhisperEngine\(model, language = "auto"\)\)/);
   assert.match(jni, /whisper_init_from_file_with_params/);
   assert.match(jni, /whisper_full\(session->ctx/);
