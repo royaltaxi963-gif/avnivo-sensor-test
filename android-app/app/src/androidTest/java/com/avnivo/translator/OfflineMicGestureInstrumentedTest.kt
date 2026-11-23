@@ -65,12 +65,12 @@ class OfflineMicGestureInstrumentedTest {
     }
 
     @Test
-    fun terminalStatusClearsGestureStateWithoutInsertingText() {
+    fun rejectionClearsGestureStateWithoutInsertingText() {
         val web = loadInterface()
         val value = evaluate(
             web,
             "var s=document.querySelector('.writing-shell');s.classList.add('hold-voice');" +
-                "window.AvnivoOfflineStatus('Model allaqachon yuklangan.');" +
+                "window.AvnivoOfflineRejected('Model allaqachon yuklangan.');" +
                 "s.classList.contains('hold-voice')+'|'+document.querySelector('.writing-area').value"
         )
         assertEquals("false|", value)
