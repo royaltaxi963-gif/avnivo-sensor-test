@@ -371,6 +371,9 @@ jobs:
             grep -q "OK (" instrument_whisper_runtime.txt || { echo WHISPER_RUNTIME_FAILED; exit 1; }
             adb shell am instrument -w -e class com.avnivo.translator.OfflineModuleCardInstrumentedTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_module_card.txt
             grep -q "OK (" instrument_module_card.txt || { echo MODULE_CARD_FAILED; exit 1; }
+            # Persisted selection across 10 manager restarts, and deletion that leaves a neighbour.
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineModuleLifecycleInstrumentedTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_module_lifecycle.txt
+            grep -q "OK (" instrument_module_lifecycle.txt || { echo MODULE_LIFECYCLE_FAILED; exit 1; }
             adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper.txt
             grep -q "OK (" instrument_whisper.txt || { echo WHISPER_INFERENCE_FAILED; exit 1; }
             # A skipped test also reports "OK", so require the real download, SHA-256 and both
