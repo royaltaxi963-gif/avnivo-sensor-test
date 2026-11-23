@@ -118,7 +118,10 @@ class OfflineRealInferenceTest {
         val audio = File(context.cacheDir, "jfk_english_for_uzbek_stt_16k.wav")
         asset.use { input -> audio.outputStream().use { input.copyTo(it) } }
         val samples = readWavSamples(audio)
-        val text = OfflineSpeechEngine(modelDir).use { it.transcribe(samples) }.trim()
+        val text = OfflineSpeechEngine(modelDir).use {
+            it.prepare()
+            it.transcribe(samples)
+        }.trim()
         val marker = "UZBEK_STT_ENGLISH_ROUTE engine=uzbek-stt accuracy=not-scored chars=${text.length} text=${text.take(120)}"
         println(marker)
         android.util.Log.i("AvnivoUzbekStt", marker)
