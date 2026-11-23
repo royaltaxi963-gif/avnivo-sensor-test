@@ -422,13 +422,15 @@ class OfflineWhisperInferenceTest {
             val status = JSONObject(manager.status("whisper-small-q8") ?: "{}")
             assertEquals("ready", status.optString("state"))
 
+            // Real native recordings, not espeak-ng. Synthetic speech made this test assert words
+            // the synthesizer never pronounced; the model was blamed for the fixture's failure.
             val cases = listOf(
-                Triple("whisper_hi_16k.wav", "hi", listOf("नमस्ते", "आज", "मौसम", "अच्छा")),
-                Triple("whisper_bn_16k.wav", "bn", listOf("আজ", "আবহাওয়া", "সুন্দর"))
+                Triple("hindi_delhi_16k.wav", "hi", listOf("दिल्ली")),
+                Triple("bengali_bangla_16k.wav", "bn", listOf("বাংলা"))
             )
             for ((assetName, language, expected) in cases) {
                 val samples = assetSamples(assetName, assetName)
-                assertTrue("$language audio must be non-trivial", samples.size > 16000)
+                assertTrue("$language audio must be non-trivial", samples.size > 8000)
                 val text = manager.transcribe("whisper-small-q8", samples, language).lowercase()
                 assertFalse("$language transcription must not be empty", text.isBlank())
                 val script = if (language == "hi") '\u0900'..'\u097F' else '\u0980'..'\u09FF'
