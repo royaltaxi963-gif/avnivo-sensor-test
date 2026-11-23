@@ -343,7 +343,7 @@ jobs:
             adb logcat -d | grep -a "UZBEK_STT_ACCURACY" | tail -1
             adb logcat -d | grep -qa "UZBEK_STT_ACCURACY wer=" || { echo UZBEK_STT_ACCURACY_NOT_MEASURED; exit 1; }
             adb logcat -d | grep -a "UZBEK_STT_LATENCY" | tail -1
-            adb logcat -d | grep -qa "UZBEK_STT_LATENCY decode_ms=" || { echo UZBEK_STT_LATENCY_NOT_MEASURED; exit 1; }
+            adb logcat -d | grep -qa "UZBEK_STT_LATENCY .*decode_ms=" || { echo UZBEK_STT_LATENCY_NOT_MEASURED; exit 1; }
             # 30 sequential real sessions, 10 restarts and 5 memory recoveries on the real decoder.
             adb shell am instrument -w -e class com.avnivo.translator.OfflineUzbekSttStressInstrumentedTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_stress.txt
             grep -q "OK (" instrument_stress.txt || { echo UZBEK_STT_STRESS_FAILED; exit 1; }
@@ -394,7 +394,7 @@ jobs:
             adb logcat -d | grep -a "UZBEK_STT_RESULT" | tail -1
             adb logcat -d | grep -qa "UZBEK_STT_RESULT text=." || { echo UZBEK_STT_OFFLINE_NOT_TRANSCRIBED; exit 1; }
             adb logcat -d | grep -qa "UZBEK_STT_ACCURACY wer=" || { echo UZBEK_STT_OFFLINE_ACCURACY_NOT_MEASURED; exit 1; }
-            adb logcat -d | grep -qa "UZBEK_STT_LATENCY decode_ms=" || { echo UZBEK_STT_OFFLINE_LATENCY_NOT_MEASURED; exit 1; }
+            adb logcat -d | grep -qa "UZBEK_STT_LATENCY .*decode_ms=" || { echo UZBEK_STT_OFFLINE_LATENCY_NOT_MEASURED; exit 1; }
             # The same 30 sessions / 10 restarts / 5 recoveries with the radios off prove the whole
             # stability path is offline, not only the first decode.
             adb shell am instrument -w -e class com.avnivo.translator.OfflineUzbekSttStressInstrumentedTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_stress_offline.txt
