@@ -431,12 +431,12 @@ class OfflineWhisperInferenceTest {
                 "Hindi audio must produce Devanagari, got: $hiText",
                 hiText.any { it in '\u0900'..'\u097F' }
             )
-            val hiHits = listOf("अभी", "क्रैश", "धरती").count { it in hiText }
+            val hiHits = listOf("यह", "पता", "कितना").count { it in hiText }
             android.util.Log.i(
                 "AvnivoWhisper",
                 "WHISPER_SMALL_LANG lang=hi chars=${hiText.length} recall=$hiHits/3 text=${hiText.take(120)}"
             )
-            assertTrue("Hindi recall $hiHits/3 too low for: $hiText", hiHits >= 1)
+            assertTrue("Hindi recall $hiHits/3 too low for: $hiText", hiHits >= 2)
 
             val bengali = assetSamples("bengali_fleurs_1654_16k.wav", "bengali_fleurs_1654_16k.wav")
             assertTrue("Bengali audio must be non-trivial", bengali.size > 16000)
