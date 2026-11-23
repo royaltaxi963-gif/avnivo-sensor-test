@@ -1612,3 +1612,54 @@ never the Uzbek one. If the device has no Russian TTS voice, the button title mu
 «Bu til uchun ovoz o‘rnatilmagan: ru» and it must stay silent rather than speak Russian in Uzbek.
 Capture `adb logcat -s AvnivoNllb AvnivoSileroTts` while doing it.
 
+
+## Stage: offline STT session chain (S23 Ultra report)
+
+The S23 Ultra reported one bug chain, not three separate faults: the first Uzbek recording produced
+nothing, the second press showed the first recording's text, and the processing indicator never
+appeared. The same run showed the module card claiming the engine was missing while its files were
+installed, and the greeting animation returning in the middle of transcription.
+
+| Symptom | Root cause | Fix |
+| --- | --- | --- |
+| First press yields no text | `start` submitted microphone capture to the same single-thread executor that loads the 592 MB model, so capture waited behind `verifyEngine()` and often missed the whole press. | `captureWorker` (microphone) is separate from `worker` (download/activation) and `sttWorker` (decode). Capture starts immediately. |
+| Second press shows the first transcript | A press was refused while `busy` was true, and `busy` stayed set during decoding. The first result was therefore only visible when the user pressed again. | `UzbekSttController` owns `openSession` and `transcribingSession`. A press is refused only while another capture is still open; a running decode never blocks it. |
+| A result can land in the wrong press | Native results had no session identity, so a late result could overwrite a newer recording. | The page allocates the session, the controller adopts it, and every native callback carries it. `AvnivoOfflineResult` / `Error` / `Level` / `State` reject a session that is not current. |
+| Processing indicator never appears | The indicator was driven by a status string, and the old status handler treated any non-"yozib olin" message as a release. | The controller emits `recording` and `transcribing` states before decoding. `AvnivoOfflineStatus` is informational only; only a result, error or explicit rejection ends a press. |
+| Greeting animation returns mid-transcription | The same status heuristic called `finishOfflineHold()` on "Matnga aylantirilmoqda…", restoring the composer while the decode was still running. | The heuristic is gone; the hold stays until the current press settles. |
+| Card cannot read its own state | `moduleStatus()` was declared on the Activity, but only the `Bridge()` object is passed to `addJavascriptInterface`, so the page could never call it. | `moduleStatus()` moved onto `Bridge`; `AvnivoOfflineState` updates the card, the active list and the reason line from that JSON. |
+| Recording/decoding makes the card disappear | `renderOfflineActiveList` kept only `ready`. | `recording` and `transcribing` are active states; the card stays visible with its switch. |
+| Release before the microphone opens is lost | `recorder` was null when `stop()` arrived, so the capture ran to the 30 s limit. | The bridge remembers the release per session (`stopRequestedSession`) and applies it when capture starts. |
+| Engine released under memory pressure never returns | The old engine field was closed and never rebuilt. | `onTrimMemory(RUNNING_CRITICAL)` calls `releaseForMemory()`; the next press or `onResume` reloads through `ensureReady()`. |
+| Installed card says the engine is missing | The card was promoted or demoted by wording instead of evidence. | Native states `installed`, `initializing`, `ready`, `recording`, `transcribing` and `error` are rendered directly; `installed` reads "O'rnatilgan · ishlatilganda yuklanadi". |
+
+### Tests added
+
+| Layer | What it proves |
+| --- | --- |
+| Node `offline-stt-state.test.cjs` (12) | A status string never ends a press; the card accepts every native state; `moduleStatus` is on the registered bridge; memory release is recoverable; resume re-announces; a cancelled press discards its audio; startup READY cannot cut a live recording. |
+| JVM `UzbekSttControllerTest` (16) | 30 sequential sessions produce 30 transcripts; a new press is allowed while the previous decode runs; a stale release cannot own a newer capture; 5 release/recovery cycles rebuild the decoder; OOM and decode failures settle ERROR and the next session recovers; 10 restarts reach READY; `statusJson` exposes the evidence. |
+| JVM `SpeechAccuracyTest` (7) | WER/CER are real edit distances; an empty hypothesis is never "perfect"; a wrong transcript has a positive error rate. |
+| JVM `OfflineModuleStateTest` (7) | READY/RECORDING/TRANSCRIBING are operational; a download can never jump to READY; capture transitions exist. |
+| Instrumented `OfflineMicGestureInstrumentedTest` (+5) | 30 pointer press/release cycles insert 30 own transcripts; 10 mode switches keep the card ready; the state callback drives the card; a progress status does not end a live recording; a cancelled press drops its late result. |
+| Instrumented `OfflineUzbekSttStressInstrumentedTest` (new) | 30 real sessions, 10 restarts and 5 recoveries on the real decoder; logs `UZBEK_STT_STRESS`, `UZBEK_STT_RESTARTS`, `UZBEK_STT_RECOVERY`. |
+| Instrumented `OfflineRealInferenceTest` | Adds `UZBEK_STT_ACCURACY wer=... cer=...` and `UZBEK_STT_LATENCY prepare_ms=... decode_ms=...`; WER must stay below 1.0. |
+
+### Evidence status for this stage
+
+| Check | Result |
+| --- | --- |
+| Node suites (13 files) | **114 pass / 0 fail** locally with `node --test`. |
+| JVM unit tests | 140 test methods present (116 before + 16 controller + 7 accuracy + 1 state). CI runs them; this sandbox has no JVM/Gradle. |
+| Instrumented tests | 48 methods across 13 suites (42 before + 5 gesture + 1 stress class). CI runs them; this sandbox has no emulator. |
+| APK | Produced by the `apk` job of the pushed commit; digest recorded after the run. |
+| PR | #28 stays **draft**; no new branch or PR, `main` untouched. |
+
+### Next exact action
+
+Push the commit to `integrate/offline-engines-20261118`, wait for the `apk` and `emulator-smoke`
+jobs, then install the new APK on the S23 Ultra and run the acceptance: 30 sequential Uzbek
+recordings each produce their own text on the first press; the processing indicator appears
+immediately after release; 10 offline/online switches keep the module card visible; 5 forced
+memory-pressure cycles recover on the next press; and a Russian translation is never read with the
+Uzbek voice. Capture `adb logcat -s AvnivoUzbekStt AvnivoSileroTts` during the run.

@@ -26,21 +26,27 @@ class MainActivity : Activity() {
     private var recorder: OfflinePcmRecorder? = null
     private var busy = false
 
-    /** Reused across recordings: rebuilding the NeMo recognizer costs seconds per press. */
-    private var uzEngine: OfflineSpeechEngine? = null
-
-    @Volatile private var state = OfflineModuleState.NOT_INSTALLED
-    @Volatile private var percent = 0
-    @Volatile private var recording = false
-
     /**
-     * Bumped on every press. A capture and its inference carry the value they started with, so a
-     * late result from an earlier press can never be inserted into a later one.
+     * The Uzbek recognizer's lifecycle and evidence-based state. One instance per activity, so the
+     * decoder is prepared once and reused across every press, session and mode switch.
      */
-    @Volatile private var sttSession = 0
+    private val sttController by lazy {
+        UzbekSttController(
+            recognizerFactory = { OfflineSpeechEngine(modelDir) },
+            modelPresent = { OfflineSpeechEngine.hasRequiredFiles(modelDir) },
+            onStateChanged = { _, _, session ->
+                notifyJs("AvnivoOfflineState", sttController.statusJson(session).toString(), session)
+            }
+        )
+    }
 
-    /** The session whose capture is currently open, or 0 when nothing is being recorded. */
-    @Volatile private var openCaptureSession = 0
+    @Volatile private var percent = 0
+
+    /** A cancelled press; its audio must never be decoded into a later session. */
+    @Volatile private var discardSession = 0
+
+    /** A release that arrived before the microphone object existed, applied when capture starts. */
+    @Volatile private var stopRequestedSession = 0
 
     /** The WebView capture request waiting on the Android permission dialog, if any. */
     private var pendingWebAudioRequest: PermissionRequest? = null
@@ -57,7 +63,10 @@ class MainActivity : Activity() {
         web.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 // Re-activate a previously installed model after an app restart or process death.
-                if (modelInstalled && !busy) worker.execute { verifyEngine() }
+                sttController.refreshInstalled()
+                if (modelInstalled && !busy && sttController.state != OfflineModuleState.READY) {
+                    worker.execute { verifyEngine() }
+                }
                 // Re-initialize previously downloaded extra modules so their cards recover on restart.
                 worker.execute { moduleManager.reactivateInstalled() }
             }
@@ -80,13 +89,12 @@ class MainActivity : Activity() {
     private val ttsPlayer = SileroTtsPlayer()
 
     /**
-     * The ready Whisper module id, if any. Uzbek STT keeps priority: the Uzbek model is the one the
-     * device user installed for their own language, and routing their speech to a multilingual model
-     * they did not ask for produced empty transcripts. Whisper is used only when Uzbek is unavailable
-     * and a Whisper module is actually installed.
+     * The ready Whisper module id, if any. Uzbek STT keeps priority: whenever the Uzbek model is
+     * installed, speech is routed to it even while its engine is being prepared, because silently
+     * sending the user's Uzbek audio to a multilingual model they did not choose is wrong.
      */
     private fun readyWhisper(): String? = when {
-        state.isOperational -> null
+        modelInstalled -> null
         moduleManager.isOperational("whisper-small-q8") -> "whisper-small-q8"
         moduleManager.isOperational("whisper-large-v3-turbo") -> "whisper-large-v3-turbo"
         else -> null
@@ -232,75 +240,41 @@ class MainActivity : Activity() {
         requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
     }
 
-    /** Applies a state transition, rejecting illegal jumps (e.g. DOWNLOADING -> READY). */
-    private fun transition(next: OfflineModuleState): Boolean {
-        if (!state.canTransitionTo(next)) return false
-        state = next
-        if (next != OfflineModuleState.DOWNLOADING) percent = 0
-        return true
-    }
-
-    /** Machine-readable state for diagnostics and future native module cards. */
-    @JavascriptInterface
-    fun moduleStatus(): String = org.json.JSONObject()
-        .put("id", "uzbek-stt")
-        .put("state", state.code)
-        .put("percent", percent)
-        .put("active", state.isOperational)
-        .toString()
-
-    /** Loads the native runtime and runs an inference smoke test; only then promotes to READY. */
+    /**
+     * Loads the native runtime and runs an inference smoke test; the controller promotes to READY
+     * only after both succeed. Repeated calls reuse the verified recognizer, so this never rebuilds
+     * a decoder that is already loaded.
+     */
     private fun verifyEngine() {
         if (!modelInstalled) {
-            transition(OfflineModuleState.NOT_INSTALLED)
+            sttController.refreshInstalled()
             return
         }
-        transition(OfflineModuleState.INITIALIZING)
         notifyJs("AvnivoOfflineStatus", "Dvigatel ishga tushirilmoqda…")
         try {
-            val engine = readyUzbekEngine()
-            engine.smokeTest()
-            transition(OfflineModuleState.READY)
-            notifyJs("AvnivoOfflineEngineReady", "O‘zbekcha ovoz tanish dvigateli tayyor")
-        } catch (e: Exception) {
-            uzEngine?.close(); uzEngine = null
-            transition(OfflineModuleState.INSTALLED)
-            notifyJs("AvnivoOfflineError", "Dvigatelni ishga tushirish xatosi: ${e.message}")
-        } catch (e: UnsatisfiedLinkError) {
-            transition(OfflineModuleState.INSTALLED)
-            notifyJs("AvnivoOfflineError", "Sherpa native kutubxonasi yuklanmadi")
+            sttController.ensureReady()
         } catch (e: OutOfMemoryError) {
-            // The recognizer is small, but a fragmented process can still fail here. Settle the
-            // state instead of leaving the card on "Tekshirilmoqda…".
-            uzEngine?.close(); uzEngine = null
-            transition(OfflineModuleState.ERROR)
             notifyJs("AvnivoOfflineError", "Ovoz tanish uchun xotira yetarli emas. Boshqa modulni yoping.")
-        } catch (e: Throwable) {
-            uzEngine?.close(); uzEngine = null
-            transition(OfflineModuleState.ERROR)
-            notifyJs("AvnivoOfflineError", "Dvigatel xatosi: ${e::class.java.simpleName}")
+        } catch (e: UnsatisfiedLinkError) {
+            notifyJs("AvnivoOfflineError", "Sherpa native kutubxonasi yuklanmadi")
+        } catch (e: Exception) {
+            notifyJs("AvnivoOfflineError", "Dvigatelni ishga tushirish xatosi: ${e.message}")
         }
-    }
-
-    /**
-     * The single place the Uzbek decoder is created. Concurrent callers (startup verification and a
-     * press that needs recognition) share one instance and one initialization; a decoder that is
-     * already loaded is returned as is instead of being rebuilt or re-prepared.
-     */
-    @Synchronized
-    private fun readyUzbekEngine(): OfflineSpeechEngine {
-        uzEngine?.let { if (it.isPrepared) return it }
-        val engine = OfflineSpeechEngine(modelDir)
-        engine.prepare()
-        uzEngine = engine
-        return engine
     }
 
     inner class Bridge {
+        /**
+         * Machine-readable module state. This lives on the registered bridge object because only
+         * methods of the object passed to addJavascriptInterface are reachable from the page; the
+         * previous copy on the activity was never exposed, so the card could not read it.
+         */
+        @JavascriptInterface fun moduleStatus(): String =
+            sttController.statusJson().put("percent", percent).toString()
+
         @JavascriptInterface fun status(): String = when {
-            recording -> "Yozib olinmoqda…"
+            sttController.isRecording -> "Yozib olinmoqda…"
             busy -> "Jarayon bajarilmoqda…"
-            state.isOperational -> "O‘zbekcha STT modeli yuklangan va dvigatel tayyor."
+            sttController.isOperational -> "O‘zbekcha STT modeli yuklangan va dvigatel tayyor."
             modelInstalled -> "Model fayllari mavjud; dvigatel hali tayyor emas."
             else -> "O‘zbekcha STT modeli hali yuklanmagan (592 MB)."
         }
@@ -308,7 +282,7 @@ class MainActivity : Activity() {
             runOnUiThread {
                 if (busy) {
                     notifyJs("AvnivoOfflineStatus", "Oldingi jarayon tugashini kuting.")
-                } else if (state.isOperational) {
+                } else if (sttController.isOperational) {
                     notifyJs("AvnivoOfflineStatus", "Model allaqachon yuklangan.")
                 } else {
                     AlertDialog.Builder(this@MainActivity)
@@ -327,27 +301,31 @@ class MainActivity : Activity() {
          */
         @JavascriptInterface fun start(session: Int = 0) {
             runOnUiThread {
-                val open = openCaptureSession
-                if (open != 0) {
+                if (sttController.isRecording) {
                     // Report which session owns the microphone instead of silently ignoring the press.
-                    notifyJs("AvnivoOfflineStatus", "Yozib olish allaqachon davom etmoqda.", open)
+                    notifyJs("AvnivoOfflineRejected", "Yozib olish allaqachon davom etmoqda.", sttController.openSession)
                     return@runOnUiThread
                 }
                 if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                    // Release the page's recording state now; after the grant the user presses again.
+                    notifyJs("AvnivoOfflineRejected", "Mikrofon ruxsati so‘ralmoqda. Ruxsat bergach yana bosing.", session)
                     requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
                     return@runOnUiThread
                 }
-                if (!state.isOperational && readyWhisper() == null) {
+                if (!sttController.isOperational && readyWhisper() == null) {
                     if (modelInstalled) {
                         // Files are on disk, so the microphone must open now: the engine is
                         // prepared on the worker during capture. Asking the user to download a
                         // model they already have was a dead end that made every press do nothing.
                         notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli tayyorlanmoqda…")
                         worker.execute {
-                            if (!state.isOperational) runCatching { verifyEngine() }
+                            if (!sttController.isOperational) {
+                                runCatching { verifyEngine() }
+                                    .onFailure { logStt(session, "verify-failed", it.message ?: it::class.java.simpleName) }
+                            }
                         }
                     } else {
-                        notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli hali tayyor emas. Model yuklanishi kerak.")
+                        notifyJs("AvnivoOfflineRejected", "Ovoz tanish dvigateli hali tayyor emas. Model yuklanishi kerak.")
                         AlertDialog.Builder(this@MainActivity)
                             .setTitle("Offline o\u2018zbekcha ovoz tanish")
                             .setMessage("Ovoz tanish uchun 592 MB model yuklanishi va dvigatel tayyor bo\u2018lishi kerak. Wi-Fi tavsiya etiladi. Yuklaysizmi?")
@@ -359,10 +337,12 @@ class MainActivity : Activity() {
                 }
                 // The page owns the session number so both sides always agree; a bridge call
                 // without one still gets a valid id.
-                val current = if (session > 0) session else ++sttSession
-                sttSession = maxOf(sttSession, current)
-                openCaptureSession = current
-                recording = true
+                val current = sttController.beginCapture(session)
+                if (current == 0) {
+                    notifyJs("AvnivoOfflineRejected", "Yozib olish allaqachon davom etmoqda.", sttController.openSession)
+                    return@runOnUiThread
+                }
+                discardSession = 0
                 beginRecording(current)
             }
         }
@@ -370,15 +350,27 @@ class MainActivity : Activity() {
         /** Ends the open capture at the next buffer boundary (finger released). */
         @JavascriptInterface fun stop(session: Int = 0) {
             // A release that belongs to an earlier press must not cut the current one short.
-            if (session > 0 && openCaptureSession != 0 && session != openCaptureSession) return
-            recorder?.stop()
+            if (!sttController.ownsCapture(session)) return
+            val capture = recorder
+            if (capture != null) capture.stop()
+            else stopRequestedSession = if (session > 0) session else sttController.openSession
+        }
+
+        /** Ends the capture and discards its audio; a cancelled press must not be transcribed. */
+        @JavascriptInterface fun cancel(session: Int = 0) {
+            if (!sttController.ownsCapture(session)) return
+            val target = if (session > 0) session else sttController.openSession
+            discardSession = target
+            val capture = recorder
+            if (capture != null) capture.stop() else stopRequestedSession = target
         }
     }
 
     private fun downloadModel() {
         if (busy) return
         busy = true
-        transition(OfflineModuleState.DOWNLOADING)
+        percent = 0
+        sttController.markDownloading()
         worker.execute {
             try {
                 // Refuse before writing anything if the phone cannot hold the model plus working
@@ -398,11 +390,13 @@ class MainActivity : Activity() {
                         notifyJs("AvnivoOfflineProgress", "$done/$total")
                     }
                 )
-                transition(OfflineModuleState.VERIFYING)
-                transition(OfflineModuleState.INSTALLED)
+                sttController.markVerifying()
+                sttController.markInstalled()
+                percent = 0
                 verifyEngine()
             } catch (e: Exception) {
-                transition(OfflineModuleState.ERROR)
+                percent = 0
+                sttController.markError("Model yuklash xatosi: ${e.message}")
                 notifyJs("AvnivoOfflineError", "Model yuklash xatosi: ${e.message}")
             } finally { busy = false }
         }
@@ -419,27 +413,36 @@ class MainActivity : Activity() {
     private fun beginRecording(session: Int) {
         val capture = OfflinePcmRecorder(this)
         recorder = capture
+        // The finger may already be up (a very short press, or a release that raced the bridge
+        // call). Apply that release before the loop starts so recording stops at the 0.3 s floor
+        // instead of running to the 30 s limit.
+        if (stopRequestedSession == session) capture.stop()
+        stopRequestedSession = 0
         captureWorker.execute {
             try {
                 val samples = capture.capture(30) { level ->
                     notifyJs("AvnivoOfflineLevel", level.toString(), session)
                 }
+                // The microphone is closed; the session no longer holds it, so the next press may
+                // open its own capture while this one is being decoded.
+                sttController.endCapture(session)
                 // The finger is up: tell the page to show processing before any decoding starts.
                 notifyJs("AvnivoOfflineProcessing", "Matnga aylantirilmoqda…", session)
                 logStt(session, "captured", "samples=${samples.size} seconds=${"%.3f".format(samples.size / 16_000.0)}")
                 transcribeCaptured(session, samples)
+            } catch (e: OutOfMemoryError) {
+                sttController.endCapture(session)
+                sttController.fail(session, "Ovoz yozish uchun xotira yetarli emas")
+                logStt(session, "capture-oom", e.message ?: "OutOfMemoryError")
+                notifyJs("AvnivoOfflineError", "Ovoz yozish uchun xotira yetarli emas. Boshqa modulni yoping.", session)
             } catch (e: Exception) {
+                sttController.endCapture(session)
+                sttController.fail(session, "Yozib olish xatosi: ${e.message}")
                 logStt(session, "capture-failed", e.message ?: e::class.java.simpleName)
                 notifyJs("AvnivoOfflineError", "Yozib olish xatosi: ${e.message}", session)
             } finally {
                 capture.close()
-                // Only tear down state this session still owns: a newer press may already have
-                // opened its own capture, and clearing it here would deafen that press.
                 if (recorder === capture) recorder = null
-                if (openCaptureSession == session) {
-                    openCaptureSession = 0
-                    recording = false
-                }
                 notifyJs("AvnivoOfflineLevel", "0", session)
             }
         }
@@ -447,9 +450,18 @@ class MainActivity : Activity() {
 
     /** Runs the recognizer for one finished capture and reports the result for that session only. */
     private fun transcribeCaptured(session: Int, samples: FloatArray) {
+        if (discardSession == session) {
+            // The press was cancelled; never decode its audio into any session.
+            discardSession = 0
+            sttController.complete(session)
+            logStt(session, "cancelled", "discarded")
+            notifyJs("AvnivoOfflineStatus", "Yozuv bekor qilindi.", session)
+            return
+        }
         if (samples.size < MIN_SAMPLES) {
             // Too short to contain speech. Say so, with the measured length, instead of returning a
             // blank result that looks like a failed transcription.
+            sttController.complete(session)
             logStt(session, "too-short", "samples=${samples.size} min=$MIN_SAMPLES")
             notifyJs("AvnivoOfflineStatus", "Ovoz juda qisqa (${samples.size / 16} ms). Mikrofonni bosib, gapiring.", session)
             notifyJs("AvnivoOfflineResult", "", session)
@@ -461,21 +473,26 @@ class MainActivity : Activity() {
                 val text = if (whisperId != null) {
                     moduleManager.transcribe(whisperId, samples)
                 } else {
-                    readyUzbekEngine().transcribe(samples)
+                    sttController.transcribe(session, samples)
                 }
                 logStt(session, "transcribed", "engine=${whisperId ?: "uzbek-stt"} chars=${text.length} text=${text.take(80)}")
+                sttController.complete(session)
                 if (text.isBlank()) {
                     notifyJs("AvnivoOfflineStatus", "Nutq aniqlanmadi. Qaytadan urinib ko‘ring.", session)
                 }
                 notifyJs("AvnivoOfflineResult", text, session)
+            } catch (e: OutOfMemoryError) {
+                logStt(session, "inference-oom", e.message ?: "OutOfMemoryError")
+                sttController.fail(session, "Ovoz tanish uchun xotira yetarli emas")
+                notifyJs("AvnivoOfflineError", "Ovoz tanish uchun xotira yetarli emas. Boshqa modulni yoping.", session)
             } catch (e: UnsatisfiedLinkError) {
                 logStt(session, "native-failed", "UnsatisfiedLinkError")
-                uzEngine = null
+                sttController.fail(session, "Sherpa native kutubxonasi yuklanmadi")
                 notifyJs("AvnivoOfflineError", "Sherpa native kutubxonasi yuklanmadi", session)
             } catch (e: Exception) {
                 logStt(session, "inference-failed", e.message ?: e::class.java.simpleName)
-                // A recognizer that threw may be in an unknown state; rebuild it next time.
-                uzEngine?.close(); uzEngine = null
+                // The controller closes a recognizer that threw, so the next press rebuilds it.
+                sttController.fail(session, e.message ?: "Offline STT xatosi")
                 notifyJs("AvnivoOfflineError", e.message ?: "Offline STT xatosi", session)
             }
         }
@@ -506,8 +523,11 @@ class MainActivity : Activity() {
     }
 
     /**
-     * The system is short on memory. Release the offline engine that is not in active use so the
-     * process survives; the downloaded model is untouched and reloads on the next request.
+     * The system is short on memory. Release the offline engines that are not in active use so the
+     * process survives; the downloaded models are untouched and reload on the next request.
+     *
+     * The Uzbek recognizer is only released when no capture or decode is running, and the next
+     * press reloads it automatically through [UzbekSttController.ensureReady].
      */
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
@@ -515,6 +535,23 @@ class MainActivity : Activity() {
             DeviceMemory.log(this, "AvnivoMemoryTrim")
             moduleManager.onTrimMemory()
         }
+        if (level >= TRIM_MEMORY_RUNNING_CRITICAL && sttController.releaseForMemory()) {
+            notifyJs(
+                "AvnivoOfflineStatus",
+                "Xotira tejash uchun STT dvigateli bo‘shatildi; keyingi ishlatishda avtomatik yuklanadi."
+            )
+        }
+    }
+
+    /**
+     * Re-announce the real module state after the screen unlocks or the app returns to the
+     * foreground. A card must never stay blank or stale because a callback was missed while the
+     * page was hidden.
+     */
+    override fun onResume() {
+        super.onResume()
+        sttController.refreshInstalled()
+        notifyJs("AvnivoOfflineState", sttController.statusJson().toString())
     }
 
     override fun onDestroy() {
@@ -524,8 +561,7 @@ class MainActivity : Activity() {
         ttsPlayer.close()
         ttsWorker.shutdown()
         moduleManager.close()
-        uzEngine?.close()
-        uzEngine = null
+        sttController.close()
         captureWorker.shutdown()
         sttWorker.shutdown()
         worker.shutdown()

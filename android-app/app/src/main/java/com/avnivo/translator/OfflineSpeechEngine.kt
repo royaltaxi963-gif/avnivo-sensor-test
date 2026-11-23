@@ -5,11 +5,10 @@ import com.k2fsa.sherpa.onnx.OfflineModelConfig
 import com.k2fsa.sherpa.onnx.OfflineNemoEncDecCtcModelConfig
 import com.k2fsa.sherpa.onnx.OfflineRecognizer
 import com.k2fsa.sherpa.onnx.OfflineRecognizerConfig
-import java.io.Closeable
 import java.io.File
 
 /** Offline-only NeMo CTC decoder; all methods must be called off the UI thread. */
-class OfflineSpeechEngine(private val modelDirectory: File) : Closeable {
+class OfflineSpeechEngine(private val modelDirectory: File) : SttRecognizer {
     private var recognizer: OfflineRecognizer? = null
 
     companion object {
@@ -26,7 +25,7 @@ class OfflineSpeechEngine(private val modelDirectory: File) : Closeable {
 
     /** True once [prepare] has succeeded and the native decoder is loaded. */
     @get:Synchronized
-    val isPrepared: Boolean get() = recognizer != null
+    override val isPrepared: Boolean get() = recognizer != null
 
     /**
      * Loads the native decoder. Idempotent and thread-safe: the settings card verifies the engine
@@ -34,7 +33,7 @@ class OfflineSpeechEngine(private val modelDirectory: File) : Closeable {
      * must end up sharing one decoder instead of failing with "already initialized".
      */
     @Synchronized
-    fun prepare() {
+    override fun prepare() {
         if (recognizer != null) return
         val model = File(modelDirectory, MODEL_FILE)
         val tokens = File(modelDirectory, TOKENS_FILE)
@@ -58,7 +57,7 @@ class OfflineSpeechEngine(private val modelDirectory: File) : Closeable {
      * streams at once.
      */
     @Synchronized
-    fun transcribe(samples: FloatArray): String {
+    override fun transcribe(samples: FloatArray): String {
         val decoder = checkNotNull(recognizer) { "Call prepare() first" }
         require(samples.isNotEmpty()) { "Empty recording" }
         val stream = decoder.createStream()
@@ -76,7 +75,7 @@ class OfflineSpeechEngine(private val modelDirectory: File) : Closeable {
      * loads, the feature extractor runs and the decoder returns without error, so [READY] can be
      * granted. Must be called after [prepare] and off the UI thread.
      */
-    fun smokeTest(): String = transcribe(FloatArray(SAMPLE_RATE))
+    override fun smokeTest(): String = transcribe(FloatArray(SAMPLE_RATE))
 
     @Synchronized
     override fun close() {

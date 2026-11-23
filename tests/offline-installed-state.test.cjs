@@ -21,10 +21,10 @@ const shipped = fs.readFileSync(
 const renderer = shipped.slice(shipped.indexOf('function updateOfflineModule('));
 
 test('1. the renderer accepts the installed state', () => {
-  const allowed = renderer.match(/!\[([^\]]*)\]\.includes\(state\)/);
+  const allowed = shipped.match(/const offlineStateKeys=\{([^}]*)\}/);
   assert.ok(allowed, 'the renderer must whitelist the states it can draw');
   assert.ok(
-    allowed[1].includes("'installed'"),
+    allowed[1].includes("installed:'offline.state.installed'"),
     `installed must be drawable, found: ${allowed[1]}`
   );
 });

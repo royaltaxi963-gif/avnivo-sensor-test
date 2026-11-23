@@ -106,6 +106,9 @@ jobs:
       - name: Assert one press produces one transcript
         working-directory: .
         run: node --test tests/offline-stt-session.test.cjs
+      - name: Assert the STT card follows native state, not status wording
+        working-directory: .
+        run: node --test tests/offline-stt-state.test.cjs
       - name: Assert the online capture lifecycle releases the microphone
         working-directory: .
         run: node --test tests/online-capture-lifecycle.test.cjs
@@ -335,6 +338,20 @@ jobs:
             # A skipped test also reports "OK", so require the transcript itself.
             adb logcat -d | grep -a "UZBEK_STT_RESULT" | tail -1
             adb logcat -d | grep -qa "UZBEK_STT_RESULT text=." || { echo UZBEK_STT_NOT_TRANSCRIBED; exit 1; }
+            # Accuracy and latency are reported separately so neither can hide the other. The WER/CER
+            # values are measured against the documented transcript, never assumed to be perfect.
+            adb logcat -d | grep -a "UZBEK_STT_ACCURACY" | tail -1
+            adb logcat -d | grep -qa "UZBEK_STT_ACCURACY wer=" || { echo UZBEK_STT_ACCURACY_NOT_MEASURED; exit 1; }
+            adb logcat -d | grep -a "UZBEK_STT_LATENCY" | tail -1
+            adb logcat -d | grep -qa "UZBEK_STT_LATENCY decode_ms=" || { echo UZBEK_STT_LATENCY_NOT_MEASURED; exit 1; }
+            # 30 sequential real sessions, 10 restarts and 5 memory recoveries on the real decoder.
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineUzbekSttStressInstrumentedTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_stress.txt
+            grep -q "OK (" instrument_stress.txt || { echo UZBEK_STT_STRESS_FAILED; exit 1; }
+            adb logcat -d | grep -a "UZBEK_STT_STRESS\|UZBEK_STT_RESTARTS\|UZBEK_STT_RECOVERY" | tail -3
+            adb logcat -d | grep -qa "UZBEK_STT_STRESS sessions=30 ok=30" || { echo UZBEK_STT_STRESS_NOT_MEASURED; exit 1; }
+            adb logcat -d | grep -qa "UZBEK_STT_RESTARTS restarts=10 ready=10" || { echo UZBEK_STT_RESTARTS_NOT_MEASURED; exit 1; }
+            adb logcat -d | grep -qa "UZBEK_STT_RECOVERY cycles=5 recovered=5" || { echo UZBEK_STT_RECOVERY_NOT_MEASURED; exit 1; }
+            echo UZBEK_STT_STRESS_OK
             adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_runtime.txt
             grep -q "OK (" instrument_whisper_runtime.txt || { echo WHISPER_RUNTIME_FAILED; exit 1; }
             adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper.txt
@@ -376,6 +393,17 @@ jobs:
             grep -q "OK (" instrument_real_offline.txt || { echo REAL_INFERENCE_OFFLINE_FAILED; exit 1; }
             adb logcat -d | grep -a "UZBEK_STT_RESULT" | tail -1
             adb logcat -d | grep -qa "UZBEK_STT_RESULT text=." || { echo UZBEK_STT_OFFLINE_NOT_TRANSCRIBED; exit 1; }
+            adb logcat -d | grep -qa "UZBEK_STT_ACCURACY wer=" || { echo UZBEK_STT_OFFLINE_ACCURACY_NOT_MEASURED; exit 1; }
+            adb logcat -d | grep -qa "UZBEK_STT_LATENCY decode_ms=" || { echo UZBEK_STT_OFFLINE_LATENCY_NOT_MEASURED; exit 1; }
+            # The same 30 sessions / 10 restarts / 5 recoveries with the radios off prove the whole
+            # stability path is offline, not only the first decode.
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineUzbekSttStressInstrumentedTest -e avnivoRealInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_stress_offline.txt
+            grep -q "OK (" instrument_stress_offline.txt || { echo UZBEK_STT_STRESS_OFFLINE_FAILED; exit 1; }
+            adb logcat -d | grep -a "UZBEK_STT_STRESS\|UZBEK_STT_RESTARTS\|UZBEK_STT_RECOVERY" | tail -3
+            adb logcat -d | grep -qa "UZBEK_STT_STRESS sessions=30 ok=30" || { echo UZBEK_STT_OFFLINE_STRESS_NOT_MEASURED; exit 1; }
+            adb logcat -d | grep -qa "UZBEK_STT_RESTARTS restarts=10 ready=10" || { echo UZBEK_STT_OFFLINE_RESTARTS_NOT_MEASURED; exit 1; }
+            adb logcat -d | grep -qa "UZBEK_STT_RECOVERY cycles=5 recovered=5" || { echo UZBEK_STT_OFFLINE_RECOVERY_NOT_MEASURED; exit 1; }
+            echo UZBEK_STT_STRESS_OFFLINE_OK
             # The download test above already installed the real artifact on this same emulator, so
             # re-running the module with the radios down proves the reuse path on the bytes that
             # actually came over HTTP, not on a CI-seeded copy.

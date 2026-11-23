@@ -22,11 +22,25 @@ class OfflineModuleStateTest {
         assertFalse(OfflineModuleState.INSTALLED.canTransitionTo(OfflineModuleState.READY))
     }
 
-    @Test fun onlyReadyIsOperational() {
+    @Test fun onlyLoadedEngineStatesAreOperational() {
         OfflineModuleState.entries.forEach {
-            assertTrue(it == OfflineModuleState.READY || !it.isOperational)
+            val expected = it == OfflineModuleState.READY ||
+                it == OfflineModuleState.RECORDING ||
+                it == OfflineModuleState.TRANSCRIBING
+            assertTrue("$it operational=${it.isOperational}", it.isOperational == expected)
         }
-        assertTrue(OfflineModuleState.READY.isOperational)
+    }
+
+    @Test fun captureAndDecodeFollowTheReadyPath() {
+        assertTrue(OfflineModuleState.READY.canTransitionTo(OfflineModuleState.RECORDING))
+        assertTrue(OfflineModuleState.RECORDING.canTransitionTo(OfflineModuleState.TRANSCRIBING))
+        assertTrue(OfflineModuleState.TRANSCRIBING.canTransitionTo(OfflineModuleState.READY))
+        assertTrue("a new press may start while the previous decode finishes",
+            OfflineModuleState.TRANSCRIBING.canTransitionTo(OfflineModuleState.RECORDING))
+        assertFalse("a download can never start a capture",
+            OfflineModuleState.DOWNLOADING.canTransitionTo(OfflineModuleState.RECORDING))
+        assertFalse("an uninstalled module can never start a capture",
+            OfflineModuleState.NOT_INSTALLED.canTransitionTo(OfflineModuleState.RECORDING))
     }
 
     @Test fun failureStatesAreReachableFromEveryStage() {
@@ -43,5 +57,8 @@ class OfflineModuleStateTest {
     @Test fun wireCodesMatchBridgeContract() {
         assertTrue(OfflineModuleState.READY.code == "ready")
         assertTrue(OfflineModuleState.NOT_INSTALLED.code == "not_installed")
+        assertTrue(OfflineModuleState.RECORDING.code == "recording")
+        assertTrue(OfflineModuleState.TRANSCRIBING.code == "transcribing")
+        assertTrue(OfflineModuleState.INITIALIZING.code == "initializing")
     }
 }
