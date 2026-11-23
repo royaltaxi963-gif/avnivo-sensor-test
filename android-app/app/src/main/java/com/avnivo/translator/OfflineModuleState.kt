@@ -31,7 +31,7 @@ internal enum class OfflineModuleState {
      * engine path (INSTALLED/INITIALIZING/READY) and always settle back to READY or ERROR.
      */
     fun canTransitionTo(next: OfflineModuleState): Boolean = when (this) {
-        NOT_INSTALLED -> next in setOf(DOWNLOADING, INITIALIZING, ERROR)
+        NOT_INSTALLED -> next in setOf(DOWNLOADING, INSTALLED, INITIALIZING, ERROR)
         DOWNLOADING -> next in setOf(VERIFYING, NOT_INSTALLED, ERROR)
         VERIFYING -> next in setOf(INSTALLED, NOT_INSTALLED, ERROR)
         INSTALLED -> next in setOf(INITIALIZING, RECORDING, NOT_INSTALLED, ERROR)

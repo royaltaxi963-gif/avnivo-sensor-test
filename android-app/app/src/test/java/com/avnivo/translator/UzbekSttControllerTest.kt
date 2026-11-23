@@ -165,7 +165,7 @@ class UzbekSttControllerTest {
             assertFalse(h.controller.isOperational)
             assertNotNull(h.controller.reason)
         }
-        assertEquals("every recovery must rebuild the decoder", 6, h.built.size)
+        assertEquals("each cycle must build exactly one decoder", 5, h.built.size)
         assertEquals(5, h.built.count { it.closed == 1 })
         h.controller.close()
     }
