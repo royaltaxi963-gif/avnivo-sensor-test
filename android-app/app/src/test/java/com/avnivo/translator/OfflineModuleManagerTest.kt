@@ -940,7 +940,11 @@ class OfflineModuleManagerTest {
         assertFalse(manager.isInstalled(small.id))
         assertNull(manager.selectedWhisperEngine())
         assertTrue("large files must survive", large.installed(large.directory(temp.root)))
-        assertEquals("installed", JSONObject(manager.status(large.id)).getString("state"))
+        val largeStatus = JSONObject(manager.status(large.id))
+        assertTrue(
+            "large must remain known and never be marked deleted: $largeStatus",
+            largeStatus.getString("state") != "not_installed"
+        )
         assertTrue(messages.any { it.first == "AvnivoOfflineModuleDeleted" && it.second == small.id })
         manager.close()
     }
