@@ -95,6 +95,9 @@ jobs:
       - name: Run language synchronisation and gating tests
         working-directory: .
         run: node --test tests/offline-language-sync.test.mjs
+      - name: Assert the offline picker uses the full NLLB registry, not the STT list
+        working-directory: .
+        run: node --test tests/offline-language-registry.test.mjs
       - name: Run model integrity tests
         working-directory: .
         run: node --test tests/offline-sha256.test.cjs

@@ -974,7 +974,8 @@ function offlineLanguagesForPicker(){
   code:entry.code,name:entry.name,script:entry.script||'',locale:entry.locale||entry.code
  }));
  // Older native bridge fallback: the ready tokenizer's own list, still without any STT gate.
- const state=offlineTranslationState();
+ const ready=offlineLanguagesReady();
+ const state=ready&&ready.length?{languages:ready}:offlineTranslationState();
  return (state.languages||[]).map(code=>{
   const {name,script,locale}=offlineCodeLabel(code);
   return{code,name,script,locale};
@@ -1529,14 +1530,14 @@ function stripLanguageMarkers(text){
    so every code the UI can show maps back to a voice language. */
 const SPEECH_LOCALE_BY_NLLB=(()=>{
  const map={};
- for(const entry of offlineLanguageRegistry())if(entry&&entry.code&&entry.locale)map[entry.code]=entry.locale;
+ for(const entry of (typeof offlineLanguageRegistry==='function'?offlineLanguageRegistry():[]))if(entry&&entry.code&&entry.locale)map[entry.code]=entry.locale;
  for(const [base,code] of Object.entries(NLLB_BY_BASE))if(!map[code])map[code]=base;
  for(const [locale,code] of Object.entries(NLLB_BY_LOCALE))map[code]=locale;
  return map;
 })();
 function speechLocaleForNllb(code){
  if(typeof code!=='string'||!code)return null;
- const entry=offlineLanguageEntry(code);
+ const entry=typeof offlineLanguageEntry==='function'?offlineLanguageEntry(code):null;
  if(entry&&entry.locale)return entry.locale;
  return SPEECH_LOCALE_BY_NLLB[code]||code.split('_')[0]||null;
 }
@@ -1571,7 +1572,7 @@ function offlineLanguageRegistry(){
  }catch(e){return []}
 }
 function offlineLanguageEntry(code){
- if(!code)return null;
+ if(!code||typeof offlineLanguageRegistry!=='function')return null;
  return offlineLanguageRegistry().find(entry=>entry&&entry.code===code)||null;
 }
 /* The picker's truth comes from the native side: `ready` is only true after download, SHA-256,
@@ -1613,7 +1614,7 @@ function supportedOfflineCode(code,supported){
 function offlineCodeFromLocale(locale,supported){
  const code=nllbCodeForLocale(locale);
  if(!code)return null;
- const registry=offlineLanguageRegistry();
+ const registry=typeof offlineLanguageRegistry==='function'?offlineLanguageRegistry():[];
  if(registry.length&&!registry.some(entry=>entry.code===code))return null;
  if(supported)return supported.includes(code)?code:null;
  return code;

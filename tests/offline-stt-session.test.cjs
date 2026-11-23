@@ -43,7 +43,7 @@ function functionBody(source, signature) {
   throw new Error(`unbalanced braces in ${signature}`);
 }
 
-const startBody = functionBody(activity, '@JavascriptInterface fun start(session: Int = 0)');
+const startBody = functionBody(activity, 'private fun startForLanguage(session: Int, sourceLanguage: String)');
 const beginBody = functionBody(activity, 'private fun beginRecording(session: Int)');
 const transcribeBody = functionBody(activity, 'private fun transcribeCaptured(');
 const captureBody = functionBody(recorder, 'fun capture(maxSeconds: Int = 30');
@@ -59,12 +59,14 @@ const beginHold = functionBody(shipped, 'function beginHold()');
 const releaseHold = functionBody(shipped, 'function releaseHold(event)');
 
 test('1. the first press opens its own capture session', () => {
+  assert.match(activity, /@JavascriptInterface fun start\(session: Int = 0\) =\s*startForLanguage/,
+    'the legacy bridge entry point must delegate to the language-aware path');
   // One session number, owned by the page and adopted by the controller, lets a result be matched
   // to the press that made it.
   assert.match(beginCaptureBody, /val current = if \(requested > 0\) requested else lastSession \+ 1/,
     'the page session must be adopted, with a fallback id');
   assert.match(beginCaptureBody, /openSession = current/, 'the open capture must record its session');
-  assert.match(startBody, /sttController\.beginCapture\(session\)/, 'the bridge must delegate to the controller');
+  assert.match(startBody, /sttController\.beginCapture\(opened\.session\)/, 'the bridge must delegate to the controller');
   assert.match(startBody, /beginRecording\(current\)/, 'capture must be given the session id');
 });
 

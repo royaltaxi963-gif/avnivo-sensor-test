@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-class OfflineSttRouterTest(
+internal class OfflineSttRouterTest(
     private val source: String,
     private val engine: OfflineSttEngine,
     private val whisperLanguage: String?
