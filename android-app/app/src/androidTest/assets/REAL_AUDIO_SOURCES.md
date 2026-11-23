@@ -6,8 +6,8 @@ inside the test APK.
 
 | File | Source | Author | License |
 | --- | --- | --- | --- |
-| `hindi_delhi_16k.wav` | [File:Hi-Delhi.ogg](https://commons.wikimedia.org/wiki/File:Hi-Delhi.ogg) | Aksera | CC BY-SA 2.5 |
-| `bengali_bangla_16k.wav` | [File:Bn-বাংলা ১.wav](https://commons.wikimedia.org/wiki/File:Bn-%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE_%E0%A7%A7.wav) | Joysriramsarkar.manathetiger56 | CC BY-SA 4.0 |
+| `hindi_fleurs_1551_16k.wav` | [google/fleurs](https://huggingface.co/datasets/google/fleurs) `hi_in` validation row `id=1551` | Google FLEURS contributors | CC BY 4.0 |
+| `bengali_fleurs_1654_16k.wav` | [google/fleurs](https://huggingface.co/datasets/google/fleurs) `bn_in` validation row `id=1654` | Google FLEURS contributors | CC BY 4.0 |
 
-Both files were converted to 16 kHz mono PCM16 WAV without other edits. The converted
-files remain under the source license shown above.
+The source rows are distributed as 16 kHz float WAV. They were converted to 16 kHz mono PCM16
+WAV without other edits. The converted files remain under CC BY 4.0.
