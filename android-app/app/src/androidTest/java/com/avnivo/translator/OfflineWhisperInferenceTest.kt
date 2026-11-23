@@ -118,7 +118,7 @@ class OfflineWhisperInferenceTest {
             val samples = assetSamples("whisper_jfk_16k.wav", "whisper_jfk_16k.wav")
             assertTrue("expected non-trivial audio", samples.size > 16000)
 
-            val text = manager.transcribe("whisper-small-q8", samples).lowercase()
+            val text = manager.transcribe("whisper-small-q8", samples, "en").lowercase()
             assertFalse("transcription must not be empty", text.isBlank())
             val expected = listOf("country", "ask", "what", "you", "can", "do", "for")
             val hits = expected.count { it in text }
@@ -233,7 +233,7 @@ class OfflineWhisperInferenceTest {
 
             val samples = assetSamples("whisper_ru_16k.wav", "whisper_ru_16k.wav")
             assertTrue("expected non-trivial Russian audio", samples.size > 16000)
-            val text = manager.transcribe("whisper-small-q8", samples).lowercase()
+            val text = manager.transcribe("whisper-small-q8", samples, "ru").lowercase()
             assertFalse("Russian transcription must not be empty", text.isBlank())
             assertTrue(
                 "Russian audio must produce Cyrillic text, got: $text",
@@ -399,6 +399,50 @@ class OfflineWhisperInferenceTest {
                 "recall=$hits/${expected.size}"
             println(perf)
             android.util.Log.i("AvnivoWhisperLarge", perf)
+        } finally {
+            manager.close()
+        }
+    }
+
+    /**
+     * Hindi and Bengali must be sent to Whisper with their mapped language code, not auto-detected
+     * and not the NLLB code. Both clips are real speech; the script assertion prevents an English
+     * hallucination from counting as success.
+     */
+    @Test
+    fun transcribesHindiAndBengaliWithExplicitLanguage() {
+        assumeTrue(
+            "set -e avnivoWhisperInference true to run",
+            InstrumentationRegistry.getArguments().getString("avnivoWhisperInference") == "true"
+        )
+        val manager = OfflineModuleManager(context.filesDir, context.applicationContext) { _, _ -> }
+        try {
+            manager.download("whisper-small-q8")
+            manager.awaitIdle()
+            val status = JSONObject(manager.status("whisper-small-q8") ?: "{}")
+            assertEquals("ready", status.optString("state"))
+
+            val cases = listOf(
+                Triple("whisper_hi_16k.wav", "hi", listOf("नमस्ते", "आज", "मौसम", "अच्छा")),
+                Triple("whisper_bn_16k.wav", "bn", listOf("আজ", "আবহাওয়া", "সুন্দর"))
+            )
+            for ((assetName, language, expected) in cases) {
+                val samples = assetSamples(assetName, assetName)
+                assertTrue("$language audio must be non-trivial", samples.size > 16000)
+                val text = manager.transcribe("whisper-small-q8", samples, language).lowercase()
+                assertFalse("$language transcription must not be empty", text.isBlank())
+                val script = if (language == "hi") '\u0900'..'\u097F' else '\u0980'..'\u09FF'
+                assertTrue(
+                    "$language audio must produce its own script, got: $text",
+                    text.any { it in script }
+                )
+                val hits = expected.count { it in text }
+                android.util.Log.i(
+                    "AvnivoWhisper",
+                    "WHISPER_SMALL_LANG lang=$language chars=${text.length} recall=$hits/${expected.size} text=${text.take(120)}"
+                )
+                assertTrue("$language recall $hits/${expected.size} too low for: $text", hits >= 1)
+            }
         } finally {
             manager.close()
         }

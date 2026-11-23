@@ -54,6 +54,18 @@ class MainActivity : Activity() {
     /** The WebView capture request waiting on the Android permission dialog, if any. */
     private var pendingWebAudioRequest: PermissionRequest? = null
 
+    /**
+     * Session -> source language -> engine. The source is captured at press time, so changing a
+     * language while recording cannot retarget the audio that is already being captured.
+     */
+    private val sttSessions = OfflineSttSessionRouter(
+        uzbekAvailable = { modelInstalled },
+        whisperAvailable = { moduleManager.isInstalled("whisper-small-q8") }
+    )
+
+    /** The engine currently decoding, so a different engine cannot start a parallel inference. */
+    @Volatile private var transcribingEngine: OfflineSttEngine? = null
+
     /** Files present. Necessary but not sufficient for READY; the engine must also initialize. */
     private val modelInstalled get() = OfflineSpeechEngine.hasRequiredFiles(modelDir)
 
@@ -97,22 +109,13 @@ class MainActivity : Activity() {
     private val ttsWorker = Executors.newSingleThreadExecutor()
     private val ttsPlayer = SileroTtsPlayer()
 
-    /**
-     * The ready Whisper module id, if any. Uzbek STT keeps priority: whenever the Uzbek model is
-     * installed, speech is routed to it even while its engine is being prepared, because silently
-     * sending the user's Uzbek audio to a multilingual model they did not choose is wrong.
-     */
-    private fun readyWhisper(): String? = when {
-        modelInstalled -> null
-        moduleManager.isOperational("whisper-small-q8") -> "whisper-small-q8"
-        moduleManager.isOperational("whisper-large-v3-turbo") -> "whisper-large-v3-turbo"
-        else -> null
-    }
-
     /** Narrow bridge for the extra offline modules (Whisper Small/Large, NLLB). */
     inner class Modules {
         @JavascriptInterface fun status(id: String): String =
             moduleManager.status(id) ?: org.json.JSONObject().put("id", id).put("state", "unavailable").put("active", false).toString()
+
+        /** The audited NLLB tokenizer registry; available even before the model is downloaded. */
+        @JavascriptInterface fun offlineLanguageRegistry(): String = NllbLanguageRegistry.json()
         @JavascriptInterface fun statusAll(): String = moduleManager.statusAll()
         @JavascriptInterface fun download(id: String) { if (moduleManager.hasModule(id)) moduleManager.download(id) else notifyJs("AvnivoOfflineError", "Noma’lum offline modul: $id") }
 
@@ -303,51 +306,70 @@ class MainActivity : Activity() {
                 }
             }
         }
+        /** Backward-compatible entry point; new pages use [startWithLanguage]. */
+        @JavascriptInterface fun start(session: Int = 0) =
+            startForLanguage(session, OfflineSttRouter.UZBEK)
+
         /**
-         * Opens a new capture session. A press is only refused while another capture is still
-         * open: a previous recording that is still being transcribed must not block the next one,
-         * because that is exactly what made the first result appear only on the second attempt.
+         * Starts a capture for the language of the side being spoken. The source language decides
+         * the engine; the target language is never consulted.
          */
-        @JavascriptInterface fun start(session: Int = 0) {
+        @JavascriptInterface fun startWithLanguage(session: Int = 0, sourceLanguage: String = "") =
+            startForLanguage(session, sourceLanguage)
+
+        private fun startForLanguage(session: Int, sourceLanguage: String) {
             runOnUiThread {
                 if (sttController.isRecording) {
-                    // Report which session owns the microphone instead of silently ignoring the press.
                     notifyJs("AvnivoOfflineRejected", "Yozib olish allaqachon davom etmoqda.", sttController.openSession)
                     return@runOnUiThread
                 }
+                val requested = if (session > 0) session else sttController.lastSession + 1
+                val route = runCatching { OfflineSttRouter.route(sourceLanguage) }.getOrElse {
+                    notifyJs("AvnivoOfflineRejected", it.message ?: "Manba tili tanlanmagan", requested)
+                    return@runOnUiThread
+                }
+                if (route.unsupportedReason != null) {
+                    notifyJs("AvnivoOfflineRejected", route.unsupportedReason, requested)
+                    return@runOnUiThread
+                }
+                if (transcribingEngine != null && transcribingEngine != route.engine) {
+                    notifyJs(
+                        "AvnivoOfflineRejected",
+                        "Oldingi yozuv boshqa STT dvigatelida tugatilmoqda. Tugashini kuting.",
+                        requested
+                    )
+                    return@runOnUiThread
+                }
                 if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                    // Release the page's recording state now; after the grant the user presses again.
-                    notifyJs("AvnivoOfflineRejected", "Mikrofon ruxsati so‘ralmoqda. Ruxsat bergach yana bosing.", session)
+                    notifyJs("AvnivoOfflineRejected", "Mikrofon ruxsati so‘ralmoqda. Ruxsat bergach yana bosing.", requested)
                     requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
                     return@runOnUiThread
                 }
-                if (!sttController.isOperational && readyWhisper() == null) {
-                    if (modelInstalled) {
-                        // Files are on disk, so the microphone must open now: the engine is
-                        // prepared on the worker during capture. Asking the user to download a
-                        // model they already have was a dead end that made every press do nothing.
-                        notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli tayyorlanmoqda…")
-                        worker.execute {
-                            if (!sttController.isOperational) {
-                                runCatching { verifyEngine() }
-                                    .onFailure { logStt(session, "verify-failed", it.message ?: it::class.java.simpleName) }
-                            }
+                val opened = sttSessions.open(requested, sourceLanguage).getOrElse {
+                    notifyJs("AvnivoOfflineRejected", it.message ?: "STT dvigatelini tanlab bo‘lmadi", requested)
+                    return@runOnUiThread
+                }
+                // Releasing the previous engine is deliberate: only one recognizer is resident for
+                // a session. Model files stay on disk and their INSTALLED state is preserved.
+                when (opened.previous) {
+                    // false simply means the Uzbek recognizer was not resident; there is nothing
+                    // to release and the model files must stay untouched.
+                    OfflineSttEngine.UZBEK_STT -> sttController.releaseForMemory()
+                    OfflineSttEngine.WHISPER_SMALL_Q8 -> moduleManager.unload("whisper-small-q8")
+                    null -> Unit
+                }
+                if (route.engine == OfflineSttEngine.UZBEK_STT && modelInstalled && !sttController.isOperational) {
+                    notifyJs("AvnivoOfflineStatus", "Ovoz tanish dvigateli tayyorlanmoqda…")
+                    worker.execute {
+                        if (!sttController.isOperational) {
+                            runCatching { verifyEngine() }
+                                .onFailure { logStt(opened.session, "verify-failed", it.message ?: it::class.java.simpleName) }
                         }
-                    } else {
-                        notifyJs("AvnivoOfflineRejected", "Ovoz tanish dvigateli hali tayyor emas. Model yuklanishi kerak.")
-                        AlertDialog.Builder(this@MainActivity)
-                            .setTitle("Offline o\u2018zbekcha ovoz tanish")
-                            .setMessage("Ovoz tanish uchun 592 MB model yuklanishi va dvigatel tayyor bo\u2018lishi kerak. Wi-Fi tavsiya etiladi. Yuklaysizmi?")
-                            .setNegativeButton("Bekor qilish", null)
-                            .setPositiveButton("Yuklash") { _, _ -> downloadModel() }
-                            .show()
-                        return@runOnUiThread
                     }
                 }
-                // The page owns the session number so both sides always agree; a bridge call
-                // without one still gets a valid id.
-                val current = sttController.beginCapture(session)
+                val current = sttController.beginCapture(opened.session)
                 if (current == 0) {
+                    sttSessions.close(opened.session)
                     notifyJs("AvnivoOfflineRejected", "Yozib olish allaqachon davom etmoqda.", sttController.openSession)
                     return@runOnUiThread
                 }
@@ -441,11 +463,13 @@ class MainActivity : Activity() {
                 transcribeCaptured(session, samples)
             } catch (e: OutOfMemoryError) {
                 sttController.endCapture(session)
+                sttSessions.close(session)
                 sttController.fail(session, "Ovoz yozish uchun xotira yetarli emas")
                 logStt(session, "capture-oom", e.message ?: "OutOfMemoryError")
                 notifyJs("AvnivoOfflineError", "Ovoz yozish uchun xotira yetarli emas. Boshqa modulni yoping.", session)
             } catch (e: Exception) {
                 sttController.endCapture(session)
+                sttSessions.close(session)
                 sttController.fail(session, "Yozib olish xatosi: ${e.message}")
                 logStt(session, "capture-failed", e.message ?: e::class.java.simpleName)
                 notifyJs("AvnivoOfflineError", "Yozib olish xatosi: ${e.message}", session)
@@ -462,6 +486,7 @@ class MainActivity : Activity() {
         if (discardSession == session) {
             // The press was cancelled; never decode its audio into any session.
             discardSession = 0
+            sttSessions.close(session)
             sttController.complete(session)
             logStt(session, "cancelled", "discarded")
             notifyJs("AvnivoOfflineStatus", "Yozuv bekor qilindi.", session)
@@ -470,21 +495,35 @@ class MainActivity : Activity() {
         if (samples.size < MIN_SAMPLES) {
             // Too short to contain speech. Say so, with the measured length, instead of returning a
             // blank result that looks like a failed transcription.
+            sttSessions.close(session)
             sttController.complete(session)
             logStt(session, "too-short", "samples=${samples.size} min=$MIN_SAMPLES")
             notifyJs("AvnivoOfflineStatus", "Ovoz juda qisqa (${samples.size / 16} ms). Mikrofonni bosib, gapiring.", session)
             notifyJs("AvnivoOfflineResult", "", session)
             return
         }
+        val route = sttSessions.routeFor(session)
+        if (route == null) {
+            // A cancelled, superseded or already-finished session must not decode into a newer one.
+            sttController.complete(session)
+            logStt(session, "stale", "no route for session")
+            return
+        }
         sttWorker.execute {
-            val whisperId = readyWhisper()
+            transcribingEngine = route.engine
             try {
-                val text = if (whisperId != null) {
-                    moduleManager.transcribe(whisperId, samples)
-                } else {
-                    sttController.transcribe(session, samples)
+                val text = when (route.engine) {
+                    OfflineSttEngine.UZBEK_STT -> sttController.transcribe(session, samples)
+                    OfflineSttEngine.WHISPER_SMALL_Q8 ->
+                        moduleManager.transcribe(OfflineSttEngine.WHISPER_SMALL_Q8.moduleId, samples, route.whisperLanguage)
                 }
-                logStt(session, "transcribed", "engine=${whisperId ?: "uzbek-stt"} chars=${text.length} text=${text.take(80)}")
+                logStt(
+                    session,
+                    "transcribed",
+                    "engine=${route.engine.moduleId} whisper_lang=${route.whisperLanguage ?: "-"} " +
+                        "chars=${text.length} text=${text.take(80)}"
+                )
+                sttSessions.close(session)
                 sttController.complete(session)
                 if (text.isBlank()) {
                     notifyJs("AvnivoOfflineStatus", "Nutq aniqlanmadi. Qaytadan urinib ko‘ring.", session)
@@ -492,17 +531,25 @@ class MainActivity : Activity() {
                 notifyJs("AvnivoOfflineResult", text, session)
             } catch (e: OutOfMemoryError) {
                 logStt(session, "inference-oom", e.message ?: "OutOfMemoryError")
+                sttSessions.close(session)
                 sttController.fail(session, "Ovoz tanish uchun xotira yetarli emas")
                 notifyJs("AvnivoOfflineError", "Ovoz tanish uchun xotira yetarli emas. Boshqa modulni yoping.", session)
             } catch (e: UnsatisfiedLinkError) {
                 logStt(session, "native-failed", "UnsatisfiedLinkError")
+                sttSessions.close(session)
                 sttController.fail(session, "Sherpa native kutubxonasi yuklanmadi")
                 notifyJs("AvnivoOfflineError", "Sherpa native kutubxonasi yuklanmadi", session)
             } catch (e: Exception) {
                 logStt(session, "inference-failed", e.message ?: e::class.java.simpleName)
-                // The controller closes a recognizer that threw, so the next press rebuilds it.
-                sttController.fail(session, e.message ?: "Offline STT xatosi")
+                sttSessions.close(session)
+                if (route.engine == OfflineSttEngine.UZBEK_STT) {
+                    sttController.fail(session, e.message ?: "Offline STT xatosi")
+                } else {
+                    sttController.complete(session)
+                }
                 notifyJs("AvnivoOfflineError", e.message ?: "Offline STT xatosi", session)
+            } finally {
+                if (transcribingEngine == route.engine) transcribingEngine = null
             }
         }
     }
@@ -570,6 +617,7 @@ class MainActivity : Activity() {
         ttsPlayer.close()
         ttsWorker.shutdown()
         moduleManager.close()
+        sttSessions.closeAll()
         sttController.close()
         captureWorker.shutdown()
         sttWorker.shutdown()

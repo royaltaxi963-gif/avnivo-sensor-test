@@ -99,11 +99,11 @@ internal class OfflineModuleManager(
     }
 
     /** Runs recognition on the loaded engine, loading it first if it was unloaded. */
-    fun transcribe(id: String, samples: FloatArray): String {
+    fun transcribe(id: String, samples: FloatArray, language: String? = null): String {
         val (_, engine) = ensureLoaded(id)
         return synchronized(engine) {
             when (engine) {
-                is WhisperEngine -> engine.transcribe(samples)
+                is WhisperEngine -> engine.transcribe(samples, language)
                 else -> error("Module is not a recognizer")
             }
         }

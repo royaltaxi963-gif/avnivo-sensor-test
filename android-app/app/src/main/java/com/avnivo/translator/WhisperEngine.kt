@@ -38,10 +38,12 @@ internal class WhisperEngine(private val modelFile: File, private val language: 
     }
 
     @Synchronized
-    fun transcribe(samples: FloatArray): String {
+    fun transcribe(samples: FloatArray, languageOverride: String? = null): String {
         check(handle != 0L) { "Call prepare() first" }
         require(samples.isNotEmpty()) { "Empty recording" }
-        return nativeTranscribe(handle, samples, language)
+        // The source language belongs to the recording session, not to the model instance: one
+        // resident Whisper engine serves every non-Uzbek/English source in turn.
+        return nativeTranscribe(handle, samples, languageOverride ?: language)
     }
 
     /** One second of silence through the full pipeline proves the model and runtime work. */

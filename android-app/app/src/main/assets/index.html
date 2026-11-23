@@ -879,6 +879,8 @@ function updateOnlineLanguageLabels(){
    an unsupported or not-yet-installed language shows as empty instead of pretending. */
 function offlineDisplayName(code){
  if(!code)return '';
+ const entry=offlineLanguageEntry(code);
+ if(entry)return entry.name;
  const locale=ONLINE_LANGUAGES.find(x=>nllbCodeForLocale(x[0])===code);
  return locale?onlineLanguageName(locale[0]):code;
 }
@@ -958,22 +960,39 @@ function openOnlineLanguages(side){
 }
 function closeOnlineLanguages(){languageSheet.hidden=true;longPressSide=null;languageSheet.dataset.mode='';languageSearch.blur();syncBackNavigation()}
 /* Offline picker: same sheet, same search, same animation — only the source of the list differs.
-   It lists exactly the codes the loaded tokenizer carries, so every entry is a language this build
-   can really translate. It is unreachable unless the module is READY. */
+   It lists the audited NLLB tokenizer registry, so it is usable before the model is downloaded.
+   Translation remains gated separately until the loaded tokenizer is ready. */
 function offlineCodeLabel(code){
+ const entry=offlineLanguageEntry(code);
+ if(entry)return{name:entry.name,script:entry.script,locale:entry.locale||code,code};
  const locale=ONLINE_LANGUAGES.find(x=>nllbCodeForLocale(x[0])===code);
- return{name:locale?onlineLanguageName(locale[0]):code,locale:locale?locale[0]:code};
+ return{name:locale?onlineLanguageName(locale[0]):code,script:'',locale:locale?locale[0]:code,code};
+}
+function offlineLanguagesForPicker(){
+ const registry=offlineLanguageRegistry();
+ if(registry.length)return registry.map(entry=>({
+  code:entry.code,name:entry.name,script:entry.script||'',locale:entry.locale||entry.code
+ }));
+ // Older native bridge fallback: the ready tokenizer's own list, still without any STT gate.
+ const state=offlineTranslationState();
+ return (state.languages||[]).map(code=>{
+  const {name,script,locale}=offlineCodeLabel(code);
+  return{code,name,script,locale};
+ });
 }
 function renderOfflineLanguages(){
- const state=offlineTranslationState();
+ const languages=offlineLanguagesForPicker();
+ const ready=offlineLanguagesReady();
  const q=languageSearch.value.trim().toLocaleLowerCase();
  languageResults.replaceChildren();
- for(const code of state.languages){
-  const {name,locale}=offlineCodeLabel(code);
-  if(q&&!((name+' '+locale+' '+code).toLocaleLowerCase().includes(q)))continue;
+ for(const entry of languages){
+  const {code,name,script,locale}=entry;
+  if(q&&!((name+' '+script+' '+locale+' '+code).toLocaleLowerCase().includes(q)))continue;
   const item=document.createElement('button');item.type='button';item.className='online-language-item';
   const title=document.createElement('span');title.textContent=name+' · '+code;
-  const note=document.createElement('small');note.textContent=avnivoUiText('offline.language.available','Oflayn mavjud');
+  const note=document.createElement('small');
+  const missing=ready&&!ready.includes(code);
+  note.textContent=(script?script+' · ':'')+(missing?avnivoUiText('offline.language.modelMissing','Modelda yo‘q'):avnivoUiText('offline.language.available','Oflayn mavjud'));
   item.append(title,note);
   item.setAttribute('aria-selected',String(offlineChoice[longPressSide]===code));
   item.addEventListener('click',()=>{
@@ -985,12 +1004,12 @@ function renderOfflineLanguages(){
 }
 function openOfflineLanguages(side){
  if(document.documentElement.dataset.avnivoMode!=='offline')return;
- const state=offlineTranslationState();
- if(!state.ready||state.languages.length===0)return;
+ const languages=offlineLanguagesForPicker();
+ if(languages.length===0)return;
  longPressSide=side;longPressFired=true;languageSearch.value='';
  languageSheet.dataset.mode='offline';
  languageSheet.querySelector('.online-language-head strong').textContent=
-  avnivoUiText('offline.languages.title','Oflayn tillar')+' · '+state.languages.length;
+  avnivoUiText('offline.languages.title','Oflayn tillar')+' · '+languages.length;
  languageSheet.hidden=false;renderOfflineLanguages();syncBackNavigation();
 }
 languageSheet.querySelector('.online-language-close').addEventListener('click',closeOnlineLanguages);
@@ -1019,9 +1038,11 @@ for(const [side,chip] of [['left',leftLanguage],['right',rightLanguage]]){
   longPressFired=false;clearTimeout(longPressTimer);
   longPressTimer=setTimeout(()=>{
    if(mode==='online'){openOnlineLanguages(side);return}
+   // Language selection is independent of the NLLB model and of every STT model. Translation
+   // itself is refused later by translateOfflineText until the model is ready.
+   openOfflineLanguages(side);
    const state=offlineTranslationState();
-   if(state.ready&&state.languages.length>0){openOfflineLanguages(side);return}
-   hint(offlinePickerBlockedMessage(state));
+   if(!state.ready)hint(avnivoUiText('offline.translate.notReady','Offline tarjima moduli yuklab olinmagan.'));
   },1100);
  });
  for(const name of ['pointerup','pointercancel','pointerleave'])chip.addEventListener(name,()=>clearTimeout(longPressTimer));
@@ -1508,12 +1529,15 @@ function stripLanguageMarkers(text){
    so every code the UI can show maps back to a voice language. */
 const SPEECH_LOCALE_BY_NLLB=(()=>{
  const map={};
+ for(const entry of offlineLanguageRegistry())if(entry&&entry.code&&entry.locale)map[entry.code]=entry.locale;
  for(const [base,code] of Object.entries(NLLB_BY_BASE))if(!map[code])map[code]=base;
  for(const [locale,code] of Object.entries(NLLB_BY_LOCALE))map[code]=locale;
  return map;
 })();
 function speechLocaleForNllb(code){
  if(typeof code!=='string'||!code)return null;
+ const entry=offlineLanguageEntry(code);
+ if(entry&&entry.locale)return entry.locale;
  return SPEECH_LOCALE_BY_NLLB[code]||code.split('_')[0]||null;
 }
 /* The bundled Silero voice speaks Uzbek only. Routing any other language to it is what made a
@@ -1530,6 +1554,25 @@ function speechVoiceForLocale(locale){
  return voices.find(voice=>String(voice.lang||'').toLowerCase()===tag)
      ||voices.find(voice=>String(voice.lang||'').toLowerCase().split('-')[0]===base)
      ||null;
+}
+/* Full audited NLLB-200 tokenizer registry from the native side. It exists before the model is
+   downloaded and never depends on which STT model is installed. */
+var offlineRegistryCache=null;
+function offlineLanguageRegistry(){
+ if(offlineRegistryCache)return offlineRegistryCache;
+ const bridge=window.AvnivoOfflineModules;
+ if(!bridge||typeof bridge.offlineLanguageRegistry!=='function')return [];
+ try{
+  const raw=bridge.offlineLanguageRegistry();
+  const parsed=typeof raw==='string'?JSON.parse(raw):raw;
+  const list=parsed&&Array.isArray(parsed.languages)?parsed.languages:[];
+  if(list.length)offlineRegistryCache=list;
+  return list;
+ }catch(e){return []}
+}
+function offlineLanguageEntry(code){
+ if(!code)return null;
+ return offlineLanguageRegistry().find(entry=>entry&&entry.code===code)||null;
 }
 /* The picker's truth comes from the native side: `ready` is only true after download, SHA-256,
    native init and a smoke inference, and `languages` is that tokenizer's own vocabulary. */
@@ -1568,7 +1611,12 @@ function supportedOfflineCode(code,supported){
 }
 /* Imports an online locale into the offline pair, or null when NLLB has no code for it. */
 function offlineCodeFromLocale(locale,supported){
- return supportedOfflineCode(nllbCodeForLocale(locale),supported);
+ const code=nllbCodeForLocale(locale);
+ if(!code)return null;
+ const registry=offlineLanguageRegistry();
+ if(registry.length&&!registry.some(entry=>entry.code===code))return null;
+ if(supported)return supported.includes(code)?code:null;
+ return code;
 }
 /* Paint the chips for the restored mode once every piece above exists. */
 syncLanguageChips();
@@ -2106,7 +2154,7 @@ async function startVoice(){
  if(document.documentElement.dataset.avnivoMode==='offline'){
   if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
   // Native bridge reports real state (permission, model readiness, runtime errors) via AvnivoOffline*.
-  try{window.AvnivoOfflineSTT.start(offlineSession)}
+  try{startOfflineStt(offlineSession)}
   catch(e){hint('Offline STT xatosi: '+(e&&e.message||e))}
   return;
  }
@@ -2335,6 +2383,16 @@ function finishHold(cancel=false){
  else {if(!cancel)input.value=appendTranscript(holdBase,holdFinal||holdTranscript);window.avnivoVoiceFinalizing=false;persistDraft();resize();syncComposerMode();hint('')}
  syncComposerMode();
 }
+function offlineSourceLanguage(){
+ const side=languageRow.dataset.selected==='right'?'right':'left';
+ return offlineChoice[side]||'';
+}
+function startOfflineStt(session){
+ const bridge=window.AvnivoOfflineSTT;
+ const source=offlineSourceLanguage();
+ if(bridge&&typeof bridge.startWithLanguage==='function')bridge.startWithLanguage(session,source);
+ else if(bridge)bridge.start(session);
+}
 function beginHold(){
  if(document.documentElement.dataset.avnivoMode==='offline'){
   if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
@@ -2350,7 +2408,7 @@ function beginHold(){
   clearTimeout(timeout);timeout=0;label.hidden=true;
   offlineStateName('recording');
   offlineLevel=0;offlineWaveActive=true;cancelAnimationFrame(offlineWaveFrame);offlineWaveFrame=requestAnimationFrame(offlineWaveFrameStep);
-  try{window.AvnivoOfflineSTT.start(session)}
+  try{startOfflineStt(session)}
   catch(e){
    stopOfflineWave();shell.classList.remove('hold-voice');mic.setAttribute('aria-pressed','false');
    offlineStateName('error');hint('Offline STT xatosi: '+(e&&e.message||e));
