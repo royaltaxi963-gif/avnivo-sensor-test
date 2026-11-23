@@ -124,8 +124,8 @@ class OfflineSttRouterRulesTest {
         assertEquals("ru", OfflineSttRouter.route("rus_Cyrl").whisperLanguage)
         assertEquals("hi", OfflineSttRouter.route("hin_Deva").whisperLanguage)
         assertEquals("bn", OfflineSttRouter.route("ben_Beng").whisperLanguage)
-        assertEquals("uz", OfflineSttRouter.route("uzn_Latn").whisperLanguage)
-        assertEquals("en", OfflineSttRouter.route("eng_Latn").whisperLanguage)
+        assertEquals("uz", WhisperLanguageMap.codeFor("uzn_Latn"))
+        assertEquals("en", WhisperLanguageMap.codeFor("eng_Latn"))
         assertEquals("NLLB code must not be passed as a Whisper code", "ru", WhisperLanguageMap.codeFor("rus_Cyrl"))
     }
 

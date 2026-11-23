@@ -164,4 +164,44 @@ class OfflineModuleCardInstrumentedTest {
         )
         assertEquals("false|true|O‘rnatilgan va tekshirilgan · ishlatilganda yuklanadi", value)
     }
+
+    /**
+     * The S23 Ultra picker was gated on NLLB being READY and on the Whisper card's language list.
+     * This drives the real sheet with the real registry and no NLLB module: all 202 languages must
+     * be searchable, selectable and persisted, while translation stays gated.
+     */
+    @Test
+    fun offlinePickerUsesTheFullRegistryWithoutNllbInstalled() {
+        val web = loadInterface()
+        val registry = org.json.JSONObject.quote(NllbLanguageRegistry.json())
+        evaluate(
+            web,
+            "window.AvnivoOfflineModules={" +
+                "offlineLanguageRegistry:function(){return $registry}," +
+                "offlineTranslationState:function(){return JSON.stringify({ready:false,languages:[],status:{state:'not_installed'}})}," +
+                "statusAll:function(){return '[]'},status:function(){return '{}'},download:function(){}};'ok'"
+        )
+        evaluate(
+            web,
+            "document.querySelector('.source-language').dispatchEvent(new MouseEvent('pointerdown',{button:0,bubbles:true}));'ok'"
+        )
+        Thread.sleep(1400)
+        assertEquals("202", evaluate(web, "document.querySelectorAll('.online-language-results .online-language-item').length"))
+        assertTrue(
+            "header must show the registry count",
+            evaluate(web, "document.querySelector('.online-language-head strong').textContent").contains("202")
+        )
+        evaluate(
+            web,
+            "var s=document.querySelector('.online-language-search');s.value='Russian';s.dispatchEvent(new Event('input',{bubbles:true}));'ok'"
+        )
+        assertEquals("1", evaluate(web, "document.querySelectorAll('.online-language-results .online-language-item').length"))
+        evaluate(web, "document.querySelector('.online-language-results .online-language-item').click();'ok'")
+        assertEquals("Russian", evaluate(web, "document.querySelector('.source-language .language-name').textContent"))
+        assertEquals("RUS", evaluate(web, "document.querySelector('.source-language .language-code').textContent"))
+        assertTrue(
+            "the selected code must be persisted",
+            evaluate(web, "localStorage.getItem('avnivo.offline.language-pair.v1')||''").contains("rus_Cyrl")
+        )
+    }
 }
