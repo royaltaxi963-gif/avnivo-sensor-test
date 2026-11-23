@@ -18,6 +18,10 @@ on:
         description: 'Also repeat the Whisper Small inference suite with the radios disabled (~15m)'
         type: boolean
         default: false
+      run_whisper_small_stress:
+        description: 'Also run 20 real Whisper Small sessions, 10 unload/reload cycles and 10 app restarts (~20m)'
+        type: boolean
+        default: false
       run_tts_seed_verification:
         description: 'Verify the Silero TTS runtime against a CI-exported artifact, bypassing model hosting (~10m)'
         type: boolean
@@ -118,6 +122,9 @@ jobs:
       - name: Assert module download progress and failure reasons reach the cards
         working-directory: .
         run: node --test tests/offline-module-progress.test.cjs
+      - name: Assert Whisper Small card state and real progress
+        working-directory: .
+        run: node --test tests/offline-whisper-small-state.test.cjs
       - name: Upload unit test reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -290,6 +297,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         env:
           WHISPER_OFFLINE: ${{ inputs.run_whisper_offline_verification }}
+          WHISPER_STRESS: ${{ inputs.run_whisper_small_stress }}
         with:
           api-level: 34
           arch: x86_64
@@ -354,10 +362,49 @@ jobs:
             echo UZBEK_STT_STRESS_OK
             adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_runtime.txt
             grep -q "OK (" instrument_whisper_runtime.txt || { echo WHISPER_RUNTIME_FAILED; exit 1; }
+            adb shell am instrument -w -e class com.avnivo.translator.OfflineModuleCardInstrumentedTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_module_card.txt
+            grep -q "OK (" instrument_module_card.txt || { echo MODULE_CARD_FAILED; exit 1; }
             adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper.txt
             grep -q "OK (" instrument_whisper.txt || { echo WHISPER_INFERENCE_FAILED; exit 1; }
+            # A skipped test also reports "OK", so require the real download, SHA-256 and both
+            # language transcripts from logcat. This is the evidence the card is not faking state.
+            adb logcat -d | grep -a "WHISPER_SMALL_DOWNLOAD\|WHISPER_SMALL_STATE\|WHISPER_SMALL_TRANSCRIPT\|WHISPER_SMALL_RU" | tail -6
+            adb logcat -d | grep -qa "WHISPER_SMALL_STATE state=ready sha_verified=true" || { echo WHISPER_SMALL_NOT_VERIFIED; exit 1; }
+            adb logcat -d | grep -qa "WHISPER_SMALL_RU .*recall=" || { echo WHISPER_SMALL_RU_NOT_TRANSCRIBED; exit 1; }
             adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest#reportsWhisperLatencyAndRepeats -e avnivoWhisperPerf true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_perf.txt
             grep -q "OK (" instrument_whisper_perf.txt || { echo WHISPER_PERF_FAILED; exit 1; }
+
+            if [ "$WHISPER_STRESS" = "true" ]; then
+              echo "=== whisper small stress: 20 real sessions ==="
+              adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest#twentyRealSessionsKeepTheirOwnTranscript -e avnivoWhisperStress true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_stress.txt
+              grep -q "OK (" instrument_whisper_stress.txt || { echo WHISPER_SMALL_STRESS_FAILED; exit 1; }
+              adb logcat -d | grep -a "WHISPER_SMALL_STRESS" | tail -3
+              adb logcat -d | grep -qa "WHISPER_SMALL_STRESS sessions=20 ok=20" || { echo WHISPER_SMALL_STRESS_NOT_MEASURED; exit 1; }
+
+              echo "=== whisper small stress: 10 unload/reload cycles ==="
+              adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest#tenUnloadReloadCyclesKeepTheModelUsable -e avnivoWhisperStress true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper_reload.txt
+              grep -q "OK (" instrument_whisper_reload.txt || { echo WHISPER_SMALL_RELOAD_FAILED; exit 1; }
+              adb logcat -d | grep -a "WHISPER_SMALL_RELOAD" | tail -3
+              adb logcat -d | grep -qa "WHISPER_SMALL_RELOAD cycles=10 ok=10" || { echo WHISPER_SMALL_RELOAD_NOT_MEASURED; exit 1; }
+
+              echo "=== whisper small stress: 10 real app restarts ==="
+              restarts=0
+              for i in $(seq 1 10); do
+                adb logcat -c
+                adb shell am force-stop com.avnivo.translator
+                adb shell am start -n com.avnivo.translator/.MainActivity >/dev/null
+                ready=0
+                for t in $(seq 1 60); do
+                  sleep 1
+                  if adb logcat -d | grep -qa "AvnivoModules: AvnivoOfflineModuleReady whisper-small-q8"; then ready=1; break; fi
+                done
+                [ "$ready" = 1 ] || { echo APP_RESTART_$i_NOT_READY; adb logcat -d | grep -a "AvnivoModules" | tail -20; exit 1; }
+                restarts=$((restarts + 1))
+              done
+              echo WHISPER_SMALL_RESTARTS restarts=$restarts ready=$restarts
+              [ "$restarts" = 10 ] || { echo WHISPER_SMALL_RESTARTS_NOT_MEASURED; exit 1; }
+              echo WHISPER_SMALL_STRESS_OK
+            fi
 
             # Uzbek TTS: 92 MB model, so the real inference run is cheap enough to do inline. It
             # downloads from the signed ticket, verifies SHA-256, loads the TorchScript Lite graph

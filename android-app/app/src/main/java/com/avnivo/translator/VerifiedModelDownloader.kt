@@ -6,6 +6,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
 
+/** The download step a module manager needs; tests substitute it to avoid the network. */
+internal interface ModelDownloader {
+    fun download(progress: (String) -> Unit, bytesProgress: (Long, Long) -> Unit)
+}
+
 /** Downloads only the reviewed Uzbek STT model into app-private storage. Run off the UI thread. */
 internal class VerifiedModelDownloader(
     private val directory: File,
@@ -13,7 +18,7 @@ internal class VerifiedModelDownloader(
     private val allowedHosts: List<String> = DEFAULT_ALLOWED_HOSTS,
     private val modelId: String = MODEL_ID,
     private val expected: Map<String, Pair<Long, String>> = EXPECTED
-) {
+) : ModelDownloader {
     companion object {
         const val DEFAULT_API_BASE = "https://avnivo-translation-test-792624108019.europe-west1.run.app"
         val DEFAULT_ALLOWED_HOSTS = listOf(
@@ -32,7 +37,7 @@ internal class VerifiedModelDownloader(
 
     private val ticketUrl get() = "$apiBase/api/offline-models/$modelId/download-ticket"
 
-    fun download(progress: (String) -> Unit, bytesProgress: (Long, Long) -> Unit) {
+    override fun download(progress: (String) -> Unit, bytesProgress: (Long, Long) -> Unit) {
         require(directory.mkdirs() || directory.isDirectory) { "Cannot create model directory" }
         progress("Model serveriga ulanmoqda…")
         val ticket = JSONObject(readHttps(ticketUrl))

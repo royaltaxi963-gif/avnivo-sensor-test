@@ -26,6 +26,7 @@ class OfflineModuleManagerTest {
         // The stand-in files are the right length but not the right bytes, so the digest check is
         // replaced here. ModelIntegrityTest covers the real hashing path with real content.
         .also { it.integrityVerifier = { _, _ -> ModelIntegrity.Result(true) } }
+        .also { it.downloaderFactory = { _, _, _ -> error("unexpected network download in unit test") } }
 
     private fun placeInstalledModel(spec: OfflineModelSpec) {
         val dir = spec.directory(temp.root).apply { mkdirs() }
@@ -35,6 +36,40 @@ class OfflineModuleManagerTest {
             RandomAccessFile(file, "rw").use { it.setLength(sizeAndHash.first) }
         }
     }
+
+    /** A tiny real spec so the real SHA-256 path can be exercised without a 264 MB fixture. */
+    private fun testSpec(id: String = "test-whisper-small", content: String = "test"): Pair<OfflineModelSpec, String> {
+        val bytes = content.toByteArray()
+        val hash = java.security.MessageDigest.getInstance("SHA-256").digest(bytes)
+            .joinToString("") { "%02x".format(it.toInt() and 255) }
+        return OfflineModelSpec(
+            id = id,
+            engine = OfflineEngineKind.WHISPER_GGML,
+            files = mapOf("model.bin" to (bytes.size.toLong() to hash)),
+            requiredRamBytes = 1L
+        ) to content
+    }
+
+    private fun placeContent(spec: OfflineModelSpec, content: String) {
+        val directory = spec.directory(temp.root).apply { mkdirs() }
+        File(directory, "model.bin").writeText(content)
+    }
+
+    private fun realManager() = OfflineModuleManager(temp.root) { fn, v ->
+        synchronized(messages) { messages += fn to v }
+    }.also { it.downloaderFactory = { _, _, _ -> error("unexpected network download in unit test") } }
+
+    private fun downloaderThatWrites(specId: String, content: String, onCall: () -> Unit = {}) = object : ModelDownloader {
+        override fun download(progress: (String) -> Unit, bytesProgress: (Long, Long) -> Unit) {
+            onCall()
+            val directory = temp.root.resolve("models/$specId")
+            directory.mkdirs()
+            File(directory, "model.bin").writeText(content)
+            progress("fake download complete")
+            bytesProgress(content.toByteArray().size.toLong(), content.toByteArray().size.toLong())
+        }
+    }
+
 
     private class FakeEngine : Closeable {
         var closed = false
@@ -53,7 +88,12 @@ class OfflineModuleManagerTest {
         // module INSTALLED at startup and let it look like a downloaded model.
         val blocked = OfflineModelSpecs.all.getValue("navoiy-tts")
         assertFalse(blocked.installed(File(temp.root, "navoiy-tts")))
-        assertEquals("not_installed", JSONObject(manager().status("navoiy-tts")).getString("state"))
+        val manager = manager()
+        try {
+            assertEquals("not_installed", JSONObject(manager.status("navoiy-tts")).getString("state"))
+        } finally {
+            manager.close()
+        }
     }
 
     @Test fun catalogOnlyContainsRealEngines() {
@@ -75,7 +115,7 @@ class OfflineModuleManagerTest {
         val manager = manager()
         val fake = FakeEngine()
         manager.engineFactory = { _, _ -> fake }
-        assertEquals("installed", JSONObject(manager.status(spec.id)).getString("state"))
+        assertEquals("verifying", JSONObject(manager.status(spec.id)).getString("state"))
 
         manager.download(spec.id)
         manager.awaitIdle()
@@ -119,8 +159,11 @@ class OfflineModuleManagerTest {
 
         placeInstalledModel(spec)
         val fresh = manager()
-        assertEquals("installed", JSONObject(fresh.status(spec.id)).getString("state"))
+        assertEquals("verifying", JSONObject(fresh.status(spec.id)).getString("state"))
         assertEquals(emptyList<String>(), fresh.supportedLanguages(spec.id))
+        fresh.reactivateInstalled()
+        fresh.awaitIdle()
+        assertEquals("installed", JSONObject(fresh.status(spec.id)).getString("state"))
 
         fresh.engineFactory = { _, _ -> throw IllegalStateException("boom") }
         fresh.download(spec.id)
@@ -597,6 +640,13 @@ class OfflineModuleManagerTest {
         placeInstalledModel(nllb)
         val manager = manager()
         manager.integrityVerifier = { _, _ -> ModelIntegrity.Result(false, "SHA-256 mos kelmadi") }
+        manager.downloaderFactory = { _, _, _ ->
+            object : ModelDownloader {
+                override fun download(progress: (String) -> Unit, bytesProgress: (Long, Long) -> Unit) {
+                    throw IllegalStateException("network disabled in unit test")
+                }
+            }
+        }
 
         manager.download(nllb.id)
         manager.awaitIdle()
@@ -611,5 +661,170 @@ class OfflineModuleManagerTest {
         assertFalse(manager.isInstalled("whisper-small-q8"))
         assertFalse(manager.isInstalled("does-not-exist"))
         manager.close()
+    }
+
+    @Test fun startupNeverClaimsInstalledUntilSha256Passes() {
+        // A 91 MB sparse file has the right length but the wrong bytes. The card must start in
+        // VERIFYING, not INSTALLED, and settle in ERROR after the real digest check.
+        val spec = OfflineModelSpecs.all.getValue("silero-tts")
+        placeInstalledModel(spec)
+        val manager = realManager()
+        assertEquals("verifying", JSONObject(manager.status(spec.id)).getString("state"))
+        assertFalse("length alone must not make it installed", manager.isInstalled(spec.id))
+
+        manager.reactivateInstalled()
+        manager.awaitIdle()
+
+        assertEquals("error", JSONObject(manager.status(spec.id)).getString("state"))
+        assertFalse(manager.isInstalled(spec.id))
+        manager.close()
+    }
+
+    @Test fun aStampedModelIsInstalledWithoutHashingAgain() {
+        val (spec, content) = testSpec()
+        placeContent(spec, content)
+        val directory = spec.directory(temp.root)
+        assertTrue("the fixture must hash to its manifest", ModelIntegrity.verify(directory, spec).ok)
+
+        val manager = realManager()
+        manager.registerForTest(spec)
+        manager.reactivateInstalled()
+        manager.awaitIdle()
+
+        assertEquals("installed", JSONObject(manager.status(spec.id)).getString("state"))
+        assertTrue(manager.isInstalled(spec.id))
+        manager.close()
+    }
+
+    @Test fun reactivationKeepsALiveEngineReadyAndDoesNotRebuildIt() {
+        val spec = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        placeInstalledModel(spec)
+        val manager = manager()
+        var builds = 0
+        manager.engineFactory = { _, _ -> builds += 1; FakeEngine() }
+        manager.download(spec.id)
+        manager.awaitIdle()
+        assertEquals("ready", JSONObject(manager.status(spec.id)).getString("state"))
+        assertEquals(1, builds)
+
+        manager.reactivateInstalled()
+        manager.awaitIdle()
+
+        assertEquals("a live engine must stay ready", "ready", JSONObject(manager.status(spec.id)).getString("state"))
+        assertEquals("reactivation must not rebuild a live engine", 1, builds)
+        manager.close()
+    }
+
+    @Test fun aCorruptInstalledModelIsDeletedAndDownloadedAgain() {
+        val (spec, content) = testSpec()
+        // Same length as the real file, so only the SHA-256 check can catch it.
+        placeContent(spec, "nope")
+        val manager = realManager()
+        manager.registerForTest(spec)
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        var downloads = 0
+        manager.downloaderFactory = { _, _, _ -> downloaderThatWrites(spec.id, content) { downloads += 1 } }
+
+        manager.download(spec.id)
+        manager.awaitIdle()
+
+        assertEquals("the corrupt bytes must be replaced in the same press", 1, downloads)
+        assertEquals(content, File(spec.directory(temp.root), "model.bin").readText())
+        assertEquals("ready", JSONObject(manager.status(spec.id)).getString("state"))
+        manager.close()
+    }
+
+    @Test fun aDownloadThatFailsPostVerificationNeverReportsInstalled() {
+        val (spec, content) = testSpec()
+        val manager = realManager()
+        manager.registerForTest(spec)
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.downloaderFactory = { _, _, _ -> downloaderThatWrites(spec.id, content) }
+        manager.integrityVerifier = { _, _ -> ModelIntegrity.Result(false, "SHA-256 mos kelmadi") }
+
+        manager.download(spec.id)
+        manager.awaitIdle()
+
+        assertEquals("error", JSONObject(manager.status(spec.id)).getString("state"))
+        assertFalse(manager.isInstalled(spec.id))
+        manager.close()
+    }
+
+    @Test fun missingBytesUnderAnInstalledStateStartARealDownload() {
+        val (spec, content) = testSpec()
+        placeContent(spec, content)
+        ModelIntegrity.verify(spec.directory(temp.root), spec)
+        val manager = realManager()
+        manager.registerForTest(spec)
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.reactivateInstalled()
+        manager.awaitIdle()
+        assertEquals("installed", JSONObject(manager.status(spec.id)).getString("state"))
+
+        File(spec.directory(temp.root), "model.bin").delete()
+        var stateDuringDownload = ""
+        manager.downloaderFactory = { _, _, _ ->
+            downloaderThatWrites(spec.id, content) {
+                stateDuringDownload = JSONObject(manager.status(spec.id) ?: "{}").optString("state")
+            }
+        }
+
+        manager.download(spec.id)
+        manager.awaitIdle()
+
+        assertEquals("the card must say downloading while bytes are fetched", "downloading", stateDuringDownload)
+        assertEquals("ready", JSONObject(manager.status(spec.id)).getString("state"))
+        manager.close()
+    }
+
+    @Test fun progressIsForwardedWithRealBytesOnTheModuleChannel() {
+        val (spec, content) = testSpec()
+        val manager = realManager()
+        manager.registerForTest(spec)
+        manager.engineFactory = { _, _ -> FakeEngine() }
+        manager.downloaderFactory = { _, _, _ ->
+            object : ModelDownloader {
+                override fun download(progress: (String) -> Unit, bytesProgress: (Long, Long) -> Unit) {
+                    bytesProgress(1, 4)
+                    bytesProgress(4, 4)
+                    val directory = spec.directory(temp.root).apply { mkdirs() }
+                    File(directory, "model.bin").writeText(content)
+                }
+            }
+        }
+
+        manager.download(spec.id)
+        manager.awaitIdle()
+
+        val progress = messages.filter { it.first == "AvnivoOfflineModuleProgress" }.map { it.second }
+        assertTrue("real byte progress must reach the card: $progress", progress.contains("${spec.id}|1/4"))
+        assertTrue("the final byte count must reach the card: $progress", progress.contains("${spec.id}|4/4"))
+        manager.close()
+    }
+
+    @Test fun tenRestartsRehydrateTheInstalledModelWithoutDownloadingAgain() {
+        val (spec, content) = testSpec()
+        placeContent(spec, content)
+        assertTrue(ModelIntegrity.verify(spec.directory(temp.root), spec).ok)
+
+        repeat(10) { restart ->
+            val manager = realManager()
+            manager.registerForTest(spec)
+            var builds = 0
+            manager.engineFactory = { _, _ -> builds += 1; FakeEngine() }
+            manager.downloaderFactory = { _, _, _ -> error("restart $restart must not download") }
+            manager.activeModuleId = spec.id
+
+            manager.reactivateInstalled()
+            manager.awaitIdle()
+
+            assertEquals(
+                "restart $restart must rehydrate ready",
+                "ready",
+                JSONObject(manager.status(spec.id)).getString("state")
+            )
+            assertEquals("restart $restart must load exactly one engine", 1, builds)
+            manager.close()
+        }
     }
 }

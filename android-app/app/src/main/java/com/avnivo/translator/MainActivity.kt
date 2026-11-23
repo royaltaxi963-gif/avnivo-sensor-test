@@ -85,7 +85,13 @@ class MainActivity : Activity() {
         web.loadUrl("file:///android_asset/index.html")
     }
 
-    private val moduleManager by lazy { OfflineModuleManager(filesDir, applicationContext) { fn, v -> notifyJs(fn, v) } }
+    private val moduleManager by lazy {
+        OfflineModuleManager(filesDir, applicationContext) { fn, v ->
+            // Logcat is the only evidence a CI restart loop can read after the page reloads.
+            android.util.Log.i("AvnivoModules", "$fn $v")
+            notifyJs(fn, v)
+        }
+    }
 
     /** Synthesis and playback run here so neither the UI nor the WebView thread is ever blocked. */
     private val ttsWorker = Executors.newSingleThreadExecutor()

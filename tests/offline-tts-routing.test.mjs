@@ -139,6 +139,16 @@ test('playMessage routes offline speech by the message language, not its side', 
     'the message language must resolve to its NLLB code, preferring the bubble it was sent with')
   assert.match(body, /isUzbekNllb\(code\)/, 'the native Uzbek engine must be gated by language')
   assert.match(body, /speechLocaleForNllb\(code\)/, 'the browser voice must use the message locale')
+  assert.match(body, /const text=bubble\.textContent\.trim\(\)/,
+    'the speaker must read the bubble it is attached to, not a shared or last message')
+})
+
+test('offline browser playback keeps the selected rate', () => {
+  const start = html.indexOf('async function playMessage(')
+  const end = html.indexOf('ttsTestButton.addEventListener', start)
+  const body = html.slice(start, end)
+  assert.match(body, /utterance\.lang=speechLocale;utterance\.rate=Number\(ttsRateSelect\.value\)/,
+    'the offline Web Speech fallback must use the same rate control as online')
 })
 
 test('each speaker carries the language code of the message it belongs to', () => {
@@ -148,6 +158,8 @@ test('each speaker carries the language code of the message it belongs to', () =
   const body = html.slice(start, end)
   assert.match(body, /function attachSpeaker\(bubble,language,code\)/, 'attachSpeaker must accept the code')
   assert.match(body, /if\(code\)button\.dataset\.code=code/, 'the code must be stamped on the button')
+  assert.match(html, /line\.append\(bubble,button\)/,
+    'each button must stay bound to its own bubble')
   // Sending and history restore must both pass the pinned code through.
   assert.match(html, /attachSpeaker\(sourceBubble,language,sourceCode\)/)
   assert.match(html, /attachSpeaker\(translationBubble,oppositeLanguage\(language\),targetCode\)/)

@@ -38,10 +38,18 @@ internal class OfflineModuleManager(
     init {
         OfflineModelSpecs.all.values.forEach { spec ->
             val module = Module(spec)
-            // Length is enough to know a model is a candidate for loading. Verification (SHA-256)
-            // runs on the worker before the module is reported as installed, so a truncated file
-            // is never presented as ready.
-            if (spec.installed(spec.directory(filesDir))) module.state = OfflineModuleState.INSTALLED
+            val directory = spec.directory(filesDir)
+            // A file of the right length is only a candidate. INSTALLED is reserved for a model
+            // whose bytes are covered by a SHA-256 stamp; anything else is verified on the worker
+            // before the card may claim it is installed.
+            if (spec.installed(directory)) {
+                module.state = if (ModelIntegrity.isStamped(directory, spec)) {
+                    module.verified = true
+                    OfflineModuleState.INSTALLED
+                } else {
+                    OfflineModuleState.VERIFYING
+                }
+            }
             modules[spec.id] = module
         }
     }
@@ -153,7 +161,10 @@ internal class OfflineModuleManager(
     fun isInstalled(id: String): Boolean {
         val module = modules[id] ?: return false
         if (module.state == OfflineModuleState.ERROR) return false
-        return module.spec.runnable && module.spec.installed(module.spec.directory(filesDir))
+        if (!module.spec.runnable) return false
+        val directory = module.spec.directory(filesDir)
+        if (!module.spec.installed(directory)) return false
+        return module.verified || ModelIntegrity.isStamped(directory, module.spec)
     }
 
     /**
@@ -214,24 +225,37 @@ internal class OfflineModuleManager(
         worker.execute {
             for (module in modules.values) {
                 if (!module.spec.runnable) continue
+                // A live engine is already the strongest evidence there is. Demoting it to
+                // INSTALLED on every page load is what made a working Whisper Small card lose
+                // "Faol" and look like it needed downloading again.
+                if (module.state.isOperational && module.engine != null) continue
+                if (module.state == OfflineModuleState.DOWNLOADING) continue
                 val directory = module.spec.directory(filesDir)
-                if (!module.spec.installed(directory)) continue
-                val integrity = integrityVerifier(directory, module.spec)
-                module.verified = integrity.ok
-                if (!integrity.ok) {
-                    module.reason = "model buzilgan: ${integrity.reason}. Qayta yuklab oling."
-                    transition(module, OfflineModuleState.ERROR)
-                    notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+                if (!module.spec.installed(directory)) {
+                    if (module.state == OfflineModuleState.VERIFYING) {
+                        module.reason = "model fayllari topilmadi"
+                        transition(module, OfflineModuleState.NOT_INSTALLED)
+                    }
                     continue
                 }
-                transition(module, OfflineModuleState.INSTALLED)
+                if (!module.verified) {
+                    val integrity = integrityVerifier(directory, module.spec)
+                    module.verified = integrity.ok
+                    if (!integrity.ok) {
+                        module.reason = "model buzilgan: ${integrity.reason}. Qayta yuklab oling."
+                        transition(module, OfflineModuleState.ERROR)
+                        notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+                        continue
+                    }
+                }
                 module.reason = null
+                transition(module, OfflineModuleState.INSTALLED)
                 notify("AvnivoOfflineModuleStatus", module.spec.id)
             }
             // Restore the single engine that was active, and only that one.
             activeModuleId?.let { id ->
                 modules[id]?.let { module ->
-                    if (module.verified) activate(module)
+                    if (module.verified && !module.state.isOperational) activate(module)
                 }
             }
         }
@@ -277,10 +301,14 @@ internal class OfflineModuleManager(
             DeviceMemory.log(appContext)
             notify("AvnivoOfflineModuleReady", module.spec.id)
         } catch (e: Exception) {
+            module.engine?.let { runCatching { it.close() } }
+            module.engine = null
             module.reason = "dvigatel ishga tushmadi: ${e.message}"
             transition(module, OfflineModuleState.INSTALLED)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e.message}")
         } catch (e: UnsatisfiedLinkError) {
+            module.engine?.let { runCatching { it.close() } }
+            module.engine = null
             module.reason = "native kutubxonasi yuklanmadi"
             transition(module, OfflineModuleState.INSTALLED)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|native kutubxonasi yuklanmadi")
@@ -365,7 +393,7 @@ internal class OfflineModuleManager(
         }
         worker.execute {
             val directory = module.spec.directory(filesDir)
-            if (module.state.isOperational) {
+            if (module.state.isOperational && module.engine != null) {
                 // A ready engine is already the finished result; rebuilding it would drop a working
                 // decoder for no reason and briefly report a state that is not true.
                 notify("AvnivoOfflineModuleReady", module.spec.id)
@@ -373,27 +401,38 @@ internal class OfflineModuleManager(
             }
             if (module.spec.installed(directory)) {
                 // Files are there: prove they are intact before claiming anything about them.
+                if (!module.verified) transition(module, OfflineModuleState.VERIFYING)
                 val integrity = integrityVerifier(directory, module.spec)
                 module.verified = integrity.ok
                 if (!integrity.ok) {
+                    // A corrupt file with the expected length can never be repaired by re-hashing
+                    // it. Delete it so the same press can fetch clean bytes instead of leaving the
+                    // user in an ERROR loop that says "download again" and then refuses to.
                     ModelIntegrity.invalidate(directory)
-                    module.reason = "model buzilgan: ${integrity.reason}. Qayta yuklab oling."
-                    transition(module, OfflineModuleState.ERROR)
-                    notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+                    module.spec.files.keys.forEach { File(directory, it).delete() }
+                    module.verified = false
+                    module.reason = "model buzilgan: ${integrity.reason}. Qayta yuklanmoqda."
+                    transition(module, OfflineModuleState.NOT_INSTALLED)
+                } else {
+                    module.reason = null
+                    transition(module, OfflineModuleState.INSTALLED)
+                    activate(module)
                     return@execute
                 }
-                transition(module, OfflineModuleState.INSTALLED)
-                activate(module)
-                return@execute
+            } else if (module.state == OfflineModuleState.INSTALLED ||
+                module.state == OfflineModuleState.READY ||
+                module.state == OfflineModuleState.VERIFYING) {
+                // The state said installed but the bytes are gone (manual cleanup, failed
+                // migration, or a partial restore). Reset before starting a real download so the
+                // card cannot stay on "installed" while bytes are being fetched.
+                ModelIntegrity.invalidate(directory)
+                module.verified = false
+                transition(module, OfflineModuleState.NOT_INSTALLED)
             }
             try {
                 transition(module, OfflineModuleState.DOWNLOADING)
                 notify("AvnivoOfflineStatus", "${module.spec.id} yuklanmoqda…")
-                VerifiedModelDownloader(
-                    directory = directory,
-                    modelId = module.spec.id,
-                    expected = module.spec.files
-                ).download(
+                downloaderFactory(directory, module.spec.id, module.spec.files).download(
                     { notify("AvnivoOfflineStatus", it) },
                     { done, total ->
                         module.percent = if (total > 0) ((done * 100) / total).toInt().coerceIn(0, 100) else 0
@@ -407,7 +446,16 @@ internal class OfflineModuleManager(
                 transition(module, OfflineModuleState.VERIFYING)
                 // The downloader hashes every byte it writes; record that so the next page load
                 // does not re-hash 916 MB just to answer "is this still installed?".
-                module.verified = integrityVerifier(directory, module.spec).ok
+                val verified = integrityVerifier(directory, module.spec).ok
+                module.verified = verified
+                if (!verified) {
+                    ModelIntegrity.invalidate(directory)
+                    module.reason = "model tekshiruvdan o‘tmadi (SHA-256). Qayta yuklab oling."
+                    transition(module, OfflineModuleState.ERROR)
+                    notify("AvnivoOfflineModuleError", "$id|${module.reason}")
+                    return@execute
+                }
+                module.reason = null
                 transition(module, OfflineModuleState.INSTALLED)
                 activate(module)
             } catch (e: Exception) {
@@ -420,6 +468,12 @@ internal class OfflineModuleManager(
 
     /** Overridable so JVM tests can exercise the lifecycle without the native runtime. */
     internal var engineFactory: (OfflineModelSpec, File) -> Closeable = ::buildEngine
+
+    /** Overridable so lifecycle tests can prove progress and verification without the network. */
+    internal var downloaderFactory: (File, String, Map<String, Pair<Long, String>>) -> ModelDownloader =
+        { directory, id, expected ->
+            VerifiedModelDownloader(directory = directory, modelId = id, expected = expected)
+        }
 
     /** Overridable so tests can present the memory picture of a specific phone. */
     internal var memoryProvider: (Context?) -> MemorySnapshot? = DeviceMemory::snapshot
@@ -493,6 +547,7 @@ internal class OfflineModuleManager(
     }
 
     private fun transition(module: Module, next: OfflineModuleState) {
+        if (module.state == next) return
         if (!module.state.canTransitionTo(next)) return
         module.state = next
         if (next != OfflineModuleState.DOWNLOADING) {
