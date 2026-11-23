@@ -79,7 +79,7 @@ class OfflineModuleCardInstrumentedTest {
         val web = loadInterface()
         val value = evaluate(
             web,
-            "window.AvnivoOfflineModuleProgress('whisper-small-q8|132232303/264464607');" +
+            "window.AvnivoOfflineModuleProgress('whisper-small-q8|132232304/264464607');" +
                 "var r=document.querySelector('[data-module-id=\"multilingual-stt\"]');" +
                 "[r.querySelector('.offline-module-percent').textContent," +
                 "r.querySelector('.offline-module-mb').textContent," +
