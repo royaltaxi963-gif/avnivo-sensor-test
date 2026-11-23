@@ -8,7 +8,7 @@ import com.k2fsa.sherpa.onnx.OfflineRecognizerConfig
 import java.io.File
 
 /** Offline-only NeMo CTC decoder; all methods must be called off the UI thread. */
-class OfflineSpeechEngine(private val modelDirectory: File) : SttRecognizer {
+internal class OfflineSpeechEngine(private val modelDirectory: File) : SttRecognizer {
     private var recognizer: OfflineRecognizer? = null
 
     companion object {

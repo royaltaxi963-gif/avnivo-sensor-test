@@ -30,14 +30,17 @@ class MainActivity : Activity() {
      * The Uzbek recognizer's lifecycle and evidence-based state. One instance per activity, so the
      * decoder is prepared once and reused across every press, session and mode switch.
      */
-    private val sttController by lazy {
+    private val sttController: UzbekSttController by lazy {
         UzbekSttController(
             recognizerFactory = { OfflineSpeechEngine(modelDir) },
             modelPresent = { OfflineSpeechEngine.hasRequiredFiles(modelDir) },
-            onStateChanged = { _, _, session ->
-                notifyJs("AvnivoOfflineState", sttController.statusJson(session).toString(), session)
-            }
+            onStateChanged = { _, _, session -> announceSttState(session) }
         )
+    }
+
+    /** Publishes the controller state to the page. Kept out of the initializer to avoid a self-reference. */
+    private fun announceSttState(session: Int) {
+        notifyJs("AvnivoOfflineState", sttController.statusJson(session).toString(), session)
     }
 
     @Volatile private var percent = 0

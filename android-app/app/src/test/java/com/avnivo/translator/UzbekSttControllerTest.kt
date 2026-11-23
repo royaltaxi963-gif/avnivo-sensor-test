@@ -48,8 +48,8 @@ class UzbekSttControllerTest {
         }
     }
 
-    private class Harness(installed: Boolean = true) {
-        var installed = installed
+    private class Harness(initialInstalled: Boolean = true) {
+        var installed = initialInstalled
         var nextText = "salom"
         val built = mutableListOf<FakeRecognizer>()
         val events = mutableListOf<Triple<OfflineModuleState, String?, Int>>()
