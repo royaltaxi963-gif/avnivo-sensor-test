@@ -266,6 +266,31 @@ class OfflineMicGestureInstrumentedTest {
     }
 
     /**
+     * The reported S23 Ultra card state: after release the native controller must publish
+     * TRANSCRIBING, and the card must stop saying "Ovoz yozilmoqda...". A slow Uzbek reload after
+     * Whisper Large used to leave this card on recording while inference was already pending.
+     */
+    @Test
+    fun releasedCaptureMovesTheCardFromRecordingToProcessing() {
+        val web = loadInterface()
+        val value = evaluate(
+            web,
+            "window.AvnivoOfflineState(JSON.stringify({id:'uzbek-stt',state:'recording',reason:null}),4);" +
+                "var row=document.querySelector('[data-module-id=\"uz-stt\"]');" +
+                "var status=row.querySelector('.offline-module-state');" +
+                "var recording=status.textContent;" +
+                "window.AvnivoOfflineState(JSON.stringify({id:'uzbek-stt',state:'transcribing',reason:null}),4);" +
+                "var processing=status.textContent;" +
+                "[recording,processing,recording!==processing,processing.includes('yozilmoqda')].join('|')"
+        )
+        val parts = value.split("|")
+        assertEquals("the card must first show recording: $value", true, parts[0].isNotEmpty())
+        assertEquals("the card must show processing after release: $value", true, parts[1].isNotEmpty())
+        assertEquals("the card text must change: $value", "true", parts[2])
+        assertEquals("processing must not still say recording: $value", "false", parts[3])
+    }
+
+    /**
      * A progress message must not end a live recording. The old code guessed from the wording of
      * every status string, which could drop the press mid-capture. Only an explicit rejection ends
      * it.

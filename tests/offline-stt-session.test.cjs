@@ -77,8 +77,62 @@ test('1b. a release from an older press cannot cut a newer one', () => {
 });
 
 test('1c. a finished capture only clears state it still owns', () => {
-  assert.match(endCaptureBody, /if \(openSession == session\) openSession = 0/);
+  assert.match(endCaptureBody, /if \(openSession != session\) return/,
+    'an old capture must not clear a newer capture');
+  assert.match(endCaptureBody, /openSession = 0/);
   assert.match(beginBody, /sttController\.endCapture\(session\)/);
+});
+
+test('1d. release ends capture and enters processing before prepare/decode', () => {
+  // The S23 Ultra report: the Uzbek card stayed on "Ovoz yozilmoqda..." while the engine was
+  // being reloaded after Whisper Large, so the next press hit the cross-engine guard forever.
+  assert.match(endCaptureBody, /transcribingSession == 0\) transcribingSession = session/,
+    'the released session must own the processing slot');
+  assert.match(endCaptureBody, /setState\(OfflineModuleState\.TRANSCRIBING/,
+    'the card must move to processing as soon as the microphone closes');
+  const processingAt = transcribeControllerBody.indexOf('setState(OfflineModuleState.TRANSCRIBING');
+  const prepareAt = transcribeControllerBody.indexOf('ensureReady(session)');
+  assert.ok(processingAt !== -1 && prepareAt !== -1 && processingAt < prepareAt,
+    'processing must be published before a slow ensureReady/prepare');
+  assert.match(transcribeControllerBody, /transcribingSession = session/,
+    'the decode must claim its session before preparing the recognizer');
+});
+
+test('1e. a microphone release stops AudioRecord, not just a flag', () => {
+  const stopBody = functionBody(recorder, 'fun stop()');
+  assert.match(stopBody, /recordingState == AudioRecord\.RECORDSTATE_RECORDING\) audio\.stop\(\)/,
+    'stop() must wake a blocked AudioRecord.read()');
+  assert.match(captureBody, /if \(stopRequested\) break/,
+    'a read that fails because of release must end normally');
+  assert.match(activity, /CAPTURE_RELEASE_TIMEOUT_MS = 5_000L/,
+    'a release watchdog must settle a capture that never returns');
+  assert.match(activity, /capture-timeout/, 'the watchdog must leave a traceable log line');
+  assert.match(activity, /capture\?\.abort\(\)/, 'the watchdog must force-stop the stuck recorder');
+  assert.match(recorder, /fun abort\(\)/, 'the recorder must expose an emergency stop');
+});
+
+test('1f. a rejection is stamped with the new press session', () => {
+  assert.match(
+    startBody,
+    /notifyJs\("AvnivoOfflineRejected", "Yozib olish allaqachon davom etmoqda\.", requested\)/,
+    'the page must receive a rejection it can act on'
+  );
+  assert.match(startBody, /if \(recorder == null\)/,
+    'a capture that ended without clearing the controller must be settled first');
+  assert.match(startBody, /stale-capture/, 'the stale-session recovery must be traceable');
+});
+
+test('1g. the cross-engine guard is real and clears with the inference', () => {
+  assert.match(
+    startBody,
+    /if \(transcribingEngine != null && transcribingEngine != route\.engine\)/,
+    'two different engines must never decode at the same time'
+  );
+  assert.match(startBody, /previous-engine=\$\{transcribingEngine\?\.moduleId\}/,
+    'a rejection must log which engine still owns the session');
+  assert.match(transcribeBody, /if \(transcribingEngine == route\.engine\) transcribingEngine = null/,
+    'the guard must be cleared on success and failure');
+  assert.match(transcribeBody, /inference-end/, 'the end of inference must be traceable');
 });
 
 test('2. a press is not blocked by the previous recording being transcribed', () => {
@@ -199,7 +253,7 @@ test('13. every native resource is released when the activity is destroyed', () 
   // recognizer alive after the user leaves, which is what produced "microphone busy" reports.
   const destroy = functionBody(activity, 'override fun onDestroy()');
   for (const call of [
-    'recorder?.stop()',
+    'recorder?.abort()',
     'ttsPlayer.close()',
     'ttsWorker.shutdown()',
     'moduleManager.close()',

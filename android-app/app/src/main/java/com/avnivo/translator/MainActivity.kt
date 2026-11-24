@@ -5,6 +5,8 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
@@ -50,6 +52,33 @@ class MainActivity : Activity() {
 
     /** A release that arrived before the microphone object existed, applied when capture starts. */
     @Volatile private var stopRequestedSession = 0
+
+    /**
+     * A release must end capture even if AudioRecord.read() is stuck. stop() calls
+     * AudioRecord.stop(); this watchdog is the last-resort recovery that settles the session so a
+     * stale capture can never block every later press.
+     */
+    private val mainHandler = Handler(Looper.getMainLooper())
+    @Volatile private var captureWatchdogSession = 0
+    @Volatile private var captureWatchdogRecorder: OfflinePcmRecorder? = null
+    private val captureWatchdog = Runnable {
+        val session = captureWatchdogSession
+        val capture = captureWatchdogRecorder
+        captureWatchdogSession = 0
+        captureWatchdogRecorder = null
+        if (session == 0 || sttController.openSession != session) return@Runnable
+        logStt(session, "capture-timeout", "release did not end AudioRecord")
+        discardSession = session
+        runCatching { capture?.abort() }
+        sttController.endCapture(session)
+        sttSessions.close(session)
+        sttController.fail(session, "Mikrofon javob bermadi; yozuv bekor qilindi")
+        notifyJs(
+            "AvnivoOfflineError",
+            "Mikrofon javob bermadi; yozuv bekor qilindi. Qayta urinib ko‘ring.",
+            session
+        )
+    }
 
     /** The WebView capture request waiting on the Android permission dialog, if any. */
     private var pendingWebAudioRequest: PermissionRequest? = null
@@ -419,11 +448,25 @@ class MainActivity : Activity() {
 
         private fun startForLanguage(session: Int, sourceLanguage: String) {
             runOnUiThread {
-                if (sttController.isRecording) {
-                    notifyJs("AvnivoOfflineRejected", "Yozib olish allaqachon davom etmoqda.", sttController.openSession)
-                    return@runOnUiThread
-                }
                 val requested = if (session > 0) session else sttController.lastSession + 1
+                if (sttController.isRecording) {
+                    val open = sttController.openSession
+                    if (recorder == null) {
+                        // The capture worker ended without clearing the controller (or a release
+                        // was lost). Settle the stale session before accepting the new press.
+                        logStt(open, "stale-capture", "recovering before session=$requested")
+                        discardSession = open
+                        sttController.endCapture(open)
+                        sttSessions.close(open)
+                        sttController.complete(open)
+                    } else {
+                        // Reject with the NEW session id. The page ignores a rejection stamped with
+                        // the old id, which left the composer looking permanently blocked.
+                        logStt(requested, "rejected", "capture-open=$open")
+                        notifyJs("AvnivoOfflineRejected", "Yozib olish allaqachon davom etmoqda.", requested)
+                        return@runOnUiThread
+                    }
+                }
                 val route = runCatching { OfflineSttRouter.route(sourceLanguage) }.getOrElse {
                     notifyJs("AvnivoOfflineRejected", it.message ?: "Manba tili tanlanmagan", requested)
                     return@runOnUiThread
@@ -433,6 +476,11 @@ class MainActivity : Activity() {
                     return@runOnUiThread
                 }
                 if (transcribingEngine != null && transcribingEngine != route.engine) {
+                    logStt(
+                        requested,
+                        "rejected",
+                        "previous-engine=${transcribingEngine?.moduleId} requested-engine=${route.engine.moduleId}"
+                    )
                     notifyJs(
                         "AvnivoOfflineRejected",
                         "Oldingi yozuv boshqa STT dvigatelida tugatilmoqda. Tugashini kuting.",
@@ -471,10 +519,17 @@ class MainActivity : Activity() {
                 val current = sttController.beginCapture(opened.session)
                 if (current == 0) {
                     sttSessions.close(opened.session)
-                    notifyJs("AvnivoOfflineRejected", "Yozib olish allaqachon davom etmoqda.", sttController.openSession)
+                    logStt(opened.session, "rejected", "beginCapture refused")
+                    notifyJs("AvnivoOfflineRejected", "Yozib olish allaqachon davom etmoqda.", opened.session)
                     return@runOnUiThread
                 }
                 discardSession = 0
+                logStt(
+                    current,
+                    "start",
+                    "source=${route.sourceLanguage ?: "-"} engine=${route.engine.moduleId} " +
+                        "previous=${opened.previous?.moduleId ?: "-"} whisper_lang=${route.whisperLanguage ?: "-"}"
+                )
                 beginRecording(current)
             }
         }
@@ -483,9 +538,11 @@ class MainActivity : Activity() {
         @JavascriptInterface fun stop(session: Int = 0) {
             // A release that belongs to an earlier press must not cut the current one short.
             if (!sttController.ownsCapture(session)) return
+            val target = if (session > 0) session else sttController.openSession
             val capture = recorder
             if (capture != null) capture.stop()
-            else stopRequestedSession = if (session > 0) session else sttController.openSession
+            else stopRequestedSession = target
+            armCaptureWatchdog(target, capture)
         }
 
         /** Ends the capture and discards its audio; a cancelled press must not be transcribed. */
@@ -495,6 +552,7 @@ class MainActivity : Activity() {
             discardSession = target
             val capture = recorder
             if (capture != null) capture.stop() else stopRequestedSession = target
+            armCaptureWatchdog(target, capture)
         }
     }
 
@@ -548,7 +606,10 @@ class MainActivity : Activity() {
         // The finger may already be up (a very short press, or a release that raced the bridge
         // call). Apply that release before the loop starts so recording stops at the 0.3 s floor
         // instead of running to the 30 s limit.
-        if (stopRequestedSession == session) capture.stop()
+        if (stopRequestedSession == session) {
+            capture.stop()
+            armCaptureWatchdog(session, capture)
+        }
         stopRequestedSession = 0
         captureWorker.execute {
             try {
@@ -575,6 +636,7 @@ class MainActivity : Activity() {
                 logStt(session, "capture-failed", e.message ?: e::class.java.simpleName)
                 notifyJs("AvnivoOfflineError", "Yozib olish xatosi: ${e.message}", session)
             } finally {
+                disarmCaptureWatchdog(session)
                 capture.close()
                 if (recorder === capture) recorder = null
                 notifyJs("AvnivoOfflineLevel", "0", session)
@@ -610,8 +672,10 @@ class MainActivity : Activity() {
             logStt(session, "stale", "no route for session")
             return
         }
+        logStt(session, "processing", "engine=${route.engine.moduleId}")
         sttWorker.execute {
             transcribingEngine = route.engine
+            logStt(session, "inference-start", "engine=${route.engine.moduleId}")
             try {
                 val text = when (route.engine) {
                     OfflineSttEngine.UZBEK_STT -> sttController.transcribe(session, samples)
@@ -652,8 +716,24 @@ class MainActivity : Activity() {
                 notifyJs("AvnivoOfflineError", e.message ?: "Offline STT xatosi", session)
             } finally {
                 if (transcribingEngine == route.engine) transcribingEngine = null
+                logStt(session, "inference-end", "engine=${route.engine.moduleId}")
             }
         }
+    }
+
+    private fun armCaptureWatchdog(session: Int, capture: OfflinePcmRecorder?) {
+        if (session <= 0) return
+        captureWatchdogSession = session
+        captureWatchdogRecorder = capture
+        mainHandler.removeCallbacks(captureWatchdog)
+        mainHandler.postDelayed(captureWatchdog, CAPTURE_RELEASE_TIMEOUT_MS)
+    }
+
+    private fun disarmCaptureWatchdog(session: Int) {
+        if (captureWatchdogSession != session) return
+        captureWatchdogSession = 0
+        captureWatchdogRecorder = null
+        mainHandler.removeCallbacks(captureWatchdog)
     }
 
     /** Session-tagged diagnostic line, so a stale or dropped segment can be traced in logcat. */
@@ -715,7 +795,10 @@ class MainActivity : Activity() {
     override fun onDestroy() {
         pendingWebAudioRequest?.deny()
         pendingWebAudioRequest = null
-        recorder?.stop()
+        mainHandler.removeCallbacks(captureWatchdog)
+        captureWatchdogSession = 0
+        captureWatchdogRecorder = null
+        recorder?.abort()
         ttsPlayer.close()
         ttsWorker.shutdown()
         moduleManager.close()
@@ -730,6 +813,7 @@ class MainActivity : Activity() {
 
     private companion object {
         const val MIN_SAMPLES = 4800 // 0.3 s at 16 kHz: below this there is no usable speech.
+        const val CAPTURE_RELEASE_TIMEOUT_MS = 5_000L
         const val NLLB_MODULE = "nllb-200-600m-int8"
         const val SILERO_MODULE = "silero-tts"
         const val REQUEST_RECORD_AUDIO = 100

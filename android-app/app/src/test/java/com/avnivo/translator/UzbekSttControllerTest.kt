@@ -24,10 +24,12 @@ class UzbekSttControllerTest {
         var closed = 0
         var failPrepare: Throwable? = null
         var failTranscribe: Throwable? = null
+        var onPrepare: (() -> Unit)? = null
 
         override val isPrepared: Boolean get() = prepared > 0
 
         override fun prepare() {
+            onPrepare?.invoke()
             failPrepare?.let { throw it }
             prepared += 1
         }
@@ -51,11 +53,17 @@ class UzbekSttControllerTest {
     private class Harness(initialInstalled: Boolean = true) {
         var installed = initialInstalled
         var nextText = "salom"
+        var prepareHook: (() -> Unit)? = null
         val built = mutableListOf<FakeRecognizer>()
         val events = mutableListOf<Triple<OfflineModuleState, String?, Int>>()
 
         val controller = UzbekSttController(
-            recognizerFactory = { FakeRecognizer(nextText).also { built += it } },
+            recognizerFactory = {
+                FakeRecognizer(nextText).also {
+                    it.onPrepare = prepareHook
+                    built += it
+                }
+            },
             modelPresent = { this.installed },
             onStateChanged = { state, reason, session -> events += Triple(state, reason, session) }
         )
@@ -87,6 +95,66 @@ class UzbekSttControllerTest {
         assertEquals(1, h.current.prepared)
         assertEquals(1, h.current.smoked)
         assertTrue(h.controller.isOperational)
+        h.controller.close()
+    }
+
+    @Test
+    fun endingCapturePublishesProcessingBeforeAnyPrepare() {
+        val h = Harness()
+        h.controller.refreshInstalled()
+        assertEquals(1, h.controller.beginCapture(1))
+        assertEquals(OfflineModuleState.RECORDING, h.controller.state)
+
+        h.controller.endCapture(1)
+
+        assertEquals(
+            "the card must leave recording as soon as the microphone closes",
+            OfflineModuleState.TRANSCRIBING,
+            h.controller.state
+        )
+        assertEquals(1, h.controller.transcribingSession)
+        val status = JSONObject(h.controller.statusJson(1).toString())
+        assertFalse("recording must be false after release", status.getBoolean("recording"))
+        assertTrue("processing must be visible before prepare/decode", status.getBoolean("transcribing"))
+        h.controller.complete(1)
+        assertEquals("no decoder was prepared, so the module returns to installed", OfflineModuleState.INSTALLED, h.controller.state)
+        h.controller.close()
+    }
+
+    @Test
+    fun transcribePublishesProcessingBeforeASlowPrepare() {
+        val h = Harness()
+        h.controller.refreshInstalled()
+        h.controller.beginCapture(1)
+        h.controller.endCapture(1)
+        h.prepareHook = {
+            assertEquals(
+                "a slow Uzbek reload must already be visible as processing",
+                OfflineModuleState.TRANSCRIBING,
+                h.controller.state
+            )
+        }
+
+        assertEquals("salom", h.controller.transcribe(1, FloatArray(1600)))
+        h.controller.complete(1)
+        assertEquals(OfflineModuleState.READY, h.controller.state)
+        h.controller.close()
+    }
+
+    @Test
+    fun endingAnOlderCaptureCannotSettleANewerRecording() {
+        val h = Harness()
+        h.controller.refreshInstalled()
+        h.controller.beginCapture(1)
+        h.controller.endCapture(1)
+        assertEquals(OfflineModuleState.TRANSCRIBING, h.controller.state)
+
+        assertEquals(2, h.controller.beginCapture(2))
+        assertEquals(OfflineModuleState.RECORDING, h.controller.state)
+        h.controller.endCapture(1)
+        assertEquals("a stale release must not move the newer recording", OfflineModuleState.RECORDING, h.controller.state)
+        h.controller.complete(1)
+        assertEquals("a stale completion must not settle the newer recording", OfflineModuleState.RECORDING, h.controller.state)
         h.controller.close()
     }
 

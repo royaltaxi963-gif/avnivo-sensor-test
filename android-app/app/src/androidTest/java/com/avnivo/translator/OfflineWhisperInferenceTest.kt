@@ -395,6 +395,24 @@ class OfflineWhisperInferenceTest {
             val hits = expected.count { it in text }
             assertTrue("recall $hits/${expected.size} too low for: $text", hits >= 4)
 
+            // The same resident Large model must transcribe real Russian speech with an explicit
+            // ru language code. This is the Large counterpart of the Small Russian regression.
+            val ru = assetSamples("whisper_ru_16k.wav", "whisper_ru_large_16k.wav")
+            assertTrue("expected non-trivial Russian audio", ru.size > 16000)
+            val ruText = manager.transcribe("whisper-large-v3-turbo", ru, "ru").lowercase()
+            assertFalse("Large Russian transcription must not be empty", ruText.isBlank())
+            assertTrue(
+                "Large Russian audio must produce Cyrillic text, got: $ruText",
+                ruText.any { it in '\u0400'..'\u04FF' }
+            )
+            val ruExpected = listOf("сегодня", "погода", "говорим", "русски")
+            val ruHits = ruExpected.count { it in ruText }
+            android.util.Log.i(
+                "AvnivoWhisperLarge",
+                "WHISPER_LARGE_RU chars=${ruText.length} recall=$ruHits/${ruExpected.size} text=${ruText.take(120)}"
+            )
+            assertTrue("Large Russian recall $ruHits/${ruExpected.size} too low for: $ruText", ruHits >= 2)
+
             // dumpsys meminfo runs after the instrumentation process has exited, so it reports
             // nothing useful. Read the numbers from inside the process instead, immediately after
             // inference while the model is still resident: heap in use, native allocation, and the

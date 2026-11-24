@@ -151,20 +151,43 @@ internal class UzbekSttController(
         openSession != 0 && (session <= 0 || session == openSession)
     }
 
-    /** The microphone loop has ended; the session no longer holds the capture. */
+    /**
+     * The microphone loop has ended. Capture ownership is released immediately and the session
+     * enters the processing state before the worker prepares a recognizer or decodes anything.
+     *
+     * This transition is the fix for the S23 Ultra report: endCapture used to clear only
+     * openSession, so a slow Uzbek engine reload (after switching from Whisper Large) left the
+     * card on "Ovoz yozilmoqda…" while transcribingEngine was already set. A new press then hit
+     * the cross-engine guard and appeared permanently blocked.
+     */
     fun endCapture(session: Int) {
         synchronized(lock) {
-            if (openSession == session) openSession = 0
+            if (openSession != session) return
+            openSession = 0
+            if (transcribingSession == 0) transcribingSession = session
+            if (state == OfflineModuleState.RECORDING) {
+                setState(OfflineModuleState.TRANSCRIBING, null, session)
+            }
         }
     }
 
     fun transcribe(session: Int, samples: FloatArray): String {
-        val engine = ensureReady(session)
+        // Claim the session and publish PROCESSING before ensureReady(). A recognizer that was
+        // released for Whisper Large can take seconds to reload; the UI must never show
+        // "recording" during that work, and releaseForMemory must refuse while it is pending.
         synchronized(lock) {
             transcribingSession = session
             if (state == OfflineModuleState.RECORDING || state == OfflineModuleState.READY) {
                 setState(OfflineModuleState.TRANSCRIBING, null, session)
             }
+        }
+        val engine = try {
+            ensureReady(session)
+        } catch (t: Throwable) {
+            synchronized(lock) {
+                if (transcribingSession == session) transcribingSession = 0
+            }
+            throw t
         }
         try {
             return engine.transcribe(samples)

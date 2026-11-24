@@ -252,6 +252,51 @@ class OfflineSttRouterRulesTest {
     }
 
     @Test
+    fun uzbekToLargeToUzbekReleasesEachPreviousEngine() {
+        val router = OfflineSttSessionRouter(
+            uzbekAvailable = { true },
+            whisperAvailable = { true },
+            whisperEngine = { OfflineSttEngine.WHISPER_LARGE_V3_TURBO }
+        )
+        val uzbek = router.open(1, "uzn_Latn").getOrThrow()
+        assertEquals(OfflineSttEngine.UZBEK_STT, uzbek.route.engine)
+        assertNull(uzbek.previous)
+        router.close(1)
+
+        val large = router.open(2, "rus_Cyrl").getOrThrow()
+        assertEquals(OfflineSttEngine.WHISPER_LARGE_V3_TURBO, large.route.engine)
+        assertEquals("ru", large.route.whisperLanguage)
+        assertEquals("entering Large must release Uzbek STT", OfflineSttEngine.UZBEK_STT, large.previous)
+        router.close(2)
+
+        val back = router.open(3, "eng_Latn").getOrThrow()
+        assertEquals(OfflineSttEngine.UZBEK_STT, back.route.engine)
+        assertEquals("returning to Uzbek STT must release Large", OfflineSttEngine.WHISPER_LARGE_V3_TURBO, back.previous)
+        router.close(3)
+        assertEquals(OfflineSttEngine.UZBEK_STT, router.residentEngine())
+    }
+
+    @Test
+    fun uzbekToSmallToUzbekReleasesEachPreviousEngine() {
+        val router = OfflineSttSessionRouter({ true }, { true })
+        val uzbek = router.open(1, "uzn_Latn").getOrThrow()
+        assertEquals(OfflineSttEngine.UZBEK_STT, uzbek.route.engine)
+        router.close(1)
+
+        val small = router.open(2, "deu_Latn").getOrThrow()
+        assertEquals(OfflineSttEngine.WHISPER_SMALL_Q8, small.route.engine)
+        assertEquals("de", small.route.whisperLanguage)
+        assertEquals(OfflineSttEngine.UZBEK_STT, small.previous)
+        router.close(2)
+
+        val back = router.open(3, "eng_Latn").getOrThrow()
+        assertEquals(OfflineSttEngine.UZBEK_STT, back.route.engine)
+        assertEquals(OfflineSttEngine.WHISPER_SMALL_Q8, back.previous)
+        router.close(3)
+        assertEquals(OfflineSttEngine.UZBEK_STT, router.residentEngine())
+    }
+
+    @Test
     fun selectedLargeIsTheOnlyWhisperEngineInTheSession() {
         val router = OfflineSttSessionRouter(
             uzbekAvailable = { true },

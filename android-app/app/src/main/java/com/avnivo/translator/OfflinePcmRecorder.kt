@@ -19,6 +19,7 @@ import kotlin.math.sqrt
 class OfflinePcmRecorder(private val context: Context) : Closeable {
     @Volatile private var stopRequested = false
     @Volatile private var recordingStarted = false
+    @Volatile private var capturedSamples = 0
     @Volatile private var recorder: AudioRecord? = null
     private val sampleRate = 16000
 
@@ -40,6 +41,7 @@ class OfflinePcmRecorder(private val context: Context) : Closeable {
             maxOf(minBytes * 2, 3200)
         )
         recorder = audio
+        capturedSamples = 0
         // Primitive buffer avoids boxing hundreds of thousands of PCM samples.
         val data = FloatArray(sampleRate * maxSeconds)
         var count = 0
@@ -53,7 +55,14 @@ class OfflinePcmRecorder(private val context: Context) : Closeable {
             // keep capturing up to MIN_HOLD_SAMPLES so the first press still yields real audio.
             while (shouldContinue(stopRequested, count, limit)) {
                 val read = audio.read(buffer, 0, minOf(buffer.size, limit - count))
-                if (read < 0) error("AudioRecord read error $read")
+                if (read < 0) {
+                    // stop() calls AudioRecord.stop() to unblock a read that is waiting for the
+                    // microphone. That makes the pending read fail with an error code; a release
+                    // must end the capture normally instead of turning it into an STT failure.
+                    if (stopRequested) break
+                    error("AudioRecord read error $read")
+                }
+                if (read == 0 && stopRequested) break
                 var sum = 0.0
                 for (i in 0 until read) {
                     val value = buffer[i] / 32768f
@@ -77,12 +86,30 @@ class OfflinePcmRecorder(private val context: Context) : Closeable {
      */
     fun stop() {
         stopRequested = true
+        // A quick tap keeps the documented 0.3 s floor; once that floor exists the capture thread
+        // may be blocked inside AudioRecord.read() waiting for the next buffer. A flag alone cannot
+        // wake it, so stop the native recorder from the UI thread. Without this the session stayed
+        // RECORDING forever and blocked every later press.
+        if (capturedSamples < MIN_HOLD_SAMPLES) return
+        val audio = recorder ?: return
+        runCatching {
+            if (audio.recordingState == AudioRecord.RECORDSTATE_RECORDING) audio.stop()
+        }
+    }
+
+    /** Emergency release used when the capture thread does not return within the watchdog. */
+    fun abort() {
+        stopRequested = true
+        val audio = recorder ?: return
+        runCatching {
+            if (audio.recordingState == AudioRecord.RECORDSTATE_RECORDING) audio.stop()
+        }
     }
 
     /** True once the microphone is actually open, so a release can be matched to a live capture. */
-    fun isCapturing(): Boolean = recordingStarted && !stopRequested
+    fun isCapturing(): Boolean = recordingStarted && !stopRequested && recorder != null
 
-    override fun close() = stop()
+    override fun close() = abort()
 
     companion object {
         /** 0.3 s floor, matching [MainActivity.MIN_SAMPLES]: below this there is no usable speech. */
