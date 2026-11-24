@@ -28,7 +28,11 @@ class OfflineMicGestureInstrumentedTest {
             web.evaluateJavascript(script) { value -> result.set(value); latch.countDown() }
         }
         assertTrue("JS did not return: $script", latch.await(10, TimeUnit.SECONDS))
-        return result.get().orEmpty().trim('"')
+        val raw = result.get().orEmpty()
+        // A page script that throws hands back the literal null; without this the caller fails
+        // later with a confusing index error instead of naming the script.
+        assertTrue("the page threw while evaluating: $script", raw != "null" && raw != "undefined")
+        return raw.trim('"')
     }
 
     private fun loadInterface(): WebView {
@@ -277,13 +281,16 @@ class OfflineMicGestureInstrumentedTest {
             web,
             "window.AvnivoOfflineState(JSON.stringify({id:'uzbek-stt',state:'recording',reason:null}),4);" +
                 "var row=document.querySelector('[data-module-id=\"uz-stt\"]');" +
-                "var status=row.querySelector('.offline-module-state');" +
-                "var recording=status.textContent;" +
+                // `var status` binds the legacy window.status DOMString, which coerces the element
+                // to text and makes every later property read undefined.
+                "var stateLine=row.querySelector('.offline-module-state');" +
+                "var recording=stateLine.textContent;" +
                 "window.AvnivoOfflineState(JSON.stringify({id:'uzbek-stt',state:'transcribing',reason:null}),4);" +
-                "var processing=status.textContent;" +
+                "var processing=stateLine.textContent;" +
                 "[recording,processing,recording!==processing,processing.includes('yozilmoqda')].join('|')"
         )
         val parts = value.split("|")
+        assertEquals("the card must return four fields: $value", 4, parts.size)
         assertTrue("the card must first show recording: $value", parts[0].isNotEmpty())
         assertTrue("the card must show processing after release: $value", parts[1].isNotEmpty())
         assertEquals("the card text must change: $value", "true", parts[2])
