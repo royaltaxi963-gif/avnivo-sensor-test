@@ -25,7 +25,7 @@ class MainActivity : Activity() {
     /** Recognition runs here so a recording is transcribed as soon as it ends. */
     private val sttWorker = Executors.newSingleThreadExecutor()
     private val modelDir get() = File(filesDir, "models/uzbek-stt")
-    private var recorder: OfflinePcmRecorder? = null
+    @Volatile private var recorder: OfflinePcmRecorder? = null
     private var busy = false
 
     /**
