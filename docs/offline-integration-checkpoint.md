@@ -1707,3 +1707,48 @@ only resident engine after activation, switch Small→Large→Small with real sp
 module and leave the other intact, and confirm the Russian translation is never spoken by the
 Uzbek Silero voice. The pass 2 offline repeat is also still pending; it needs a longer job timeout
 or a narrower class filter so it does not exceed 110 minutes.
+
+## Recovery checkpoint 2026-11-24: offline STT session deadlock
+
+The S23 Ultra loaded Whisper Large V3 Turbo and reported it active, but speech never became text.
+The composer stayed on «Oldingi yozuv boshqa STT dvigatelida tugatilmoqda. Tugashini kuting.» and
+the Uzbek card stayed on «Ovoz yozilmoqda...».
+
+| Symptom | Root cause | Fix |
+| --- | --- | --- |
+| Release never ends capture | `OfflinePcmRecorder.stop()` only set a flag. Once the capture thread was blocked in `AudioRecord.read()` waiting for the microphone, nothing woke it, so the 30 s limit or a later buffer was the only exit. | `stop()` now calls `AudioRecord.stop()` once the 0.3 s floor exists. `abort()` is the unconditional emergency release used by `close()` and the watchdog. |
+| Card stays on recording while inference waits | `UzbekSttController.endCapture()` cleared only `openSession`; the module state remained `RECORDING` until `transcribe()` ran on `sttWorker`. Meanwhile `MainActivity` had already set `transcribingEngine`, so the next press hit the cross-engine guard forever. | `endCapture()` now releases capture ownership and publishes `TRANSCRIBING` immediately. `transcribe()` claims the session and publishes processing before `ensureReady()`, including a slow Uzbek reload after Whisper Large. |
+| Stale capture blocks every later press | A capture that ended without clearing the controller was not recoverable: `start` saw `isRecording` with no recorder and rejected. | `start` settles a stale session (end capture, close route, complete) before accepting the new press; a release that raced capture start is still remembered per session. |
+| Rejection keeps the composer blocked | A rejection was stamped with the old open session, which the page ignores because it is not its current session. | Rejections carry the new press session. |
+| Older decode settles a newer one | `complete()`/`fail()` could promote the module to READY or ERROR while a newer session was already processing. | Each released capture becomes the newest `transcribingSession`; an older completion or failure returns without changing the newer state. |
+| AudioRecord read error after release | `AudioRecord.stop()` makes a pending read fail; that was treated as an STT failure. | A read error after a release ends the capture normally. |
+
+### Tests added
+
+| Layer | What it proves |
+| --- | --- |
+| Node `offline-stt-session.test.cjs` (22) | Release stops AudioRecord; a rejection is stamped with the new press session; the cross-engine guard is real; destroy aborts the recorder; the watchdog aborts capture; an older completion cannot settle a newer session; endCapture owns the processing slot. |
+| JVM `UzbekSttControllerTest` | Processing is published before any prepare; a slow prepare never leaves the state RECORDING; an older completion/failure cannot settle a newer processing session. |
+| JVM `OfflineSttRouterTest` | Uzbek → Large → Uzbek and Uzbek → Small → Uzbek release each previous engine and never fall back to a different engine. |
+| Instrumented `OfflineMicGestureInstrumentedTest` | After release the card leaves recording and shows processing; the state callback drives the card; a cancelled press drops its late result. |
+| Instrumented `OfflineWhisperInferenceTest` | Russian speech on the resident Large model returns Russian text, not empty or Uzbek text. |
+
+### Evidence status
+
+| Check | Result |
+| --- | --- |
+| Local JVM `testDebugUnitTest` | **BUILD SUCCESSFUL** on the new code (JDK 17, Android SDK 35). New controller and router tests ran with no failures. |
+| Local `compileDebugAndroidTestKotlin` | **BUILD SUCCESSFUL**; the new gesture test compiles. |
+| Node suites | **151 pass / 0 fail** with `node --test tests/*.test.cjs tests/*.test.mjs`; `offline-stt-session.test.cjs` is **22 pass / 0 fail**. |
+| GitHub CI for `1badd25` and `5e70f9a` | **Blocked before any job started**: GitHub annotation says *"The job was not started because your account is locked due to a billing issue."* This is not a test or compile failure. |
+| Release APK / SHA-256 | **Not produced yet** because the CI account is locked. No digest is claimed. |
+| S23 Ultra real-speech acceptance | **Pending**; the reported issue must not be closed until this passes. |
+| PR #28 | Open, **draft**, base `main`; no new branch or PR was created. |
+
+### Next exact action
+
+Restore GitHub Actions billing, rerun the `apk` job for `5e70f9a`, then install the resulting
+release APK on the S23 Ultra. Accept only when a release immediately changes the Uzbek card to
+processing, the first press produces its own transcript, and a second press after switching from
+Whisper Large is accepted instead of showing the cross-engine message. Capture
+`adb logcat -s AvnivoOfflineStt AvnivoSileroTts` during the run.
