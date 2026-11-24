@@ -52,6 +52,8 @@ const endCaptureBody = functionBody(controller, 'fun endCapture(session: Int)');
 const ownsCaptureBody = functionBody(controller, 'fun ownsCapture(session: Int): Boolean');
 const ensureReadyBody = functionBody(controller, 'fun ensureReady(session: Int = 0): SttRecognizer');
 const transcribeControllerBody = functionBody(controller, 'fun transcribe(session: Int, samples: FloatArray): String');
+const completeBody = functionBody(controller, 'fun complete(session: Int)');
+const failBody = functionBody(controller, 'fun fail(session: Int, message: String)');
 const closeRecognizerBody = functionBody(controller, 'private fun closeRecognizerLocked()');
 const resultHandler = functionBody(shipped, 'window.AvnivoOfflineResult=function(text,session)');
 const processingHandler = functionBody(shipped, 'window.AvnivoOfflineProcessing=function(message,session)');
@@ -86,7 +88,7 @@ test('1c. a finished capture only clears state it still owns', () => {
 test('1d. release ends capture and enters processing before prepare/decode', () => {
   // The S23 Ultra report: the Uzbek card stayed on "Ovoz yozilmoqda..." while the engine was
   // being reloaded after Whisper Large, so the next press hit the cross-engine guard forever.
-  assert.match(endCaptureBody, /transcribingSession == 0\) transcribingSession = session/,
+  assert.match(endCaptureBody, /transcribingSession = session/,
     'the released session must own the processing slot');
   assert.match(endCaptureBody, /setState\(OfflineModuleState\.TRANSCRIBING/,
     'the card must move to processing as soon as the microphone closes');
@@ -133,6 +135,15 @@ test('1g. the cross-engine guard is real and clears with the inference', () => {
   assert.match(transcribeBody, /if \(transcribingEngine == route\.engine\) transcribingEngine = null/,
     'the guard must be cleared on success and failure');
   assert.match(transcribeBody, /inference-end/, 'the end of inference must be traceable');
+});
+
+test('1h. an older completion cannot settle a newer processing session', () => {
+  assert.match(completeBody, /if \(transcribingSession != 0\) return/,
+    'an older complete() must not promote the newer session to READY');
+  assert.match(failBody, /if \(transcribingSession != 0\) return/,
+    'an older fail() must not overwrite the newer session');
+  assert.match(endCaptureBody, /transcribingSession = session/,
+    'each released capture must become the newest pending decode');
 });
 
 test('2. a press is not blocked by the previous recording being transcribed', () => {

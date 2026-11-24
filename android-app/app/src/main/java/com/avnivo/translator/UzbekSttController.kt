@@ -164,7 +164,9 @@ internal class UzbekSttController(
         synchronized(lock) {
             if (openSession != session) return
             openSession = 0
-            if (transcribingSession == 0) transcribingSession = session
+            // This session is now the newest pending decode. An older decode may still be
+            // finishing on sttWorker; complete()/fail() must not settle the state for it.
+            transcribingSession = session
             if (state == OfflineModuleState.RECORDING) {
                 setState(OfflineModuleState.TRANSCRIBING, null, session)
             }
@@ -197,7 +199,7 @@ internal class UzbekSttController(
             synchronized(lock) {
                 if (transcribingSession == session) transcribingSession = 0
                 closeRecognizerLocked()
-                if (openSession == 0 || openSession == session) {
+                if (transcribingSession == 0 && (openSession == 0 || openSession == session)) {
                     setState(OfflineModuleState.ERROR, describe(t), session)
                 }
             }
@@ -209,6 +211,9 @@ internal class UzbekSttController(
     fun complete(session: Int) {
         synchronized(lock) {
             if (transcribingSession == session) transcribingSession = 0
+            // A newer capture or decode owns the state now; an older completion must not promote
+            // the module to READY while that newer session is still pending.
+            if (transcribingSession != 0) return
             if (openSession != 0 && openSession != session) return
             if (state == OfflineModuleState.RECORDING || state == OfflineModuleState.TRANSCRIBING) {
                 setState(
@@ -228,6 +233,8 @@ internal class UzbekSttController(
     fun fail(session: Int, message: String) {
         synchronized(lock) {
             if (transcribingSession == session) transcribingSession = 0
+            // An older failure must not overwrite a newer recording/decode that is still alive.
+            if (transcribingSession != 0) return
             if (openSession != 0 && openSession != session) return
             setState(OfflineModuleState.ERROR, message, session)
         }

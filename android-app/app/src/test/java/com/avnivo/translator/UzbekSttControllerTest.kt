@@ -159,6 +159,30 @@ class UzbekSttControllerTest {
     }
 
     @Test
+    fun olderCompletionOrFailureCannotSettleNewerProcessing() {
+        val h = Harness()
+        h.controller.refreshInstalled()
+        h.controller.beginCapture(1)
+        h.controller.endCapture(1)
+        h.controller.beginCapture(2)
+        h.controller.endCapture(2)
+        assertEquals(2, h.controller.transcribingSession)
+
+        h.controller.complete(1)
+        assertEquals("an old completion must not promote the newer session", OfflineModuleState.TRANSCRIBING, h.controller.state)
+        assertEquals(2, h.controller.transcribingSession)
+
+        h.controller.fail(1, "old decode failed")
+        assertEquals("an old failure must not overwrite the newer session", OfflineModuleState.TRANSCRIBING, h.controller.state)
+        assertEquals(2, h.controller.transcribingSession)
+
+        h.controller.complete(2)
+        assertEquals(OfflineModuleState.INSTALLED, h.controller.state)
+        assertEquals(0, h.controller.transcribingSession)
+        h.controller.close()
+    }
+
+    @Test
     fun repeatedEnsureReadyBuildsAndSmokesOnce() {
         val h = Harness()
         repeat(5) { h.controller.ensureReady() }

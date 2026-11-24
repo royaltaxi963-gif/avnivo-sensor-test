@@ -284,8 +284,8 @@ class OfflineMicGestureInstrumentedTest {
                 "[recording,processing,recording!==processing,processing.includes('yozilmoqda')].join('|')"
         )
         val parts = value.split("|")
-        assertEquals("the card must first show recording: $value", true, parts[0].isNotEmpty())
-        assertEquals("the card must show processing after release: $value", true, parts[1].isNotEmpty())
+        assertTrue("the card must first show recording: $value", parts[0].isNotEmpty())
+        assertTrue("the card must show processing after release: $value", parts[1].isNotEmpty())
         assertEquals("the card text must change: $value", "true", parts[2])
         assertEquals("processing must not still say recording: $value", "false", parts[3])
     }
