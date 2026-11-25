@@ -101,6 +101,11 @@ class ModelIntegrityTest {
 
         // Same length, different bytes, and a newer timestamp: the stamp must not cover it.
         write(dir, "ggml.bin", "content two".toByteArray())
+        // The stamp key is size + lastModified. A fast machine can rewrite the file inside the
+        // filesystem's timestamp granularity, which leaves the key unchanged and made this test
+        // fail on CI while passing locally. Set the timestamp explicitly so the precondition is
+        // the one the test describes.
+        assertTrue(File(dir, "ggml.bin").setLastModified(System.currentTimeMillis() + 5_000))
         assertFalse("a changed file must be hashed again", ModelIntegrity.isStamped(dir, modelSpec))
         assertFalse("and then rejected", ModelIntegrity.verify(dir, modelSpec).ok)
     }
