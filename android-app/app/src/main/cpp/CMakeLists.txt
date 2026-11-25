@@ -13,6 +13,17 @@ foreach(config DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
   set(CMAKE_CXX_FLAGS_${config} "${CMAKE_CXX_FLAGS_${config}} -O3")
 endforeach()
 
+# Android is always a cross build, so ggml takes the `GGML_CPU_ARM_ARCH` branch and otherwise
+# compiles for the plain ARMv8-A baseline: no dot-product, no fp16 arithmetic. On a Snapdragon
+# 8 Gen 2 the quantised matrix kernels are the whole decode, and `ggml_vdotq_s32` collapses from
+# two vmull/vpaddl pairs into one sdot with the dot-product extension. The kernels are selected by
+# ggml's getauxval checks at runtime, so this flag does not change which ones execute.
+# Requires ARMv8.2-A with dot-product (2018 and later phones).
+# Pass -DGGML_CPU_ARM_ARCH= to build the plain baseline instead (used for A/B measurements).
+if (ANDROID_ABI STREQUAL "arm64-v8a")
+  set(GGML_CPU_ARM_ARCH "armv8.2-a+dotprod+fp16" CACHE STRING "ggml: CPU architecture for ARM")
+endif()
+
 # whisper.cpp is fetched by CI into ./whisper.cpp (never committed).
 add_subdirectory(whisper.cpp)
 set_target_properties(whisper PROPERTIES POSITION_INDEPENDENT_CODE ON)

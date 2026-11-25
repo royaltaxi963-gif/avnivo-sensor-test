@@ -23,12 +23,12 @@ curl -fsSL -o app/libs/sherpa-onnx-2.0.1.aar \
   https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.1/sherpa-onnx-2.0.1.aar
 git clone --depth 1 --branch v1.7.4 https://github.com/ggml-org/whisper.cpp.git app/src/main/cpp/whisper.cpp
 
-gradle --no-daemon testDebugUnitTest      # 291 JVM tests
+gradle --no-daemon testDebugUnitTest      # 303 JVM tests
 gradle --no-daemon assembleRelease        # 54 s for one ABI on 8 vCPU
 ```
 
 Measured in this workspace: **BUILD SUCCESSFUL in 54 s**, `app-release-unsigned.apk` 30,610,388 bytes
-for `arm64-v8a` only. `testDebugUnitTest`: 291 tests, 0 failures. Node suites: 153 pass.
+for `arm64-v8a` only. `testDebugUnitTest`: 303 tests, 0 failures. Node suites: 153 pass.
 
 `app-release-unsigned.apk` is unsigned on purpose: `app/build.gradle.kts` only configures a release
 signing config when `AVNIVO_KEYSTORE_FILE` is set. **Do not generate a new key** — an APK signed by
