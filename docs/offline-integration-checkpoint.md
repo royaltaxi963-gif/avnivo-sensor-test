@@ -1752,3 +1752,55 @@ release APK on the S23 Ultra. Accept only when a release immediately changes the
 processing, the first press produces its own transcript, and a second press after switching from
 Whisper Large is accepted instead of showing the cross-engine message. Capture
 `adb logcat -s AvnivoOfflineStt AvnivoSileroTts` during the run.
+
+## Recovery checkpoint 2026-11-25: native stage budgets and engine-aware capture
+
+The 2026-11-24 fixes made capture stop and the card publish processing, but the S23 Ultra still
+never produced text: Whisper Large V3 Turbo stayed on «Ishga tushmoqda…», the Uzbek card stayed on
+«Nutq matnga aylantirilmoqda…», and neither module could be deactivated without force-stopping the
+app. Three defects combined, and none of them was the recorder.
+
+| Symptom | Root cause | Fix |
+| --- | --- | --- |
+| Whisper Large never becomes usable | `OfflineModuleManager.activate()` was `@Synchronized` and ran the entire native load inside the monitor on the only worker thread, with no budget. A load that never returns blocked `deactivate`, `unload` and `delete` for every module, forever. | The load runs outside the monitor through `OfflineGuard.boundedCloseable` (180 s). A timeout settles the card on `installed` with `engine-load:<id>` in the reason, keeps the verified files, and a later press retries with a fresh engine. |
+| Uzbek card stuck on processing while the user is on Whisper | `beginCapture()`/`endCapture()` ran for **every** capture, including Whisper sessions, so a Whisper decode that never finished pinned the Uzbek card on `TRANSCRIBING` forever. | Capture bookkeeping is engine-aware (`publishState`), and only an Uzbek session may `complete()`/`fail()` the Uzbek card. |
+| Deactivation refused | Both deactivation paths refused while a decode was "in progress", and a hang never cleared that flag. | A stuck decode is detected by budget, its engine is quarantined, `transcribingEngine` is cleared and the module stays deactivatable. |
+| Restart landed on the same stuck card | `reactivateInstalled()` reloaded the active module on every page load. | A load that had to be abandoned is remembered; only an explicit activation retries it. |
+| One stuck decode blocked every later press | All decodes shared one single-thread executor. | Decodes run on a cached pool; the one-engine guard still serializes real work. |
+| No way to see where a hang was | Only ad-hoc logcat lines. | `OfflineDiagnostics` writes every stage to logcat and to `diagnostics/offline.log` under the app's external files directory. The JNI layer logs `WHISPER_NATIVE_INIT_START/_END` and `WHISPER_DECODE_PROGRESS pct=`. |
+
+A quarantined decoder is never freed: `whisper_free` under a running `whisper_full`, or closing an
+ONNX session under a running `OfflineRecognizer` constructor, is undefined behaviour. It is detached
+and kept referenced, and a fresh engine is built for the next attempt.
+
+### Tests added
+
+| Layer | What it proves |
+| --- | --- |
+| JVM `OfflineGuardTest` (5) | A call that never returns fails with its stage name inside the budget; a result that arrives after the caller gave up is released; the decode budget grows with the recording and stops at the ceiling. |
+| JVM `UzbekSttControllerTest` (+2) | A prepare that never returns settles the card with a reason and stays retryable; a stuck decode is quarantined, never freed under native code, and the next session still runs. |
+| JVM `OfflineModuleManagerTest` (+1) | An engine factory that never returns reports `engine-load:<id>`, keeps the verified files, is not operational, and a retry after the abandoned load works. |
+| Node `offline-stt-session.test.cjs` (12, 13) | Only an Uzbek session may move the Uzbek card; every native wait has a budget and a stage name. |
+| JVM `ModelIntegrityTest` | The stamp test now sets the file timestamp explicitly instead of depending on filesystem granularity, which failed only on CI. |
+
+### Evidence status
+
+| Check | Result |
+| --- | --- |
+| Local JVM `testDebugUnitTest` | **291 tests, 0 failures** (JDK 17, Android SDK 35). |
+| Local `compileDebugAndroidTestKotlin` | **BUILD SUCCESSFUL**. |
+| Local `assembleRelease` (workspace, no Actions) | **BUILD SUCCESSFUL in 54 s**, `arm64-v8a`, 30,610,388 bytes, unsigned (no keystore present in the workspace). |
+| Node suites | **153 pass / 0 fail**. |
+| GitHub Actions run `45633727504` for `6a03fd9` | **completed success**: `apk`, `update-install`, `emulator-smoke`. The billing lock of 2026-11-24 has cleared. |
+| Signed release APK | `update-v101.apk`, 123,753,929 bytes, SHA-256 `9126ddd6afd93a5686e7b800fe435d3e04f16b9564ad4cece7698dbeb177a24e`, versionCode 1319, certificate SHA-256 `12e7e261…ecb8e` — identical to the identity the installed app already trusts. |
+| Fix present in the APK | `OfflineGuard`, `OfflineDiagnostics`, `ENGINE_QUARANTINED`, `uzbek-decode` are all present in `classes*.dex`. |
+| In-place update | `update-install` installed v100, then `adb install -r update-v101.apk` → `Success`, `firstInstallTime` unchanged, versionCode incremented, package still present. Android keeps `/data/data/com.avnivo.translator` (and therefore the downloaded offline modules) when `firstInstallTime` is preserved. |
+| Downloaded module bytes survive the update | **Pending on the device**: the emulator job proves the package was replaced in place, not that a specific model file is still readable. Check on the S23 Ultra with the commands in `docs/independent-android-build.md`. |
+| S23 Ultra real-speech acceptance | **Pending**; this issue must not be closed until the device produces a transcript from Whisper Large and the Uzbek card leaves processing. |
+
+### Next exact action
+
+Install the release APK over the existing app on the S23 Ultra (`adb install -r`), confirm
+`firstInstallTime` is unchanged and the downloaded modules are still listed, then press the
+microphone with Whisper Large active and capture
+`adb logcat -s AvnivoWhisper AvnivoOfflineStt AvnivoModuleLifecycle AvnivoGuard`.

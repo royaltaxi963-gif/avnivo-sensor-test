@@ -121,3 +121,44 @@ the S23 Ultra report.
 A quarantined engine is never freed: `whisper_free` under a running `whisper_full`, or closing an
 ONNX session under a running `OfflineRecognizer` constructor, is undefined behaviour. It is detached
 and kept referenced, and a fresh engine is built for the next attempt.
+
+## 5. Verifying the update on a device (data must survive)
+
+`adb install -r` over the installed app is what the user actually does. The signature must match
+(the fingerprint check above) and the app data must survive:
+
+```bash
+# before
+adb shell dumpsys package com.avnivo.translator | grep -m1 firstInstallTime
+adb shell dumpsys package com.avnivo.translator | grep -m1 versionCode
+adb shell ls /sdcard/Android/data/com.avnivo.translator/files/models/   # downloaded modules
+
+adb install -r AVNIVO-Translator-release.apk          # must print Success
+
+# after: firstInstallTime must be unchanged (the data dir was kept), versionCode must be higher,
+# and every downloaded module must still be listed.
+adb shell dumpsys package com.avnivo.translator | grep -m1 firstInstallTime
+adb shell dumpsys package com.avnivo.translator | grep -m1 versionCode
+adb shell ls /sdcard/Android/data/com.avnivo.translator/files/models/
+```
+
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE` means the key does not match: stop, do not sign with another
+key, fix the keystore instead. A changed `firstInstallTime` means the app was reinstalled rather
+than updated, and the offline modules are gone.
+
+The CI `update-install` job already runs the first three checks on an emulator (install v100,
+`adb install -r` v101, assert `Success`, unchanged `firstInstallTime`, higher versionCode). The
+model-directory listing is device-only, because no emulator job downloads a 460 MB model.
+
+## 6. Measured results for `6a03fd9`
+
+| Item | Value |
+| --- | --- |
+| GitHub Actions run | `45633727504`, **completed success** (`apk`, `update-install`, `emulator-smoke`) |
+| APK | `update-v101.apk`, 123,753,929 bytes |
+| SHA-256 | `9126ddd6afd93a5686e7b800fe435d3e04f16b9564ad4cece7698dbeb177a24e` |
+| versionCode / name | 1319 / 1.0.0 |
+| Certificate SHA-256 | `12e7e26104c7a5110a849baec36d6916efe0b2494384749d4c733286aeeecb8e` |
+| ABIs in the APK | `arm64-v8a`, `armeabi-v7a`, `x86_64` |
+| Local build (same tree) | 54 s, `arm64-v8a`, 30,610,388 bytes, unsigned |
+| JVM tests / node tests | 291 / 153, 0 failures each |
