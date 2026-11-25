@@ -7,6 +7,8 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * Exercises the Uzbek STT lifecycle with a real state machine and a stand-in recognizer; only the
@@ -25,6 +27,7 @@ class UzbekSttControllerTest {
         var failPrepare: Throwable? = null
         var failTranscribe: Throwable? = null
         var onPrepare: (() -> Unit)? = null
+        var onTranscribe: (() -> Unit)? = null
 
         override val isPrepared: Boolean get() = prepared > 0
 
@@ -40,6 +43,7 @@ class UzbekSttControllerTest {
         }
 
         override fun transcribe(samples: FloatArray): String {
+            onTranscribe?.invoke()
             failTranscribe?.let { throw it }
             decodes += 1
             return text
@@ -414,5 +418,78 @@ class UzbekSttControllerTest {
         h.controller.close()
         assertEquals(1, h.current.closed)
         assertNull(h.controller.reason)
+    }
+
+    /**
+     * The S23 Ultra symptom: the ONNX session creation never returned, so the card sat on
+     * «Nutq matnga aylantirilmoqda…» and deactivation did nothing because the monitor was held by
+     * the stuck load. The load must now fail with a stage name and leave the module retryable.
+     */
+    @Test
+    fun aPrepareThatNeverReturnsSettlesTheCardAndStaysRetryable() {
+        val budget = OfflineGuard.prepareBudgetMs
+        OfflineGuard.prepareBudgetMs = 200
+        val gate = CountDownLatch(1)
+        try {
+            val h = Harness()
+            h.prepareHook = { gate.await(5, TimeUnit.SECONDS) }
+            val thrown = runCatching { h.controller.ensureReady(7) }.exceptionOrNull()
+            val stuck = h.built.first()
+            assertEquals("a decoder inside native code must not be freed", 0, stuck.closed)
+            gate.countDown()
+            assertTrue("expected a stage timeout, got $thrown", thrown is OfflineGuard.StageTimeout)
+            assertEquals(OfflineModuleState.ERROR, h.controller.state)
+            assertTrue(
+                "the reason must name the load stage",
+                h.controller.reason.orEmpty().contains("uzbek-prepare")
+            )
+            assertFalse(h.controller.isOperational)
+            assertTrue("the card must be able to retry", h.controller.releaseForMemory() || h.controller.state == OfflineModuleState.ERROR)
+
+            // A second attempt after the stuck load builds a fresh recognizer instead of reusing it.
+            h.prepareHook = null
+            h.controller.ensureReady(8)
+            assertEquals(OfflineModuleState.READY, h.controller.state)
+            assertEquals(2, h.built.size)
+            assertFalse("the stuck decoder must not be reused", h.built.first() === h.built.last())
+            h.controller.close()
+        } finally {
+            OfflineGuard.prepareBudgetMs = budget
+        }
+    }
+
+    @Test
+    fun aStuckDecodeIsQuarantinedAndTheNextSessionStillRuns() {
+        val budget = OfflineGuard.decodeFloorMs
+        val perSecond = OfflineGuard.decodePerAudioSecondMs
+        OfflineGuard.decodeFloorMs = 200
+        OfflineGuard.decodePerAudioSecondMs = 0
+        val gate = CountDownLatch(1)
+        try {
+            val h = Harness()
+            h.controller.ensureReady()
+            val stuck = h.current
+            stuck.onTranscribe = { gate.await(5, TimeUnit.SECONDS) }
+            val thrown = runCatching {
+                h.controller.beginCapture(11)
+                h.controller.endCapture(11)
+                h.controller.transcribe(11, FloatArray(16_000))
+            }.exceptionOrNull()
+            gate.countDown()
+            assertTrue("expected a stage timeout, got $thrown", thrown is OfflineGuard.StageTimeout)
+            assertEquals(OfflineModuleState.ERROR, h.controller.state)
+            assertEquals(0, h.controller.transcribingSession)
+            assertEquals("a decoder inside native code must not be freed", 0, stuck.closed)
+
+            h.controller.beginCapture(12)
+            h.controller.endCapture(12)
+            assertEquals("salom", h.controller.transcribe(12, FloatArray(16_000)))
+            h.controller.complete(12)
+            assertEquals(OfflineModuleState.READY, h.controller.state)
+            h.controller.close()
+        } finally {
+            OfflineGuard.decodeFloorMs = budget
+            OfflineGuard.decodePerAudioSecondMs = perSecond
+        }
     }
 }

@@ -48,7 +48,17 @@ internal class OfflineSpeechEngine(private val modelDirectory: File) : SttRecogn
                 provider = "cpu"
             )
         )
+        val startedAt = System.currentTimeMillis()
+        OfflineDiagnostics.log(
+            OfflineDiagnostics.TAG_STT,
+            "UZBEK_LOAD_START model_mb=${model.length() / (1024 * 1024)} " +
+                "thread=${Thread.currentThread().name}"
+        )
         recognizer = OfflineRecognizer(assetManager = null, config = config)
+        OfflineDiagnostics.log(
+            OfflineDiagnostics.TAG_STT,
+            "UZBEK_LOAD_END elapsed_ms=${System.currentTimeMillis() - startedAt}"
+        )
     }
 
     /**
@@ -60,6 +70,10 @@ internal class OfflineSpeechEngine(private val modelDirectory: File) : SttRecogn
     override fun transcribe(samples: FloatArray): String {
         val decoder = checkNotNull(recognizer) { "Call prepare() first" }
         require(samples.isNotEmpty()) { "Empty recording" }
+        OfflineDiagnostics.log(
+            OfflineDiagnostics.TAG_STT,
+            "UZBEK_DECODE_START samples=${samples.size} thread=${Thread.currentThread().name}"
+        )
         val stream = decoder.createStream()
         return try {
             stream.acceptWaveform(samples, sampleRate = SAMPLE_RATE)
@@ -67,6 +81,7 @@ internal class OfflineSpeechEngine(private val modelDirectory: File) : SttRecogn
             decoder.getResult(stream).text
         } finally {
             stream.release()
+            OfflineDiagnostics.log(OfflineDiagnostics.TAG_STT, "UZBEK_DECODE_END")
         }
     }
 

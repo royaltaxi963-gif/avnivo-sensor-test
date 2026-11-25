@@ -39,7 +39,20 @@ internal class WhisperEngine(private val modelFile: File, private val language: 
         require(modelFile.isFile && modelFile.length() > 0L) {
             "Missing model file: ${modelFile.name} (${modelFile.length()} bytes)"
         }
+        val startedAt = System.currentTimeMillis()
+        OfflineDiagnostics.log(
+            OfflineDiagnostics.TAG_WHISPER,
+            "WHISPER_LOAD_START file=${modelFile.name} bytes=${modelFile.length()} " +
+                "thread=${Thread.currentThread().name} native_mb=" +
+                MemorySnapshot.mb(android.os.Debug.getNativeHeapAllocatedSize())
+        )
         handle = nativeInit(modelFile.absolutePath)
+        OfflineDiagnostics.log(
+            OfflineDiagnostics.TAG_WHISPER,
+            "WHISPER_LOAD_END file=${modelFile.name} elapsed_ms=${System.currentTimeMillis() - startedAt} " +
+                "loaded=${handle != 0L} native_mb=" +
+                MemorySnapshot.mb(android.os.Debug.getNativeHeapAllocatedSize())
+        )
         require(handle != 0L) {
             "Whisper model failed to load: ${modelFile.name} (${modelFile.length()} bytes)"
         }
@@ -47,8 +60,8 @@ internal class WhisperEngine(private val modelFile: File, private val language: 
             val info = nativeModelInfo(handle)
             require(info.isNotBlank()) { "Whisper loaded without model metadata" }
             modelDescription = info
-            android.util.Log.i(
-                "AvnivoWhisper",
+            OfflineDiagnostics.log(
+                OfflineDiagnostics.TAG_WHISPER,
                 "WHISPER_MODEL_LOADED file=${modelFile.name} bytes=${modelFile.length()} info=$info"
             )
         } catch (t: Throwable) {
@@ -63,7 +76,21 @@ internal class WhisperEngine(private val modelFile: File, private val language: 
         require(samples.isNotEmpty()) { "Empty recording" }
         // The source language belongs to the recording session, not to the model instance: one
         // resident Whisper engine serves every non-Uzbek/English source in turn.
-        return nativeTranscribe(handle, samples, languageOverride ?: language)
+        val startedAt = System.currentTimeMillis()
+        OfflineDiagnostics.log(
+            OfflineDiagnostics.TAG_WHISPER,
+            "WHISPER_DECODE_START samples=${samples.size} " +
+                "seconds=${"%.2f".format(samples.size / 16_000.0)} language=${languageOverride ?: language} " +
+                "thread=${Thread.currentThread().name}"
+        )
+        try {
+            return nativeTranscribe(handle, samples, languageOverride ?: language)
+        } finally {
+            OfflineDiagnostics.log(
+                OfflineDiagnostics.TAG_WHISPER,
+                "WHISPER_DECODE_END elapsed_ms=${System.currentTimeMillis() - startedAt}"
+            )
+        }
     }
 
     /**

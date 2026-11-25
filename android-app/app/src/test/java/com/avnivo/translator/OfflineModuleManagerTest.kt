@@ -11,6 +11,8 @@ import org.junit.rules.TemporaryFolder
 import java.io.Closeable
 import java.io.File
 import java.io.RandomAccessFile
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * Exercises the module lifecycle with real files on disk and a real (non-mocked) downloader; only
@@ -1011,5 +1013,47 @@ class OfflineModuleManagerTest {
         assertEquals("installed", JSONObject(manager.status(large.id)).getString("state"))
         assertTrue(JSONObject(manager.status(large.id)).getString("reason").contains("large rejected"))
         manager.close()
+    }
+
+    /**
+     * The S23 Ultra symptom on the Whisper side: the load never returned, so the card sat on
+     * «Ishga tushmoqda…» and every later action queued behind it. The load must now fail with the
+     * stage name, keep the downloaded model, and let a retry succeed.
+     */
+    @Test
+    fun anEngineFactoryThatNeverReturnsReportsTheLoadStageAndKeepsTheModel() {
+        val budget = OfflineGuard.loadBudgetMs
+        OfflineGuard.loadBudgetMs = 250
+        val gate = CountDownLatch(1)
+        val manager = manager()
+        try {
+            val (spec, content) = testSpec()
+            manager.registerForTest(spec)
+            placeContent(spec, content)
+            manager.engineFactory = { _, _ ->
+                gate.await(5, TimeUnit.SECONDS)
+                FakeEngine()
+            }
+            manager.activate(spec.id)
+            manager.awaitIdle()
+
+            val status = JSONObject(manager.status(spec.id)!!)
+            assertEquals("installed", status.getString("state"))
+            assertFalse("a stuck load must not look operational", manager.isOperational(spec.id))
+            assertTrue("the verified model files stay usable", manager.isInstalled(spec.id))
+            assertTrue(
+                "the reason must name the stage: ${status.optString("reason")}",
+                status.optString("reason").contains("engine-load:${spec.id}")
+            )
+
+            gate.countDown()
+            manager.engineFactory = { _, _ -> FakeEngine() }
+            manager.activate(spec.id)
+            manager.awaitIdle()
+            assertTrue("a retry after an abandoned load must work", manager.isOperational(spec.id))
+        } finally {
+            OfflineGuard.loadBudgetMs = budget
+            manager.close()
+        }
     }
 }

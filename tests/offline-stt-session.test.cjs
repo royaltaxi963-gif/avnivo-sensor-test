@@ -44,11 +44,11 @@ function functionBody(source, signature) {
 }
 
 const startBody = functionBody(activity, 'private fun startForLanguage(session: Int, sourceLanguage: String)');
-const beginBody = functionBody(activity, 'private fun beginRecording(session: Int)');
+const beginBody = functionBody(activity, 'private fun beginRecording(session: Int, engine: OfflineSttEngine)');
 const transcribeBody = functionBody(activity, 'private fun transcribeCaptured(');
 const captureBody = functionBody(recorder, 'fun capture(maxSeconds: Int = 30');
-const beginCaptureBody = functionBody(controller, 'fun beginCapture(requested: Int): Int');
-const endCaptureBody = functionBody(controller, 'fun endCapture(session: Int)');
+const beginCaptureBody = functionBody(controller, 'fun beginCapture(requested: Int, publishState: Boolean = true): Int');
+const endCaptureBody = functionBody(controller, 'fun endCapture(session: Int, publishState: Boolean = true)');
 const ownsCaptureBody = functionBody(controller, 'fun ownsCapture(session: Int): Boolean');
 const ensureReadyBody = functionBody(controller, 'fun ensureReady(session: Int = 0): SttRecognizer');
 const transcribeControllerBody = functionBody(controller, 'fun transcribe(session: Int, samples: FloatArray): String');
@@ -68,8 +68,8 @@ test('1. the first press opens its own capture session', () => {
   assert.match(beginCaptureBody, /val current = if \(requested > 0\) requested else lastSession \+ 1/,
     'the page session must be adopted, with a fallback id');
   assert.match(beginCaptureBody, /openSession = current/, 'the open capture must record its session');
-  assert.match(startBody, /sttController\.beginCapture\(opened\.session\)/, 'the bridge must delegate to the controller');
-  assert.match(startBody, /beginRecording\(current\)/, 'capture must be given the session id');
+  assert.match(startBody, /sttController\.beginCapture\(\s*opened\.session,/, 'the bridge must delegate to the controller');
+  assert.match(startBody, /beginRecording\(current, route\.engine\)/, 'capture must be given the session id and its engine');
 });
 
 test('1b. a release from an older press cannot cut a newer one', () => {
@@ -82,7 +82,7 @@ test('1c. a finished capture only clears state it still owns', () => {
   assert.match(endCaptureBody, /if \(openSession != session\) return/,
     'an old capture must not clear a newer capture');
   assert.match(endCaptureBody, /openSession = 0/);
-  assert.match(beginBody, /sttController\.endCapture\(session\)/);
+  assert.match(beginBody, /sttController\.endCapture\(session, publishState = uzbek\)/);
 });
 
 test('1d. release ends capture and enters processing before prepare/decode', () => {
@@ -160,7 +160,9 @@ test('2. a press is not blocked by the previous recording being transcribed', ()
 test('3. capture is not queued behind model loading', () => {
   // Capture and inference must not share the executor that downloads models.
   assert.match(activity, /private val captureWorker = Executors\.newSingleThreadExecutor\(\)/);
-  assert.match(activity, /private val sttWorker = Executors\.newSingleThreadExecutor\(\)/);
+  // Decoding gets its own pool: one shared thread let a stuck native decode block every later
+  // press, which is what the S23 Ultra report showed.
+  assert.match(activity, /private val sttWorker = Executors\.newCachedThreadPool/);
   assert.match(beginBody, /captureWorker\.execute/, 'capture must run on its own worker');
   assert.match(transcribeBody, /sttWorker\.execute/, 'inference must run on its own worker');
   assert.doesNotMatch(beginBody, /worker\.execute/, 'capture must never wait on the model worker');
@@ -220,7 +222,7 @@ test('10. an unusable recording reports its measured reason', () => {
   assert.match(transcribeBody, /samples\.size < MIN_SAMPLES/, 'short audio must be detected');
   assert.match(transcribeBody, /logStt\(session, "too-short"/, 'the reason must be logged');
   assert.match(transcribeBody, /text\.isBlank\(\)/, 'a blank transcript must be detected');
-  assert.match(activity, /Log\.i\("AvnivoOfflineStt", "session=\$session stage=\$stage \$detail"\)/);
+  assert.match(activity, /OfflineDiagnostics\.log\(/, 'the reason must reach logcat and the diagnostics file');
 });
 
 test('11. the recognizer is reused instead of rebuilt on every press', () => {
@@ -228,7 +230,7 @@ test('11. the recognizer is reused instead of rebuilt on every press', () => {
   // Startup verification and a press both go through the controller's single accessor.
   assert.match(ensureReadyBody, /recognizer\?\.let \{ if \(recognizerVerified\) return it \}/,
     'an already verified decoder must be returned as is');
-  assert.match(ensureReadyBody, /val engine = recognizer \?: recognizerFactory\(\)\.also \{ recognizer = it \}/,
+  assert.match(ensureReadyBody, /(val )?engine = recognizer \?: recognizerFactory\(\)\.also \{ recognizer = it \}/,
     'the factory must run only when no decoder exists');
   const verifyBody = functionBody(activity, 'private fun verifyEngine()');
   assert.match(verifyBody, /sttController\.ensureReady\(\)/, 'verification must use the shared accessor');
@@ -284,4 +286,34 @@ test('14. a failed engine is dropped so the next press can retry cleanly', () =>
     'a failed prepare must close and drop the decoder');
   assert.match(closeRecognizerBody, /recognizer = null/);
   assert.match(closeRecognizerBody, /recognizerVerified = false/);
+});
+
+test('12. a Whisper session never moves the Uzbek card', () => {
+  // The S23 Ultra report: the Uzbek card stayed on «Nutq matnga aylantirilmoqda…» while the user
+  // was on Whisper Large, because every capture drove the Uzbek state machine. Only a session
+  // routed to this recognizer may publish its recording/processing states.
+  assert.match(beginBody, /val uzbek = engine == OfflineSttEngine\.UZBEK_STT/);
+  assert.match(beginBody, /sttController\.endCapture\(session, publishState = uzbek\)/);
+  assert.match(startBody, /publishState = route\.engine == OfflineSttEngine\.UZBEK_STT/);
+  assert.match(beginCaptureBody, /if \(publishState &&/);
+  assert.match(endCaptureBody, /if \(!publishState\) return/);
+  assert.match(transcribeBody, /if \(uzbek\) sttController\.complete\(session\)/);
+  assert.match(transcribeBody, /if \(uzbek\) sttController\.fail\(session/);
+});
+
+test('13. every native wait has a budget and a stage name', () => {
+  // A load or decode that never returns must fail with the stage it stopped in, keep the verified
+  // model on disk, and leave the module retryable — never an endless spinner.
+  assert.match(controller, /stage = "uzbek-prepare"/);
+  assert.match(controller, /stage = "uzbek-decode"/);
+  assert.match(controller, /prepareInFlight/);
+  const manager = fs.readFileSync(path.join(main, 'OfflineModuleManager.kt'), 'utf8');
+  assert.match(manager, /engine-load:\$\{module\.spec\.id\}/);
+  assert.match(manager, /engine-decode:\$id/);
+  assert.match(manager, /ENGINE_QUARANTINED/);
+  assert.doesNotMatch(manager, /@Synchronized\s*\n\s*private fun activate\(/,
+    'the native load must not hold the manager monitor');
+  const guard = fs.readFileSync(path.join(main, 'OfflineGuard.kt'), 'utf8');
+  assert.match(guard, /class StageTimeout/);
+  assert.match(guard, /STAGE_TIMEOUT/);
 });

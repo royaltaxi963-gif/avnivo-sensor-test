@@ -48,6 +48,19 @@ internal class UzbekSttController(
     private var recognizer: SttRecognizer? = null
     private val lock = Any()
 
+    /** Only one native prepare may run at a time; a second press must not stack another load. */
+    private val prepareInFlight = java.util.concurrent.atomic.AtomicBoolean(false)
+
+    /**
+     * A recognizer still inside a native call we stopped waiting for. It is never closed, because
+     * freeing the ONNX session under a running `OfflineRecognizer` constructor is undefined
+     * behaviour; it is kept referenced so the object cannot be collected under native code.
+     */
+    private val quarantined = java.util.Collections.synchronizedList(mutableListOf<SttRecognizer>())
+
+    /** Injected so JVM tests can silence the device log. */
+    internal var logSink: (String) -> Unit = { OfflineDiagnostics.log(OfflineDiagnostics.TAG_STT, it) }
+
     /** Operational means a verified engine is loaded and the module is not in a failed state. */
     val isOperational: Boolean
         get() = recognizerVerified &&
@@ -93,25 +106,68 @@ internal class UzbekSttController(
      * Loads and smoke-tests the recognizer exactly once. A second call returns the verified
      * instance instead of rebuilding it, so a press never pays the NeMo load cost again.
      */
-    fun ensureReady(session: Int = 0): SttRecognizer = synchronized(lock) {
-        if (!modelPresent()) {
-            setState(OfflineModuleState.NOT_INSTALLED, "Model hali yuklab olinmagan", session)
-            throw IllegalStateException("Model hali yuklab olinmagan")
+    fun ensureReady(session: Int = 0): SttRecognizer {
+        val engine: SttRecognizer
+        synchronized(lock) {
+            if (!modelPresent()) {
+                setState(OfflineModuleState.NOT_INSTALLED, "Model hali yuklab olinmagan", session)
+                throw IllegalStateException("Model hali yuklab olinmagan")
+            }
+            recognizer?.let { if (recognizerVerified) return it }
+            if (!prepareInFlight.compareAndSet(false, true)) {
+                throw IllegalStateException(
+                    "Dvigatel hozir yuklanmoqda; bir necha soniyadan keyin urinib ko‘ring"
+                )
+            }
+            val capturing = state == OfflineModuleState.RECORDING ||
+                state == OfflineModuleState.TRANSCRIBING
+            if (!capturing) setState(OfflineModuleState.INITIALIZING, null, session)
+            engine = recognizer ?: recognizerFactory().also { recognizer = it }
         }
-        recognizer?.let { if (recognizerVerified) return it }
-        val capturing = state == OfflineModuleState.RECORDING || state == OfflineModuleState.TRANSCRIBING
-        if (!capturing) setState(OfflineModuleState.INITIALIZING, null, session)
-        val engine = recognizer ?: recognizerFactory().also { recognizer = it }
         try {
-            engine.prepare()
-            engine.smokeTest()
-            recognizerVerified = true
-            if (!capturing) setState(OfflineModuleState.READY, null, session)
-            engine
+            // The native prepare runs outside the monitor. Holding the lock across it is what made
+            // the S23 Ultra card unrecoverable: the ONNX session creation never returned, so every
+            // other call — release, complete, fail — blocked on the same monitor forever.
+            val verified = OfflineGuard.bounded(
+                stage = "uzbek-prepare",
+                budgetMs = OfflineGuard.prepareBudgetMs,
+                log = { logSink(it) },
+                onLateResult = { late: SttRecognizer -> runCatching { late.close() } }
+            ) {
+                engine.prepare()
+                engine.smokeTest()
+                engine
+            }
+            synchronized(lock) {
+                if (recognizer === verified) {
+                    recognizerVerified = true
+                    if (state == OfflineModuleState.INITIALIZING) {
+                        setState(OfflineModuleState.READY, null, session)
+                    }
+                }
+            }
+            logSink("UZBEK_PREPARE_OK session=$session")
+            return engine
         } catch (t: Throwable) {
-            closeRecognizerLocked()
-            setState(OfflineModuleState.ERROR, describe(t), session)
+            // The guarded call has returned (by throwing), so a plain failure may be freed. Only a
+            // timeout leaves native code running, and that case quarantines instead.
+            prepareInFlight.set(false)
+            synchronized(lock) {
+                if (t is OfflineGuard.StageTimeout && recognizer === engine) {
+                    // Still inside native code: detaching is safe, freeing is not.
+                    recognizer = null
+                    recognizerVerified = false
+                    quarantined += engine
+                } else {
+                    // The call returned by throwing, so the decoder is not running any more.
+                    closeRecognizerLocked()
+                }
+                setState(OfflineModuleState.ERROR, describe(t), session)
+            }
+            logSink("UZBEK_PREPARE_FAILED session=$session reason=${describe(t)}")
             throw t
+        } finally {
+            prepareInFlight.set(false)
         }
     }
 
@@ -132,12 +188,15 @@ internal class UzbekSttController(
      * Opens a capture. Returns the adopted session id, or 0 when another capture is still open.
      * A decode that is still running does not block the next recording.
      */
-    fun beginCapture(requested: Int): Int = synchronized(lock) {
+    fun beginCapture(requested: Int, publishState: Boolean = true): Int = synchronized(lock) {
         if (openSession != 0) return 0
         val current = if (requested > 0) requested else lastSession + 1
         lastSession = maxOf(lastSession, current)
         openSession = current
-        if (state != OfflineModuleState.NOT_INSTALLED &&
+        // [publishState] is false when the press is routed to Whisper: this card must report only
+        // what this recognizer is doing, never another engine's session.
+        if (publishState &&
+            state != OfflineModuleState.NOT_INSTALLED &&
             state != OfflineModuleState.DOWNLOADING &&
             state != OfflineModuleState.VERIFYING
         ) {
@@ -160,10 +219,11 @@ internal class UzbekSttController(
      * card on "Ovoz yozilmoqda…" while transcribingEngine was already set. A new press then hit
      * the cross-engine guard and appeared permanently blocked.
      */
-    fun endCapture(session: Int) {
+    fun endCapture(session: Int, publishState: Boolean = true) {
         synchronized(lock) {
             if (openSession != session) return
             openSession = 0
+            if (!publishState) return
             // This session is now the newest pending decode. An older decode may still be
             // finishing on sttWorker; complete()/fail() must not settle the state for it.
             transcribingSession = session
@@ -192,13 +252,25 @@ internal class UzbekSttController(
             throw t
         }
         try {
-            return engine.transcribe(samples)
+            return OfflineGuard.bounded(
+                stage = "uzbek-decode",
+                budgetMs = OfflineGuard.decodeBudgetMs(samples.size),
+                log = { logSink(it) }
+            ) { engine.transcribe(samples) }
         } catch (t: Throwable) {
             // A decoder that threw is in an unknown state; drop it so the next press rebuilds a
             // clean one. A newer recording keeps its own state and simply reloads on its decode.
             synchronized(lock) {
                 if (transcribingSession == session) transcribingSession = 0
-                closeRecognizerLocked()
+                if (t is OfflineGuard.StageTimeout && recognizer === engine) {
+                    // Still inside native code: detaching is safe, freeing is not.
+                    recognizer = null
+                    recognizerVerified = false
+                    quarantined += engine
+                    logSink("UZBEK_QUARANTINED reason=decode-timeout session=$session")
+                } else {
+                    closeRecognizerLocked()
+                }
                 if (transcribingSession == 0 && (openSession == 0 || openSession == session)) {
                     setState(OfflineModuleState.ERROR, describe(t), session)
                 }
@@ -247,6 +319,7 @@ internal class UzbekSttController(
         .put("readyForSpeech", state == OfflineModuleState.READY && recognizerVerified)
         .put("verified", recognizerVerified)
         .put("resident", recognizer != null)
+        .put("preparing", prepareInFlight.get())
         .put("recording", state == OfflineModuleState.RECORDING)
         .put("transcribing", state == OfflineModuleState.TRANSCRIBING)
         .put("reason", reason ?: JSONObject.NULL)
@@ -271,14 +344,23 @@ internal class UzbekSttController(
     }
 
     private fun closeRecognizerLocked() {
-        recognizer?.let { runCatching { it.close() } }
+        val engine = recognizer ?: return
         recognizer = null
         recognizerVerified = false
+        if (prepareInFlight.get()) {
+            // A native prepare is still inside this engine. Freeing it now would crash the
+            // process, so it is detached and kept alive instead.
+            quarantined += engine
+            logSink("UZBEK_QUARANTINED reason=prepare-in-flight")
+            return
+        }
+        runCatching { engine.close() }
     }
 
     private fun describe(t: Throwable): String = when (t) {
         is OutOfMemoryError -> "Ovoz tanish uchun xotira yetarli emas"
         is UnsatisfiedLinkError -> "Sherpa native kutubxonasi yuklanmadi"
+        is OfflineGuard.StageTimeout -> "dvigatel yuklanmadi: ${t.message}"
         else -> t.message ?: t::class.java.simpleName
     }
 }

@@ -25,6 +25,9 @@ internal class OfflineModuleManager(
         @Volatile var engine: Closeable? = null
         @Volatile var reason: String? = null
 
+        /** True while a native load is running for this module; a second press must not stack one. */
+        @Volatile var activating: Boolean = false
+
         /** Every file has been hashed against the manifest, not merely sized. */
         @Volatile var verified: Boolean = false
 
@@ -34,6 +37,20 @@ internal class OfflineModuleManager(
 
     private val worker = Executors.newSingleThreadExecutor()
     private val modules = LinkedHashMap<String, Module>()
+
+    /**
+     * Serializes the activation state machine, never the native load itself. Holding this across
+     * `whisper_init` would freeze `deactivate`, `unload` and every other module behind one stuck
+     * native call, which is exactly what the S23 Ultra report showed.
+     */
+    private val activationLock = Any()
+
+    /**
+     * Engines that are still inside a native call we gave up waiting for. They are never freed,
+     * because `whisper_free` under a running `whisper_full` is undefined behaviour; they are only
+     * kept alive so the object is not collected while native code still holds its address.
+     */
+    private val quarantined = java.util.Collections.synchronizedList(mutableListOf<Closeable>())
 
     init {
         OfflineModelSpecs.all.values.forEach { spec ->
@@ -111,18 +128,33 @@ internal class OfflineModuleManager(
             if (!integrity.ok) error("Model buzilgan: ${integrity.reason}")
         }
         activate(module)
-        val engine = module.engine ?: error(module.reason ?: "Dvigatel ishga tushmadi")
+        val engine = module.engine ?: error(
+            if (module.activating) "Dvigatel yuklanmoqda; bir necha soniyadan keyin yana urinib ko‘ring"
+            else module.reason ?: "Dvigatel ishga tushmadi"
+        )
         return module to engine
     }
 
     /** Runs recognition on the loaded engine, loading it first if it was unloaded. */
     fun transcribe(id: String, samples: FloatArray, language: String? = null): String {
-        val (_, engine) = ensureLoaded(id)
-        return synchronized(engine) {
-            when (engine) {
-                is WhisperEngine -> engine.transcribe(samples, language)
-                else -> error("Module is not a recognizer")
+        val (module, engine) = ensureLoaded(id)
+        val stage = "engine-decode:$id"
+        val budget = OfflineGuard.decodeBudgetMs(samples.size)
+        try {
+            return OfflineGuard.bounded(stage, budget, ::lifecycleLog) {
+                synchronized(engine) {
+                    when (engine) {
+                        is WhisperEngine -> engine.transcribe(samples, language)
+                        else -> error("Module is not a recognizer")
+                    }
+                }
             }
+        } catch (t: OfflineGuard.StageTimeout) {
+            // A decoder that never returns leaves the module unusable but the model intact: the
+            // files stay verified and INSTALLED, the engine is quarantined, and the next press
+            // loads a fresh one. Before this, the card stayed on TRANSCRIBING until force-stop.
+            quarantine(module, engine, t)
+            throw IllegalStateException("${module.spec.id}: ${t.message}", t)
         }
     }
 
@@ -244,6 +276,12 @@ internal class OfflineModuleManager(
         worker.execute {
             for (module in modules.values) {
                 if (!module.spec.runnable) continue
+                if (wasFailed(module.spec.id)) {
+                    // A previous load had to be abandoned. Reloading it on every page load is what
+                    // made a restart land on the same stuck card; only an explicit press retries.
+                    lifecycleLog("REACTIVATE_SKIPPED id=${module.spec.id} reason=previous-load-failed")
+                    continue
+                }
                 // A live engine is already the strongest evidence there is. Demoting it to
                 // INSTALLED on every page load is what made a working Whisper Small card lose
                 // "Faol" and look like it needed downloading again.
@@ -288,46 +326,63 @@ internal class OfflineModuleManager(
      * a second model without unloading the first is what made the device fail, so activation always
      * frees the previous engine first and the state machine reports that honestly.
      */
-    @Synchronized
     private fun activate(module: Module) {
-        if (module.state.isOperational && module.engine != null) {
-            module.lastUsedAt = System.currentTimeMillis()
-            return
-        }
         val directory = module.spec.directory(filesDir)
-        if (!module.spec.installed(directory)) {
-            transition(module, OfflineModuleState.NOT_INSTALLED)
-            return
+        val snapshot: MemorySnapshot?
+        synchronized(activationLock) {
+            if (module.state.isOperational && module.engine != null) {
+                module.lastUsedAt = System.currentTimeMillis()
+                return
+            }
+            if (module.activating) {
+                lifecycleLog("ACTIVATE_SKIPPED id=${module.spec.id} reason=already-initializing")
+                return
+            }
+            if (!module.spec.installed(directory)) {
+                transition(module, OfflineModuleState.NOT_INSTALLED)
+                return
+            }
+            module.activating = true
+            // A failed load must not leave the previous module selected: routing would then
+            // silently use Small after the user chose Large (or vice versa). Clear first.
+            if (activeModuleId != module.spec.id) rememberActive(null)
+            unloadOthers(module)
+            snapshot = memoryProvider(appContext)
+            lifecycleLog(
+                "ACTIVATE_START id=${module.spec.id} bytes=${module.spec.files.values.sumOf { it.first }} " +
+                    "required_mb=${MemorySnapshot.mb(module.spec.requiredRamBytes)} " +
+                    "budget_mb=${snapshot?.let { MemorySnapshot.mb(it.modelBudgetBytes) } ?: -1} " +
+                    "total_mb=${snapshot?.let { MemorySnapshot.mb(it.totalMem) } ?: -1} " +
+                    "avail_mb=${snapshot?.let { MemorySnapshot.mb(it.availMem) } ?: -1} " +
+                    "low=${snapshot?.lowMemory ?: false}"
+            )
+            if (snapshot != null && !snapshot.fits(module.spec.requiredRamBytes)) {
+                module.activating = false
+                module.reason = "xotira yetarli emas: " + snapshot.describe(module.spec.requiredRamBytes) +
+                    ". Boshqa modulni yoping yoki qurilmani qayta ishga tushiring."
+                transition(module, OfflineModuleState.INSTALLED)
+                notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+                return
+            }
+            transition(module, OfflineModuleState.INITIALIZING)
         }
-        // A failed load must not leave the previous module selected: routing would then silently
-        // use Small after the user chose Large (or vice versa). Clear first, then set the winner.
-        if (activeModuleId != module.spec.id) rememberActive(null)
-        unloadOthers(module)
-        val snapshot = memoryProvider(appContext)
-        lifecycleLog(
-            "ACTIVATE_START id=${module.spec.id} bytes=${module.spec.files.values.sumOf { it.first }} " +
-                "required_mb=${MemorySnapshot.mb(module.spec.requiredRamBytes)} " +
-                "budget_mb=${snapshot?.let { MemorySnapshot.mb(it.modelBudgetBytes) } ?: -1} " +
-                "total_mb=${snapshot?.let { MemorySnapshot.mb(it.totalMem) } ?: -1} " +
-                "avail_mb=${snapshot?.let { MemorySnapshot.mb(it.availMem) } ?: -1} " +
-                "low=${snapshot?.lowMemory ?: false}"
-        )
-        if (snapshot != null && !snapshot.fits(module.spec.requiredRamBytes)) {
-            module.reason = "xotira yetarli emas: " + snapshot.describe(module.spec.requiredRamBytes) +
-                ". Boshqa modulni yoping yoki qurilmani qayta ishga tushiring."
-            transition(module, OfflineModuleState.INSTALLED)
-            notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
-            return
-        }
-        transition(module, OfflineModuleState.INITIALIZING)
         try {
-            val engine = engineFactory(module.spec, directory)
-            module.engine?.let { runCatching { it.close() } }
-            module.engine = engine
-            module.reason = null
-            module.lastUsedAt = System.currentTimeMillis()
-            rememberActive(module.spec.id)
-            transition(module, OfflineModuleState.READY)
+            // The native load runs outside the lock: a model that never finishes loading must not
+            // freeze deactivation or any other module's state changes.
+            val engine = OfflineGuard.boundedCloseable(
+                stage = "engine-load:${module.spec.id}",
+                budgetMs = OfflineGuard.loadBudgetMs,
+                log = ::lifecycleLog
+            ) { engineFactory(module.spec, directory) }
+            synchronized(activationLock) {
+                module.engine?.let { runCatching { it.close() } }
+                module.engine = engine
+                module.reason = null
+                module.lastUsedAt = System.currentTimeMillis()
+                rememberActive(module.spec.id)
+                clearFailure(module.spec.id)
+                transition(module, OfflineModuleState.READY)
+            }
             DeviceMemory.log(appContext)
             val nativeAllocated = if (appContext != null) {
                 runCatching { android.os.Debug.getNativeHeapAllocatedSize() }.getOrDefault(0L)
@@ -337,42 +392,90 @@ internal class OfflineModuleManager(
                     "engine=${engine::class.java.simpleName}"
             )
             notify("AvnivoOfflineModuleReady", module.spec.id)
-        } catch (e: Exception) {
-            module.engine?.let { runCatching { it.close() } }
-            module.engine = null
-            module.reason = "dvigatel ishga tushmadi: ${e.message}"
-            lifecycleLog(
-                "ACTIVATE_FAILED id=${module.spec.id} type=${e::class.java.simpleName} message=${e.message}",
-                e
+        } catch (e: OfflineGuard.StageTimeout) {
+            // Remember the failure so a restart does not immediately reload the same model and
+            // land on the same card. Only an explicit activation clears it.
+            failActivation(
+                module,
+                "dvigatel yuklanmadi: ${e.message}. Qayta urinish uchun modulni qayta yoqing.",
+                e,
+                OfflineModuleState.INSTALLED,
+                remember = true
             )
-            transition(module, OfflineModuleState.INSTALLED)
-            notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e.message}")
         } catch (e: UnsatisfiedLinkError) {
-            module.engine?.let { runCatching { it.close() } }
-            module.engine = null
-            module.reason = "native kutubxonasi yuklanmadi"
-            lifecycleLog("ACTIVATE_FAILED id=${module.spec.id} UnsatisfiedLinkError", e)
-            transition(module, OfflineModuleState.INSTALLED)
-            notify("AvnivoOfflineModuleError", "${module.spec.id}|native kutubxonasi yuklanmadi")
+            failActivation(module, "native kutubxonasi yuklanmadi", e, OfflineModuleState.INSTALLED, false)
         } catch (e: OutOfMemoryError) {
             // A large model can exhaust the process inside the native loader. Report the real cause
-            // and release the handle instead of leaving the card on "Tekshirilmoqda…" forever.
-            module.engine?.let { runCatching { it.close() } }
-            module.engine = null
-            module.reason = "model uchun xotira yetarli emas (OutOfMemoryError): " +
-                memoryProvider(appContext)?.describe(module.spec.requiredRamBytes)
-            lifecycleLog("ACTIVATE_FAILED id=${module.spec.id} OutOfMemoryError", e)
-            transition(module, OfflineModuleState.ERROR)
-            notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+            // and release the handle instead of leaving the card on "Ishga tushmoqda…" forever.
+            failActivation(
+                module,
+                "model uchun xotira yetarli emas (OutOfMemoryError): " +
+                    memoryProvider(appContext)?.describe(module.spec.requiredRamBytes),
+                e,
+                OfflineModuleState.ERROR,
+                remember = true
+            )
+        } catch (e: Exception) {
+            failActivation(
+                module,
+                "dvigatel ishga tushmadi: ${e.message}",
+                e,
+                OfflineModuleState.INSTALLED,
+                remember = true
+            )
         } catch (e: Throwable) {
             // Any other VM-level failure must still settle the state machine instead of hanging.
+            failActivation(
+                module,
+                "dvigatel ishga tushmadi: ${e::class.java.simpleName}",
+                e,
+                OfflineModuleState.ERROR,
+                remember = true
+            )
+        } finally {
+            module.activating = false
+        }
+    }
+
+    private fun failActivation(
+        module: Module,
+        reason: String,
+        error: Throwable?,
+        settle: OfflineModuleState,
+        remember: Boolean
+    ) {
+        synchronized(activationLock) {
             module.engine?.let { runCatching { it.close() } }
             module.engine = null
-            module.reason = "dvigatel ishga tushmadi: ${e::class.java.simpleName}"
-            lifecycleLog("ACTIVATE_FAILED id=${module.spec.id} ${e::class.java.simpleName}", e)
-            transition(module, OfflineModuleState.ERROR)
-            notify("AvnivoOfflineModuleError", "${module.spec.id}|dvigatel ishga tushmadi: ${e::class.java.simpleName}")
+            module.reason = reason
+            if (remember) rememberFailure(module.spec.id)
+            transition(module, settle)
         }
+        lifecycleLog(
+            "ACTIVATE_FAILED id=${module.spec.id} type=${error?.let { it::class.java.simpleName }} reason=$reason",
+            error
+        )
+        notify("AvnivoOfflineModuleError", "${module.spec.id}|$reason")
+    }
+
+    /**
+     * Drops a decoder that is still inside a native call. It is not closed: the native frame may
+     * still be using it. The module reports the failure, keeps its verified files, and the next
+     * activation builds a fresh engine.
+     */
+    private fun quarantine(module: Module, engine: Closeable, error: Throwable) {
+        synchronized(activationLock) {
+            if (module.engine === engine) module.engine = null
+            module.reason = "dvigatel javob bermadi: ${error.message}. Qayta urinish uchun modulni qayta yoqing."
+            if (module.state.isOperational || module.state == OfflineModuleState.INITIALIZING) {
+                transition(module, OfflineModuleState.INSTALLED)
+            }
+            if (activeModuleId == module.spec.id) rememberActive(null)
+            quarantined += engine
+            rememberFailure(module.spec.id)
+        }
+        lifecycleLog("ENGINE_QUARANTINED id=${module.spec.id} reason=${error.message}", error)
+        notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
     }
 
     /** Releases every loaded engine except [keep], so only one model is ever resident. */
@@ -398,6 +501,7 @@ internal class OfflineModuleManager(
             notify("AvnivoOfflineModuleError", "$id|Noma’lum offline modul")
             return
         }
+        clearFailure(id)
         worker.execute { verifyAndActivate(module) }
     }
 
@@ -444,6 +548,8 @@ internal class OfflineModuleManager(
             if (module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
             module.reason = null
             if (activeModuleId == id) rememberActive(null)
+            clearFailure(id)
+            lifecycleLog("DEACTIVATE id=$id")
             notify("AvnivoOfflineModuleStatus", id)
         }
     }
@@ -637,11 +743,29 @@ internal class OfflineModuleManager(
     /** Android logging is unavailable in JVM tests, so lifecycle diagnostics are device-only. */
     private fun lifecycleLog(message: String, error: Throwable? = null) {
         if (appContext == null) return
-        runCatching {
-            if (error == null) android.util.Log.i("AvnivoModuleLifecycle", message)
-            else android.util.Log.e("AvnivoModuleLifecycle", message, error)
-        }
+        OfflineDiagnostics.error(OfflineDiagnostics.TAG_MODULE, message, error)
     }
+
+    /**
+     * A load or decode that had to be abandoned is remembered across restarts.
+     *
+     * Without this, `reactivateInstalled()` reloads the same model on every page load and the phone
+     * lands on the same stuck card immediately after every restart, which is exactly what the S23
+     * Ultra report described. An explicit activation clears the mark.
+     */
+    private fun rememberFailure(id: String) {
+        appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)?.edit()
+            ?.putBoolean("$KEY_FAILED$id", true)?.apply()
+    }
+
+    private fun clearFailure(id: String) {
+        appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)?.edit()
+            ?.remove("$KEY_FAILED$id")?.apply()
+    }
+
+    private fun wasFailed(id: String): Boolean = appContext
+        ?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        ?.getBoolean("$KEY_FAILED$id", false) == true
 
     /** Overridable so JVM tests can exercise the lifecycle without the native runtime. */
     internal var engineFactory: (OfflineModelSpec, File) -> Closeable = ::buildEngine
@@ -714,12 +838,18 @@ internal class OfflineModuleManager(
             it.engine?.let { engine -> runCatching { engine.close() } }
             it.engine = null
         }
+        // Quarantined engines are deliberately not closed: native code may still be running
+        // inside them, and `whisper_free` under a live `whisper_full` would crash the process.
+        if (quarantined.isNotEmpty()) {
+            lifecycleLog("ENGINE_QUARANTINE_KEPT count=${quarantined.size}")
+        }
         worker.shutdown()
     }
 
     private companion object {
         const val PREFS = "avnivo.offline"
         const val KEY_ACTIVE = "active.module"
+        const val KEY_FAILED = "failed."
     }
 
     /** Blocks until all queued work finishes. Used by tests and shutdown paths. */

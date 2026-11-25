@@ -28,13 +28,21 @@ std::string jstringToStd(JNIEnv *env, jstring value) {
 }
 
 /**
- * Leaves one core for the audio thread and the UI. A floor of 4 would oversubscribe a 2-core
- * emulator and cause contention, while capping at 8 avoids thermal throttling on the big cluster.
+ * ggml synchronises its threads with a spin barrier, so a thread that lands on a little core makes
+ * every other thread wait for it. On an 8-core big.LITTLE phone the old `hw - 1` (7) oversubscribed
+ * the performance cluster and turned a short decode into a multi-second stall; four is the ceiling
+ * whisper.cpp recommends for mobile and still leaves cores for audio and the UI.
  */
 int inferenceThreads() {
     const unsigned hw = std::thread::hardware_concurrency();
-    if (hw == 0) return 4;
-    return static_cast<int>(std::min(8u, std::max(1u, hw - 1)));
+    if (hw == 0) return 2;
+    return static_cast<int>(std::min(4u, std::max(1u, hw - 1)));
+}
+
+/** whisper_full progress, so a stalled decode shows the exact percentage it stopped at. */
+void onProgress(struct whisper_context *, struct whisper_state *, int progress, void *) {
+    if (progress % 10 != 0) return;
+    __android_log_print(ANDROID_LOG_INFO, kLogTag, "WHISPER_DECODE_PROGRESS pct=%d", progress);
 }
 
 }  // namespace
@@ -45,7 +53,15 @@ Java_com_avnivo_translator_WhisperEngine_nativeInit(JNIEnv *env, jclass, jstring
     if (path.empty()) return 0;
     whisper_context_params params = whisper_context_default_params();
     params.use_gpu = false;
+    const auto started = std::chrono::steady_clock::now();
+    __android_log_print(ANDROID_LOG_INFO, kLogTag,
+                        "WHISPER_NATIVE_INIT_START path=%s threads=%d", path.c_str(), inferenceThreads());
     whisper_context *ctx = whisper_init_from_file_with_params(path.c_str(), params);
+    const auto init_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                             std::chrono::steady_clock::now() - started).count();
+    __android_log_print(ANDROID_LOG_INFO, kLogTag,
+                        "WHISPER_NATIVE_INIT_END elapsed_ms=%lld ok=%d",
+                        static_cast<long long>(init_ms), ctx != nullptr);
     if (ctx == nullptr) {
         __android_log_print(ANDROID_LOG_ERROR, kLogTag,
                             "WHISPER_INIT_FAILED path=%s", path.c_str());
@@ -101,17 +117,22 @@ Java_com_avnivo_translator_WhisperEngine_nativeTranscribe(
     params.single_segment = false;
     params.n_threads = inferenceThreads();
     params.no_context = true;
+    params.progress_callback = onProgress;
+    params.progress_callback_user_data = nullptr;
     const std::string language = requested.empty() ? "auto" : requested;
     params.language = language.c_str();
 
     const auto started = std::chrono::steady_clock::now();
+    __android_log_print(ANDROID_LOG_INFO, kLogTag,
+                        "WHISPER_NATIVE_DECODE_START samples=%d seconds=%.2f threads=%d language=%s",
+                        count, static_cast<double>(count) / 16000.0, params.n_threads, language.c_str());
     const int rc = whisper_full(session->ctx, params, pcm.data(), count);
     const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
                              std::chrono::steady_clock::now() - started)
                              .count();
     const double audioSeconds = static_cast<double>(count) / 16000.0;
     __android_log_print(ANDROID_LOG_INFO, kLogTag,
-                        "inference latency=%lldms audio=%.2fs threads=%d rt_ratio=%.2fx rc=%d",
+                        "WHISPER_NATIVE_DECODE_END latency=%lldms audio=%.2fs threads=%d rt_ratio=%.2fx rc=%d",
                         static_cast<long long>(elapsed), audioSeconds, params.n_threads,
                         audioSeconds > 0 ? (elapsed / 1000.0) / audioSeconds : 0.0, rc);
     if (rc != 0) {
