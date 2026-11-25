@@ -38,3 +38,27 @@ and verify without GitHub Actions, including the cost of each path.
 Native loads and decodes must go through `OfflineGuard`, which runs them on their own thread with a
 budget and a stage name. A decoder that is still inside native code is quarantined, never freed.
 Diagnostics go through `OfflineDiagnostics` (logcat plus `diagnostics/offline.log`).
+
+## Whisper on device
+
+`whisper.cpp` always encodes 1500 positions - a full 30 s window - whatever the recording length.
+That single fact explains the offline STT latency: on a 5 s clip the encoder was 37.8 s of a 37.9 s
+decode and the decoder was 78 ms. `WhisperTuning.audioContextFor` sizes the window to the recording
+(`positions + max(160, positions/2)`, clamped to `[320, 1500]`); the 160 floor is measured, because a
+3 s clip loops on a repetition below 288 positions. Leave whisper's temperature ladder alone - it is
+the safety net that recovers the clips that still trip a loop.
+
+`WHISPER_STAGE_TIMING` in logcat is `whisper_print_timings()` captured through the JNI log callback;
+it is the only way to see where a decode went without instrumenting native code.
+
+Never hand whisper's transcript to `NewStringUTF`: it wants Modified UTF-8 and aborts the process
+(CheckJNI is on for every debuggable build) when the text holds a four-byte sequence. `utf8ToJString`
+in `avnivo_whisper_jni.cpp` does the conversion.
+
+## Emulator smoke job
+
+The `emulator-smoke` job runs every instrumented suite in one long shell step, so a single flaky
+suite fails the job. It has failed on different suites in different runs (Maven Central 429 during
+`checkReleaseAarMetadata`, `OnlineMicInstrumentedTest` process crash, whisper inference crash) while
+`apk` and `update-install` stayed green. Read the failing step before assuming a code regression, and
+remember that a dead instrumentation process prints no test dots - its buffered output is lost.
