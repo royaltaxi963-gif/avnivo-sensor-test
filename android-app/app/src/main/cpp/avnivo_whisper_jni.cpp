@@ -11,6 +11,7 @@
 #include <cstring>
 #include <mutex>
 #include <string>
+#include <cstdint>
 #include <thread>
 #include <vector>
 #include "whisper.h"
@@ -24,6 +25,48 @@ struct Session {
     bool ready = false;
     std::string lastTimings;
 };
+
+/**
+ * Decodes UTF-8 into a jstring.
+ *
+ * NewStringUTF takes *Modified* UTF-8, where anything outside the BMP is a surrogate pair; it
+ * aborts the process when handed the four-byte form, and every debuggable build runs with CheckJNI
+ * on. whisper.cpp hands back plain UTF-8, and a reduced encoder window can produce a transcript
+ * that contains an emoji or another supplementary character, so the conversion has to be explicit.
+ */
+jstring utf8ToJString(JNIEnv *env, const std::string &text) {
+    std::u16string utf16;
+    utf16.reserve(text.size());
+    const auto *bytes = reinterpret_cast<const unsigned char *>(text.data());
+    const size_t size = text.size();
+    for (size_t i = 0; i < size;) {
+        const unsigned char lead = bytes[i];
+        uint32_t code = 0xFFFD;
+        size_t width = 1;
+        if (lead < 0x80) {
+            code = lead;
+        } else if ((lead & 0xE0) == 0xC0 && i + 1 < size) {
+            code = ((lead & 0x1Fu) << 6) | (bytes[i + 1] & 0x3Fu);
+            width = 2;
+        } else if ((lead & 0xF0) == 0xE0 && i + 2 < size) {
+            code = ((lead & 0x0Fu) << 12) | ((bytes[i + 1] & 0x3Fu) << 6) | (bytes[i + 2] & 0x3Fu);
+            width = 3;
+        } else if ((lead & 0xF8) == 0xF0 && i + 3 < size) {
+            code = ((lead & 0x07u) << 18) | ((bytes[i + 1] & 0x3Fu) << 12) |
+                   ((bytes[i + 2] & 0x3Fu) << 6) | (bytes[i + 3] & 0x3Fu);
+            width = 4;
+        }
+        i += width;
+        if (code < 0x10000) {
+            utf16.push_back(static_cast<char16_t>(code));
+        } else {
+            code -= 0x10000;
+            utf16.push_back(static_cast<char16_t>(0xD800 + (code >> 10)));
+            utf16.push_back(static_cast<char16_t>(0xDC00 + (code & 0x3FF)));
+        }
+    }
+    return env->NewString(reinterpret_cast<const jchar *>(utf16.data()), static_cast<jsize>(utf16.size()));
+}
 
 std::string jstringToStd(JNIEnv *env, jstring value) {
     if (value == nullptr) return {};
@@ -233,7 +276,7 @@ Java_com_avnivo_translator_WhisperEngine_nativeModelInfo(JNIEnv *env, jclass, jl
         " text_ctx=" + std::to_string(whisper_model_n_text_ctx(session->ctx)) +
         " multilingual=" + std::to_string(whisper_is_multilingual(session->ctx)) +
         " type=" + (whisper_model_type_readable(session->ctx) ? whisper_model_type_readable(session->ctx) : "unknown");
-    return env->NewStringUTF(info.c_str());
+    return utf8ToJString(env, info);
 }
 
 /** Per-stage timings of the last decode, as reported by whisper_print_timings(). */
@@ -241,7 +284,7 @@ extern "C" JNIEXPORT jstring JNICALL
 Java_com_avnivo_translator_WhisperEngine_nativeLastTimings(JNIEnv *env, jclass, jlong handle) {
     auto *session = reinterpret_cast<Session *>(handle);
     if (session == nullptr) return env->NewStringUTF("");
-    return env->NewStringUTF(session->lastTimings.c_str());
+    return utf8ToJString(env, session->lastTimings);
 }
 
 extern "C" JNIEXPORT jstring JNICALL
@@ -320,7 +363,7 @@ Java_com_avnivo_translator_WhisperEngine_nativeTranscribe(
         const char *segment = whisper_full_get_segment_text(session->ctx, i);
         if (segment != nullptr) text += segment;
     }
-    return env->NewStringUTF(text.c_str());
+    return utf8ToJString(env, text);
 }
 
 extern "C" JNIEXPORT void JNICALL

@@ -375,7 +375,15 @@ jobs:
             adb shell am instrument -w -e class com.avnivo.translator.OfflineModuleLifecycleInstrumentedTest com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_module_lifecycle.txt
             grep -q "OK (" instrument_module_lifecycle.txt || { echo MODULE_LIFECYCLE_FAILED; exit 1; }
             adb shell am instrument -w -e class com.avnivo.translator.OfflineWhisperInferenceTest -e avnivoWhisperInference true com.avnivo.translator.test/androidx.test.runner.AndroidJUnitRunner | tee instrument_whisper.txt
-            grep -q "OK (" instrument_whisper.txt || { echo WHISPER_INFERENCE_FAILED; exit 1; }
+            # A dead instrumentation process reports "Process crashed" and nothing else, which says
+            # nothing about why. Dump the native side before failing.
+            if ! grep -q "OK (" instrument_whisper.txt; then
+              echo WHISPER_INFERENCE_FAILED
+              adb logcat -d | grep -aE "FATAL|Fatal signal|SIGSEGV|SIGABRT|JNI DETECTED|CheckJNI|Abort message|AvnivoWhisper" | tail -60 || true
+              adb shell "ls -l /data/tombstones 2>/dev/null | tail -3" || true
+              adb shell "su 0 cat \$(ls -t /data/tombstones/tombstone_* 2>/dev/null | head -1) 2>/dev/null | head -80" || true
+              exit 1
+            fi
             # A skipped test also reports "OK", so require the real download, SHA-256 and both
             # language transcripts from logcat. This is the evidence the card is not faking state.
             adb logcat -d | grep -a "WHISPER_SMALL_DOWNLOAD\|WHISPER_SMALL_STATE\|WHISPER_SMALL_TRANSCRIPT\|WHISPER_SMALL_RU" | tail -6
