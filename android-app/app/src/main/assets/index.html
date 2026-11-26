@@ -1382,7 +1382,9 @@ function syncInstalledModules(){
  try{
   for(const info of JSON.parse(bridge.statusAll()||'[]')){
    const progress=info.progress&&Number.isFinite(info.progress.downloadedBytes)&&Number.isFinite(info.progress.totalBytes)?info.progress:null;
-   syncOfflineModule(info.id,info.state,progress);
+   // A module the user switched on keeps reading as active after a restart even when its engine
+   // is not resident yet: dropping the flag here made every enabled module look switched off.
+   syncOfflineModule(info.id,info.state,progress,info.enabled===true);
   }
  }catch(e){}
 }

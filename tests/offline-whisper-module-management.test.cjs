@@ -160,3 +160,8 @@ test('14. an enabled module stays active while its engine is out of memory', () 
   assert.match(manager, /private fun makeRoomFor\(module: Module\)/);
   assert.match(manager, /module\.enabled = false\n            rememberEnabled\(id, false\)/, 'deactivate must be the only switch-off path');
 });
+test('15. a restart reconciles the cards with the persisted enabled flag', () => {
+  const reconcile = body(shipped, 'function syncInstalledModules()');
+  assert.match(reconcile, /syncOfflineModule\(info\.id,info\.state,progress,info\.enabled===true\)/,
+    'page load must carry enabled through, otherwise every enabled module looks switched off');
+});
