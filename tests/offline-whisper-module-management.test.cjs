@@ -50,18 +50,24 @@ test('2. activation is explicit and never starts a download', () => {
   assert.match(verify, /activate\(module\)/);
 });
 
-test('3. exactly one engine can be resident; switching releases the other', () => {
-  const unload = body(manager, 'private fun unloadOthers(keep: Module)');
-  assert.match(unload, /if \(other === keep\) continue/);
-  assert.match(unload, /runCatching \{ engine\.close\(\) \}/);
-  assert.match(unload, /other\.engine = null/);
+test('3. only the two Whisper models exclude each other', () => {
+  // The device report: switching NLLB on switched Whisper off, and the other way round, which
+  // broke the speech -> translation -> speech chain. Only Small and Large are alternatives.
+  const enable = body(manager, 'private fun enable(module: Module)');
+  assert.match(enable, /peer\.spec\.exclusiveGroup != group/, 'only the shared group may be released');
+  assert.match(enable, /rememberEnabled\(peer\.spec\.id, false\)/, 'the released peer must record the intent');
+  assert.match(enable, /module\.enabled = true/);
+  assert.doesNotMatch(manager, /unloadOthers/, 'a blanket unload is what switched unrelated modules off');
+  assert.match(specs, /exclusiveGroup = WHISPER_GROUP/, 'the Whisper specs must share a group');
   const activate = body(manager, 'private fun activate(module: Module)');
-  assert.match(activate, /unloadOthers\(module\)/);
+  assert.match(activate, /enable\(module\)/);
+  assert.match(activate, /makeRoomFor\(module\)/, 'memory, not the user, decides what is released');
 });
 
 test('4. the selected Whisper choice is persisted and restored', () => {
   assert.match(manager, /fun selectedWhisperEngine\(\): OfflineSttEngine\?/);
-  assert.match(manager, /"whisper-large-v3-turbo" -> OfflineSttEngine\.WHISPER_LARGE_V3_TURBO/);
+  assert.match(manager, /modules\[WHISPER_LARGE_ID\]\?\.enabled == true -> OfflineSttEngine\.WHISPER_LARGE_V3_TURBO/);
+  assert.match(manager, /rememberEnabled\(module\.spec\.id, true\)/);
   assert.match(manager, /rememberActive\(module\.spec\.id\)/);
   assert.match(manager, /getString\(KEY_ACTIVE, null\)/);
   assert.match(manager, /activeModuleId\?\.let \{ id ->/);
@@ -143,3 +149,14 @@ test('13. a verified download may replace a stale destination', () => {
   assert.match(downloader, /require\(temporary\.renameTo\(destination\)\)/);
 });
 
+test('14. an enabled module stays active while its engine is out of memory', () => {
+  // Enabled is the user's intent; resident is where the bytes are. Evicting an engine must not
+  // make the card claim the user switched the module off.
+  assert.match(manager, /\.put\("enabled", module\.enabled\)/);
+  assert.match(shipped, /const offlineActiveStates=new Set\(\['enabled'/);
+  assert.match(shipped, /\(enabled===true&&state==='installed'\)\?'enabled'/);
+  assert.match(shipped, /info\.enabled===true/);
+  assert.match(shipped, /"offline\.state\.enabled"/);
+  assert.match(manager, /private fun makeRoomFor\(module: Module\)/);
+  assert.match(manager, /module\.enabled = false\n            rememberEnabled\(id, false\)/, 'deactivate must be the only switch-off path');
+});

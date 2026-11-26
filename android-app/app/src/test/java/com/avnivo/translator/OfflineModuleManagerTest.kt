@@ -471,9 +471,10 @@ class OfflineModuleManagerTest {
         manager.close()
     }
 
-    @Test fun activatingASecondModuleUnloadsTheFirst() {
-        // One engine at a time is the constraint that keeps the process alive. Activating a second
-        // module must release the first instead of holding both and pushing the device into OOM.
+    @Test fun enablingAnotherModuleLeavesTheSelectedWhisperAlone() {
+        // The S23 Ultra report: switching the translator or TTS on switched Whisper off, and
+        // switching Whisper on switched the translator off. Only the two Whisper models are
+        // alternatives; every other module must run alongside the selected recognizer.
         val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
         val tts = OfflineModelSpecs.all.getValue("silero-tts")
         placeInstalledModel(small)
@@ -489,10 +490,86 @@ class OfflineModuleManagerTest {
         manager.download(tts.id)
         manager.awaitIdle()
 
-        assertTrue("the requested module must be the active one", manager.isOperational(tts.id))
-        assertFalse("the previous module must be released", manager.isOperational(small.id))
-        assertTrue("the previous engine must actually be closed", engines.getValue(small.id).closed)
-        assertFalse("the new engine must be live", engines.getValue(tts.id).closed)
+        assertTrue("the requested module must be active", manager.isOperational(tts.id))
+        assertTrue("enabling TTS must not switch the recognizer off", manager.isOperational(small.id))
+        assertFalse("the recognizer engine must stay live", engines.getValue(small.id).closed)
+        assertEquals(OfflineSttEngine.WHISPER_SMALL_Q8, manager.selectedWhisperEngine())
+        assertTrue(JSONObject(manager.status(small.id)).getBoolean("enabled"))
+        manager.close()
+    }
+
+    @Test fun enablingTranslationAndTtsKeepsEveryModuleEnabled() {
+        // Acceptance criterion: Whisper + NLLB + TTS enabled at the same time, each loaded once.
+        val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
+        val nllb = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
+        val tts = OfflineModelSpecs.all.getValue("silero-tts")
+        for (spec in listOf(small, nllb, tts)) placeInstalledModel(spec)
+        val manager = manager()
+        var builds = 0
+        manager.engineFactory = { _, _ -> builds += 1; FakeEngine() }
+
+        for (spec in listOf(small, nllb, tts)) {
+            manager.activate(spec.id)
+            manager.awaitIdle()
+        }
+
+        for (spec in listOf(small, nllb, tts)) {
+            val status = JSONObject(manager.status(spec.id))
+            assertTrue("${spec.id} must stay enabled: $status", status.getBoolean("enabled"))
+            assertTrue("${spec.id} must stay installed: $status", manager.isInstalled(spec.id))
+            assertTrue("${spec.id} must stay operational: $status", manager.isOperational(spec.id))
+        }
+        assertEquals("each module is loaded once and nothing is rebuilt", 3, builds)
+        assertEquals(OfflineSttEngine.WHISPER_SMALL_Q8, manager.selectedWhisperEngine())
+        manager.close()
+    }
+
+    @Test fun memoryPressureReleasesTheEngineButKeepsTheModuleEnabled() {
+        // 8 GB phone: Large (1.4 GB) and NLLB (2.9 GB) cannot both be resident. The guard may drop
+        // one, but dropping it must not switch it off - the next request reloads it.
+        val large = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
+        val nllb = OfflineModelSpecs.all.getValue("nllb-200-600m-int8")
+        placeInstalledModel(large)
+        placeInstalledModel(nllb)
+        val manager = manager()
+        val engines = mutableMapOf<String, FakeEngine>()
+        manager.engineFactory = { spec, _ -> FakeEngine().also { engines[spec.id] = it } }
+        manager.memoryProvider = {
+            MemorySnapshot(
+                totalMem = 8_000L * 1024 * 1024,
+                availMem = 3_000L * 1024 * 1024,
+                lowMemory = false,
+                appPssBytes = 0,
+                nativeHeapBytes = 0,
+                vmHeapMax = 512L * 1024 * 1024
+            )
+        }
+
+        manager.activate(large.id)
+        manager.awaitIdle()
+        assertTrue(manager.isOperational(large.id))
+
+        manager.activate(nllb.id)
+        manager.awaitIdle()
+
+        assertTrue("the translator must load", manager.isOperational(nllb.id))
+        val largeStatus = JSONObject(manager.status(large.id))
+        assertTrue("the evicted module must stay enabled: $largeStatus", largeStatus.getBoolean("enabled"))
+        assertFalse("the evicted engine must not be resident: $largeStatus", manager.isOperational(large.id))
+        assertTrue("the evicted engine must be closed", engines.getValue(large.id).closed)
+        assertEquals(
+            "the Whisper choice must survive eviction",
+            OfflineSttEngine.WHISPER_LARGE_V3_TURBO,
+            manager.selectedWhisperEngine()
+        )
+
+        manager.activate(large.id)
+        manager.awaitIdle()
+        assertTrue("a later request must reload the evicted module", manager.isOperational(large.id))
+        assertTrue(
+            "the translator must stay enabled while it is out of memory",
+            JSONObject(manager.status(nllb.id)).getBoolean("enabled")
+        )
         manager.close()
     }
 
@@ -991,7 +1068,7 @@ class OfflineModuleManagerTest {
         manager.close()
     }
 
-    @Test fun aFailedLargeLoadDoesNotSilentlySelectSmall() {
+    @Test fun aFailedLargeLoadKeepsTheChoiceAndNeverFallsBackToSmall() {
         val small = OfflineModelSpecs.all.getValue("whisper-small-q8")
         val large = OfflineModelSpecs.all.getValue("whisper-large-v3-turbo")
         placeInstalledModel(small)
@@ -1008,10 +1085,16 @@ class OfflineModuleManagerTest {
 
         manager.activate(large.id)
         manager.awaitIdle()
-        assertNull("a failed Large load must clear the choice, not fall back", manager.selectedWhisperEngine())
+        assertEquals(
+            "the user's choice must survive a failed load; routing must never fall back to Small",
+            OfflineSttEngine.WHISPER_LARGE_V3_TURBO,
+            manager.selectedWhisperEngine()
+        )
         assertFalse("Small must not be left operational after the failed switch", manager.isOperational(small.id))
-        assertEquals("installed", JSONObject(manager.status(large.id)).getString("state"))
-        assertTrue(JSONObject(manager.status(large.id)).getString("reason").contains("large rejected"))
+        val failed = JSONObject(manager.status(large.id))
+        assertEquals("installed", failed.getString("state"))
+        assertTrue(failed.getString("reason").contains("large rejected"))
+        assertTrue("only an explicit action may switch a module off: $failed", failed.getBoolean("enabled"))
         manager.close()
     }
 

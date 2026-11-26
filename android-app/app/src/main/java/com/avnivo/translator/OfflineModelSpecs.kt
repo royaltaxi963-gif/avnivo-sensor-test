@@ -13,6 +13,12 @@ internal data class OfflineModelSpec(
     val files: Map<String, Pair<Long, String>>,
     /** Bytes of RAM the loaded model needs, from the model's own size and runtime overhead. */
     val requiredRamBytes: Long = 0L,
+    /**
+     * Modules that answer the same question and must never be enabled together. Only the two
+     * Whisper models share a group: the user has to be able to tell which recognizer is live.
+     * A null group means the module is independent of every other module.
+     */
+    val exclusiveGroup: String? = null,
     /** Why this build cannot run the module. Shown verbatim instead of a generic failure. */
     val blocker: String? = null
 ) {
@@ -29,13 +35,17 @@ internal data class OfflineModelSpec(
 internal enum class OfflineEngineKind { UZBEK_NEMO_CTC, WHISPER_GGML, NLLB_ONNX, SILERO_TTS, UNAVAILABLE }
 
 internal object OfflineModelSpecs {
+    /** Small Q8 and Large V3 Turbo are alternatives; everything else runs alongside them. */
+    const val WHISPER_GROUP = "whisper"
+
     // Verified from GCS: multilingual-stt/whisper-small-q8_0/ggml-small-q8_0.bin
     private val WHISPER_SMALL = OfflineModelSpec(
         id = "whisper-small-q8",
         engine = OfflineEngineKind.WHISPER_GGML,
         files = mapOf("ggml-small-q8_0.bin" to (264464607L to "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f")),
         // Quantized weights plus whisper.cpp's mel/decoder/KV buffers.
-        requiredRamBytes = 700_000_000L
+        requiredRamBytes = 700_000_000L,
+        exclusiveGroup = WHISPER_GROUP
     )
 
     // Verified from GCS: multilingual-stt/whisper-large-v3-turbo-q5_0/ggml-large-v3-turbo-q5_0.bin
@@ -45,7 +55,8 @@ internal object OfflineModelSpecs {
         files = mapOf("ggml-large-v3-turbo-q5_0.bin" to (574041195L to "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2")),
         // whisper.cpp keeps the quantized weights plus decoder/KV buffers resident; 2.5x the
         // model size is the headroom this build refuses to go below instead of risking an OOM kill.
-        requiredRamBytes = 1_435_000_000L
+        requiredRamBytes = 1_435_000_000L,
+        exclusiveGroup = WHISPER_GROUP
     )
 
     // Verified from GCS: multilingual-translation/nllb-200-600m-int8/

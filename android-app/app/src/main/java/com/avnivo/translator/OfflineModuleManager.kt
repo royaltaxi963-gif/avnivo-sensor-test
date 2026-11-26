@@ -33,6 +33,13 @@ internal class OfflineModuleManager(
 
         /** Recency for eviction, so the model the user just used is the last one unloaded. */
         @Volatile var lastUsedAt: Long = 0L
+
+        /**
+         * The user's intent, which is not the same thing as the engine being in memory. Enabled
+         * modules keep working after the process evicts them: the next request reloads the engine.
+         * Only an explicit enable, deactivate or delete changes this.
+         */
+        @Volatile var enabled: Boolean = false
     }
 
     private val worker = Executors.newSingleThreadExecutor()
@@ -53,8 +60,17 @@ internal class OfflineModuleManager(
     private val quarantined = java.util.Collections.synchronizedList(mutableListOf<Closeable>())
 
     init {
+        val prefs = appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val storedEnabled = prefs?.all?.keys?.filter { it.startsWith(KEY_ENABLED) }.orEmpty()
+        // Builds before this one remembered a single active module. Promote it once so an upgrade
+        // does not silently turn the module the user had switched on back off.
+        val legacyActive = prefs?.getString(KEY_ACTIVE, null)
         OfflineModelSpecs.all.values.forEach { spec ->
             val module = Module(spec)
+            module.enabled = prefs != null && (
+                prefs.getBoolean(KEY_ENABLED + spec.id, false) ||
+                    (storedEnabled.isEmpty() && spec.id == legacyActive)
+                )
             val directory = spec.directory(filesDir)
             // A file of the right length is only a candidate. INSTALLED is reserved for a model
             // whose bytes are covered by a SHA-256 stamp; anything else is verified on the worker
@@ -75,7 +91,13 @@ internal class OfflineModuleManager(
 
     /** Adds a spec at runtime; only used by tests to exercise non-runnable engines. */
     internal fun registerForTest(spec: OfflineModelSpec) {
-        modules[spec.id] = Module(spec)
+        val module = Module(spec)
+        // Read the persisted intent like the constructor does, so a test can restart the manager
+        // and see the same enabled modules a real process restart would restore.
+        module.enabled = appContext
+            ?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            ?.getBoolean(KEY_ENABLED + spec.id, false) == true
+        modules[spec.id] = module
     }
 
     /** Machine-readable status for one module, or null if the id is unknown (fail closed). */
@@ -97,9 +119,9 @@ internal class OfflineModuleManager(
      * selected. STT routing uses this instead of guessing Small: selecting Large must never
      * silently fall back to Small (or vice versa), and deactivating a module clears the choice.
      */
-    fun selectedWhisperEngine(): OfflineSttEngine? = when (activeModuleId) {
-        "whisper-small-q8" -> OfflineSttEngine.WHISPER_SMALL_Q8
-        "whisper-large-v3-turbo" -> OfflineSttEngine.WHISPER_LARGE_V3_TURBO
+    fun selectedWhisperEngine(): OfflineSttEngine? = when {
+        modules[WHISPER_LARGE_ID]?.enabled == true -> OfflineSttEngine.WHISPER_LARGE_V3_TURBO
+        modules[WHISPER_SMALL_ID]?.enabled == true -> OfflineSttEngine.WHISPER_SMALL_Q8
         else -> null
     }
 
@@ -260,6 +282,7 @@ internal class OfflineModuleManager(
             .put("progress", progress ?: JSONObject.NULL)
             .put("verified", module.verified)
             .put("resident", module.engine != null)
+            .put("enabled", module.enabled)
             .put("reason", module.reason ?: module.spec.blocker ?: JSONObject.NULL)
     }
 
@@ -289,6 +312,10 @@ internal class OfflineModuleManager(
                 if (module.state == OfflineModuleState.DOWNLOADING) continue
                 val directory = module.spec.directory(filesDir)
                 if (!module.spec.installed(directory)) {
+                    if (module.enabled) {
+                        module.enabled = false
+                        rememberEnabled(module.spec.id, false)
+                    }
                     if (module.state == OfflineModuleState.VERIFYING) {
                         module.reason = "model fayllari topilmadi"
                         transition(module, OfflineModuleState.NOT_INSTALLED)
@@ -309,7 +336,9 @@ internal class OfflineModuleManager(
                 transition(module, OfflineModuleState.INSTALLED)
                 notify("AvnivoOfflineModuleStatus", module.spec.id)
             }
-            // Restore the single engine that was active, and only that one.
+            // Reload the module the user last switched on so the microphone is ready on the first
+            // press. Everything else stays enabled and loads on its first request, which keeps a
+            // 12 GB phone from trying to hold Whisper, NLLB and TTS at the same time.
             activeModuleId?.let { id ->
                 modules[id]?.let { module ->
                     if (module.verified && !module.state.isOperational) activate(module)
@@ -328,7 +357,7 @@ internal class OfflineModuleManager(
      */
     private fun activate(module: Module) {
         val directory = module.spec.directory(filesDir)
-        val snapshot: MemorySnapshot?
+        var snapshot: MemorySnapshot?
         synchronized(activationLock) {
             if (module.state.isOperational && module.engine != null) {
                 module.lastUsedAt = System.currentTimeMillis()
@@ -343,10 +372,8 @@ internal class OfflineModuleManager(
                 return
             }
             module.activating = true
-            // A failed load must not leave the previous module selected: routing would then
-            // silently use Small after the user chose Large (or vice versa). Clear first.
-            if (activeModuleId != module.spec.id) rememberActive(null)
-            unloadOthers(module)
+            rememberActive(module.spec.id)
+            enable(module)
             snapshot = memoryProvider(appContext)
             lifecycleLog(
                 "ACTIVATE_START id=${module.spec.id} bytes=${module.spec.files.values.sumOf { it.first }} " +
@@ -356,12 +383,18 @@ internal class OfflineModuleManager(
                     "avail_mb=${snapshot?.let { MemorySnapshot.mb(it.availMem) } ?: -1} " +
                     "low=${snapshot?.lowMemory ?: false}"
             )
-            if (snapshot != null && !snapshot.fits(module.spec.requiredRamBytes)) {
+            if (snapshot != null && !fitsNextToResident(module, snapshot)) {
+                // Another engine is in the way, not the user's choice: release memory, keep the
+                // modules enabled, and let the next request reload whatever was dropped.
+                makeRoomFor(module)
+                snapshot = memoryProvider(appContext)
+            }
+            if (snapshot != null && !fitsNextToResident(module, snapshot)) {
                 module.activating = false
                 module.reason = "xotira yetarli emas: " + snapshot.describe(module.spec.requiredRamBytes) +
-                    ". Boshqa modulni yoping yoki qurilmani qayta ishga tushiring."
+                    ". Modul yoqilgan holatda qoldi; ishlatilganda qayta uriniladi."
                 transition(module, OfflineModuleState.INSTALLED)
-                notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
+                notify("AvnivoOfflineModuleStatus", module.spec.id)
                 return
             }
             transition(module, OfflineModuleState.INITIALIZING)
@@ -478,15 +511,70 @@ internal class OfflineModuleManager(
         notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
     }
 
-    /** Releases every loaded engine except [keep], so only one model is ever resident. */
-    private fun unloadOthers(keep: Module) {
-        for (other in modules.values) {
-            if (other === keep) continue
+    /**
+     * True when [module] fits next to the engines that are already resident. The budget covers the
+     * whole process, so a model that fits on its own can still push the next one over the edge;
+     * counting what is already loaded is what makes the eviction decision honest.
+     */
+    private fun fitsNextToResident(module: Module, snapshot: MemorySnapshot): Boolean {
+        val resident = modules.values
+            .filter { it !== module && it.engine != null }
+            .sumOf { it.spec.requiredRamBytes }
+        return snapshot.fits(module.spec.requiredRamBytes + resident)
+    }
+
+    /**
+     * Records that the user switched [module] on, and applies the only exclusion this app has.
+     *
+     * The two Whisper models share [OfflineModelSpec.exclusiveGroup]: they answer the same
+     * question, so the card must never claim both are live. Everything else - Uzbek STT, NLLB and
+     * TTS - is independent, and enabling one of them must not switch anything else off. The
+     * device report that motivated this was NLLB and Whisper cancelling each other, which broke
+     * the speech -> translation -> speech chain the user had configured.
+     */
+    private fun enable(module: Module) {
+        val group = module.spec.exclusiveGroup
+        if (group != null) {
+            for (peer in modules.values) {
+                if (peer === module || peer.spec.exclusiveGroup != group) continue
+                if (!peer.enabled && peer.engine == null) continue
+                peer.enabled = false
+                rememberEnabled(peer.spec.id, false)
+                peer.engine?.let { engine -> runCatching { engine.close() } }
+                peer.engine = null
+                if (peer.state.isOperational) transition(peer, OfflineModuleState.INSTALLED)
+                peer.reason = "boshqa Whisper modeli tanlandi: ${module.spec.id}. Fayllar saqlangan."
+                lifecycleLog("EXCLUSIVE_RELEASE id=${peer.spec.id} selected=${module.spec.id}")
+                notify("AvnivoOfflineModuleStatus", peer.spec.id)
+            }
+        }
+        module.enabled = true
+        rememberEnabled(module.spec.id, true)
+    }
+
+    /**
+     * Frees memory, never intent. When a model does not fit next to what is already loaded, the
+     * least recently used engines are released one at a time until it does; those modules stay
+     * enabled and reload on their next request, so the chain keeps working without the user
+     * switching anything back on.
+     */
+    private fun makeRoomFor(module: Module) {
+        var snapshot = memoryProvider(appContext) ?: return
+        if (fitsNextToResident(module, snapshot)) return
+        val candidates = modules.values
+            .filter { it !== module && it.engine != null && !it.activating }
+            .sortedBy { it.lastUsedAt }
+            .toList()
+        for (other in candidates) {
+            if (fitsNextToResident(module, snapshot)) return
             val engine = other.engine ?: continue
             runCatching { engine.close() }
             other.engine = null
             if (other.state.isOperational) transition(other, OfflineModuleState.INSTALLED)
+            other.reason = "xotiradan vaqtincha bo‘shatildi; ishlatilganda avtomatik yuklanadi"
+            lifecycleLog("MEMORY_RELEASE id=${other.spec.id} for=${module.spec.id}")
             notify("AvnivoOfflineModuleStatus", other.spec.id)
+            snapshot = memoryProvider(appContext) ?: return
         }
     }
 
@@ -514,6 +602,8 @@ internal class OfflineModuleManager(
         val directory = module.spec.directory(filesDir)
         if (!module.spec.installed(directory)) {
             module.reason = "model fayllari topilmadi"
+            module.enabled = false
+            rememberEnabled(module.spec.id, false)
             transition(module, OfflineModuleState.NOT_INSTALLED)
             notify("AvnivoOfflineModuleError", "${module.spec.id}|${module.reason}")
             return
@@ -545,6 +635,8 @@ internal class OfflineModuleManager(
             val engine = module.engine
             if (engine != null) runCatching { engine.close() }
             module.engine = null
+            module.enabled = false
+            rememberEnabled(id, false)
             if (module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
             module.reason = null
             if (activeModuleId == id) rememberActive(null)
@@ -578,6 +670,8 @@ internal class OfflineModuleManager(
             val directory = module.spec.directory(filesDir)
             runCatching { module.engine?.close() }
             module.engine = null
+            module.enabled = false
+            rememberEnabled(id, false)
             if (module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
             if (activeModuleId == id) rememberActive(null)
             ModelIntegrity.invalidate(directory)
@@ -629,7 +723,6 @@ internal class OfflineModuleManager(
             module.engine = null
             if (module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
             module.reason = "xotiradan bo‘shatildi; qayta ishlatishda avtomatik yuklanadi"
-            if (activeModuleId == id) rememberActive(null)
             notify("AvnivoOfflineModuleStatus", id)
         }
     }
@@ -640,13 +733,12 @@ internal class OfflineModuleManager(
      */
     fun onTrimMemory() {
         worker.execute {
-            val keep = activeModuleId
             for (module in modules.values) {
-                if (module.spec.id == keep) continue
                 val engine = module.engine ?: continue
                 runCatching { engine.close() }
                 module.engine = null
                 if (module.state.isOperational) transition(module, OfflineModuleState.INSTALLED)
+                module.reason = "xotiradan vaqtincha bo‘shatildi; ishlatilganda avtomatik yuklanadi"
                 notify("AvnivoOfflineModuleStatus", module.spec.id)
             }
         }
@@ -791,6 +883,11 @@ internal class OfflineModuleManager(
         ?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         ?.getString(KEY_ACTIVE, null)
 
+    private fun rememberEnabled(id: String, enabled: Boolean) {
+        appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)?.edit()
+            ?.putBoolean(KEY_ENABLED + id, enabled)?.apply()
+    }
+
     private fun rememberActive(id: String?) {
         activeModuleId = id
         appContext?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)?.edit()
@@ -849,6 +946,9 @@ internal class OfflineModuleManager(
     private companion object {
         const val PREFS = "avnivo.offline"
         const val KEY_ACTIVE = "active.module"
+        const val KEY_ENABLED = "enabled."
+        const val WHISPER_SMALL_ID = "whisper-small-q8"
+        const val WHISPER_LARGE_ID = "whisper-large-v3-turbo"
         const val KEY_FAILED = "failed."
     }
 

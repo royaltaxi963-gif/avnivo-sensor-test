@@ -82,6 +82,59 @@ class OfflineModuleLifecycleInstrumentedTest {
         }
     }
 
+    /**
+     * The device report: enabling NLLB switched Whisper off and the other way round, so the
+     * speech -> translation -> speech chain could never be configured. Enabled is user intent and
+     * must survive a restart; residency is only where the bytes happen to be.
+     */
+    @Test
+    fun independentModulesStayEnabledTogetherAcrossARestart() {
+        prefs.edit().clear().commit()
+        val recognizer = spec("test-independent-stt-${System.nanoTime()}", "stt-bytes")
+        val translator = spec("test-independent-nllb-${System.nanoTime()}", "nllb-bytes")
+        place(recognizer, "stt-bytes")
+        place(translator, "nllb-bytes")
+        try {
+            val first = manager()
+            first.registerForTest(recognizer)
+            first.registerForTest(translator)
+            first.activate(recognizer.id)
+            first.awaitIdle()
+            first.activate(translator.id)
+            first.awaitIdle()
+            assertTrue(
+                "enabling the translator must not switch the recognizer off",
+                JSONObject(first.status(recognizer.id) ?: "{}").getBoolean("enabled")
+            )
+            assertTrue(
+                "the translator must be enabled",
+                JSONObject(first.status(translator.id) ?: "{}").getBoolean("enabled")
+            )
+            first.close()
+
+            val restarted = manager()
+            restarted.registerForTest(recognizer)
+            restarted.registerForTest(translator)
+            restarted.reactivateInstalled()
+            restarted.awaitIdle()
+            val stt = JSONObject(restarted.status(recognizer.id) ?: "{}")
+            val nllb = JSONObject(restarted.status(translator.id) ?: "{}")
+            assertTrue("the recognizer must stay enabled after a restart: $stt", stt.getBoolean("enabled"))
+            assertTrue("the translator must stay enabled after a restart: $nllb", nllb.getBoolean("enabled"))
+            assertTrue("the last enabled module is reloaded eagerly: $nllb", nllb.getBoolean("resident"))
+            restarted.close()
+        } finally {
+            val cleanup = manager()
+            cleanup.registerForTest(recognizer)
+            cleanup.registerForTest(translator)
+            cleanup.delete(recognizer.id)
+            cleanup.delete(translator.id)
+            cleanup.awaitIdle()
+            cleanup.close()
+            prefs.edit().clear().commit()
+        }
+    }
+
     @Test
     fun deletingOneModuleKeepsTheNeighbourAndItsBytes() {
         prefs.edit().clear().commit()

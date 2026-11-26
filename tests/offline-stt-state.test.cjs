@@ -68,7 +68,7 @@ test('3. the native state callback drives the card and its reason', () => {
 test('4. the card accepts every native state', () => {
   const keys = shipped.match(/const offlineStateKeys=\{([^}]*)\}/);
   assert.ok(keys, 'the state whitelist must exist');
-  for (const state of ['not_installed', 'downloading', 'verifying', 'installed', 'initializing', 'ready', 'recording', 'transcribing', 'error']) {
+  for (const state of ['not_installed', 'downloading', 'verifying', 'installed', 'initializing', 'ready', 'enabled', 'recording', 'transcribing', 'error']) {
     assert.ok(keys[1].includes(`${state}:`), `${state} must be drawable`);
   }
 });
@@ -76,7 +76,7 @@ test('4. the card accepts every native state', () => {
 test('5. recording and decoding keep the module in the active list', () => {
   const active = shipped.match(/const offlineActiveStates=new Set\(\[([^\]]*)\]\)/);
   assert.ok(active, 'the active-state set must exist');
-  for (const state of ['ready', 'recording', 'transcribing']) {
+  for (const state of ['enabled', 'ready', 'recording', 'transcribing']) {
     assert.ok(active[1].includes(`'${state}'`), `${state} must stay active`);
   }
 });

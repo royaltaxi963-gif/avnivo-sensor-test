@@ -86,14 +86,15 @@ test('6. a failed engine is released instead of leaking its native handle', () =
   assert.match(manager, /loadVerified\(SileroTtsEngine\(model\)\)/, 'tts must use it');
 });
 
-test('7. only one engine is resident, and it is loaded lazily', () => {
+test('7. engines are resident lazily and memory is released without switching modules off', () => {
   // Loading every installed model on page load exhausted memory and left every card reading
-  // "dvigatel ulanmagan". The replacement is one engine at a time, restored from disk.
-  assert.match(manager, /private fun unloadOthers\(keep: Module\)/, 'activation must release the previous engine');
+  // "dvigatel ulanmagan". Engines now load on demand, and the only release that changes state is
+  // an explicit deactivate: memory pressure drops the engine and keeps the module enabled.
+  assert.match(manager, /private fun makeRoomFor\(module: Module\)/, 'memory pressure must release the least recently used engine');
   assert.match(manager, /fun unload\(id: String\)/, 'an engine must be unloadable without losing the model');
   assert.match(manager, /fun onTrimMemory\(\)/, 'memory pressure must release what is not in use');
   assert.match(manager, /private fun ensureLoaded\(id: String\)/, 'a request must reload an unloaded model');
-  assert.match(manager, /activeModuleId\?\.let \{ id ->/, 'page load must restore exactly one engine');
+  assert.match(manager, /activeModuleId\?\.let \{ id ->/, 'page load must restore the module the user last switched on');
   assert.doesNotMatch(manager, /initialize\(module, allowEvict/, 'the old load-everything path must be gone');
 });
 

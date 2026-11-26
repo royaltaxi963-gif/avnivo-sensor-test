@@ -62,3 +62,17 @@ suite fails the job. It has failed on different suites in different runs (Maven 
 `checkReleaseAarMetadata`, `OnlineMicInstrumentedTest` process crash, whisper inference crash) while
 `apk` and `update-install` stayed green. Read the failing step before assuming a code regression, and
 remember that a dead instrumentation process prints no test dots - its buffered output is lost.
+
+## Offline module independence
+
+A module has two independent facts: `enabled` (what the user switched on, persisted in
+`avnivo.offline` as `enabled.<id>`) and `resident` (whether its engine is in memory right now).
+Only `activate`, `deactivate` and `delete` change `enabled`; memory pressure only changes
+residency, and the next request reloads the engine. `reactivateInstalled()` reloads the module the
+user switched on last and leaves the rest enabled-but-lazy.
+
+The only exclusivity is `OfflineModelSpec.exclusiveGroup`: Whisper Small Q8 and Whisper Large V3
+Turbo share `"whisper"` because they answer the same question. Enabling anything else must never
+switch a module off - that regression broke the speech -> NLLB -> TTS chain on the S23 Ultra.
+`fitsNextToResident` counts the engines already loaded, so a model that fits alone but not next to
+what is resident triggers `makeRoomFor` instead of an out-of-memory kill.

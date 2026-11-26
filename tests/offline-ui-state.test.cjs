@@ -89,3 +89,16 @@ test('8. the original offline appearance is untouched', () => {
   assert.match(shipped, /animation:avnivo-offline-record-pulse 1\.15s ease-in-out infinite/);
   assert.match(shipped, /html\[data-avnivo-mode=offline\] \.online-stt-status\{color:#7cd5ff\}/);
 });
+
+test("9. the active line names the module own job, not speech recognition for everything", () => {
+  // The device report: the translator card read "Faol — nutqni tanishga tayyor" (active - ready to
+  // recognize speech) while it was a translator. One shared string cannot describe three jobs.
+  assert.match(shipped, /const offlineReadyKey=module=>module\.id\.indexOf\('offline-translate'\)===0\?'offline\.state\.ready\.translate'/);
+  assert.match(shipped, /offlineReadyFallback=module=>[^;]*'Faol — tarjimaga tayyor'/);
+  assert.match(shipped, /offlineReadyFallback=module=>[^;]*'Faol — ovozga tayyor'/);
+  assert.match(shipped, /"offline\.state\.ready\.translate":"Faol — tarjimaga tayyor"/);
+  assert.match(shipped, /"offline\.state\.ready\.tts":"Faol — ovozga tayyor"/);
+  assert.match(shipped, /"offline\.state\.ready\.translate":"Active — ready to translate"/);
+  assert.match(shipped, /"offline\.state\.ready\.translate":"Активен — готов к переводу"/);
+  assert.match(shipped, /status\.textContent=avnivoUiText\(state==='ready'\?offlineReadyKey\(module\)/);
+});
