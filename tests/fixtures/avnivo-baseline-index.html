@@ -1,0 +1,1151 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>AVNIVO — Toza fon</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:#17120d}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{height:100dvh;min-height:320px;max-width:540px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 11px calc(10px + env(safe-area-inset-bottom));background:radial-gradient(ellipse at 12% 10%,#51391c 0%,transparent 48%),radial-gradient(ellipse at 95% 78%,#3c2b1d 0%,transparent 48%),#17120d}
+.background{height:100%;width:100%;position:relative;border-radius:26px;border:1px solid rgba(255,255,255,.11);background:linear-gradient(145deg,#4a3422,#34271e 65%,#2c251e);box-shadow:0 12px 30px #0005,inset 0 1px #ffffff12}
+.writing-shell{position:fixed;bottom:var(--input-bottom,18px);left:var(--input-left,28px);width:var(--input-width,calc(100% - 56px));border-radius:24px;z-index:10;border:1px solid rgba(255,224,168,.35);background:#2c221a;box-shadow:inset 0 1px 4px #0003;min-height:60px;max-height:var(--input-max,300px);overflow:hidden;display:flex;align-items:flex-end}.writing-shell:focus-within{border-color:#e9c483}.writing-area{display:block;position:relative;z-index:1;box-sizing:border-box;width:100%;height:60px;min-height:60px;max-height:var(--input-max,300px);overflow-y:auto;resize:none;border:0;border-radius:24px;background:transparent;color:#fff8e9;font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:17px 12px 17px 18px;outline:none;overflow-wrap:anywhere;flex:1;min-width:0}.mic-icon{width:48px;height:58px;flex:0 0 48px;display:grid;place-items:center;color:#f6c977;pointer-events:none;align-self:flex-end}.mic-icon svg{width:25px;height:25px;display:block}.animated-greeting{position:absolute;z-index:0;top:17px;left:18px;right:62px;color:#fffdf7;text-shadow:0 0 8px #ffffff55;font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:clip}.animated-greeting[hidden]{display:none}.animated-greeting:after{content:"";display:inline-block;vertical-align:-2px;height:1em;border-right:1.5px solid currentColor;margin-inline-start:2px;animation:blink .85s step-end infinite}@keyframes blink{50%{opacity:0}}@media(prefers-reduced-motion:reduce){.animated-greeting:after{animation:none}}@media(min-width:650px){.app{box-shadow:0 0 50px #0007}}
+.mic-icon{position:relative;z-index:5;width:48px;height:58px;flex:0 0 48px;display:grid;place-items:center;color:#f6c977;pointer-events:auto;align-self:flex-end;cursor:pointer;background:transparent;border:0;padding:0;isolation:isolate;outline-offset:-5px}.mic-icon svg{grid-area:1/1;transition:transform .6s cubic-bezier(.22,.8,.2,1),opacity .4s ease,filter .5s ease}.mic-symbol{opacity:1;transform:rotate(0) scale(1);animation:micBreathe 2.2s ease-in-out infinite}.close-symbol{opacity:0;transform:rotate(-130deg) scale(.25)}.writing-shell.voice-active .mic-symbol{opacity:0;transform:rotate(135deg) scale(.25);animation:none}.writing-shell.voice-active .close-symbol{opacity:1;transform:rotate(0) scale(1);filter:drop-shadow(0 0 6px #f6c977)}.writing-shell.voice-active .mic-icon{color:#f6c977}.mic-icon:focus-visible{outline:none}.mic-icon{-webkit-tap-highlight-color:transparent;outline:none;box-shadow:none}.mic-icon:focus,.mic-icon:active{outline:none;box-shadow:none}.voice-trace{position:absolute;left:18px;right:55px;top:50%;height:32px;transform:translateY(-50%);pointer-events:none;opacity:0;z-index:2;overflow:visible}.voice-trace-fill{position:absolute;inset:0;transform:scaleX(0);transform-origin:right center;transition:transform .9s cubic-bezier(.16,.85,.23,1);background:linear-gradient(90deg,transparent,#22a7ff 25%,#82ecff 75%,#55c9ff);height:2px;top:15px;box-shadow:0 0 7px #00aaff,0 0 16px #008bff}.voice-trace-glow{position:absolute;left:0;right:0;top:0;height:32px;opacity:0;transition:opacity .5s;filter:drop-shadow(0 0 5px #25baff);background:transparent}.writing-shell.voice-active .voice-trace{opacity:1}.writing-shell.voice-active .voice-trace-fill{transform:scaleX(1)}.writing-shell.voice-active .voice-trace-glow{opacity:1}.writing-shell.voice-active .animated-greeting{display:none!important}@keyframes micBreathe{0%,100%{filter:drop-shadow(0 0 1px #eebd6e);transform:scale(1)}50%{filter:drop-shadow(0 0 9px #ffc974);transform:scale(1.09)}}@media(prefers-reduced-motion:reduce){.mic-symbol{animation:none}}.send-symbol{opacity:0;transform:translateY(9px) rotate(-110deg) scale(.4)}.writing-shell.text-mode .mic-symbol{opacity:0;transform:rotate(110deg) scale(.3);animation:none}.writing-shell.text-mode .close-symbol{opacity:0;transform:rotate(-90deg) scale(.3)}.writing-shell.text-mode .send-symbol{opacity:1;transform:translateY(0) rotate(0) scale(1);filter:drop-shadow(0 0 5px #e8b766)}.writing-shell.text-mode .mic-icon{color:#f6c977}.writing-shell.text-mode .mic-icon:disabled{opacity:.52;cursor:default}.sent-messages{position:fixed;z-index:3;top:var(--chat-top,70px);left:var(--chat-left,14px);width:var(--chat-width,calc(100% - 28px));bottom:var(--chat-bottom,230px);min-height:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:7px;overflow-y:auto;overflow-x:hidden;pointer-events:auto;overscroll-behavior:contain;scrollbar-width:none;touch-action:pan-y;overflow-anchor:none}.sent-messages>.message-line:first-child{margin-top:auto}.sent-messages:empty{display:none}.message-line{display:flex;flex-direction:row-reverse;align-items:center;gap:7px;max-width:100%;min-width:0;align-self:flex-end}.message-line.line-left{align-self:flex-start;flex-direction:row}.message-line .sent-message{align-self:auto;min-width:0;max-width:calc(100% - 43px)}.speak-message{flex:0 0 36px;width:36px;height:40px;padding:0;border:0;background:transparent;color:#eac58d;display:grid;place-items:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;outline-offset:2px}.speak-message svg{width:26px;height:26px;overflow:visible}.speak-message .sound-bars{opacity:.48;transform-origin:16px 16px;transition:opacity .2s}.speak-message .speaker-core{transform-origin:12px 16px}.speak-message.is-speaking{color:#fff1c9;filter:drop-shadow(0 0 5px #ffd68a99) drop-shadow(0 0 11px #f5b84a66)}.speak-message.is-speaking .sound-bars{opacity:1;animation:avnivo-wave-breathe 1.15s ease-in-out infinite}.speak-message.is-speaking .speaker-core{animation:avnivo-speaker-breathe 1.15s ease-in-out infinite}@keyframes avnivo-wave-breathe{0%,100%{opacity:.32;transform:scale(.94)}50%{opacity:1;transform:scale(1.04)}}@keyframes avnivo-speaker-breathe{0%,100%{opacity:.85}50%{opacity:1}}@media(prefers-reduced-motion:reduce){.speak-message.is-speaking .sound-bars,.speak-message.is-speaking .speaker-core{animation:none;opacity:1}}.sent-message{align-self:flex-end;max-width:88%;padding:7px 13px;border-radius:18px 18px 5px 18px;background:#57402a;border:1px solid #c99a5966;color:#fff6e9;overflow-wrap:anywhere;white-space:pre-wrap;font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 3px 9px #0003}.sent-message.message-left{align-self:flex-start;border-radius:18px 18px 18px 5px;background:#40352d;border-color:#a88a6c66}.sent-message.message-right{align-self:flex-end}.sent-message.translation-preview{border-color:#d8b47c88;background:#3c332a;color:#ffe6bc}.translation-preview.typing:after{content:"";display:inline-block;height:1em;margin-left:2px;border-right:2px solid #ffd69a;vertical-align:-2px;animation:blink .7s step-end infinite}.writing-shell.text-mode .voice-trace{opacity:0!important}.center-brand{position:fixed;left:50%;top:var(--brand-center,50%);transform:translate(-50%,-50%);width:min(90vw,490px);text-align:center;pointer-events:none;z-index:1;transition:opacity .24s ease,visibility .24s ease;visibility:visible;opacity:1}.center-brand[hidden]{display:none}.center-brand.brand-hidden{opacity:0;visibility:hidden}.brand-name{display:flex;justify-content:center;align-items:baseline;letter-spacing:.065em;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:800;font-size:clamp(39px,11vw,64px);line-height:1.12;white-space:nowrap;text-shadow:0 4px 16px #0005}.brand-av{color:#fff}.brand-nivo{color:#e6b76c}.brand-translator{display:flex;align-items:center;justify-content:center;width:100%;height:42px;margin-top:12px;font-size:clamp(17px,5vw,24px);font-weight:450;line-height:1.35;color:#e8c89a;white-space:nowrap;direction:ltr;unicode-bidi:isolate;overflow:visible}.brand-translator-text{display:inline-block;direction:inherit;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:clip}.brand-caret{height:1.05em;border-right:2px solid #e6b76c;flex:0 0 2px;margin-left:2px;animation:blink .85s step-end infinite}.brand-translator[dir=rtl] .brand-caret{margin-left:0;margin-right:2px;border-right:0;border-left:2px solid #e6b76c}@media(max-height:470px){.brand-name{font-size:clamp(30px,9vw,46px)}.brand-translator{margin-top:5px;height:34px}}.writing-shell.hold-voice .writing-area{opacity:.32;transition:opacity .25s ease}.writing-shell .writing-area{transition:opacity .25s ease}.writing-shell.hold-voice .mic-symbol,.writing-shell.hold-voice .send-symbol{opacity:0!important;transform:rotate(120deg) scale(.3)!important;animation:none}.writing-shell.hold-voice .close-symbol{opacity:1!important;transform:rotate(0) scale(1)!important;filter:drop-shadow(0 0 6px #f6c977)}.writing-shell.hold-voice .voice-trace{opacity:1}.writing-shell.hold-voice .voice-trace-fill{transform:scaleX(1)}.writing-shell.hold-voice .voice-trace-glow{opacity:1}.mic-icon{touch-action:none;user-select:none;-webkit-user-select:none}.voice-hint{position:fixed;bottom:calc(var(--input-bottom,44px) + 70px);left:50%;transform:translateX(-50%);color:#bde9ff;background:#23323b;border:1px solid #54b5e477;border-radius:12px;padding:7px 12px;font:13px/1.3 system-ui,sans-serif;white-space:nowrap;z-index:15;pointer-events:none}.voice-hint[hidden]{display:none}.language-row{position:fixed;z-index:9;bottom:var(--language-bottom,38px);left:var(--input-left,28px);width:var(--input-width,calc(100% - 56px));display:grid;grid-template-columns:minmax(0,1fr) 52px minmax(0,1fr);align-items:center;gap:4px;height:60px;user-select:none;-webkit-user-select:none}.language-chip{height:49px;min-width:0;border:1.5px solid #8c765b;border-radius:14px;background:linear-gradient(150deg,#443526,#30251d);display:flex;justify-content:center;align-items:center;gap:5px;white-space:nowrap;padding:0 5px;box-shadow:inset 0 1px #ffffff10,0 3px 9px #0002;transition:border-color .42s,box-shadow .42s,background .42s,transform .35s;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;color:inherit;font-family:inherit}.language-chip:focus-visible{outline:2px solid #ffe0a0;outline-offset:2px}.language-chip.is-selected{border:2px solid #ffe0a0;box-shadow:0 0 0 1px #fbd68c75,0 0 19px #ffd08365,inset 0 1px #fff0bb72,inset 0 0 11px #d8a35e25;background:linear-gradient(145deg,#775634,#43301f)}.language-name{font-size:clamp(13px,3.85vw,17px);font-weight:700;color:#fff0d9;overflow:hidden;text-overflow:ellipsis}.language-code{font-size:clamp(10px,2.8vw,12px);font-weight:800;color:#f7ce8c;flex-shrink:0}.language-controls{display:grid;place-items:center;height:60px;pointer-events:none}.direction-arrows{width:46px;height:44px;color:#f0cb8d;overflow:visible;filter:drop-shadow(0 0 3px #e4b76566);transform:rotate(0deg);transition:transform .78s cubic-bezier(.22,.75,.24,1),filter .78s}.direction-arrows path{fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}.language-row[data-selected="right"] .direction-arrows{transform:rotate(180deg)}.language-row.direction-changing .direction-arrows{filter:drop-shadow(0 0 10px #ffe0a0bb)}.language-row.direction-changing .language-chip.is-selected{animation:selectionPulse .78s ease-out}@keyframes selectionPulse{0%{transform:scale(.97)}45%{transform:scale(1.035)}100%{transform:scale(1)}}@media(max-width:360px){.language-row{grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);gap:2px}.direction-arrows{width:39px;height:40px}.language-name{font-size:clamp(12px,3.55vw,14px)}.language-code{font-size:10px}.language-chip{gap:3px;padding:0 3px}}@media(prefers-reduced-motion:reduce){.direction-arrows{transition:none}.language-row.direction-changing .language-chip.is-selected{animation:none}}.history-toggle{position:absolute;z-index:25;top:19px;left:19px;width:43px;height:43px;display:grid;place-items:center;border:1px solid #e4bb7a85;border-radius:14px;color:#f8d59b;background:linear-gradient(145deg,#58412c,#30251e);box-shadow:0 4px 14px #0005,inset 0 1px #fff2;cursor:pointer;-webkit-tap-highlight-color:transparent}.history-toggle svg{width:23px;height:23px}.history-overlay{position:fixed;z-index:29;inset:0;background:#0007;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}.history-overlay.open{opacity:1;visibility:visible}.history-drawer{position:fixed;z-index:30;top:0;bottom:0;left:0;width:min(78vw,310px);max-width:310px;padding:calc(20px + env(safe-area-inset-top)) 13px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(155deg,#463223,#2b211b 80%);border-right:1px solid #e6b76c77;box-shadow:12px 0 35px #0008;transform:translateX(-105%);transition:transform .35s cubic-bezier(.22,.8,.22,1);display:flex;flex-direction:column;gap:15px;visibility:hidden}.history-drawer.open{transform:translateX(0);visibility:visible}.history-header{display:flex;justify-content:space-between;align-items:center;color:#ffe1aa;font-weight:750;font-size:19px;padding:0 3px}.history-close{background:transparent;border:0;color:#ffe1aa;font-size:27px;cursor:pointer;width:38px;height:38px}.history-new{border:1px solid #e7c17c9c;border-radius:13px;padding:11px;color:#ffe4b7;background:#63462c;font:600 14px system-ui;cursor:pointer}.history-items{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:7px;overscroll-behavior:contain}.history-entry{width:100%;text-align:left;background:#ffffff0a;border:1px solid #ffffff18;border-radius:12px;padding:11px 10px;color:#fff4df;cursor:pointer;display:flex;flex-direction:column;gap:5px}.history-entry.current{border-color:#edc17caa;background:#a67a4029}.history-entry-title{font:600 14px/1.35 system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-entry-date{font:12px system-ui;color:#c6ad8e}.history-empty{padding:18px 9px;color:#c9b89e;font-size:13px;line-height:1.6}.history-toggle:focus-visible,.history-entry:focus-visible,.history-close:focus-visible,.history-new:focus-visible{outline:2px solid #ffe2a0;outline-offset:2px}@media(prefers-reduced-motion:reduce){.history-drawer,.history-overlay{transition:none}}.settings-toggle{position:absolute;z-index:25;top:19px;right:19px;width:43px;height:43px;display:grid;place-items:center;border:1px solid #e4bb7a85;border-radius:14px;color:#f8d59b;background:linear-gradient(145deg,#58412c,#30251e);box-shadow:0 4px 14px #0005,inset 0 1px #fff2;cursor:pointer;-webkit-tap-highlight-color:transparent}.settings-toggle svg{width:23px;height:23px}.settings-overlay{position:fixed;z-index:29;inset:0;background:#0007;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}.settings-overlay.open{opacity:1;visibility:visible}.settings-drawer{position:fixed;z-index:30;top:0;bottom:0;right:0;width:min(78vw,310px);max-width:310px;padding:calc(20px + env(safe-area-inset-top)) 13px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(205deg,#463223,#2b211b 80%);border-left:1px solid #e6b76c77;box-shadow:-12px 0 35px #0008;transform:translateX(105%);transition:transform .35s cubic-bezier(.22,.8,.22,1);display:flex;flex-direction:column;gap:15px;visibility:hidden}.settings-drawer.open{transform:translateX(0);visibility:visible}.settings-drawer{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#8b7156 transparent;gap:12px}.settings-header{position:sticky;top:0;z-index:3;background:#463223;padding:5px 3px 9px;margin:-5px 0 0;border-bottom:1px solid #c99c5b33;flex-shrink:0}.offline-settings-top{display:none;flex-shrink:0}.offline-settings-top-title{font:700 14px/1.4 system-ui;color:#ffe1aa;margin:0 0 5px}.offline-settings-top-note{font:11.5px/1.5 system-ui;color:#c9b89e;margin:0}.offline-modules{margin-top:auto;flex-shrink:0;border-top:1px solid #57748866;padding-top:14px}html[data-avnivo-mode=offline] .offline-settings-top{display:block}.settings-header{display:flex;justify-content:space-between;align-items:center;color:#ffe1aa;font-weight:750;font-size:19px;padding:0 3px}.settings-close{background:transparent;border:0;color:#ffe1aa;font-size:27px;cursor:pointer;width:38px;height:38px}.settings-description{color:#c9b89e;font:13px/1.6 system-ui;padding:0 3px}.settings-toggle:focus-visible,.settings-close:focus-visible{outline:2px solid #ffe2a0;outline-offset:2px}@media(prefers-reduced-motion:reduce){.settings-drawer,.settings-overlay{transition:none}}.mode-switch{position:fixed;z-index:26;top:calc(22px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;gap:5px;padding:4px;border-radius:17px;background:#211a17ed;border:1px solid #caa36a55;box-shadow:0 3px 13px #0005}.mode-switch button{width:39px;height:35px;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:#b7a897;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}.mode-switch svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.mode-switch button[aria-pressed=true]{color:#ffe1a5;background:#73502b;box-shadow:inset 0 0 0 1px #e8b97770,0 0 9px #e6ad4933}.mode-switch button:focus-visible{outline:2px solid currentColor;outline-offset:2px}html[data-avnivo-mode=offline],html[data-avnivo-mode=offline] body{background:#080f19}html[data-avnivo-mode=offline] .mode-switch{background:#081827ed;border-color:#3a9bd077}html[data-avnivo-mode=offline] .mode-switch button{color:#79b4d5}html[data-avnivo-mode=offline] .mode-switch button[aria-pressed=true]{background:#145077;color:#b8eeff;box-shadow:inset 0 0 0 1px #4bcaff77,0 0 12px #27baff55}html[data-avnivo-mode=offline] .app{background:radial-gradient(ellipse at 12% 10%,#103956,transparent 48%),radial-gradient(ellipse at 95% 78%,#0a2b47,transparent 48%),#080f19}html[data-avnivo-mode=offline] .background{background:linear-gradient(145deg,#102c42,#0c1b2c 65%,#081522);border-color:#4aa8e833}html[data-avnivo-mode=offline] .writing-shell{background:#0b2134;border-color:#3688b888}html[data-avnivo-mode=offline] .writing-area{color:#e9f8ff}html[data-avnivo-mode=offline] .brand-nivo{color:#63c8ff}html[data-avnivo-mode=offline] .sent-message{background:#16364d;border-color:#4baee177;color:#edf9ff}html[data-avnivo-mode=offline] .sent-message.message-left{background:#10283e;border-color:#408bb677}html[data-avnivo-mode=offline] .sent-message.translation-preview{background:#123147;border-color:#59b9ec88;color:#aee8ff}html[data-avnivo-mode=offline] .speak-message{color:#75cfff}html[data-avnivo-mode=offline] .speak-message.is-speaking{color:#d8f7ff;filter:drop-shadow(0 0 6px #39bfffbb) drop-shadow(0 0 12px #168fff77)}html[data-avnivo-mode=offline] .history-drawer{background:linear-gradient(155deg,#103049,#091a2b);border-color:#4ba7d877;color:#eaf8ff}html[data-avnivo-mode=offline] .settings-drawer{background:linear-gradient(155deg,#103049,#091a2b);border-color:#4ba7d877;color:#eaf8ff}
+html[data-avnivo-mode=offline] .settings-header{background:#103049;border-bottom-color:#4ba7d833}html[data-avnivo-mode=offline] .history-toggle{color:#91d8ff}html[data-avnivo-mode=offline] .settings-toggle{color:#91d8ff}html[data-avnivo-mode=offline] .mic-icon{color:#91d8ff}html[data-avnivo-mode=offline] .voice-trace-fill{background:linear-gradient(90deg,transparent,#c68c37 25%,#ffe19a 75%,#e8b65e);box-shadow:0 0 7px #ffc46e,0 0 16px #e9a840}html[data-avnivo-mode=offline] .translation-preview.typing:after{border-color:#7cdaff}html[data-avnivo-mode=offline] .writing-shell.voice-active .mic-icon,html[data-avnivo-mode=offline] .writing-shell.text-mode .mic-icon{color:#91d8ff}html[data-avnivo-mode=offline] .history-overlay,html[data-avnivo-mode=offline] .settings-overlay{background:#020b18aa}html[data-avnivo-mode=offline] .voice-trace-glow{filter:drop-shadow(0 0 5px #f2c16e)}
+/* Offline: consistent blue-black visual palette, retaining gold microphone waveform. */
+html[data-avnivo-mode=offline] .language-chip{border-color:#376c90;background:linear-gradient(150deg,#15334b,#0b2032);box-shadow:inset 0 1px #c8ecff14,0 3px 9px #0004}
+html[data-avnivo-mode=offline] .language-chip.is-selected{border-color:#8cdbff;box-shadow:0 0 0 1px #5ac6f877,0 0 19px #25baff66,inset 0 1px #c5f0ff88,inset 0 0 11px #3b9dcd33;background:linear-gradient(145deg,#235476,#102d45)}
+html[data-avnivo-mode=offline] .language-name{color:#e3f6ff}
+html[data-avnivo-mode=offline] .language-code{color:#8edaff}
+html[data-avnivo-mode=offline] .direction-arrows{color:#83d5ff;filter:drop-shadow(0 0 4px #45baff77)}
+html[data-avnivo-mode=offline] .language-row.direction-changing .direction-arrows{filter:drop-shadow(0 0 10px #61cfffbb)}
+html[data-avnivo-mode=offline] .language-chip:focus-visible{outline-color:#91dcff}
+html[data-avnivo-mode=offline] .history-toggle,html[data-avnivo-mode=offline] .settings-toggle{border-color:#489cc488;background:linear-gradient(145deg,#19435d,#102638);box-shadow:0 4px 14px #0006,inset 0 1px #8cdcff25}
+html[data-avnivo-mode=offline] .history-header,html[data-avnivo-mode=offline] .settings-header{color:#c5efff}
+html[data-avnivo-mode=offline] .history-close,html[data-avnivo-mode=offline] .settings-close{color:#a6e2ff}
+html[data-avnivo-mode=offline] .history-new{border-color:#56b2df88;background:#164260;color:#e5f7ff}
+html[data-avnivo-mode=offline] .history-entry{background:#14354b;border-color:#428eb366;color:#e5f7ff}
+html[data-avnivo-mode=offline] .history-entry.current{border-color:#79d0f9aa;background:#24597988}
+html[data-avnivo-mode=offline] .history-entry-date,html[data-avnivo-mode=offline] .history-empty,html[data-avnivo-mode=offline] .settings-description{color:#a0c9de}
+html[data-avnivo-mode=offline] .history-toggle:focus-visible,html[data-avnivo-mode=offline] .settings-toggle:focus-visible,html[data-avnivo-mode=offline] .history-close:focus-visible,html[data-avnivo-mode=offline] .settings-close:focus-visible,html[data-avnivo-mode=offline] .history-entry:focus-visible,html[data-avnivo-mode=offline] .history-new:focus-visible{outline-color:#90dbff}
+html[data-avnivo-mode=offline] .writing-shell:focus-within{border-color:#6acfff}
+html[data-avnivo-mode=offline] .animated-greeting{color:#f2fbff;text-shadow:0 0 8px #7bcaff55}
+html[data-avnivo-mode=offline] .brand-translator{color:#a6e5ff}
+html[data-avnivo-mode=offline] .mic-symbol{animation-name:offlineMicBreathe}
+@keyframes offlineMicBreathe{0%,100%{filter:drop-shadow(0 0 1px #4fbaff);transform:scale(1)}50%{filter:drop-shadow(0 0 9px #65cfff);transform:scale(1.09)}}
+@media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .mic-symbol{animation:none}}
+/* Online-only STT status icon inside the composer, never overlapping the text. */
+html[data-avnivo-mode=online] .writing-area{padding-left:41px}
+html[data-avnivo-mode=online] .animated-greeting{left:41px}
+.online-stt-status{display:none;position:absolute;z-index:3;left:12px;top:50%;transform:translateY(-50%) scale(.75);width:25px;height:25px;align-items:center;justify-content:center;pointer-events:none;color:#ffd493;opacity:0}
+html[data-avnivo-mode=online] .online-stt-status[data-state=recording],html[data-avnivo-mode=online] .online-stt-status[data-state=loading],html[data-avnivo-mode=online] .online-stt-status[data-state=error]{display:flex;opacity:1;transform:translateY(-50%) scale(1)}
+.online-stt-status svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.online-stt-status[data-state=recording]{animation:avnivo-record-pulse 1.15s ease-in-out infinite}
+.online-stt-status[data-state=loading]{animation:avnivo-record-blink .7s ease-in-out infinite}
+.online-stt-status[data-state=error]{color:#ff515c;animation:none}
+.online-stt-status.is-leaving{animation:avnivo-record-leave .27s ease-in forwards!important}
+@keyframes avnivo-record-pulse{0%,100%{opacity:.6;filter:drop-shadow(0 0 1px #f8bc63)}50%{opacity:1;filter:drop-shadow(0 0 8px #ffce79)}}
+@keyframes avnivo-record-blink{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes avnivo-record-leave{from{opacity:1;transform:translateY(-50%) scale(1)}to{opacity:0;transform:translateY(-50%) scale(.12)}}
+@media(prefers-reduced-motion:reduce){.online-stt-status[data-state=recording],.online-stt-status[data-state=loading]{animation:none}}
+html[data-avnivo-mode=online] .voice-trace{left:40px;right:55px}
+/* Offline: same left recording indicator layout, blue theme; no Chirp 2/API integration. */
+html[data-avnivo-mode=offline] .writing-area{padding-left:41px}
+html[data-avnivo-mode=offline] .animated-greeting{left:41px}
+html[data-avnivo-mode=offline] .voice-trace{left:40px;right:55px}
+html[data-avnivo-mode=offline] .online-stt-status{color:#7cd5ff}
+html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,
+html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{display:flex;opacity:1;transform:translateY(-50%) scale(1);animation:avnivo-offline-record-pulse 1.15s ease-in-out infinite}
+@keyframes avnivo-offline-record-pulse{0%,100%{opacity:.58;filter:drop-shadow(0 0 1px #4ab9f4)}50%{opacity:1;filter:drop-shadow(0 0 8px #75d9ff)}}
+@media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{animation:none}}
+
+/* Online-only 93-locale selector, long-press to open; offline chips unchanged. */
+.online-language-sheet[hidden]{display:none}
+.online-language-sheet{position:fixed;z-index:55;inset:0;display:flex;align-items:flex-end;justify-content:center;background:#090704b8}
+.online-language-panel{width:min(540px,100%);height:min(75dvh,650px);display:flex;flex-direction:column;background:#302419;border:1px solid #b58a52;border-radius:24px 24px 0 0;padding:16px 14px max(15px,env(safe-area-inset-bottom));color:#fff2d9;box-shadow:0 -12px 45px #0009}
+.online-language-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.online-language-head strong{font-size:17px}
+.online-language-close{background:#4b3525;border:1px solid #bd9561;color:#ffe2ac;border-radius:12px;width:36px;height:36px;font-size:24px}
+.online-language-search{width:100%;height:43px;border:1px solid #a47d50;border-radius:12px;background:#201911;color:#fff4e5;font:16px system-ui;padding:0 13px;margin:12px 0;outline:none}
+.online-language-results{overflow:auto;flex:1;overscroll-behavior:contain}
+.online-language-item{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;gap:12px;padding:11px 9px;background:transparent;color:#fff4e5;border:0;border-bottom:1px solid #9c795039;font:15px system-ui}
+.online-language-item small{color:#d5ac75;font-size:12px;white-space:nowrap}
+.online-language-item:active,.online-language-item[aria-selected=true]{background:#76512c}
+.online-language-help{font-size:12px;color:#d4b78e;margin:7px 0 0}
+
+/* Compact offline module list: icon / content / action, mobile-first. */
+.offline-modules{display:none;padding:4px 14px 20px;color:#e4f5ff}
+html[data-avnivo-mode=offline] .offline-modules{display:block}
+html[data-avnivo-mode=offline] .settings-description{display:none}
+.offline-modules-title{font:700 16px/1.35 system-ui;margin:8px 0 5px}
+.offline-modules-subtitle{font:11.5px/1.5 system-ui;color:#a8c6da;margin:0 0 13px}
+.offline-module-card{display:grid;grid-template-columns:38px minmax(0,1fr) 36px;align-items:center;column-gap:10px;row-gap:0;padding:12px 11px;margin:0 0 9px;border:1px solid #386783;border-radius:15px;background:linear-gradient(125deg,#18384a,#112737);box-shadow:0 3px 12px #0002}
+.offline-module-mark{width:38px;height:38px;border-radius:12px;background:#285470;display:grid;place-items:center;color:#bde7ff;align-self:start}
+.offline-module-mark svg,.offline-module-action svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.offline-module-copy{min-width:0;text-align:left}
+.offline-module-name{font:700 12.8px/1.32 system-ui;color:#f1fbff;margin:0 0 4px;overflow-wrap:anywhere}
+.offline-module-desc{font:11px/1.42 system-ui;color:#b4d2e3;margin:0 0 7px;overflow-wrap:anywhere}
+.offline-module-meta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.offline-module-size{font:600 10.5px/1.3 system-ui;color:#d0e9f7;margin:0}
+.offline-module-state{font:10.5px/1.3 system-ui;color:#91b8d1;margin:0}
+.offline-module-action{-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;border:0;border-radius:50%;width:36px;height:36px;background:#1c455f;color:#c2eaff;display:grid;place-items:center;cursor:pointer;align-self:center;justify-self:end;isolation:isolate;overflow:hidden;transition:transform .24s ease,background .24s ease}
+.offline-module-action:focus-visible{outline:2px solid #a8e4ff;outline-offset:3px}
+.offline-module-action:active{transform:scale(.88)}
+.offline-module-action.is-tapped{animation:avnivoDownloadTap .45s ease}
+@keyframes avnivoDownloadTap{0%{transform:scale(1)}40%{transform:scale(.83)}75%{transform:scale(1.1)}100%{transform:scale(1)}}
+.offline-module-action[disabled]{cursor:wait}
+.offline-module-action.is-downloading{background:conic-gradient(#65d7f3 var(--module-progress,0%),#20475d 0);color:white}
+.offline-module-action.is-downloading::before{content:"";position:absolute;inset:3px;border-radius:50%;background:#122e40;z-index:-1}
+.offline-module-action .module-percent{font:700 9px/1 system-ui;letter-spacing:-.2px;font-variant-numeric:tabular-nums}
+.offline-module-action.is-ready{background:#137d55;color:white}
+.offline-module-action.is-ready svg{stroke-width:2.5}
+@media(prefers-reduced-motion:reduce){.offline-module-action{transition:none}.offline-module-action.is-tapped{animation:none}}
+.offline-module-progress{grid-column:1/-1;width:100%;margin-top:10px}
+.offline-module-progress[hidden]{display:none}
+.offline-module-progress-label{display:flex;justify-content:space-between;align-items:center;gap:8px;font:600 11px/1.4 system-ui;color:#cbe8f9;margin-bottom:6px}
+.offline-module-track{height:9px;border-radius:999px;background:#092030;overflow:hidden;border:1px solid #366a83}
+.offline-module-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,#398ac2,#69d7ed);transition:width .15s ease}
+.offline-module-notice{font:11px/1.45 system-ui;color:#ffdba4;margin:7px 0 0;min-height:16px}
+@media(max-width:360px){.offline-module-card{grid-template-columns:34px minmax(0,1fr) 34px;column-gap:8px;padding:10px 9px}.offline-module-mark{width:34px;height:34px}.offline-module-action{width:34px;height:34px}}
+
+
+/* Keep Online AI voice controls separate from Offline model downloads. */
+.avnivo-online-tts-settings{padding:0 15px 24px}
+html[data-avnivo-mode=offline] .avnivo-online-tts-settings{display:none}
+html[data-avnivo-mode=online] .offline-modules{display:none}
+</style>
+</head>
+<body>
+<main class="app" aria-label="AVNIVO fon">
+<div class="background"><div class="mode-switch" role="group" aria-label="Tarjimon rejimi"><button type="button" id="mode-online" aria-label="Online rejimi" title="Online" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="mode-offline" aria-label="Offline rejimi" title="Offline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M3 3l18 18"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></button></div><button type="button" class="history-toggle" aria-label="Chatlar tarixini ochish" aria-controls="history-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 8h7M8 12h7M8 16h4M19 7h2v12a2 2 0 0 1-2 2H8"/></svg></button><button type="button" class="settings-toggle" aria-label="Sozlamalarni ochish" aria-controls="settings-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h4l.65 2.15 1.7.98 2.19-.53 2 3.46-1.53 1.61v1.96l1.53 1.61-2 3.46-2.19-.53-1.7.98L14 20h-4l-.65-2.15-1.7-.98-2.19.53-2-3.46 1.53-1.61v-1.96L3.46 8.76l2-3.46 2.19.53 1.7-.98z"/><circle cx="12" cy="11.25" r="3"/></svg></button><div class="settings-overlay" hidden></div><aside class="settings-drawer" id="settings-drawer" aria-label="Sozlamalar" aria-hidden="true" inert><div class="settings-header"><span>Sozlamalar</span><button type="button" class="settings-close" aria-label="Sozlamalarni yopish">×</button></div><p class="settings-description">Sozlamalar bo‘limi</p><section class="offline-settings-top" aria-label="Offline sozlamalar"><h2 class="offline-settings-top-title">Offline sozlamalar</h2><p class="offline-settings-top-note">Qo‘shimcha sozlamalar shu yerda, modullar ro‘yxatidan yuqorida joylashadi.</p></section><section class="offline-modules" aria-label="Offline modullar" id="offline-modules"><h2 class="offline-modules-title">Offline modullar</h2><p class="offline-modules-subtitle">Modullarni oldindan yuklab oling va internetsiz ham foydalaning. Ayrim imkoniyatlar Online rejimdan farq qilishi mumkin.</p><div class="offline-modules-list"></div><p class="offline-module-notice" role="status" aria-live="polite"></p></section></aside><div class="history-overlay" hidden></div><aside class="history-drawer" id="history-drawer" aria-label="Chatlar tarixi" aria-hidden="true" inert><div class="history-header"><span>Chatlar tarixi</span><button type="button" class="history-close" aria-label="Tarixni yopish">×</button></div><button type="button" class="history-new">+ Yangi chat</button><div class="history-items"></div></aside><div class="center-brand" aria-label="AVNIVO Tarjimon"><div class="brand-name"><span class="brand-av">AV</span><span class="brand-nivo">NIVO</span></div><div class="brand-translator" aria-hidden="true"><span class="brand-translator-text"></span><span class="brand-caret"></span></div></div><div class="voice-hint" role="status" aria-live="polite" hidden></div><div class="sent-messages" aria-live="polite" aria-label="Yuborilgan xabarlar"></div><div class="language-row" data-selected="left" aria-label="Tarjima tillari"><button type="button" class="language-chip source-language is-selected" aria-label="O‘zbek tilini tanlash" aria-pressed="true"><span class="language-name">O‘zbek tili</span><span class="language-code">UZ</span></button><div class="language-controls" aria-hidden="true"><svg class="direction-arrows" viewBox="0 0 52 52"><path d="M7 18H43M34 9l9 9-9 9"/><path d="M7 34H43M34 25l9 9-9 9"/></svg></div><button type="button" class="language-chip target-language" aria-label="Rus tilini tanlash" aria-pressed="false"><span class="language-name" lang="ru">Русский язык</span><span class="language-code">РУ</span></button></div><div class="online-language-sheet" hidden role="dialog" aria-modal="true" aria-label="Online tillar"><div class="online-language-panel"><div class="online-language-head"><strong>Online tillar · 93</strong><button class="online-language-close" type="button" aria-label="Yopish">×</button></div><input class="online-language-search" type="search" placeholder="Til nomi yoki kodini qidiring" aria-label="Til qidirish"><div class="online-language-results"></div><p class="online-language-help">77 tasdiqlangan · 13 tajribaviy · 3 qayta sinov talab qiladi</p></div></div><div class="writing-shell"><span class="online-stt-status" data-state="idle" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></span><span class="animated-greeting" aria-hidden="true"></span><textarea class="writing-area" aria-label="Matn yozish" rows="1" dir="auto"></textarea><div class="voice-trace" aria-hidden="true"><div class="voice-trace-fill"></div><div class="voice-trace-glow"></div></div><button type="button" class="mic-icon" aria-label="Mikrofonni yoqish" aria-pressed="false"><svg class="mic-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg><svg class="close-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5"/></svg><svg class="send-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></div></div>
+</main>
+<script src="offline-uzbek-download.js"></script>
+<script>
+(()=>{'use strict';
+const greetings=[["uz","Assalomu alaykum"],["ar","السلام عليكم"],["fa","السلام علیکم"],["ur","السلام علیکم"],["ps","السلام علیکم"],["tg","Ассалому алайкум"],["ky","Ассалому алейкум"],["kk","Ассалаумағалейкум"],["tk","Essalawmaleýkim"],["az","Əssəlamu əleykum"],["tr","Selamünaleyküm"],["ug","ئەسسالامۇ ئەلەيكۇم"],["sd","السلام عليڪم"],["ku","سڵاو"],["ms","Assalamualaikum"],["id","Assalamualaikum"],["bn","আসসালামু আলাইকুম"],["so","Asalaamu calaykum"],["sw","As-salaam alaikum"],["ha","Assalamu alaikum"],["dv","އައްސަލާމު އަލައިކުމް"],["bs","Esselamu alejkum"],["sq","Es-selamu alejkum"],["ff","Assalaamu alaikum"],["wo","Salaam aleekum"],["mn","Сайн байна уу"],["ru","Привет"],["en","Hello"],["fr","Bonjour"],["de","Hallo"],["es","Hola"],["it","Ciao"],["pt","Olá"],["nl","Hallo"],["sv","Hej"],["no","Hei"],["da","Hej"],["fi","Hei"],["is","Halló"],["et","Tere"],["lv","Sveiki"],["lt","Labas"],["pl","Cześć"],["cs","Ahoj"],["sk","Ahoj"],["sl","Živjo"],["hr","Bok"],["sr","Здраво"],["mk","Здраво"],["bg","Здравей"],["ro","Salut"],["hu","Szia"],["el","Γεια σου"],["hy","Բարև"],["ka","გამარჯობა"],["he","שלום"],["hi","नमस्ते"],["ne","नमस्ते"],["mr","नमस्कार"],["gu","નમસ્તે"],["pa","ਸਤ ਸ੍ਰੀ ਅਕਾਲ"],["ta","வணக்கம்"],["te","నమస్కారం"],["kn","ನಮಸ್ಕಾರ"],["ml","നമസ്കാരം"],["si","ආයුබෝවන්"],["th","สวัสดี"],["lo","ສະບາຍດີ"],["km","សួស្តី"],["my","မင်္ဂလာပါ"],["vi","Xin chào"],["zh","你好"],["ja","こんにちは"],["ko","안녕하세요"],["bo","བཀྲ་ཤིས་བདེ་ལེགས"],["am","ሰላም"],["ti","ሰላም"],["om","Akkam"],["zu","Sawubona"],["xh","Molo"],["af","Hallo"],["ny","Moni"],["sn","Mhoro"],["rw","Muraho"],["lg","Oli otya"],["yo","Ẹ n lẹ"],["ig","Ndewo"],["ak","Maakye"],["ee","Ŋdi"],["ln","Mbote"],["mg","Salama"],["ht","Bonjou"],["eo","Saluton"],["la","Salve"],["ga","Dia dhuit"],["cy","Helo"],["gd","Halò"],["eu","Kaixo"],["ca","Hola"],["gl","Ola"]];
+const input=document.querySelector('.writing-area'),label=document.querySelector('.animated-greeting'),shell=document.querySelector('.writing-shell'),app=document.querySelector('.app');
+const segment=text=>typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(text)].map(x=>x.segment):Array.from(text);
+let index=0,position=0,erasing=false,timeout=0;
+let previousLast=-1;
+function shuffleRound(){
+ const order=Array.from({length:greetings.length},(_,i)=>i);
+ for(let i=order.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [order[i],order[j]]=[order[j],order[i]];
+ }
+ // Do not repeat the last language immediately across round boundaries.
+ if(order.length>1&&order[0]===previousLast){
+  const swapWith=1+Math.floor(Math.random()*(order.length-1));
+  [order[0],order[swapWith]]=[order[swapWith],order[0]];
+ }
+ previousLast=order[order.length-1];
+ return order;
+}
+let order=shuffleRound();
+const delay=ms=>{clearTimeout(timeout);timeout=setTimeout(tick,ms)};
+function tick(){
+ if(input.value.length||messages.children.length||shell.classList.contains("voice-active")||shell.classList.contains("hold-voice")){label.hidden=true;delay(350);return}
+ label.hidden=false;
+ const [lang,word]=greetings[order[index]];const letters=segment(word);
+ label.lang=lang;label.dir=/^(ar|fa|ur|ps|ug|sd|dv|ku|yi|he)$/.test(lang)?'rtl':'auto';
+ if(!erasing){
+  position=Math.min(position+1,letters.length);label.textContent=letters.slice(0,position).join('');
+  if(position===letters.length){erasing=true;delay(1000)}else delay(85);
+ }else{
+  position=Math.max(0,position-1);label.textContent=letters.slice(0,position).join('');
+  if(position===0){erasing=false;index++;if(index===order.length){index=0;order=shuffleRound()}delay(240)}else delay(45);
+ }
+}
+let chatFollowLatest=true;
+let chatRestingBottom=230;
+let chatScrollRestore=0;
+function chatIsAtBottom(){
+ const pane=document.querySelector('.sent-messages');
+ return !pane||pane.scrollHeight-pane.clientHeight-pane.scrollTop<=24;
+}
+function trackChatScroll(){
+ const pane=document.querySelector('.sent-messages');
+ if(!pane)return;
+ chatFollowLatest=chatIsAtBottom();
+ if(!chatFollowLatest)chatScrollRestore=pane.scrollTop;
+}
+function followLatestMessage(){
+ const pane=document.querySelector('.sent-messages');
+ if(pane&&chatFollowLatest)pane.scrollTop=pane.scrollHeight;
+}
+function layout(){
+ const vv=window.visualViewport;
+ const visibleHeight=vv?vv.height:window.innerHeight;
+ const bottomOccluded=vv?Math.max(0,window.innerHeight-(vv.offsetTop+vv.height)):0;
+ const margin=112;
+ const languageBottom=bottomOccluded+43;
+ document.documentElement.style.setProperty('--language-bottom',languageBottom+'px');
+ document.documentElement.style.setProperty("--brand-center",(vv?(vv.offsetTop+vv.height/2):window.innerHeight/2)+"px");
+ const rect=app.getBoundingClientRect();
+ const side=Math.max(14,Math.min(24,window.innerWidth*.04));
+ const left=Math.max(side,rect.left+11+side);
+ const right=Math.min(window.innerWidth-side,rect.right-11-side);
+ shell.style.setProperty('--input-left',left+'px');
+ shell.style.setProperty('--input-width',Math.max(180,right-left)+'px');
+ document.documentElement.style.setProperty('--input-left',left+'px');
+ document.documentElement.style.setProperty('--input-width',Math.max(180,right-left)+'px');
+ shell.style.setProperty('--input-bottom',(bottomOccluded+margin)+'px');
+ shell.style.setProperty('--input-max',Math.max(60,Math.min(300,visibleHeight*.38))+'px');
+ // Chat occupies the visible space ABOVE the composer and follows keyboard movement.
+ const composerHeight=shell.getBoundingClientRect().height||60;
+ const composerTop=window.innerHeight-(bottomOccluded+margin)-composerHeight;
+ const chatTop=Math.max(58,(vv?.offsetTop||0)+60);
+ document.documentElement.style.setProperty('--chat-top',chatTop+'px');
+ document.documentElement.style.setProperty('--chat-left',left+'px');
+ document.documentElement.style.setProperty('--chat-width',Math.max(180,right-left)+'px');
+ // While reading older messages, keep the chat at its previous height instead
+ // of pushing it upward with the keyboard. Resume following only at the bottom.
+ const chatBottom=window.innerHeight-composerTop+17;
+ if(bottomOccluded<80)chatRestingBottom=chatBottom;
+ document.documentElement.style.setProperty('--chat-bottom',Math.max(0,chatFollowLatest?chatBottom:Math.min(chatBottom,chatRestingBottom))+'px');
+}
+function resize(){
+ const pane=document.querySelector('.sent-messages');
+ const wasFollowing=chatFollowLatest;
+ const oldScroll=chatScrollRestore;
+ layout();
+ const max=Math.max(60,Math.min(300,(window.visualViewport?.height||window.innerHeight)*.43));
+ input.style.height='auto';
+ input.style.height=Math.min(Math.max(60,input.scrollHeight),max)+'px';
+ input.style.overflowY=input.scrollHeight>max?'auto':'hidden';
+ layout(); // Recalculate chat clearance after composer height changes.
+ requestAnimationFrame(()=>{
+  if(!pane)return;
+  if(wasFollowing){pane.scrollTop=pane.scrollHeight}
+  else{pane.scrollTop=oldScroll}
+ });
+ label.hidden=Boolean(input.value)||Boolean(document.querySelector(".sent-messages")?.children.length)||shell.classList.contains("voice-active");
+
+ if(!input.value&&!timeout&&!shell.classList.contains("voice-active"))delay(180);
+}
+input.addEventListener('input',()=>{clearTimeout(timeout);timeout=0;resize()});
+window.addEventListener('resize',resize,{passive:true});
+if(window.visualViewport){
+ window.visualViewport.addEventListener('resize',resize,{passive:true});
+ window.visualViewport.addEventListener('scroll',layout,{passive:true});
+}
+resize();delay(350);
+const modeOnline=document.getElementById('mode-online'),modeOffline=document.getElementById('mode-offline');
+function applyMode(mode){
+ const chosen=mode==='offline'?'offline':'online';
+ document.documentElement.dataset.avnivoMode=chosen;
+ modeOnline.setAttribute('aria-pressed',String(chosen==='online'));
+ modeOffline.setAttribute('aria-pressed',String(chosen==='offline'));
+ document.querySelector('meta[name="theme-color"]').content=chosen==='offline'?'#080f19':'#17120d';
+ try{localStorage.setItem('avnivo.ui.mode.v1',chosen)}catch(e){}
+}
+modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online');updateOnlineLanguageLabels()});
+modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){requestToken++;cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
+try{applyMode(localStorage.getItem('avnivo.ui.mode.v1'))}catch(e){applyMode('online')}
+const mic=shell.querySelector('.mic-icon');
+const trace=shell.querySelector('.voice-trace-glow');
+const languageRow=document.querySelector('.language-row');
+const leftLanguage=languageRow.querySelector('.source-language'),rightLanguage=languageRow.querySelector('.target-language');
+let languageTransitionTimer=0;
+function selectLanguage(side){
+ if(languageRow.dataset.selected===side)return;
+ if(document.documentElement.dataset.avnivoMode==='online'){
+  requestToken++;cancelOnlineRecording();if(active)stopVoice();
+ }
+ languageRow.dataset.selected=side;
+ leftLanguage.classList.toggle('is-selected',side==='left');
+ rightLanguage.classList.toggle('is-selected',side==='right');
+ leftLanguage.setAttribute('aria-pressed',String(side==='left'));
+ rightLanguage.setAttribute('aria-pressed',String(side==='right'));
+ languageRow.classList.remove('direction-changing');
+ void languageRow.offsetWidth;
+ languageRow.classList.add('direction-changing');
+ clearTimeout(languageTransitionTimer);
+ languageTransitionTimer=setTimeout(()=>languageRow.classList.remove('direction-changing'),800);
+}
+// Language switching is non-editing interaction: do not steal textarea focus or summon IME.
+function keepKeyboardStateOnLanguagePress(event){
+ if(event.cancelable)event.preventDefault();
+}
+for(const chip of [leftLanguage,rightLanguage]){
+ chip.addEventListener('pointerdown',keepKeyboardStateOnLanguagePress);
+ chip.addEventListener('mousedown',keepKeyboardStateOnLanguagePress);
+}
+leftLanguage.addEventListener('click',()=>selectLanguage('left'));
+rightLanguage.addEventListener('click',()=>selectLanguage('right'));
+
+// Audited exact Chirp 2 locale -> Translation LLM code. No language substitutions.
+const ONLINE_LANGUAGES=[["af-ZA","af","official"],["am-ET","am","experimental"],["ar-EG","ar","official"],["az-AZ","az","official"],["be-BY","be","official"],["bg-BG","bg","official"],["bn-BD","bn","official"],["bn-IN","bn-IN","official"],["bs-BA","bs","official"],["ca-ES","ca","official"],["cmn-Hans-CN","zh","official"],["cmn-Hant-TW","zh-TW","official"],["cs-CZ","cs","official"],["cy-GB","cy","official"],["da-DK","da","official"],["de-DE","de","official"],["el-GR","el","official"],["en-AU","en-AU","official"],["en-GB","en-GB","official"],["en-IN","en","official"],["en-US","en-US","official"],["es-419","es-419","official"],["es-ES","es-ES","official"],["es-US","es-US","official"],["et-EE","et","official"],["eu-ES","eu","experimental"],["fa-IR","fa","official"],["fi-FI","fi","official"],["fil-PH","fil","official"],["fr-CA","fr-CA","official"],["fr-FR","fr","official"],["ga-IE","ga","experimental"],["gl-ES","gl","official"],["gu-IN","gu","official"],["ha-NG","ha","experimental"],["hi-IN","hi","official"],["hr-HR","hr","official"],["hu-HU","hu","official"],["hy-AM","hy","experimental"],["id-ID","id","official"],["ig-NG","ig","experimental"],["is-IS","is","official"],["it-IT","it","official"],["iw-IL","iw","official"],["ja-JP","ja","official"],["ka-GE","ka","official"],["km-KH","km","official"],["kn-IN","kn","official"],["ko-KR","ko","official"],["ky-KG","ky","official"],["lb-LU","lb","experimental"],["ln-CD","ln","official"],["lo-LA","lo","official"],["lt-LT","lt","official"],["lv-LV","lv","official"],["mk-MK","mk","official"],["ml-IN","ml","official"],["mn-MN","mn","experimental"],["mr-IN","mr","official"],["ms-MY","ms","official"],["mt-MT","mt","experimental"],["my-MM","my","official"],["ne-NP","ne","official"],["nl-NL","nl","official"],["no-NO","no","official"],["or-IN","or","experimental"],["pa-Guru-IN","pa","official"],["pl-PL","pl","official"],["pt-BR","pt-BR","official"],["pt-PT","pt-PT","official"],["ro-RO","ro","official"],["ru-RU","ru","official"],["si-LK","si","retest"],["sk-SK","sk","official"],["sl-SI","sl","official"],["so-SO","so","experimental"],["sq-AL","sq","official"],["sr-RS","sr","experimental"],["sv-SE","sv","official"],["sw","sw","official"],["sw-KE","sw","official"],["ta-IN","ta","official"],["te-IN","te","official"],["tg-TJ","tg","experimental"],["th-TH","th","official"],["tr-TR","tr","official"],["uk-UA","uk","official"],["ur-PK","ur","official"],["uz-UZ","uz","official"],["vi-VN","vi","official"],["xh-ZA","xh","retest"],["yo-NG","yo","retest"],["zu-ZA","zu","official"]];
+const onlineLanguagesByCode=new Map(ONLINE_LANGUAGES.map(x=>[x[0],x]));
+const onlineChoice={left:'uz-UZ',right:'ru-RU'};
+const languageSheet=document.querySelector('.online-language-sheet'),languageSearch=languageSheet.querySelector('.online-language-search'),languageResults=languageSheet.querySelector('.online-language-results');
+let longPressTimer=0,longPressSide=null,longPressFired=false;
+const languageDisplay=typeof Intl.DisplayNames==='function'?new Intl.DisplayNames(['uz'],{type:'language'}):null;
+function onlineLanguageName(locale){
+ const base=locale.startsWith('cmn-Hans')?'zh':locale.startsWith('cmn-Hant')?'zh':locale.startsWith('pa-Guru')?'pa':locale.split('-')[0];
+ try{return languageDisplay?.of(base)||base}catch(e){return base}
+}
+function updateOnlineLanguageLabels(){
+ if(document.documentElement.dataset.avnivoMode!=='online')return;
+ for(const [side,button] of [['left',leftLanguage],['right',rightLanguage]]){
+  const locale=onlineChoice[side],name=onlineLanguageName(locale);
+  button.querySelector('.language-name').textContent=name;
+  button.querySelector('.language-code').textContent=locale.split('-')[0].toUpperCase();
+  button.setAttribute('aria-label',name+' ('+locale+')');
+ }
+}
+function renderOnlineLanguages(){
+ const q=languageSearch.value.trim().toLocaleLowerCase();
+ languageResults.replaceChildren();
+ for(const [locale,translationCode,status] of ONLINE_LANGUAGES){
+  const name=onlineLanguageName(locale);
+  if(q&&!((name+' '+locale+' '+translationCode).toLocaleLowerCase().includes(q)))continue;
+  const item=document.createElement('button');item.type='button';item.className='online-language-item';
+  const title=document.createElement('span');title.textContent=name+' · '+locale;
+  const note=document.createElement('small');note.textContent=status==='official'?'Tasdiqlangan':status==='experimental'?'Tajribaviy':'Qayta sinov';
+  item.append(title,note);item.setAttribute('aria-selected',String(onlineChoice[longPressSide]===locale));
+  item.addEventListener('click',()=>{
+   if(!onlineLanguagesByCode.has(locale))return;
+   if(onlineChoice[longPressSide]!==locale){requestToken++;cancelOnlineRecording();if(active)stopVoice()}
+    onlineChoice[longPressSide]=locale;
+   updateOnlineLanguageLabels();closeOnlineLanguages();
+  });
+  languageResults.append(item);
+ }
+}
+function openOnlineLanguages(side){
+ if(document.documentElement.dataset.avnivoMode!=='online')return;
+ longPressSide=side;longPressFired=true;languageSearch.value='';
+ languageSheet.hidden=false;renderOnlineLanguages();syncBackNavigation();
+}
+function closeOnlineLanguages(){languageSheet.hidden=true;longPressSide=null;languageSearch.blur();syncBackNavigation()}
+languageSheet.querySelector('.online-language-close').addEventListener('click',closeOnlineLanguages);
+languageSheet.addEventListener('click',e=>{if(e.target===languageSheet)closeOnlineLanguages()});
+languageSearch.addEventListener('input',renderOnlineLanguages);
+for(const [side,chip] of [['left',leftLanguage],['right',rightLanguage]]){
+ chip.addEventListener('pointerdown',e=>{
+  if(document.documentElement.dataset.avnivoMode!=='online'||e.button!==0)return;
+  longPressFired=false;clearTimeout(longPressTimer);
+  longPressTimer=setTimeout(()=>openOnlineLanguages(side),1100);
+ });
+ for(const name of ['pointerup','pointercancel','pointerleave'])chip.addEventListener(name,()=>clearTimeout(longPressTimer));
+ chip.addEventListener('click',e=>{if(longPressFired){e.stopImmediatePropagation();longPressFired=false}},true);
+ chip.addEventListener('contextmenu',e=>{if(document.documentElement.dataset.avnivoMode==='online')e.preventDefault()});
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!languageSheet.hidden)closeOnlineLanguages()});
+
+updateOnlineLanguageLabels();
+const messages=document.querySelector('.sent-messages');
+messages.addEventListener('scroll',()=>{if(!chatProgrammaticScroll)trackChatScroll()},{passive:true});
+let chatProgrammaticScroll=false;
+function scrollChatToLatest(){
+ chatProgrammaticScroll=true;chatFollowLatest=true;
+ messages.scrollTop=messages.scrollHeight;
+ requestAnimationFrame(()=>{chatProgrammaticScroll=false;trackChatScroll()});
+}
+function preserveChatPosition(){
+ if(chatFollowLatest)scrollChatToLatest();
+ else messages.scrollTop=chatScrollRestore;
+}
+const historyToggle=document.querySelector('.history-toggle'),historyOverlay=document.querySelector('.history-overlay'),historyDrawer=document.querySelector('.history-drawer'),historyClose=document.querySelector('.history-close'),historyNew=document.querySelector('.history-new'),historyItems=document.querySelector('.history-items');
+const settingsToggle=document.querySelector('.settings-toggle'),settingsOverlay=document.querySelector('.settings-overlay'),settingsDrawer=document.querySelector('.settings-drawer'),settingsClose=document.querySelector('.settings-close');
+let settingsOpen=false;
+function setSettingsOpen(open){
+ settingsOpen=open;
+ settingsOverlay.hidden=!open;settingsOverlay.classList.toggle('open',open);
+ settingsDrawer.classList.toggle('open',open);settingsDrawer.setAttribute('aria-hidden',String(!open));settingsDrawer.inert=!open;
+ settingsToggle.setAttribute('aria-expanded',String(open));
+ syncBackNavigation();
+}
+settingsToggle.addEventListener('click',()=>{if(historyOpen)setHistoryOpen(false);setSettingsOpen(!settingsOpen)});
+settingsClose.addEventListener('click',()=>setSettingsOpen(false));
+settingsOverlay.addEventListener('click',()=>setSettingsOpen(false));
+
+/* Offline module UI: only installer-verified states may show success. */
+const offlineModuleCatalog=[
+ {id:'uz-stt',serverModelId:'uzbek-stt',name:'O‘zbekcha ovoz tanish',desc:'O‘zbekcha nutqni tushunib, aytilgan so‘zlarni matnga aylantiradi.',icon:'mic',bytes:591649160,sizeNote:'Model fayli: 591,6 MB · qo‘shimcha fayllar alohida'},
+ {id:'multilingual-stt',name:'Ko‘p tilli ovoz tanish',desc:'Turli tillardagi nutqni matnga aylantiradi. 99 til sifati hali tasdiqlanmagan.',icon:'languages',bytes:251875316,sizeNote:'Model: 251,9 MB · qo‘shimcha runtime alohida'},
+ {id:'offline-translate',name:'Internetsiz tarjima',desc:'Matnlarni internetga ulanmasdan boshqa tilga tarjima qilishga yordam beradi.',icon:'translate',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'},
+ {id:'offline-tts',name:'Matnni ovozli o‘qish',desc:'Yozilgan matn va tarjimalarni internetsiz ovoz chiqarib o‘qiydi.',icon:'speaker',bytes:null,sizeNote:'Aniq yuklash hajmi hali belgilanmagan'}
+];
+const offlineModuleIcons={
+ mic:'<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/>',
+ languages:'<path d="M3 5h12M9 3v2m4 0c-.5 6-4 10-9 12M5 9c2 4 5 6 9 8M15 13l4-9 4 9m-7-3h6"/>',
+ translate:'<path d="M4 5h11M9 3v2m4 0c-.5 5-3 8-8 11M5 9c1 3 4 6 8 8M15 21l4-10 4 10m-7-4h6"/>',
+ speaker:'<path d="M4 10h4l5-4v12l-5-4H4zM17 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/>',
+ download:'<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
+ check:'<path d="m5 12 4 4L19 6"/>'
+};
+const offlineSvg=name=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+offlineModuleIcons[name]+'</svg>';
+const offlineList=document.querySelector('.offline-modules-list');
+const offlineNotice=document.querySelector('.offline-module-notice');
+const offlineState=new Map();
+const offlineMb=bytes=>(bytes/1e6).toFixed(1).replace('.',',')+' MB';
+function updateOfflineModule(id,state,progress){
+ const module=offlineModuleCatalog.find(m=>m.id===id);
+ if(!module||!['not_installed','downloading','verifying','ready','error'].includes(state))return false;
+ const row=offlineList.querySelector('[data-module-id="'+id+'"]');if(!row)return false;
+ offlineState.set(id,state);
+ const btn=row.querySelector('.offline-module-action'),status=row.querySelector('.offline-module-state');
+ const progressEl=row.querySelector('.offline-module-progress');
+ const fill=row.querySelector('.offline-module-fill');
+ const pct=row.querySelector('.offline-module-percent'),mb=row.querySelector('.offline-module-mb');
+ const ready=state==='ready';
+ btn.classList.toggle('is-ready',ready);
+ btn.classList.toggle('is-downloading',state==='downloading'||state==='verifying');
+ btn.disabled=state==='downloading'||state==='verifying';
+ btn.innerHTML=offlineSvg(ready?'check':'download');
+ btn.setAttribute('aria-label',ready?'Modul faol':module.name+' — yuklab olish');
+ status.textContent=({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state];
+ const hasProgress=progress&&Number.isFinite(progress.downloadedBytes)&&Number.isFinite(progress.totalBytes)&&progress.totalBytes>0&&progress.downloadedBytes>=0;
+ progressEl.hidden=!(state==='downloading'||state==='verifying')||!hasProgress;
+ if(hasProgress){
+  const done=Math.min(progress.downloadedBytes,progress.totalBytes),percent=Math.min(100,Math.floor(done/progress.totalBytes*100));
+  fill.style.width=percent+'%';pct.textContent=percent+'%';mb.textContent=offlineMb(done)+' / '+offlineMb(progress.totalBytes);
+  btn.style.setProperty('--module-progress',percent+'%');
+  if(state==='downloading'||state==='verifying')btn.innerHTML='<span class="module-percent">'+percent+'%</span>';
+  progressEl.querySelector('[role="progressbar"]').setAttribute('aria-valuenow',String(percent));
+ }
+ return true;
+}
+for(const module of offlineModuleCatalog){
+ const row=document.createElement('article');row.className='offline-module-card';row.dataset.moduleId=module.id;
+ const mark=document.createElement('span');mark.className='offline-module-mark';mark.innerHTML=offlineSvg(module.icon);
+ const copy=document.createElement('div');copy.className='offline-module-copy';
+ const name=document.createElement('h3');name.className='offline-module-name';name.textContent=module.name;
+ const desc=document.createElement('p');desc.className='offline-module-desc';desc.textContent=module.desc;
+ const size=document.createElement('p');size.className='offline-module-size';size.textContent=module.bytes?'Hajmi: '+offlineMb(module.bytes):'Hajmi: aniqlanmoqda';size.title=module.sizeNote;
+ const status=document.createElement('p');status.className='offline-module-state';status.textContent='Yuklanmagan';
+ const meta=document.createElement('div');meta.className='offline-module-meta';meta.append(size,status);copy.append(name,desc,meta);
+ const btn=document.createElement('button');btn.type='button';btn.className='offline-module-action';btn.innerHTML=offlineSvg('download');btn.setAttribute('aria-label',module.name+' — yuklab olish');
+ const progress=document.createElement('div');progress.className='offline-module-progress';progress.hidden=true;
+ progress.innerHTML='<div class="offline-module-progress-label"><span class="offline-module-percent">0%</span><span class="offline-module-mb">0 MB</span></div><div class="offline-module-track" role="progressbar" aria-label="Yuklash jarayoni" aria-valuemin="0" aria-valuemax="100"><div class="offline-module-fill"></div></div>';
+ btn.addEventListener('click',()=>{
+  if(document.documentElement.dataset.avnivoMode!=='offline'||offlineState.get(module.id)==='ready')return;
+  btn.classList.remove('is-tapped');void btn.offsetWidth;btn.classList.add('is-tapped');
+  if(module.serverModelId){
+   const downloader=window.avnivoVerifiedUzbekDownload;
+   if(!downloader){offlineNotice.textContent='Yuklash moduli ochilmadi. Sahifani yangilang.';return}
+   btn.disabled=true;
+   offlineNotice.textContent='Haqiqiy yuklash boshlanmoqda. Internet uzilsa qayta bosib davom ettiring.';
+   downloader.run(
+    (done,total)=>updateOfflineModule(module.id,'downloading',{downloadedBytes:done,totalBytes:total}),
+    text=>{offlineNotice.textContent=text;if(text.startsWith('SHA-256'))updateOfflineModule(module.id,'verifying',{downloadedBytes:module.bytes,totalBytes:module.bytes})}
+   ).then(()=>{updateOfflineModule(module.id,'not_installed');status.textContent='Yuklangan va tekshirilgan · dvigatel ulanmagan';offlineNotice.textContent='Fayllar saqlandi va SHA-256 tasdiqlandi. Sherpa-ONNX ijro mexanizmi ulanmaguncha faol emas.'})
+    .catch(err=>{updateOfflineModule(module.id,'error');offlineNotice.textContent='Yuklash to‘xtadi: '+err.message+'. Qayta bosilsa saqlangan bo‘laklardan davom etadi.'})
+    .finally(()=>{btn.disabled=false});
+   return;
+  }
+  offlineNotice.textContent=module.name+': yuklash manbasi hali ulanmagan. Yuklash boshlanmadi.';
+ });
+ btn.addEventListener('animationend',()=>btn.classList.remove('is-tapped'));
+ row.append(mark,copy,btn,progress);offlineList.append(row);offlineState.set(module.id,'not_installed');
+}
+// The future verified installer must supply actual byte counts; no simulated progress.
+window.avnivoOfflineModuleUi={setVerifiedState:updateOfflineModule};
+
+const historyStorageKey='avnivo.preview.chat-history.v1';
+const activeHistoryKey='avnivo.preview.active-chat.v1';
+const draftHistoryKey='avnivo.preview.chat-drafts.v1';
+let historySessions=[],currentHistoryId=null,historyOpen=false,historyDrafts={};
+function persistActiveChat(){try{if(currentHistoryId)localStorage.setItem(activeHistoryKey,currentHistoryId);else localStorage.removeItem(activeHistoryKey)}catch(e){}}
+function persistDraft(){try{historyDrafts[currentHistoryId||'new']=input.value;localStorage.setItem(draftHistoryKey,JSON.stringify(historyDrafts))}catch(e){}}
+function loadDraft(){input.value=historyDrafts[currentHistoryId||'new']||'';resize();syncComposerMode()}
+
+function persistHistory(){try{localStorage.setItem(historyStorageKey,JSON.stringify(historySessions))}catch(e){console.warn('History storage unavailable',e)}}
+function loadHistory(){
+ try{
+  const raw=JSON.parse(localStorage.getItem(historyStorageKey)||'[]');
+  if(Array.isArray(raw))historySessions=raw.filter(x=>x&&typeof x.id==='string'&&Array.isArray(x.messages)).slice(0,100);
+  const drafts=JSON.parse(localStorage.getItem(draftHistoryKey)||'{}');
+  if(drafts&&typeof drafts==='object'&&!Array.isArray(drafts))historyDrafts=drafts;
+  const activeId=localStorage.getItem(activeHistoryKey);
+  if(activeId&&historySessions.some(x=>x.id===activeId))currentHistoryId=activeId;
+ }catch(e){console.warn('Tarixni o‘qib bo‘lmadi',e)}
+}
+function historyDate(iso){const d=new Date(iso);return Number.isNaN(d.getTime())?'':new Intl.DateTimeFormat('uz-UZ',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric',hour12:false}).format(d)}
+function renderHistory(){
+ historyItems.replaceChildren();
+ if(!historySessions.length){const empty=document.createElement('div');empty.className='history-empty';empty.textContent='Hozircha saqlangan chatlar yo‘q. Yangi xabar yuborilganda shu yerda sana bilan paydo bo‘ladi.';historyItems.append(empty);return}
+ for(const session of historySessions){
+  const button=document.createElement('button');button.type='button';button.className='history-entry'+(session.id===currentHistoryId?' current':'');
+  const title=document.createElement('span');title.className='history-entry-title';title.textContent='O‘zbek tili = русский язык';
+  const date=document.createElement('span');date.className='history-entry-date';date.textContent='Saqlangan: '+historyDate(session.updatedAt||session.createdAt);
+  button.append(title,date);button.addEventListener('click',()=>{persistDraft();currentHistoryId=session.id;persistActiveChat();restoreHistory(session);loadDraft();renderHistory();setHistoryOpen(false)});
+  historyItems.append(button);
+ }
+}
+function setHistoryOpen(open){
+ if(open&&settingsOpen)setSettingsOpen(false);
+ historyOpen=open;historyOverlay.hidden=!open;historyOverlay.classList.toggle('open',open);historyDrawer.classList.toggle('open',open);
+ historyDrawer.setAttribute('aria-hidden',String(!open));historyDrawer.inert=!open;historyToggle.setAttribute('aria-expanded',String(open));
+ if(open)renderHistory();
+ syncBackNavigation();
+}
+const PREVIEW_TRANSLATION='Tarjima sinov so‘zi';
+let translationTimers=new Set();
+function clearTranslationTimers(){for(const timer of translationTimers)clearTimeout(timer);translationTimers.clear()}
+function previewTranslation(entry){return entry&&typeof entry==='object'&&entry.translation===PREVIEW_TRANSLATION}
+function oppositeLanguage(language){return language==='right'?'left':'right'}
+function typeTranslation(bubble,fullText,onDone){
+ const letters=Array.from(fullText);let position=0;
+ bubble.classList.add('typing');bubble.textContent='';
+ function step(){
+  if(!bubble.isConnected){bubble.classList.remove('typing');return}
+  position++;bubble.textContent=letters.slice(0,position).join('');
+  preserveChatPosition();
+  if(position<letters.length){const timer=setTimeout(()=>{translationTimers.delete(timer);step()},85);translationTimers.add(timer)}
+  else{bubble.classList.remove('typing');onDone?.()}
+ }
+ const timer=setTimeout(()=>{translationTimers.delete(timer);step()},350);translationTimers.add(timer);
+}
+function messageData(entry,firstLanguage){
+ if(entry&&typeof entry==='object'&&!Array.isArray(entry))return {text:String(entry.text||''),language:entry.language==='right'?'right':'left'};
+ return {text:String(entry),language:firstLanguage||'left'};
+}
+const onlineTtsSettings=document.createElement('section');
+onlineTtsSettings.className='avnivo-online-tts-settings';
+onlineTtsSettings.setAttribute('aria-label','Online ovoz sozlamalari');
+document.querySelector('.settings-drawer')?.append(onlineTtsSettings);
+// Existing Gemini Cloud TTS is used only in Online mode. Offline keeps device speech.
+const AVNIVO_TTS_URL='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/tts';
+const AVNIVO_TTS_VOICES=["Zephyr","Puck","Charon","Kore","Fenrir","Leda","Orus","Aoede","Callirrhoe","Autonoe","Enceladus","Iapetus","Umbriel","Algieba","Despina","Erinome","Algenib","Rasalgethi","Laomedeia","Achernar","Alnilam","Schedar","Gacrux","Pulcherrima","Achird","Zubenelgenubi","Vindemiatrix","Sadachbia","Sadaltager","Sulafat"];
+const ttsVoiceSelect=document.createElement('select');
+ttsVoiceSelect.setAttribute('aria-label','AI ovoz turini tanlash');
+ttsVoiceSelect.style.cssText='width:100%;max-width:280px;margin:10px 0;padding:10px;border-radius:10px;background:#241b15;color:#ffe7b9;border:1px solid #b58a52;font:15px system-ui';
+for(const voice of AVNIVO_TTS_VOICES){const option=document.createElement('option');option.value=voice;option.textContent=voice;ttsVoiceSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsVoice');if(AVNIVO_TTS_VOICES.includes(saved))ttsVoiceSelect.value=saved}catch(e){}
+ttsVoiceSelect.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsVoice',ttsVoiceSelect.value)}catch(e){}});
+const ttsVoiceLabel=document.createElement('label');
+ttsVoiceLabel.textContent='AI ovozi (Online)';
+ttsVoiceLabel.style.cssText='display:block;margin:14px 0 0;color:#ffe7b9;font:14px system-ui';
+ttsVoiceLabel.append(ttsVoiceSelect);
+onlineTtsSettings.append(ttsVoiceLabel);
+
+const ttsStyleSelect=document.createElement('select');
+ttsStyleSelect.setAttribute('aria-label','Ovoz ohangini tanlash');
+ttsStyleSelect.style.cssText=ttsVoiceSelect.style.cssText;
+const AVNIVO_TTS_STYLES=[['auto','Avtomatik'],['calm','Xotirjam'],['happy','Quvnoq'],['sad','Qayg‘uli'],['excited','Hayajonli'],['concerned','Xavotirli'],["friendly","Do‘stona"],["professional","Professional"],["narrator","Audiokitob"],["documentary","Hujjatli film"],["news","Yangiliklar"],["storytelling","Hikoyachi"],["dramatic","Dramatik"],["mysterious","Sirli"],["serious","Jiddiy"],["confident","Ishonchli"],["gentle","Muloyim"],["empathetic","Hamdard"],["curious","Qiziquvchan"],["surprised","Hayratlangan"],["nervous","Asabiy"],["fearful","Qo‘rqqan"],["angry","G‘azablangan"],["frustrated","Jahli chiqqan"],["sarcastic","Kinoyali"],["ironic","Istehzo"],["bored","Zerikkan"],["tired","Charchagan"],["whisper","Pichirlash"],["mutter","Pichirlab ming‘irlash"],["breathy","Nafasli ovoz"],["robotic","Robotdek"],["monotone","Bir maromda"],["playful","O‘ynoqi"],["energetic","G‘ayratli"],["thoughtful","O‘ychan"],["persuasive","Ishontiruvchi"],["teacher","O‘qituvchi"],["poetic","She’riy"],["slow","Sekin nutq"],["fast","Tez nutq"],["custom","O‘zim belgilayman"]];
+for(const [value,label] of AVNIVO_TTS_STYLES){const option=document.createElement('option');option.value=value;option.textContent=label;ttsStyleSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsStyle');if(AVNIVO_TTS_STYLES.some(item=>item[0]===saved))ttsStyleSelect.value=saved}catch(e){}
+ttsStyleSelect.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsStyle',ttsStyleSelect.value)}catch(e){}});
+const ttsStyleLabel=document.createElement('label');
+ttsStyleLabel.textContent='O‘qish ohangi (Online)';
+ttsStyleLabel.style.cssText=ttsVoiceLabel.style.cssText;
+ttsStyleLabel.append(ttsStyleSelect);
+onlineTtsSettings.append(ttsStyleLabel);
+const ttsRateSelect=document.createElement('select');
+ttsRateSelect.setAttribute('aria-label','Ovozli o‘qish tezligi');
+ttsRateSelect.style.cssText=ttsVoiceSelect.style.cssText;
+for(const rate of [0.5,0.65,0.75,0.85,1,1.15,1.25,1.5,1.75,2]){const option=document.createElement('option');option.value=String(rate);option.textContent=rate===1?'1× — Oddiy':rate<1?rate+'× — Sekin':rate+'× — Tez';ttsRateSelect.append(option)}
+try{const saved=localStorage.getItem('avnivoTtsRate');if([...ttsRateSelect.options].some(option=>option.value===saved))ttsRateSelect.value=saved}catch(e){ }
+ttsRateSelect.addEventListener('change',()=>{if(ttsAudio)ttsAudio.playbackRate=Number(ttsRateSelect.value);try{localStorage.setItem('avnivoTtsRate',ttsRateSelect.value)}catch(e){}});
+const ttsRateLabel=document.createElement('label');
+ttsRateLabel.textContent='O‘qish tezligi (Online va Offline)';
+ttsRateLabel.style.cssText=ttsVoiceLabel.style.cssText;
+ttsRateLabel.append(ttsRateSelect);
+onlineTtsSettings.append(ttsRateLabel);
+
+function addTtsSetting(labelText,storageKey,items){
+ const select=document.createElement('select');select.setAttribute('aria-label',labelText);select.style.cssText=ttsVoiceSelect.style.cssText;
+ for(const [value,title] of items){const option=document.createElement('option');option.value=value;option.textContent=title;select.append(option)}
+ try{const saved=localStorage.getItem(storageKey);if(items.some(x=>x[0]===saved))select.value=saved}catch(e){}
+ select.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem(storageKey,select.value)}catch(e){}});
+ const label=document.createElement('label');label.textContent=labelText;label.style.cssText=ttsVoiceLabel.style.cssText;label.append(select);
+ onlineTtsSettings.append(label);return select;
+}
+const ttsDeliverySelect=addTtsSetting('Ovoz chiqarish usuli','avnivoTtsDelivery',[
+ ['normal','Oddiy'],['whisper','Pichirlash'],['breathy','Nafasli'],['clear','Ravshan talaffuz'],['soft','Past ovoz'],['projected','Baland va aniq']]);
+const ttsPitchSelect=addTtsSetting('Ovoz baland-pastligi','avnivoTtsPitch',[
+ ['normal','Tabiiy'],['low','Pastroq'],['high','Yuqoriroq'],['flat','Bir tekis'],['expressive','Ifodali']]);
+const ttsPaceSelect=addTtsSetting('AI nutq maromi','avnivoTtsPace',[
+ ['normal','Tabiiy'],['slow','Sekin'],['fast','Tez'],['deliberate','Tanaffusli']]);
+const ttsCustomLabel=document.createElement('label');
+ttsCustomLabel.textContent='Maxsus ohang tavsifi (240 belgigacha)';
+ttsCustomLabel.style.cssText=ttsVoiceLabel.style.cssText;
+const ttsCustomInput=document.createElement('textarea');
+ttsCustomInput.maxLength=240;ttsCustomInput.rows=2;ttsCustomInput.placeholder='Masalan: Speak warmly with gentle pauses.';
+ttsCustomInput.style.cssText=ttsVoiceSelect.style.cssText+';resize:vertical;display:block;';
+try{ttsCustomInput.value=localStorage.getItem('avnivoTtsCustomStyle')||''}catch(e){}
+ttsCustomInput.addEventListener('change',()=>{stopSpeaking();try{localStorage.setItem('avnivoTtsCustomStyle',ttsCustomInput.value)}catch(e){}});
+ttsCustomLabel.append(ttsCustomInput);
+onlineTtsSettings.append(ttsCustomLabel);
+const ttsTagNote=document.createElement('p');
+ttsTagNote.textContent='Matnda maxsus ovoz belgilari: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. Bu belgilar faqat yozilgan joyda qo‘llanadi; natija modelga bog‘liq.';
+ttsTagNote.style.cssText='font:12px/1.5 system-ui;color:#d6b68c;margin:10px 0;';
+onlineTtsSettings.append(ttsTagNote);
+
+
+let speakingButton=null,ttsAudio=null,ttsAudioUrl=null,ttsAbort=null,ttsGeneration=0;
+function stopSpeaking(){
+ ttsGeneration++;
+ if(ttsAbort){ttsAbort.abort();ttsAbort=null}
+ if(ttsAudio){ttsAudio.pause();ttsAudio.removeAttribute('src');ttsAudio.load();ttsAudio=null}
+ if(ttsAudioUrl){URL.revokeObjectURL(ttsAudioUrl);ttsAudioUrl=null}
+ if(window.speechSynthesis)window.speechSynthesis.cancel();
+ if(speakingButton){speakingButton.classList.remove('is-speaking');speakingButton.removeAttribute('data-loading');speakingButton.setAttribute('aria-pressed','false');speakingButton=null}
+}
+function ttsChunks(text){
+ // Preserve the complete text. Prefer sentence/word boundaries within the API's 350-character limit.
+ const result=[];let rest=text.trim();
+ while(rest){
+  if(rest.length<=350){result.push(rest);break}
+  let cut=350;
+  const section=rest.slice(0,351);
+  const sentence=[section.lastIndexOf('. '),section.lastIndexOf('! '),section.lastIndexOf('? '),section.lastIndexOf('。'),section.lastIndexOf('؟')].reduce((a,b)=>Math.max(a,b),-1);
+  if(sentence>=130)cut=sentence+1;
+  else {const space=section.lastIndexOf(' ',350);if(space>=130)cut=space}
+  // Do not split a UTF-16 surrogate pair.
+  if(cut<rest.length&&cut>0){const prev=rest.charCodeAt(cut-1),next=rest.charCodeAt(cut);if(prev>=0xD800&&prev<=0xDBFF&&next>=0xDC00&&next<=0xDFFF)cut--;}
+  result.push(rest.slice(0,cut).trim());rest=rest.slice(cut).trim();
+ }
+ return result.filter(Boolean);
+}
+async function playMessage(button,bubble,language){
+ if(speakingButton===button){stopSpeaking();return}
+ stopSpeaking();
+ const text=bubble.textContent.trim();
+ if(!text)return;
+ const generation=ttsGeneration;
+ speakingButton=button;button.classList.add('is-speaking');button.setAttribute('aria-pressed','true');
+ const finish=()=>{if(generation===ttsGeneration)stopSpeaking()};
+ if(document.documentElement.dataset.avnivoMode!=='online'){
+  if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){finish();return}
+  const utterance=new SpeechSynthesisUtterance(text);
+  utterance.lang=language==='right'?'ru-RU':'uz-UZ';utterance.rate=Number(ttsRateSelect.value);
+  utterance.onend=finish;utterance.onerror=finish;
+  try{speechSynthesis.speak(utterance)}catch(e){finish()}
+  return;
+ }
+ const voice=ttsVoiceSelect.value;
+ const style=ttsStyleSelect.value;
+ const locale=onlineChoice[language];
+ if(!onlineLanguagesByCode.has(locale)){button.title='TTS: til tanlanmagan';finish();return}
+ const chunks=ttsChunks(text);
+ try{
+  for(const chunk of chunks){
+   if(generation!==ttsGeneration)return;
+   const controller=new AbortController();ttsAbort=controller;
+   button.dataset.loading='true';button.setAttribute('aria-label','AI ovozi tayyorlanmoqda');
+   const response=await fetch(AVNIVO_TTS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunk,language:locale,voice,style,delivery:ttsDeliverySelect.value,pitch:ttsPitchSelect.value,pace:ttsPaceSelect.value,custom_style:style==='custom'?ttsCustomInput.value.trim():''}),signal:controller.signal});
+   if(!response.ok)throw Error('TTS HTTP '+response.status);
+   const blob=await response.blob();
+   if(generation!==ttsGeneration)return;
+   if(!blob.size||!blob.type.startsWith('audio/'))throw Error('Audio javobi noto‘g‘ri');
+   ttsAudioUrl=URL.createObjectURL(blob);
+   ttsAudio=new Audio(ttsAudioUrl);
+   ttsAudio.playbackRate=Number(ttsRateSelect.value);
+   button.removeAttribute('data-loading');button.setAttribute('aria-label','Ovozli o‘qishni to‘xtatish');
+   const audio=ttsAudio;
+   await new Promise((resolve,reject)=>{
+    audio.onended=resolve;audio.onpause=resolve;audio.onerror=()=>reject(Error('Audio ijro xatosi'));
+    audio.play().catch(reject);
+   });
+   if(generation!==ttsGeneration)return;
+   audio.pause();audio.removeAttribute('src');audio.load();ttsAudio=null;
+   URL.revokeObjectURL(ttsAudioUrl);ttsAudioUrl=null;
+  }
+ }catch(e){
+  if(generation===ttsGeneration&&e.name!=='AbortError'){
+   console.warn('AVNIVO TTS:',e);
+   button.title='AI ovozi ishlamadi: '+e.message;
+   button.setAttribute('aria-label','AI ovozi ishlamadi: '+e.message);
+  }
+ }finally{
+  if(generation===ttsGeneration){ttsAbort=null;finish()}
+ }
+}
+function attachSpeaker(bubble,language){
+ const isLeft=bubble.classList.contains('message-left');
+ const line=document.createElement('div');
+ line.className='message-line '+(isLeft?'line-left':'line-right');
+ const button=document.createElement('button');
+ button.type='button';button.className='speak-message';
+ button.setAttribute('aria-label','Xabarni ovoz chiqarib o‘qish');
+ button.setAttribute('aria-pressed','false');
+ button.innerHTML='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="speaker-core" d="M5 12h5l6-5v18l-6-5H5z"/><path class="sound-bars" d="M20 11q5 5 0 10M23 7q9 9 0 18"/></svg>';
+ button.addEventListener('click',()=>playMessage(button,bubble,language));
+ line.append(bubble,button);
+ return line;
+}
+function renderChatBubble(entry,firstLanguage){
+ const data=messageData(entry,firstLanguage);
+ const bubble=document.createElement('div');
+ bubble.className='sent-message '+(data.language===firstLanguage?'message-right':'message-left');
+ bubble.textContent=data.text;
+ return bubble;
+}
+function restoreHistory(session){
+ stopSpeaking();
+ messages.replaceChildren();
+ const firstLanguage=session.firstLanguage||'left';
+ clearTranslationTimers();
+ for(const entry of session.messages.slice(-30)){
+  const source=renderChatBubble(entry,firstLanguage);
+  messages.append(attachSpeaker(source,messageData(entry,firstLanguage).language));
+  if(previewTranslation(entry)){
+   const language=entry.language==='right'?'right':'left';
+   const translationBubble=renderChatBubble({text:entry.translation,language:oppositeLanguage(language)},firstLanguage);
+   translationBubble.classList.add('translation-preview');
+   messages.append(attachSpeaker(translationBubble,oppositeLanguage(language)));
+  }
+ }
+ scrollChatToLatest();
+ if(typeof updateBrandVisibility==='function')updateBrandVisibility();
+ label.hidden=Boolean(input.value)||messages.children.length>0;
+}
+function saveChatMessage(message,language,translation){
+ let session=historySessions.find(x=>x.id===currentHistoryId);
+ if(!session){session={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,8),title:'O‘zbek tili = русский язык',firstLanguage:language,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),messages:[]};historySessions.unshift(session);historyDrafts[session.id]=historyDrafts.new||'';delete historyDrafts.new;currentHistoryId=session.id;persistActiveChat()}
+ if(!session.firstLanguage)session.firstLanguage=language;
+ session.messages.push({text:message,language,translation});session.messages=session.messages.slice(-200);session.updatedAt=new Date().toISOString();
+ historySessions.sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt));historySessions=historySessions.slice(0,100);persistHistory();
+}
+historyToggle.addEventListener('click',()=>setHistoryOpen(!historyOpen));
+historyClose.addEventListener('click',()=>setHistoryOpen(false));
+historyOverlay.addEventListener('click',()=>setHistoryOpen(false));
+historyNew.addEventListener('click',()=>{chatFollowLatest=true;chatScrollRestore=0;stopSpeaking();clearTranslationTimers();persistDraft();currentHistoryId=null;persistActiveChat();messages.replaceChildren();loadDraft();syncComposerMode();if(!input.value){clearTimeout(timeout);timeout=0;delay(100)}setHistoryOpen(false)});
+/* Unified Android/Chrome Back: topmost transient layer closes first, then browser history exits normally. */
+const avnivoBackKey='avnivoOverlayEntry';
+const avnivoBackId='avnivo-'+Math.random().toString(36).slice(2);
+let avnivoBackPopping=false;
+let avnivoBackPending=false;
+function activeBackLayer(){
+ if(!languageSheet.hidden)return 'languages';
+ if(settingsOpen)return 'settings';
+ if(historyOpen)return 'history';
+ return null;
+}
+function syncBackNavigation(){
+ if(avnivoBackPopping)return;
+ const layer=activeBackLayer();
+ const current=window.history.state;
+ const owned=Boolean(current&&current[avnivoBackKey]===avnivoBackId);
+ if(layer){
+  if(owned){window.history.replaceState({...current,layer},'');return}
+  window.history.pushState({...current,[avnivoBackKey]:avnivoBackId,layer},'');
+  avnivoBackPending=false;
+ }else if(owned&&!avnivoBackPending){
+  avnivoBackPending=true;
+  queueMicrotask(()=>{
+   if(activeBackLayer()){avnivoBackPending=false;syncBackNavigation();return}
+   if(window.history.state?.[avnivoBackKey]===avnivoBackId)window.history.back();
+   else avnivoBackPending=false;
+  });
+ }
+}
+window.addEventListener('popstate',()=>{
+ avnivoBackPending=false;
+ avnivoBackPopping=true;
+ // Close only UI overlays; never switch online/offline mode or clear a chat.
+ if(!languageSheet.hidden)closeOnlineLanguages();
+ if(settingsOpen)setSettingsOpen(false);
+ if(historyOpen)setHistoryOpen(false);
+ avnivoBackPopping=false;
+});
+document.addEventListener('keydown',e=>{
+ if(e.key!=='Escape')return;
+ if(!activeBackLayer())return;
+ e.preventDefault();
+ if(!languageSheet.hidden)closeOnlineLanguages();
+ else if(settingsOpen)setSettingsOpen(false);
+ else if(historyOpen)setHistoryOpen(false);
+});
+// Initialize saved conversation only after microphone, brand and composer are ready.
+
+const brand=document.querySelector('.center-brand');
+const brandLine=document.querySelector('.brand-translator');
+const brandText=document.querySelector('.brand-translator-text');
+const translationWords=["Tarjimon","مترجم","مترجم","مترجم","ژباړن","Тарҷумон","Котормочу","Аудармашы","Terjimeçi","Tərcüməçi","Çevirmen","تەرجىمان","ترجمان","وەرگێڕ","Penterjemah","Penerjemah","অনুবাদক","Turjumaan","Mtafsiri","Mai fassara","މައުނާކުރާ","Prevodilac","Përkthyes","Fassara","Tekki","Орчуулагч","Переводчик","Translator","Traducteur","Übersetzer","Traductor","Traduttore","Tradutor","Vertaler","Översättare","Oversetter","Oversætter","Kääntäjä","Þýðandi","Tõlkija","Tulkotājs","Vertėjas","Tłumacz","Překladatel","Prekladateľ","Prevajalec","Prevoditelj","Преводилац","Преведувач","Преводач","Traducător","Fordító","Μεταφραστής","Թարգմանիչ","მთარგმნელი","מתרגם","अनुवादक","अनुवादक","अनुवादक","અનુવાદક","ਅਨੁਵਾਦਕ","மொழிபெயர்ப்பாளர்","అనువాదకుడు","ಅನುವಾದಕ","വിവർത്തകൻ","පරිවර්තකයා","นักแปล","ນັກແປ","អ្នកបកប្រែ","ဘာသာပြန်သူ","Biên dịch viên","翻译器","翻訳者","번역기","སྐད་སྒྱུར་བ","ተርጓሚ","ተርጓሚ","Hiikaa","Umhumushi","Umguquleli","Vertaler","Womasulira","Muturikiri","Umusemuzi","Omuvvuunuzi","Onítúmọ̀","Onye ntụgharị","Ɔkyerɛasefo","Gɔmeɖela","Mobongoli","Mpandika","Tradiktè","Tradukisto","Interpres","Aistritheoir","Cyfieithydd","Eadar-theangaiche","Itzultzailea","Traductor","Tradutor"];
+if(translationWords.length!==greetings.length)throw Error('Translation language count mismatch');
+let translationOrder=[],translationIndex=0,translationLast=-1,translationPosition=0,translationErasing=false,translationTimer=0;
+function shuffleTranslationOrder(){
+ const a=Array.from({length:translationWords.length},(_,i)=>i);
+ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+ if(a.length>1&&a[0]===translationLast){const j=1+Math.floor(Math.random()*(a.length-1));[a[0],a[j]]=[a[j],a[0]]}
+ translationLast=a[a.length-1];return a;
+}
+translationOrder=shuffleTranslationOrder();
+function updateBrandVisibility(){brand.classList.toggle('brand-hidden',Boolean(input.value)||messages.children.length>0||shell.classList.contains('voice-active')||shell.classList.contains('hold-voice'))}
+function translationTick(){
+ const id=translationOrder[translationIndex];
+ const [lang]=greetings[id],word=translationWords[id],chars=segment(word);
+ brandLine.lang=lang;brandLine.dir=/^(ar|fa|ur|ps|ug|sd|dv|ku|yi|he)$/.test(lang)?'rtl':'ltr';
+ if(!translationErasing){
+  translationPosition=Math.min(chars.length,translationPosition+1);
+  brandText.textContent=chars.slice(0,translationPosition).join('');
+  if(translationPosition===chars.length){translationErasing=true;translationTimer=setTimeout(translationTick,1000)}
+  else translationTimer=setTimeout(translationTick,90);
+ }else{
+  translationPosition=Math.max(0,translationPosition-1);
+  brandText.textContent=chars.slice(0,translationPosition).join('');
+  if(translationPosition===0){
+   translationErasing=false;translationIndex++;
+   if(translationIndex===translationOrder.length){translationIndex=0;translationOrder=shuffleTranslationOrder()}
+   translationTimer=setTimeout(translationTick,250);
+  }else translationTimer=setTimeout(translationTick,50);
+ }
+}
+translationTimer=setTimeout(translationTick,500);
+
+function syncComposerMode(){
+ const typing=input.value.length>0;
+ shell.classList.toggle('text-mode',typing&&!active);
+ mic.setAttribute('aria-label',typing&&!active?'Matnni yuborish':'Mikrofonni yoqish');
+ mic.setAttribute('aria-pressed',String(active));
+ mic.disabled=typing&&!active&&!input.value.trim();
+ updateBrandVisibility();
+ label.hidden=typing||messages.children.length>0||active||shell.classList.contains('hold-voice');
+}
+const ONLINE_TRANSLATION_ENDPOINT='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate';
+async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,historyId){
+ const source=onlineLanguagesByCode.get(sourceLocale),target=onlineLanguagesByCode.get(targetLocale);
+ if(!source||!target||source[1]===target[1]){
+  bubble.textContent='Tarjima uchun boshqa tilni tanlang';return;
+ }
+ const controller=new AbortController(),timeoutId=setTimeout(()=>controller.abort(),30000);
+ try{
+  const response=await fetch(ONLINE_TRANSLATION_ENDPOINT,{
+   method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({text,source:sourceLocale,target:targetLocale}),signal:controller.signal
+  });
+  if(!response.ok){
+   const msg=response.status===400?'Til juftligi serverda hali qo‘llab-quvvatlanmaydi':response.status===429?'Tarjima limiti tugadi':'Tarjima serveri xatosi ('+response.status+')';
+   throw Error(msg);
+  }
+  const data=await response.json();
+  if(data.model!=='general/translation-llm'||data.source!==source[1]||data.target!==target[1]||typeof data.text!=='string')throw Error('Tarjima javobida til kodlari mos kelmadi');
+  if(!bubble.isConnected)return;
+  typeTranslation(bubble,data.text);
+  if(entry){entry.translation=data.text;persistHistory()}
+ }catch(error){
+  if(!bubble.isConnected)return;
+  bubble.textContent=error.name==='AbortError'?'Tarjima vaqti tugadi':error instanceof TypeError?'Tarjima serveriga ulanib bo‘lmadi':error.message;
+  bubble.classList.remove('typing');
+ }finally{clearTimeout(timeoutId)}
+}
+function sendMessage(){
+ const message=input.value.trim();
+ if(!message)return;
+ const language=languageRow.dataset.selected==='right'?'right':'left';
+ let session=historySessions.find(x=>x.id===currentHistoryId);
+ const firstLanguage=session?.firstLanguage||language;
+ const sourceBubble=renderChatBubble({text:message,language},firstLanguage);
+ messages.appendChild(attachSpeaker(sourceBubble,language));
+ const online=document.documentElement.dataset.avnivoMode==='online';
+ const sourceLocale=online?onlineChoice[language]:null;
+ const targetLocale=online?onlineChoice[oppositeLanguage(language)]:null;
+ saveChatMessage(message,language,online?'':PREVIEW_TRANSLATION);
+ const savedSession=historySessions.find(x=>x.id===currentHistoryId);
+ const entry=savedSession?.messages[savedSession.messages.length-1];
+ if(online&&entry){entry.sourceLocale=sourceLocale;entry.targetLocale=targetLocale;persistHistory()}
+ const translationBubble=renderChatBubble({text:'',language:oppositeLanguage(language)},firstLanguage);
+ translationBubble.classList.add('translation-preview');
+ messages.appendChild(attachSpeaker(translationBubble,oppositeLanguage(language)));
+ if(online){
+  translationBubble.textContent='Tarjima qilinmoqda…';
+  translateOnlineText(message,sourceLocale,targetLocale,translationBubble,entry,currentHistoryId);
+ }else typeTranslation(translationBubble,PREVIEW_TRANSLATION);
+ while(messages.children.length>60)messages.firstElementChild.remove();
+ scrollChatToLatest();
+ input.value='';persistDraft();clearTimeout(timeout);timeout=0;resize();syncComposerMode();delay(300);
+}
+input.addEventListener('focus',syncComposerMode);
+input.addEventListener('blur',()=>requestAnimationFrame(syncComposerMode));
+input.addEventListener('input',()=>{syncComposerMode();persistDraft()});
+input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();sendMessage()}});
+
+let mediaStream=null,audioContext=null,analyser=null,samples=null,frame=0,active=false,requestToken=0,level=0;
+const idleWave=()=>{trace.style.background='transparent';trace.style.filter='drop-shadow(0 0 5px '+(document.documentElement.dataset.avnivoMode==='offline'?'#f2c16e':'#25baff')+')';};
+function draw(){
+ if(!active||!analyser)return;
+ analyser.getByteTimeDomainData(samples);
+ let sum=0;
+ for(let i=0;i<samples.length;i++){const v=(samples[i]-128)/128;sum+=v*v}
+ const rms=Math.sqrt(sum/samples.length);
+ level=level*.7+Math.min(1,rms*9)*.3;
+ const amplitude=Math.max(1.2,Math.min(13,level*16));
+ const points=[];
+ const n=60;
+ for(let i=0;i<=n;i++){
+  const x=i/n*100;
+  const envelope=Math.pow(Math.sin(Math.PI*i/n),.7);
+  const y=16+Math.sin(i*.83+performance.now()*.014)*amplitude*envelope+Math.sin(i*.29+performance.now()*.02)*amplitude*.27*envelope;
+  points.push(x.toFixed(2)+'% '+y.toFixed(2)+'px');
+ }
+ const wave='polygon(0 50%, '+points.join(', ')+', 100% 50%)';
+ trace.style.clipPath='none';
+ const path='M '+Array.from({length:n+1},(_,i)=>{const x=i/n*100,y=16+Math.sin(i*.83+performance.now()*.014)*amplitude*Math.sin(Math.PI*i/n);return x.toFixed(2)+','+y.toFixed(2)}).join(' L ');
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 32" preserveAspectRatio="none"><path d="'+path+'" fill="none" stroke="'+(document.documentElement.dataset.avnivoMode==='offline'?'#f6c776':'#65d9ff')+'" stroke-width="1.7" vector-effect="non-scaling-stroke" stroke-linecap="round"/></svg>';
+ trace.style.backgroundImage='url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
+ trace.style.backgroundSize='100% 100%';
+ trace.style.filter='drop-shadow(0 0 '+(4+level*14).toFixed(1)+'px '+(document.documentElement.dataset.avnivoMode==='offline'?'#eeb552':'#00aeff')+')';
+ frame=requestAnimationFrame(draw);
+}
+async function stopVoice(){
+ requestToken++;active=false;cancelAnimationFrame(frame);
+ shell.classList.remove('voice-active');mic.setAttribute('aria-pressed','false');mic.setAttribute('aria-label','Mikrofonni yoqish');syncComposerMode();
+ if(onlineRecorder&&onlineRecorder.state==='recording'){onlineState('loading');try{onlineRecorder.stop()}catch(e){onlineState('error')}}
+ if(mediaStream){mediaStream.getTracks().forEach(track=>track.stop());mediaStream=null}
+ if(audioContext){const context=audioContext;audioContext=null;await context.close().catch(()=>{})}
+ analyser=null;samples=null;level=0;idleWave();
+ if(!input.value){clearTimeout(timeout);timeout=0;delay(300)}
+}
+async function startVoice(){
+ if(!navigator.mediaDevices?.getUserMedia){return}
+ const token=++requestToken;
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  if(token!==requestToken){stream.getTracks().forEach(track=>track.stop());return}
+  const Context=window.AudioContext||window.webkitAudioContext;
+  if(!Context){stream.getTracks().forEach(track=>track.stop());return}
+  const ctx=new Context();await ctx.resume();
+  if(token!==requestToken){stream.getTracks().forEach(track=>track.stop());await ctx.close();return}
+  const source=ctx.createMediaStreamSource(stream),a=ctx.createAnalyser();
+  a.fftSize=1024;a.smoothingTimeConstant=.22;source.connect(a);
+  mediaStream=stream;audioContext=ctx;analyser=a;samples=new Uint8Array(a.fftSize);active=true;
+  if(document.documentElement.dataset.avnivoMode==='online'){
+   if(!beginOnlineRecording(stream)){await stopVoice();return}
+  }
+  clearTimeout(timeout);timeout=0;label.hidden=true;
+  mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label','Mikrofonni o‘chirish');
+  shell.classList.add('voice-active');shell.classList.remove('text-mode');updateBrandVisibility();
+  frame=requestAnimationFrame(draw);
+  stream.getAudioTracks()[0]?.addEventListener('ended',()=>{if(active)stopVoice()},{once:true});
+ }catch(error){if(token===requestToken){mic.setAttribute('aria-label','Mikrofonga ruxsat berilmadi');console.warn('Microphone unavailable',error)}}
+}
+
+const voiceHint=document.querySelector('.voice-hint');
+const SpeechAPI=window.SpeechRecognition||window.webkitSpeechRecognition;
+// Online-only Google Chirp 2 STT. No API key is embedded in the browser.
+const CHIRP2_CANDIDATE='https://candidate---avnivo-sensor-test-5xwrf7netq-ew.a.run.app';
+let onlineRecorder=null,onlineChunks=[],onlineSession=0,onlineAbort=null,onlineStatusTimer=0;
+const onlineStatus=document.querySelector('.online-stt-status');
+function onlineState(state){
+ clearTimeout(onlineStatusTimer);onlineStatus.classList.remove('is-leaving');
+ onlineStatus.dataset.state=state;
+ if(state==='error')onlineStatusTimer=setTimeout(()=>onlineState('done'),2000);
+ if(state==='done'){
+  onlineStatus.dataset.state='loading';
+  onlineStatus.classList.add('is-leaving');
+  onlineStatusTimer=setTimeout(()=>{onlineStatus.classList.remove('is-leaving');onlineStatus.dataset.state='idle'},270);
+ }
+}
+
+function onlineLocale(){return onlineChoice[languageRow.dataset.selected==='right'?'right':'left']}
+function beginOnlineRecording(stream){
+ if(!window.MediaRecorder){onlineState('error');return false}
+ const mime=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'].find(t=>MediaRecorder.isTypeSupported(t));
+ if(!mime){onlineState('error');return false}
+ try{
+  const recorder=new MediaRecorder(stream,{mimeType:mime,audioBitsPerSecond:48000});
+  const session=++onlineSession,locale=onlineLocale();
+   if(!onlineLanguagesByCode.has(locale))throw Error('Unsupported Chirp 2 locale');
+  onlineChunks=[];onlineRecorder=recorder;
+   const maxRecording=setTimeout(()=>{if(session===onlineSession&&recorder.state==='recording')stopVoice()},30000);
+  recorder.ondataavailable=e=>{if(e.data.size)onlineChunks.push(e.data)};
+  recorder.onerror=()=>{clearTimeout(maxRecording);if(session===onlineSession)onlineState('error')};
+  recorder.onstop=()=>{
+   clearTimeout(maxRecording);
+    const parts=onlineChunks.splice(0);
+   if(onlineRecorder===recorder)onlineRecorder=null;
+   if(session!==onlineSession)return;
+   const blob=new Blob(parts,{type:recorder.mimeType.split(';')[0]});
+   if(blob.size<500||blob.size>10*1024*1024){onlineState('error');return}
+   sendOnlineAudio(blob,locale,session);
+  };
+  recorder.start();
+  onlineState('recording');
+  return true;
+ }catch(e){onlineState('error');return false}
+}
+async function sendOnlineAudio(blob,locale,session){
+ if(document.documentElement.dataset.avnivoMode!=='online')return;
+ if(onlineAbort)onlineAbort.abort();
+ const ctrl=new AbortController();onlineAbort=ctrl;
+ if(!onlineLanguagesByCode.has(locale)){onlineState('error');return}
+  const extension=blob.type==='audio/ogg'?'ogg':'webm';
+  const form=new FormData();form.append('audio',blob,'speech.'+extension);form.append('language',locale);
+ onlineState('loading');
+ const timer=setTimeout(()=>ctrl.abort(),45000);
+ try{
+  const response=await fetch(CHIRP2_CANDIDATE+'/api/transcribe-google',{method:'POST',body:form,signal:ctrl.signal});
+  if(!response.ok){
+   const message=response.status===429?'So‘rov limiti tugadi':response.status===400?'Audio yoki til formati xato':response.status===503?'Server vaqtincha ishlamayapti':'Server xatosi: '+response.status;
+   throw Error(message);
+  }
+  const result=await response.json();
+  if(session!==onlineSession||document.documentElement.dataset.avnivoMode!=='online')return;
+  if(result.language!==locale||result.model!=='chirp_2')throw Error('Server noto‘g‘ri til yoki model qaytardi');
+   if(locale!==onlineLocale())return;
+  const recognized=typeof result.text==='string'?result.text.trim():'';
+  if(recognized){
+   input.value=appendTranscript(input.value,recognized);
+   persistDraft();resize();syncComposerMode();onlineState('done');
+  }else onlineState('error');
+ }catch(e){
+  if(session!==onlineSession||document.documentElement.dataset.avnivoMode!=='online')return;
+  console.warn('Chirp 2 recognition failed:',e);onlineState('error');
+ }finally{clearTimeout(timer);if(onlineAbort===ctrl)onlineAbort=null}
+}
+function cancelOnlineRecording(){
+ onlineSession++;
+ if(onlineAbort){onlineAbort.abort();onlineAbort=null}
+ if(onlineRecorder){const recorder=onlineRecorder;onlineRecorder=null;try{if(recorder.state==='recording')recorder.stop()}catch(e){}}
+ onlineChunks=[];onlineState('done');
+}
+
+let holdTimer=0,holdStarted=false,holdPointer=null,holdSuppressClick=false,holdRecognizer=null,holdBase='',holdTranscript='',holdFinal='',holdSession=0,holdWaveStream=null,holdWaveContext=null,holdWaveFrame=0,holdWaveAnalyser=null;
+function hint(message){if(document.documentElement.dataset.avnivoMode==='online'){voiceHint.hidden=true;return}voiceHint.textContent=message;voiceHint.hidden=!message}
+function appendTranscript(base,transcript){
+ const spoken=transcript.trim();
+ if(!spoken)return base;
+ return base+(base&&!/\s$/.test(base)?' ':'')+spoken;
+}
+async function startHoldWave(session){
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+  if(session!==holdSession||!holdStarted){stream.getTracks().forEach(t=>t.stop());return}
+  const Context=window.AudioContext||window.webkitAudioContext;
+  if(!Context){stream.getTracks().forEach(t=>t.stop());return}
+  const ctx=new Context();await ctx.resume();
+  if(session!==holdSession||!holdStarted){stream.getTracks().forEach(t=>t.stop());await ctx.close();return}
+  const a=ctx.createAnalyser();a.fftSize=1024;a.smoothingTimeConstant=.24;
+  ctx.createMediaStreamSource(stream).connect(a);
+  holdWaveStream=stream;holdWaveContext=ctx;holdWaveAnalyser=a;
+  const bytes=new Uint8Array(a.fftSize);
+  function animate(){
+   if(session!==holdSession||!holdStarted)return;
+   a.getByteTimeDomainData(bytes);let sum=0;
+   for(const b of bytes){const x=(b-128)/128;sum+=x*x}
+   const rms=Math.sqrt(sum/bytes.length),amp=Math.max(1.5,Math.min(13,rms*130));
+   const now=performance.now();
+   const path='M '+Array.from({length:61},(_,i)=>{
+    const x=i/60*100,env=Math.sin(Math.PI*i/60);
+    const y=16+Math.sin(i*.76+now*.014)*amp*env;
+    return x.toFixed(2)+','+y.toFixed(2);
+   }).join(' L ');
+   const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 32" preserveAspectRatio="none"><path d="'+path+'" fill="none" stroke="'+(document.documentElement.dataset.avnivoMode==='offline'?'#f6c776':'#65d9ff')+'" stroke-width="1.8" vector-effect="non-scaling-stroke"/></svg>';
+   trace.style.backgroundImage='url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
+   trace.style.backgroundSize='100% 100%';
+   trace.style.filter='drop-shadow(0 0 '+Math.min(17,4+rms*100)+'px '+(document.documentElement.dataset.avnivoMode==='offline'?'#eeb552':'#00aeff')+')';
+   holdWaveFrame=requestAnimationFrame(animate);
+  }
+  animate();
+ }catch(e){if(session===holdSession&&holdStarted)hint('Mikrofon ruxsatini tekshiring')}
+}
+function finishHold(){
+ if(!holdStarted)return;
+ holdStarted=false;holdSession++;
+ shell.classList.remove('hold-voice');cancelAnimationFrame(holdWaveFrame);
+ if(holdWaveStream){holdWaveStream.getTracks().forEach(t=>t.stop());holdWaveStream=null}
+ if(holdWaveContext){const ctx=holdWaveContext;holdWaveContext=null;ctx.close().catch(()=>{})}
+ holdWaveAnalyser=null;trace.style.backgroundImage='none';
+ if(holdRecognizer){try{holdRecognizer.stop()}catch(e){}}
+ else {input.value=appendTranscript(holdBase,holdFinal||holdTranscript);persistDraft();resize();syncComposerMode();hint('')}
+ syncComposerMode();
+}
+function beginHold(){
+ if(document.documentElement.dataset.avnivoMode==='online'){if(!active)startVoice();return}
+ if(!input.value.trim()||active||holdStarted)return;
+ holdStarted=true;holdSession++;
+ holdBase=input.value;holdTranscript='';holdFinal='';
+ shell.classList.add('hold-voice');shell.classList.remove('text-mode');
+ mic.setAttribute('aria-label','Barmoqni uzib ovoz yozishni tugatish');
+ clearTimeout(timeout);timeout=0;label.hidden=true;
+ hint('Gapiring · tugatish uchun qo‘yib yuboring');
+ const session=holdSession;
+ if(!SpeechAPI){hint('Bu Chrome’da ovozni matnga aylantirish mavjud emas');return}
+ try{
+  const recognition=new SpeechAPI();holdRecognizer=recognition;
+  recognition.lang=document.documentElement.lang||'uz-UZ';
+  recognition.continuous=true;recognition.interimResults=true;recognition.maxAlternatives=1;
+  recognition.onresult=event=>{
+   let finalText='',interim='';
+   for(let i=0;i<event.results.length;i++){
+    const text=event.results[i][0]?.transcript||'';
+    if(event.results[i].isFinal)finalText+=text+' ';else interim+=text+' ';
+   }
+   holdFinal=finalText.trim();holdTranscript=(finalText+interim).trim();
+  };
+  recognition.onerror=e=>{if(holdRecognizer===recognition)hint('Ovoz tanish: '+e.error)};
+  recognition.onend=()=>{
+   if(holdRecognizer!==recognition)return;
+   if(holdStarted){finishHold()}
+   holdRecognizer=null;
+   input.value=appendTranscript(holdBase,holdFinal||holdTranscript);
+   persistDraft();resize();syncComposerMode();hint('');
+  };
+  recognition.start();
+  startHoldWave(session);
+ }catch(e){hint('Ovoz tanishni ishga tushirib bo‘lmadi');finishHold()}
+}
+function clearHoldTimer(){clearTimeout(holdTimer);holdTimer=0}
+// Android IME policy: keep an already visible keyboard, but never resurrect a dismissed one.
+const viewport=window.visualViewport;
+let keyboardReferenceHeight=viewport?.height||window.innerHeight;
+let keyboardWasVisible=false;
+function isKeyboardVisible(){
+ const v=window.visualViewport;
+ if(!v)return false;
+ const occluded=Math.max(0,window.innerHeight-(v.height+v.offsetTop));
+ return Math.max(occluded,keyboardReferenceHeight-v.height)>140;
+}
+function reconcileKeyboardFocus(){
+ const visible=isKeyboardVisible();
+ if(keyboardWasVisible&&!visible&&document.activeElement===input){
+  input.blur(); // Back / keyboard-hide has dismissed the IME; release stale textarea focus.
+ }
+ keyboardWasVisible=visible;
+ if(!visible){
+  const height=viewport?.height||window.innerHeight;
+  keyboardReferenceHeight=Math.max(keyboardReferenceHeight,height);
+ }
+}
+if(viewport)viewport.addEventListener('resize',reconcileKeyboardFocus,{passive:true});
+window.addEventListener('resize',reconcileKeyboardFocus,{passive:true});
+function preserveKeyboardOnMicPress(event){
+ if(document.activeElement!==input)return;
+ if(isKeyboardVisible()){
+  // Prevent the button from stealing textarea focus while the IME is genuinely open.
+  event.preventDefault();
+ }else{
+  // Android may leave the textarea focused after the user hides the keyboard.
+  // Explicitly clear that stale focus before invoking audio capture.
+  input.blur();
+ }
+}
+mic.addEventListener('pointerdown',event=>{
+ // Preserve textarea focus and Android keyboard while pressing the action button.
+ preserveKeyboardOnMicPress(event);
+ if(event.button!==0||active||(document.documentElement.dataset.avnivoMode!=='online'&&!input.value.trim()))return;
+ holdPointer=event.pointerId;holdSuppressClick=false;
+ try{mic.setPointerCapture(event.pointerId)}catch(e){}
+ clearHoldTimer();holdTimer=setTimeout(()=>{holdTimer=0;holdSuppressClick=true;beginHold()},1050);
+});
+function releaseHold(event){
+ if(holdPointer===null||event.pointerId!==holdPointer)return;
+ const wasHold=holdStarted;clearHoldTimer();holdPointer=null;
+ if(wasHold){holdSuppressClick=true;finishHold()}
+}
+mic.addEventListener('pointerup',releaseHold);
+mic.addEventListener('mousedown',preserveKeyboardOnMicPress);
+mic.addEventListener('pointercancel',releaseHold);
+mic.addEventListener('lostpointercapture',event=>{if(holdPointer===event.pointerId)releaseHold(event)});
+mic.addEventListener('contextmenu',event=>{if(holdTimer||holdStarted)event.preventDefault()});
+mic.addEventListener('click',event=>{
+ if(holdSuppressClick){event.preventDefault();holdSuppressClick=false;return}
+ if(active)stopVoice();else if(shell.classList.contains('text-mode'))sendMessage();else if(!holdStarted)startVoice();
+});
+
+// All dependent const bindings and handlers are initialized before restoring a saved draft.
+loadHistory();if(currentHistoryId){const current=historySessions.find(x=>x.id===currentHistoryId);if(current)restoreHistory(current)}loadDraft();renderHistory();
+window.addEventListener('pagehide',()=>{stopSpeaking();cancelOnlineRecording();if(active)stopVoice()});
+
+})();
+</script>
+</body>
+</html>

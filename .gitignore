@@ -1,0 +1,15 @@
+# Build outputs
+android-app/.gradle/
+android-app/.kotlin/
+android-app/build/
+android-app/app/build/
+android-app/app/libs/
+android-app/local.properties
+# Native whisper.cpp sources are fetched by CI, never committed
+android-app/app/src/main/cpp/whisper.cpp/
+*.jks
+*.keystore
+**/__pycache__/
+*.pyc
+.venv/
+android-app/app/.cxx/

@@ -59,6 +59,10 @@ html[data-avnivo-mode=offline] .voice-trace{left:40px;right:55px}
 html[data-avnivo-mode=offline] .online-stt-status{color:#7cd5ff}
 html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,
 html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{display:flex;opacity:1;transform:translateY(-50%) scale(1);animation:avnivo-offline-record-pulse 1.15s ease-in-out infinite}
+/* The offline press continues past the finger release: decoding is a visible stage, not a gap. */
+html[data-avnivo-mode=offline] .online-stt-status[data-state=loading]{display:flex;opacity:1;transform:translateY(-50%) scale(1);animation:avnivo-record-blink .7s ease-in-out infinite}
+html[data-avnivo-mode=offline] .online-stt-status[data-state=error]{display:flex;opacity:1;transform:translateY(-50%) scale(1);color:#ff515c;animation:none}
+@media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .online-stt-status[data-state=loading]{animation:none}}
 @keyframes avnivo-offline-record-pulse{0%,100%{opacity:.58;filter:drop-shadow(0 0 1px #4ab9f4)}50%{opacity:1;filter:drop-shadow(0 0 8px #75d9ff)}}
 @media(prefers-reduced-motion:reduce){html[data-avnivo-mode=offline] .writing-shell.voice-active .online-stt-status,html[data-avnivo-mode=offline] .writing-shell.hold-voice .online-stt-status{animation:none}}
 
@@ -91,6 +95,7 @@ html[data-avnivo-mode=offline] .settings-description{display:none}
 .offline-module-meta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
 .offline-module-size{font:600 10.5px/1.3 system-ui;color:#d0e9f7;margin:0}
 .offline-module-state{font:10.5px/1.3 system-ui;color:#91b8d1;margin:0}
+.offline-module-reason{font:10.5px/1.35 system-ui;color:#f0b9a4;margin:5px 0 0;overflow-wrap:anywhere}
 .offline-module-action{-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;border:0;border-radius:50%;width:36px;height:36px;background:#1c455f;color:#c2eaff;display:grid;place-items:center;cursor:pointer;align-self:center;justify-self:end;isolation:isolate;overflow:hidden;transition:transform .24s ease,background .24s ease}
 .offline-module-action:focus-visible{outline:2px solid #a8e4ff;outline-offset:3px}
 .offline-module-action:active{transform:scale(.88)}
@@ -132,6 +137,11 @@ html[data-avnivo-mode=offline] .settings-description{display:none}
 .offline-module-action{width:32px;height:32px}
 .offline-module-progress{margin-top:6px}
 .offline-module-action.is-verified{background:#315c7d;color:#c7efff}
+.offline-module-delete{-webkit-tap-highlight-color:transparent;touch-action:manipulation;border:1px solid #6e4b4b;border-radius:9px;width:27px;height:27px;background:#3b2527;color:#ffb9b0;display:grid;place-items:center;padding:0;cursor:pointer}
+.offline-module-delete svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.offline-module-delete[hidden]{display:none}
+.offline-module-delete:focus-visible{outline:2px solid #ffb9b0;outline-offset:2px}
+.offline-module-delete[disabled]{cursor:wait;opacity:.6}
 /* Keep Online AI voice controls separate from Offline model downloads. */
 .avnivo-online-tts-settings{padding:0 15px 24px}
 html[data-avnivo-mode=offline] .avnivo-online-tts-settings{display:none}
@@ -183,6 +193,19 @@ html[data-avnivo-mode=online] .offline-modules{display:none}
 /* Disable the browser's blue touch flash on every interactive control. */
 html,body,button,a,input,textarea,select,[role="button"],[tabindex],*{-webkit-tap-highlight-color:transparent!important}
 button:focus:not(:focus-visible),a:focus:not(:focus-visible),[role="button"]:focus:not(:focus-visible){outline:none}
+
+/* Settings header occlusion: scrolled controls disappear at the title divider. */
+.settings-drawer .settings-header{position:sticky;top:0;z-index:20;isolation:isolate;background:#463223;box-shadow:0 -28px 0 0 #463223,0 1px 0 #c99c5b33}
+html[data-avnivo-mode=offline] .settings-drawer .settings-header{background:#103049;box-shadow:0 -28px 0 0 #103049,0 1px 0 #4ba7d833}
+
+/* Opt-in translated-text autoplay: mode-aware and independent of manual speaker buttons. */
+.avnivo-autoread{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 11px;border:1px solid #c99c5b66;border-radius:14px;background:#30241dcc;color:#ffe1aa;flex-shrink:0}
+.avnivo-autoread-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.avnivo-autoread-title{font-size:14px;font-weight:700}.avnivo-autoread-note{font-size:11px;line-height:1.4;color:#d1bca3}
+.avnivo-autoread-switch{position:relative;display:inline-flex;align-items:center;justify-content:flex-start;width:53px;height:30px;border-radius:99px;border:1px solid #bd9666;background:#261d18;cursor:pointer;flex-shrink:0;padding:3px;transition:background .2s,border-color .2s}
+.avnivo-autoread-switch::before{content:'';width:22px;height:22px;border-radius:50%;background:#c3ad91;box-shadow:0 1px 5px #0007;transition:transform .2s,background .2s}
+.avnivo-autoread-switch[aria-checked=true]{background:#bb873e;border-color:#e4b875}.avnivo-autoread-switch[aria-checked=true]::before{transform:translateX(22px);background:#fff4db}
+.avnivo-autoread-switch:focus-visible{outline:2px solid #ffe2a0;outline-offset:3px}
+html[data-avnivo-mode=offline] .avnivo-autoread{background:#0c2c42;border-color:#4ba7d877;color:#c5efff}html[data-avnivo-mode=offline] .avnivo-autoread-note{color:#91c6e0}html[data-avnivo-mode=offline] .avnivo-autoread-switch{background:#0a1b2b;border-color:#468fb3}html[data-avnivo-mode=offline] .avnivo-autoread-switch[aria-checked=true]{background:#1785bd;border-color:#80d9ff}html[data-avnivo-mode=offline] .avnivo-autoread-switch[aria-checked=true]::before{background:#e8faff}
 </style>
 </head>
 <body><div id="avnivo-first-launch" aria-label="Birinchi kirish"><div class="intro-colors"></div><div class="intro-brand"><div class="intro-brand-name"><span>AV</span><span>NIVO</span></div><div class="intro-subtitle"><span id="avnivo-intro-word">Tarjimon</span><span class="intro-caret"></span></div></div><div class="lang-pill" id="avnivo-choose-uz" role="button" tabindex="0" aria-expanded="false" aria-label="Til tanlash ro‘yxatini ochish"><span id="avnivo-language-word"></span><span class="lang-caret"></span></div><div id="avnivo-language-menu" role="listbox" aria-label="Mavjud tillar"><button id="avnivo-language-option" role="option" aria-selected="true" type="button">O‘zbek tili</button></div></div><div id="avnivo-tutorial-dim"></div><div id="avnivo-tutorial-spot" aria-hidden="true"></div><div id="avnivo-tutorial-label" role="dialog" aria-modal="true" aria-labelledby="avnivo-tutorial-heading" aria-describedby="avnivo-tutorial-description"><strong id="avnivo-tutorial-heading">Chatlar tarixi</strong><p id="avnivo-tutorial-description">Tarjimon bilan olib borgan suhbatlaringiz tarixi shu bo‘limda saqlanadi. Oldingi tarjima chatlarini ko‘rish, kerakli suhbatni qayta ochish va undagi xabarlarni davom ettirish uchun tarix bo‘limidan foydalanasiz. Yangi suhbat boshlash imkoniyati ham shu yerda joylashgan.</p><button type="button" id="avnivo-tutorial-next">Tushunarli</button></div>
@@ -191,7 +214,7 @@ button:focus:not(:focus-visible),a:focus:not(:focus-visible),[role="button"]:foc
 </main>
 <script>
 window.AVNIVO_I18N_LANGUAGES=[{"code":"uz","name":"O‘zbek tili","english":"Uzbek","rtl":false},{"code":"ar","name":"العربية","english":"Arabic","rtl":true},{"code":"fa","name":"فارسی","english":"Persian","rtl":true},{"code":"ur","name":"اردو","english":"Urdu","rtl":true},{"code":"ps","name":"پښتو","english":"Pashto","rtl":true},{"code":"tg","name":"Тоҷикӣ","english":"Tajik","rtl":false},{"code":"ky","name":"Кыргызча","english":"Kyrgyz","rtl":false},{"code":"kk","name":"Қазақ тілі","english":"Kazakh","rtl":false},{"code":"tk","name":"Türkmen dili","english":"Turkmen","rtl":false},{"code":"az","name":"Azərbaycanca","english":"Azerbaijani","rtl":false},{"code":"tr","name":"Türkçe","english":"Turkish","rtl":false},{"code":"ug","name":"ئۇيغۇرچە","english":"Uyghur","rtl":true},{"code":"sd","name":"سنڌي","english":"Sindhi","rtl":true},{"code":"ku","name":"Kurdî","english":"Kurdish","rtl":false},{"code":"ms","name":"Bahasa Melayu","english":"Malay","rtl":false},{"code":"id","name":"Bahasa Indonesia","english":"Indonesian","rtl":false},{"code":"bn","name":"বাংলা","english":"Bengali","rtl":false},{"code":"so","name":"Soomaali","english":"Somali","rtl":false},{"code":"sw","name":"Kiswahili","english":"Swahili","rtl":false},{"code":"ha","name":"Hausa","english":"Hausa","rtl":false},{"code":"dv","name":"ދިވެހި","english":"Dhivehi","rtl":true},{"code":"bs","name":"Bosanski","english":"Bosnian","rtl":false},{"code":"sq","name":"Shqip","english":"Albanian","rtl":false},{"code":"ff","name":"Fulfulde","english":"Fula","rtl":false},{"code":"wo","name":"Wolof","english":"Wolof","rtl":false},{"code":"mn","name":"Монгол","english":"Mongolian","rtl":false},{"code":"ru","name":"Русский","english":"Russian","rtl":false},{"code":"en","name":"English","english":"English","rtl":false},{"code":"fr","name":"Français","english":"French","rtl":false},{"code":"de","name":"Deutsch","english":"German","rtl":false},{"code":"es","name":"Español","english":"Spanish","rtl":false},{"code":"it","name":"Italiano","english":"Italian","rtl":false},{"code":"pt","name":"Português","english":"Portuguese","rtl":false},{"code":"nl","name":"Nederlands","english":"Dutch","rtl":false},{"code":"sv","name":"Svenska","english":"Swedish","rtl":false},{"code":"no","name":"Norsk","english":"Norwegian","rtl":false},{"code":"da","name":"Dansk","english":"Danish","rtl":false},{"code":"fi","name":"Suomi","english":"Finnish","rtl":false},{"code":"is","name":"Íslenska","english":"Icelandic","rtl":false},{"code":"et","name":"Eesti","english":"Estonian","rtl":false},{"code":"lv","name":"Latviešu","english":"Latvian","rtl":false},{"code":"lt","name":"Lietuvių","english":"Lithuanian","rtl":false},{"code":"pl","name":"Polski","english":"Polish","rtl":false},{"code":"cs","name":"Čeština","english":"Czech","rtl":false},{"code":"sk","name":"Slovenčina","english":"Slovak","rtl":false},{"code":"sl","name":"Slovenščina","english":"Slovenian","rtl":false},{"code":"hr","name":"Hrvatski","english":"Croatian","rtl":false},{"code":"sr","name":"Српски","english":"Serbian","rtl":false},{"code":"mk","name":"Македонски","english":"Macedonian","rtl":false},{"code":"bg","name":"Български","english":"Bulgarian","rtl":false},{"code":"ro","name":"Română","english":"Romanian","rtl":false},{"code":"hu","name":"Magyar","english":"Hungarian","rtl":false},{"code":"el","name":"Ελληνικά","english":"Greek","rtl":false},{"code":"hy","name":"Հայերեն","english":"Armenian","rtl":false},{"code":"ka","name":"ქართული","english":"Georgian","rtl":false},{"code":"he","name":"עברית","english":"Hebrew","rtl":true},{"code":"hi","name":"हिन्दी","english":"Hindi","rtl":false},{"code":"ne","name":"नेपाली","english":"Nepali","rtl":false},{"code":"mr","name":"मराठी","english":"Marathi","rtl":false},{"code":"gu","name":"ગુજરાતી","english":"Gujarati","rtl":false},{"code":"pa","name":"ਪੰਜਾਬੀ","english":"Punjabi","rtl":false},{"code":"ta","name":"தமிழ்","english":"Tamil","rtl":false},{"code":"te","name":"తెలుగు","english":"Telugu","rtl":false},{"code":"kn","name":"ಕನ್ನಡ","english":"Kannada","rtl":false},{"code":"ml","name":"മലയാളം","english":"Malayalam","rtl":false},{"code":"si","name":"සිංහල","english":"Sinhala","rtl":false},{"code":"th","name":"ไทย","english":"Thai","rtl":false},{"code":"lo","name":"ລາວ","english":"Lao","rtl":false},{"code":"km","name":"ខ្មែរ","english":"Khmer","rtl":false},{"code":"my","name":"မြန်မာ","english":"Burmese","rtl":false},{"code":"vi","name":"Tiếng Việt","english":"Vietnamese","rtl":false},{"code":"zh","name":"中文","english":"Chinese","rtl":false},{"code":"ja","name":"日本語","english":"Japanese","rtl":false},{"code":"ko","name":"한국어","english":"Korean","rtl":false},{"code":"bo","name":"བོད་ཡིག","english":"Tibetan","rtl":false},{"code":"am","name":"አማርኛ","english":"Amharic","rtl":false},{"code":"ti","name":"ትግርኛ","english":"Tigrinya","rtl":false},{"code":"om","name":"Oromoo","english":"Oromo","rtl":false},{"code":"zu","name":"isiZulu","english":"Zulu","rtl":false},{"code":"xh","name":"isiXhosa","english":"Xhosa","rtl":false},{"code":"af","name":"Afrikaans","english":"Afrikaans","rtl":false},{"code":"ny","name":"Chichewa","english":"Chichewa","rtl":false},{"code":"sn","name":"ChiShona","english":"Shona","rtl":false},{"code":"rw","name":"Kinyarwanda","english":"Kinyarwanda","rtl":false},{"code":"lg","name":"Luganda","english":"Luganda","rtl":false},{"code":"yo","name":"Yorùbá","english":"Yoruba","rtl":false},{"code":"ig","name":"Igbo","english":"Igbo","rtl":false},{"code":"ak","name":"Akan","english":"Akan","rtl":false},{"code":"ee","name":"Eʋegbe","english":"Ewe","rtl":false},{"code":"ln","name":"Lingála","english":"Lingala","rtl":false},{"code":"mg","name":"Malagasy","english":"Malagasy","rtl":false},{"code":"ht","name":"Kreyòl ayisyen","english":"Haitian Creole","rtl":false},{"code":"eo","name":"Esperanto","english":"Esperanto","rtl":false},{"code":"la","name":"Latina","english":"Latin","rtl":false},{"code":"ga","name":"Gaeilge","english":"Irish","rtl":false},{"code":"cy","name":"Cymraeg","english":"Welsh","rtl":false},{"code":"gd","name":"Gàidhlig","english":"Scottish Gaelic","rtl":false},{"code":"eu","name":"Euskara","english":"Basque","rtl":false},{"code":"ca","name":"Català","english":"Catalan","rtl":false},{"code":"gl","name":"Galego","english":"Galician","rtl":false}];
-window.AVNIVO_I18N_BUNDLE={"uz":{"_meta":{"code":"uz","english":"Uzbek","machineTranslated":true,"reviewed":false,"generator":"i18n/generate.py","sourceLanguage":"en"},"app.name":"AVNIVO tarjimon","app.background":"AVNIVO fon","mode.group":"Tarjimon rejimi","mode.online":"Onlayn rejim","mode.offline":"Oflayn rejim","history.toggle":"Chat tarixini oching","history.title":"Chat tarixi","history.close":"Tarixni yopish","history.new":"+ Yangi chat","history.empty":"Hali chatlar saqlanmadi. Yangi xabar yuborganingizda, u sanasi bilan shu yerda paydo bo'ladi.","history.entry.title":"O'zbek = Rus","history.saved":"Saqlangan: {{date}}","settings.toggle":"Sozlamalarni oching","settings.title":"Sozlamalar","settings.close":"Sozlamalarni yoping","settings.description":"Sozlamalar bo'limi","offline.settings.title":"Oflayn sozlamalar","offline.settings.note":"Qo'shimcha sozlamalar bu erda, modullar ro'yxati tepasida ko'rinadi.","offline.modules.label":"Oflayn modullar","offline.modules.title":"Oflayn modullar","offline.modules.subtitle":"Modullarni oldindan yuklab oling va ularni internetsiz foydalaning. Ayrim funksiyalar Onlayn rejimidan farq qilishi mumkin.","brand.label":"AVNIVO tarjimon","messages.label":"Yuborilgan xabarlar","languages.label":"Tarjima tillari","languages.source":"O'zbek tilini tanlang","languages.target":"Rus tilini tanlang","online.languages.label":"Onlayn tillar","online.languages.title":"Onlayn tillar · {{count}}","online.languages.close":"Yopish","online.languages.search":"Til nomi yoki kodini qidiring","online.languages.searchLabel":"Qidiruv tili","online.languages.help":"{{official}} tasdiqlandi · {{experimental}} tajribali · {{retest}} qayta sinovdan oʻtish kerak","online.status.official":"Tasdiqlangan","online.status.experimental":"Eksperimental","online.status.retest":"Qayta sinovdan o'tish kerak","composer.placeholder":"Matn yozing","mic.label.on":"Mikrofonni yoqing","mic.label.off":"Mikrofonni o'chiring","mic.label.send":"Matn yuboring","mic.label.denied":"Mikrofonga ruxsat berilmadi","mic.label.hold":"Yozishni tugatish uchun barmog'ingizni qo'ying","speak.label":"Xabarni ovoz chiqarib o'qing","speak.loading":"AI ovozini tayyorlash","speak.stop":"Ovozli o'qishni to'xtating","speak.error":"AI ovozi muvaffaqiyatsiz tugadi: {{message}}","tts.voice.label":"AI ovozi (Onlayn)","tts.voice.aria":"AI ovozini tanlang","tts.style.label":"O'qish ohangi (Onlayn)","tts.style.aria":"Ovoz ohangini tanlang","tts.rate.label":"O'qish tezligi (onlayn va oflayn)","tts.rate.aria":"Ovozli o'qish tezligi","tts.rate.normal":"1× — Oddiy","tts.rate.slow":"{{rate}}× — Sekin","tts.rate.fast":"{{rate}}× — Tez","tts.delivery.label":"Ovozli yetkazib berish","tts.delivery.normal":"Oddiy","tts.delivery.whisper":"Shivirlash","tts.delivery.breathy":"Nafasli","tts.delivery.clear":"Aniq artikulyatsiya","tts.delivery.soft":"Yumshoq ovoz","tts.delivery.projected":"Baland va aniq","tts.pitch.label":"Ovoz balandligi","tts.pitch.normal":"Tabiiy","tts.pitch.low":"Pastroq","tts.pitch.high":"Yuqori","tts.pitch.flat":"Yassi","tts.pitch.expressive":"Ekspressiv","tts.pace.label":"AI nutq tezligi","tts.pace.normal":"Tabiiy","tts.pace.slow":"Sekin","tts.pace.fast":"Tez","tts.pace.deliberate":"Pauzalar bilan","tts.style.auto":"Avtomatik","tts.style.calm":"Tinchlaning","tts.style.happy":"Quvnoq","tts.style.sad":"Achinarli","tts.style.excited":"hayajonlangan","tts.style.concerned":"Xavotirda","tts.style.friendly":"Do'stona","tts.style.professional":"Professional","tts.style.narrator":"Audio kitob","tts.style.documentary":"Hujjatli film","tts.style.news":"Yangiliklar","tts.style.storytelling":"Hikoyachi","tts.style.dramatic":"Dramatik","tts.style.mysterious":"Sirli","tts.style.serious":"Jiddiy","tts.style.confident":"Ishonchli","tts.style.gentle":"Yumshoq","tts.style.empathetic":"Empatik","tts.style.curious":"Qiziq","tts.style.surprised":"Hayron qoldim","tts.style.nervous":"Asabiy","tts.style.fearful":"Qo'rqinchli","tts.style.angry":"G'azablangan","tts.style.frustrated":"Xafa bo'lgan","tts.style.sarcastic":"Sarkastik","tts.style.ironic":"Kinoiy","tts.style.bored":"Zerikkan","tts.style.tired":"Charchagan","tts.style.whisper":"Shivirlash","tts.style.mutter":"G'o'ldiradi","tts.style.breathy":"Nafasli ovoz","tts.style.robotic":"Robot","tts.style.monotone":"Monoton","tts.style.playful":"O'ynoqi","tts.style.energetic":"Baquvvat","tts.style.thoughtful":"O'ychan","tts.style.persuasive":"Ishontiruvchi","tts.style.teacher":"O'qituvchi","tts.style.poetic":"Poetik","tts.style.slow":"Sekin nutq","tts.style.fast":"Tez nutq","tts.style.custom":"Men buni o'zim aniqlayman","tts.custom.label":"Maxsus ohang tavsifi (240 belgigacha)","tts.custom.placeholder":"Masalan: yumshoq pauza bilan iliq gapiring.","tts.tags.note":"Matndagi maxsus ovoz teglari: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. Bu teglar faqat yozilgan joyda amal qiladi; natija modelga bog'liq.","offline.module.uz-stt.name":"O‘zbek tilidagi nutqni aniqlash","offline.module.uz-stt.desc":"O‘zbek tilidagi nutqni tushunadi va aytilgan so‘zlarni matnga aylantiradi.","offline.module.uz-stt.sizeNote":"Model fayli: 591,6 MB · qo'shimcha fayllar alohida","offline.module.multilingual-stt.name":"Ko'p tilli nutqni aniqlash","offline.module.multilingual-stt.desc":"Turli tillardagi nutqni matnga aylantiradi. 99 ta til uchun sifat hali tasdiqlanmagan.","offline.module.multilingual-stt.sizeNote":"Model: 251,9 MB · qo'shimcha ish vaqti alohida","offline.module.offline-translate.name":"Oflayn tarjima","offline.module.offline-translate.desc":"Internetga ulanmasdan matnlarni boshqa tilga tarjima qilishga yordam beradi.","offline.module.offline-translate.sizeNote":"Yuklab olishning aniq hajmi hali aniqlanmagan","offline.module.offline-tts.name":"Matnni ovoz chiqarib o'qing","offline.module.offline-tts.desc":"Yozma matn va tarjimalarni internetsiz ovoz chiqarib o'qiydi.","offline.module.offline-tts.sizeNote":"Yuklab olishning aniq hajmi hali aniqlanmagan","offline.module.action.download":"{{name}} — yuklab olish","offline.module.action.ready":"Modul faol","offline.module.size":"Hajmi: {{size}}","offline.module.sizePending":"Hajmi: aniqlanmoqda","offline.state.not_installed":"Yuklab olinmagan","offline.state.downloading":"Yuklab olinmoqda…","offline.state.verifying":"Tekshirilmoqda…","offline.state.ready":"O'rnatilgan va faol","offline.state.error":"O'rnatish xatosi","offline.progress.label":"Yuklab olish jarayoni","offline.notice.moduleMissing":"Yuklab olish moduli ochilmadi. Sahifani qayta yuklang.","offline.notice.starting":"Haqiqiy yuklab olish boshlandi. Internet uzilib qolsa, davom etish uchun yana bosing.","offline.notice.saved":"Fayllar saqlangan va SHA-256 tasdiqlangan. Sherpa-ONNX ish vaqti ulanmaguncha faol emas.","offline.notice.failed":"Yuklab olish toʻxtatildi: {{message}}. Qayta bosish saqlangan bo'laklardan davom etadi.","offline.notice.noSource":"{{name}}: yuklab olish manbasi hali ulanmagan. Yuklab olish boshlanmadi.","offline.status.verifiedInactive":"Yuklab olingan va tasdiqlangan · dvigatel ulanmagan","translation.selectOther":"Tarjima uchun boshqa tilni tanlang","translation.pending":"Tarjima qilinmoqda…","translation.error.pair":"Til juftligi hali serverda qo'llab-quvvatlanmaydi","translation.error.limit":"Tarjima chegarasiga yetdi","translation.error.server":"Tarjima serveri xatosi ({{status}})","translation.error.mismatch":"Tarjima javobidagi til kodlari mos kelmadi","translation.error.timeout":"Tarjima vaqti tugadi","translation.error.network":"Tarjima serveriga ulanib bo‘lmadi","stt.error.limit":"Soʻrov chegarasiga yetdi","stt.error.format":"Noto'g'ri audio yoki til formati","stt.error.unavailable":"Server vaqtincha ishlamayapti","stt.error.server":"Server xatosi: {{status}}","voice.hint.release":"Gapiring · tugatish uchun qo'yib yuboring","voice.hint.noSpeech":"Ushbu Chrome brauzerida nutqdan matnga funksiya mavjud emas","voice.hint.micPermission":"Mikrofon ruxsatini tekshiring","voice.hint.recognize":"Nutqni aniqlash: {{error}}","voice.hint.startFail":"Nutqni aniqlashni ishga tushirib boʻlmadi","onboarding.language.select":"Tilni tanlang","onboarding.language.pill":"Tilni tanlang","accessibility.download":"Yuklab olish","language.settings.title":"Interfeys tili","language.settings.aria":"Interfeys tilini tanlang","language.settings.note":"Interfeys tili boshqa tillarga tarjima qilingan; nutq modellari qayta yuklanmaydi.","tutorial.history.title":"Chatlar tarixi","tutorial.history.body":"Bu — tarjima suhbatlaringiz tarixi. AVNIVO bilan oldin yozishgan xabarlaringiz va tarjima chatlaringiz shu bo‘limda saqlanadi. Kerakli suhbatni topib, avvalgi xabarlarni qayta ko‘rishingiz, tarjimalarni tekshirishingiz yoki o‘sha suhbatni davom ettirishingiz mumkin. Yangi suhbat boshlash uchun ham tarix bo‘limidagi tegishli tugmadan foydalanasiz.","tutorial.settings.title":"Sozlamalar","tutorial.settings.body":"Sozlamalar bo‘limida tarjimonning ishlash usulini o‘zingizga moslashtirasiz. Online rejimda ovoz chiqarib o‘qish, mavjud ovozlar, o‘qish ohangi va uslubi kabi imkoniyatlarni boshqarish mumkin. Offline rejimda esa qurilmaga yuklanadigan ovoz tanish, tarjima va ovozli o‘qish modullarini hamda ularning holatini ko‘rishingiz mumkin. Ayrim imkoniyatlar tanlangan rejim va o‘rnatilgan modullarga bog‘liq.","tutorial.microphone.title":"Mikrofon","tutorial.microphone.body":"Mikrofon tugmasi orqali gapirib tarjima qilishni boshlaysiz. Avval kerakli tillarni tanlang, so‘ng mikrofonni bosing va odatdagidek gapiring. Ilova tanlangan rejim imkoniyatlariga qarab nutqni taniydi va tarjima qilishga yordam beradi. Mikrofon uchun brauzer ruxsati talab qilinishi mumkin.","tutorial.online.title":"Online rejim","tutorial.online.body":"Bu tugma internet orqali ishlaydigan tarjimon rejimini tanlaydi. Online rejimda mavjud bulutli ovoz tanish va tarjima xizmatlaridan foydalanish mumkin. Internet aloqasi va tegishli xizmatlarning mavjudligi zarur. Hozir ilova Online rejimida ochilgan.","tutorial.offline.title":"Offline rejim","tutorial.offline.body":"Bu tugma internetsiz ishlash uchun mo‘ljallangan rejimni tanlaydi. Offline imkoniyatlardan foydalanish uchun kerakli til va ovoz modullari qurilmaga oldindan yuklangan bo‘lishi lozim. Qo‘llab-quvvatlanadigan tillar va funksiyalar o‘rnatilgan modullarga bog‘liq. Tushunarli tugmasini bossangiz, tanishtirish yakunlanadi va ilova ishlashga tayyor bo‘ladi.","tutorial.next":"Tushunarli"},"en":{"_meta":{"code":"en","english":"English","machineTranslated":false,"reviewed":false,"generator":"i18n/generate.py","sourceLanguage":"en"},"app.name":"AVNIVO Translator","app.background":"AVNIVO background","mode.group":"Translator mode","mode.online":"Online mode","mode.offline":"Offline mode","history.toggle":"Open chat history","history.title":"Chat history","history.close":"Close history","history.new":"+ New chat","history.empty":"No saved chats yet. When you send a new message it will appear here with its date.","history.entry.title":"Uzbek = Russian","history.saved":"Saved: {{date}}","settings.toggle":"Open settings","settings.title":"Settings","settings.close":"Close settings","settings.description":"Settings section","offline.settings.title":"Offline settings","offline.settings.note":"Additional settings appear here, above the module list.","offline.modules.label":"Offline modules","offline.modules.title":"Offline modules","offline.modules.subtitle":"Download modules in advance and use them without internet. Some features may differ from Online mode.","brand.label":"AVNIVO Translator","messages.label":"Sent messages","languages.label":"Translation languages","languages.source":"Select Uzbek","languages.target":"Select Russian","online.languages.label":"Online languages","online.languages.title":"Online languages · {{count}}","online.languages.close":"Close","online.languages.search":"Search a language name or code","online.languages.searchLabel":"Search language","online.languages.help":"{{official}} confirmed · {{experimental}} experimental · {{retest}} need retest","online.status.official":"Confirmed","online.status.experimental":"Experimental","online.status.retest":"Needs retest","composer.placeholder":"Write text","mic.label.on":"Turn on microphone","mic.label.off":"Turn off microphone","mic.label.send":"Send text","mic.label.denied":"Microphone permission denied","mic.label.hold":"Release your finger to finish recording","speak.label":"Read the message aloud","speak.loading":"Preparing AI voice","speak.stop":"Stop reading aloud","speak.error":"AI voice failed: {{message}}","tts.voice.label":"AI voice (Online)","tts.voice.aria":"Choose an AI voice","tts.style.label":"Reading tone (Online)","tts.style.aria":"Choose a voice tone","tts.rate.label":"Reading speed (Online and Offline)","tts.rate.aria":"Read-aloud speed","tts.rate.normal":"1× — Normal","tts.rate.slow":"{{rate}}× — Slow","tts.rate.fast":"{{rate}}× — Fast","tts.delivery.label":"Voice delivery","tts.delivery.normal":"Normal","tts.delivery.whisper":"Whisper","tts.delivery.breathy":"Breathy","tts.delivery.clear":"Clear articulation","tts.delivery.soft":"Soft voice","tts.delivery.projected":"Loud and clear","tts.pitch.label":"Voice pitch","tts.pitch.normal":"Natural","tts.pitch.low":"Lower","tts.pitch.high":"Higher","tts.pitch.flat":"Flat","tts.pitch.expressive":"Expressive","tts.pace.label":"AI speech pace","tts.pace.normal":"Natural","tts.pace.slow":"Slow","tts.pace.fast":"Fast","tts.pace.deliberate":"With pauses","tts.style.auto":"Automatic","tts.style.calm":"Calm","tts.style.happy":"Cheerful","tts.style.sad":"Sad","tts.style.excited":"Excited","tts.style.concerned":"Concerned","tts.style.friendly":"Friendly","tts.style.professional":"Professional","tts.style.narrator":"Audiobook","tts.style.documentary":"Documentary","tts.style.news":"News","tts.style.storytelling":"Storyteller","tts.style.dramatic":"Dramatic","tts.style.mysterious":"Mysterious","tts.style.serious":"Serious","tts.style.confident":"Confident","tts.style.gentle":"Gentle","tts.style.empathetic":"Empathetic","tts.style.curious":"Curious","tts.style.surprised":"Surprised","tts.style.nervous":"Nervous","tts.style.fearful":"Fearful","tts.style.angry":"Angry","tts.style.frustrated":"Frustrated","tts.style.sarcastic":"Sarcastic","tts.style.ironic":"Ironic","tts.style.bored":"Bored","tts.style.tired":"Tired","tts.style.whisper":"Whispering","tts.style.mutter":"Muttering","tts.style.breathy":"Breathy voice","tts.style.robotic":"Robotic","tts.style.monotone":"Monotone","tts.style.playful":"Playful","tts.style.energetic":"Energetic","tts.style.thoughtful":"Thoughtful","tts.style.persuasive":"Persuasive","tts.style.teacher":"Teacher","tts.style.poetic":"Poetic","tts.style.slow":"Slow speech","tts.style.fast":"Fast speech","tts.style.custom":"I will define it myself","tts.custom.label":"Custom tone description (up to 240 characters)","tts.custom.placeholder":"For example: Speak warmly with gentle pauses.","tts.tags.note":"Special voice tags in text: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. These tags apply only where written; the result depends on the model.","offline.module.uz-stt.name":"Uzbek speech recognition","offline.module.uz-stt.desc":"Understands Uzbek speech and turns the spoken words into text.","offline.module.uz-stt.sizeNote":"Model file: 591.6 MB · extra files are separate","offline.module.multilingual-stt.name":"Multilingual speech recognition","offline.module.multilingual-stt.desc":"Turns speech in various languages into text. The quality for 99 languages is not yet confirmed.","offline.module.multilingual-stt.sizeNote":"Model: 251.9 MB · extra runtime is separate","offline.module.offline-translate.name":"Offline translation","offline.module.offline-translate.desc":"Helps translate texts into another language without an internet connection.","offline.module.offline-translate.sizeNote":"Exact download size not yet determined","offline.module.offline-tts.name":"Read text aloud","offline.module.offline-tts.desc":"Reads written text and translations aloud without internet.","offline.module.offline-tts.sizeNote":"Exact download size not yet determined","offline.module.action.download":"{{name}} — download","offline.module.action.ready":"Module active","offline.module.size":"Size: {{size}}","offline.module.sizePending":"Size: being determined","offline.state.not_installed":"Not downloaded","offline.state.downloading":"Downloading…","offline.state.verifying":"Verifying…","offline.state.ready":"Installed and active","offline.state.error":"Installation error","offline.progress.label":"Download progress","offline.notice.moduleMissing":"The download module did not open. Reload the page.","offline.notice.starting":"Real download starting. If the internet drops, tap again to resume.","offline.notice.saved":"Files saved and SHA-256 verified. Not active until the Sherpa-ONNX runtime is connected.","offline.notice.failed":"Download stopped: {{message}}. Tapping again resumes from the saved chunks.","offline.notice.noSource":"{{name}}: the download source is not connected yet. The download did not start.","offline.status.verifiedInactive":"Downloaded and verified · engine not connected","translation.selectOther":"Choose another language for translation","translation.pending":"Translating…","translation.error.pair":"The language pair is not yet supported on the server","translation.error.limit":"Translation limit reached","translation.error.server":"Translation server error ({{status}})","translation.error.mismatch":"Language codes in the translation response did not match","translation.error.timeout":"Translation timed out","translation.error.network":"Could not connect to the translation server","stt.error.limit":"Request limit reached","stt.error.format":"Wrong audio or language format","stt.error.unavailable":"The server is temporarily unavailable","stt.error.server":"Server error: {{status}}","voice.hint.release":"Speak · release to finish","voice.hint.noSpeech":"Speech-to-text is not available in this Chrome","voice.hint.micPermission":"Check microphone permission","voice.hint.recognize":"Speech recognition: {{error}}","voice.hint.startFail":"Could not start speech recognition","onboarding.language.select":"Select language","onboarding.language.pill":"Select a language","accessibility.download":"Download","language.settings.title":"Interface language","language.settings.aria":"Select interface language","language.settings.note":"The interface language is translated into other languages; speech models are not reloaded.","tutorial.history.title":"Chat history","tutorial.history.body":"This is your translation chat history. Previous AVNIVO conversations and translations are saved here. You can reopen and review earlier conversations or start a new one.","tutorial.settings.title":"Settings","tutorial.settings.body":"Customize how the translator works here. Online settings include speech playback, voices, tones and styles. Offline settings show downloadable speech recognition, translation and speech playback modules and their status. Features depend on the selected mode and installed modules.","tutorial.microphone.title":"Microphone","tutorial.microphone.body":"Use the microphone to translate speech. Choose your languages, tap the microphone and speak normally. Speech recognition depends on the selected mode. Browser microphone permission may be required.","tutorial.online.title":"Online mode","tutorial.online.body":"This button selects internet-powered translation. Online mode can use available cloud speech recognition and translation services. An internet connection and access to the services are required. The app currently opens in Online mode.","tutorial.offline.title":"Offline mode","tutorial.offline.body":"This button selects the mode intended for use without internet. Download the required language and speech modules in advance. Available languages and features depend on installed modules. Tap Understood to finish the introduction and unlock the app.","tutorial.next":"Understood"},"ru":{"_meta":{"code":"ru","english":"Russian","machineTranslated":true,"reviewed":false,"generator":"i18n/generate.py","sourceLanguage":"en"},"app.name":"AVNIVO Переводчик","app.background":"АВНИВО фон","mode.group":"Режим переводчика","mode.online":"Онлайн-режим","mode.offline":"Офлайн-режим","history.toggle":"Открыть историю чата","history.title":"История чата","history.close":"Закрыть историю","history.new":"+ Новый чат","history.empty":"Сохраненных чатов пока нет. Когда вы отправите новое сообщение, оно появится здесь с датой.","history.entry.title":"Узбекский = Русский","history.saved":"Сохранено: {{date}}","settings.toggle":"Открыть настройки","settings.title":"Настройки","settings.close":"Закрыть настройки","settings.description":"Раздел настроек","offline.settings.title":"Офлайн-настройки","offline.settings.note":"Дополнительные настройки появляются здесь, над списком модулей.","offline.modules.label":"Оффлайн модули","offline.modules.title":"Оффлайн модули","offline.modules.subtitle":"Загрузите модули заранее и используйте их без интернета. Некоторые функции могут отличаться от онлайн-режима.","brand.label":"AVNIVO Переводчик","messages.label":"Отправленные сообщения","languages.label":"Языки перевода","languages.source":"Выберите узбекский","languages.target":"Выберите русский","online.languages.label":"Онлайн языки","online.languages.title":"Онлайн-языки · {{count}}","online.languages.close":"Закрывать","online.languages.search":"Поиск по названию или коду языка","online.languages.searchLabel":"Язык поиска","online.languages.help":"{{official}} подтверждено · {{experimental}} экспериментально · {{retest}} требуется повторное тестирование","online.status.official":"Подтвержденный","online.status.experimental":"Экспериментальный","online.status.retest":"Требуется повторное тестирование","composer.placeholder":"Написать текст","mic.label.on":"Включить микрофон","mic.label.off":"Выключить микрофон","mic.label.send":"Отправить текст","mic.label.denied":"Разрешение на использование микрофона отклонено","mic.label.hold":"Отпустите палец, чтобы завершить запись.","speak.label":"Прочитайте сообщение вслух","speak.loading":"Подготовка голоса ИИ","speak.stop":"Хватит читать вслух","speak.error":"Голос AI не удался: {{message}}","tts.voice.label":"Голос AI (Онлайн)","tts.voice.aria":"Выберите голос ИИ","tts.style.label":"Тон чтения (Онлайн)","tts.style.aria":"Выберите тон голоса","tts.rate.label":"Скорость чтения (онлайн и оффлайн)","tts.rate.aria":"Скорость чтения вслух","tts.rate.normal":"1× — Нормальный","tts.rate.slow":"{{rate}}× — Медленно","tts.rate.fast":"{{rate}}× — Быстро","tts.delivery.label":"Голосовая доставка","tts.delivery.normal":"Нормальный","tts.delivery.whisper":"Шепот","tts.delivery.breathy":"Дышливый","tts.delivery.clear":"Четкая артикуляция","tts.delivery.soft":"Мягкий голос","tts.delivery.projected":"Громко и ясно","tts.pitch.label":"Высота голоса","tts.pitch.normal":"Естественный","tts.pitch.low":"Ниже","tts.pitch.high":"Выше","tts.pitch.flat":"Плоский","tts.pitch.expressive":"Выразительный","tts.pace.label":"Скорость речи ИИ","tts.pace.normal":"Естественный","tts.pace.slow":"Медленный","tts.pace.fast":"Быстрый","tts.pace.deliberate":"С паузами","tts.style.auto":"Автоматический","tts.style.calm":"Спокойствие","tts.style.happy":"Жизнерадостный","tts.style.sad":"Грустно","tts.style.excited":"Взволнованный","tts.style.concerned":"Обеспокоенный","tts.style.friendly":"Дружелюбно","tts.style.professional":"Профессиональный","tts.style.narrator":"Аудиокнига","tts.style.documentary":"Документальный фильм","tts.style.news":"Новости","tts.style.storytelling":"Рассказчик","tts.style.dramatic":"Драматический","tts.style.mysterious":"Таинственный","tts.style.serious":"Серьезный","tts.style.confident":"Уверенный","tts.style.gentle":"Нежный","tts.style.empathetic":"чуткий","tts.style.curious":"Любопытный","tts.style.surprised":"Удивлен","tts.style.nervous":"Нервный","tts.style.fearful":"Страшный","tts.style.angry":"Злой","tts.style.frustrated":"Расстроенный","tts.style.sarcastic":"Саркастический","tts.style.ironic":"Иронично","tts.style.bored":"Скучающий","tts.style.tired":"Усталый","tts.style.whisper":"Шепот","tts.style.mutter":"Бормотание","tts.style.breathy":"Хриплый голос","tts.style.robotic":"Роботизированный","tts.style.monotone":"монотонный","tts.style.playful":"Игривый","tts.style.energetic":"Энергичный","tts.style.thoughtful":"Вдумчивый","tts.style.persuasive":"Убедительный","tts.style.teacher":"Учитель","tts.style.poetic":"Поэтический","tts.style.slow":"Медленная речь","tts.style.fast":"Быстрая речь","tts.style.custom":"я определю это сам","tts.custom.label":"Описание пользовательского тона (до 240 символов)","tts.custom.placeholder":"Например: говорите тепло, делая легкие паузы.","tts.tags.note":"Специальные голосовые теги в тексте: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. Эти теги применяются только там, где они написаны; результат зависит от модели.","offline.module.uz-stt.name":"Распознавание узбекской речи","offline.module.uz-stt.desc":"Понимает узбекскую речь и превращает произнесенные слова в текст.","offline.module.uz-stt.sizeNote":"Файл модели: 591,6 МБ · дополнительные файлы отдельные","offline.module.multilingual-stt.name":"Многоязычное распознавание речи","offline.module.multilingual-stt.desc":"Превращает речь на разных языках в текст. Качество для 99 языков еще не подтверждено.","offline.module.multilingual-stt.sizeNote":"Модель: 251,9 МБ · дополнительное время работы оплачивается отдельно","offline.module.offline-translate.name":"Оффлайн перевод","offline.module.offline-translate.desc":"Помогает переводить тексты на другой язык без подключения к Интернету.","offline.module.offline-translate.sizeNote":"Точный размер загрузки еще не определен.","offline.module.offline-tts.name":"Чтение текста вслух","offline.module.offline-tts.desc":"Читает письменный текст и переводы вслух без Интернета.","offline.module.offline-tts.sizeNote":"Точный размер загрузки еще не определен.","offline.module.action.download":"{{name}} — скачать","offline.module.action.ready":"Модуль активен","offline.module.size":"Размер: {{size}}","offline.module.sizePending":"Размер: уточняется","offline.state.not_installed":"Не загружено","offline.state.downloading":"Загрузка…","offline.state.verifying":"Проверка…","offline.state.ready":"Установлен и активен","offline.state.error":"Ошибка установки","offline.progress.label":"Прогресс загрузки","offline.notice.moduleMissing":"Модуль загрузки не открылся. Перезагрузите страницу.","offline.notice.starting":"Начинается реальная загрузка. Если подключение к Интернету пропадает, нажмите еще раз, чтобы возобновить работу.","offline.notice.saved":"Файлы сохранены и проверен SHA-256. Неактивен до тех пор, пока не будет подключена среда выполнения Sherpa-ONNX.","offline.notice.failed":"Загрузка остановлена: {{message}}. Повторное нажатие возобновляется с сохраненных фрагментов.","offline.notice.noSource":"{{name}}: источник загрузки еще не подключен. Загрузка не началась.","offline.status.verifiedInactive":"Скачано и проверено · движок не подключен","translation.selectOther":"Выберите другой язык для перевода","translation.pending":"Перевод…","translation.error.pair":"Языковая пара пока не поддерживается на сервере.","translation.error.limit":"Достигнут лимит перевода","translation.error.server":"Ошибка сервера перевода ({{status}})","translation.error.mismatch":"Коды языков в ответе на перевод не совпали.","translation.error.timeout":"Время перевода истекло","translation.error.network":"Не удалось подключиться к серверу перевода","stt.error.limit":"Достигнут лимит запросов","stt.error.format":"Неправильный аудио или языковой формат","stt.error.unavailable":"Сервер временно недоступен","stt.error.server":"Ошибка сервера: {{status}}","voice.hint.release":"Говорить · отпустить до конца","voice.hint.noSpeech":"Преобразование речи в текст недоступно в этом Chrome.","voice.hint.micPermission":"Проверьте разрешение микрофона","voice.hint.recognize":"Распознавание речи: {{error}}","voice.hint.startFail":"Не удалось запустить распознавание речи","onboarding.language.select":"Выберите язык","onboarding.language.pill":"Выберите язык","accessibility.download":"Скачать","language.settings.title":"Язык интерфейса","language.settings.aria":"Выберите язык интерфейса","language.settings.note":"Язык интерфейса переведен на другие языки; речевые модели не перезагружаются.","tutorial.history.title":"История чата","tutorial.history.body":"Это ваша история чата переводов. Здесь сохраняются предыдущие беседы и переводы AVNIVO. Вы можете снова открыть и просмотреть предыдущие разговоры или начать новый.","tutorial.settings.title":"Настройки","tutorial.settings.body":"Здесь можно настроить работу переводчика. Онлайн-настройки включают воспроизведение речи, голоса, тона и стили. В автономных настройках отображаются загружаемые модули распознавания речи, перевода и воспроизведения речи, а также их статус. Возможности зависят от выбранного режима и установленных модулей.","tutorial.microphone.title":"Микрофон","tutorial.microphone.body":"Используйте микрофон для перевода речи. Выберите языки, коснитесь микрофона и говорите как обычно. Распознавание речи зависит от выбранного режима. Может потребоваться разрешение микрофона браузера.","tutorial.online.title":"Онлайн-режим","tutorial.online.body":"Эта кнопка выбирает перевод через Интернет. В онлайн-режиме можно использовать доступные облачные службы распознавания речи и перевода. Требуется подключение к Интернету и доступ к услугам. В настоящее время приложение открывается в онлайн-режиме.","tutorial.offline.title":"Офлайн-режим","tutorial.offline.body":"Эта кнопка выбирает режим, предназначенный для использования без интернета. Заранее скачайте необходимые языковые и речевые модули. Доступные языки и функции зависят от установленных модулей. Нажмите «Понятно», чтобы завершить введение и разблокировать приложение.","tutorial.next":"Понял"}};
+window.AVNIVO_I18N_BUNDLE={"uz":{"_meta":{"code":"uz","english":"Uzbek","machineTranslated":true,"reviewed":false,"generator":"i18n/generate.py","sourceLanguage":"en"},"app.name":"AVNIVO tarjimon","app.background":"AVNIVO fon","mode.group":"Tarjimon rejimi","mode.online":"Onlayn rejim","mode.offline":"Oflayn rejim","history.toggle":"Chat tarixini oching","history.title":"Chat tarixi","history.close":"Tarixni yopish","history.new":"+ Yangi chat","history.empty":"Hali chatlar saqlanmadi. Yangi xabar yuborganingizda, u sanasi bilan shu yerda paydo bo'ladi.","history.entry.title":"O'zbek = Rus","history.saved":"Saqlangan: {{date}}","settings.toggle":"Sozlamalarni oching","settings.title":"Sozlamalar","settings.close":"Sozlamalarni yoping","settings.description":"Sozlamalar bo'limi","offline.settings.title":"Oflayn sozlamalar","offline.settings.note":"Qo'shimcha sozlamalar bu erda, modullar ro'yxati tepasida ko'rinadi.","offline.modules.label":"Oflayn modullar","offline.modules.title":"Oflayn modullar","offline.modules.subtitle":"Modullarni oldindan yuklab oling va ularni internetsiz foydalaning. Ayrim funksiyalar Onlayn rejimidan farq qilishi mumkin.","brand.label":"AVNIVO tarjimon","messages.label":"Yuborilgan xabarlar","languages.label":"Tarjima tillari","languages.source":"O'zbek tilini tanlang","languages.target":"Rus tilini tanlang","online.languages.label":"Onlayn tillar","online.languages.title":"Onlayn tillar · {{count}}","online.languages.close":"Yopish","online.languages.search":"Til nomi yoki kodini qidiring","online.languages.searchLabel":"Qidiruv tili","online.languages.help":"{{official}} tasdiqlandi · {{experimental}} tajribali · {{retest}} qayta sinovdan oʻtish kerak","online.status.official":"Tasdiqlangan","online.status.experimental":"Eksperimental","online.status.retest":"Qayta sinovdan o'tish kerak","composer.placeholder":"Matn yozing","mic.label.on":"Mikrofonni yoqing","mic.label.off":"Mikrofonni o'chiring","mic.label.send":"Matn yuboring","mic.label.denied":"Mikrofonga ruxsat berilmadi","mic.label.hold":"Yozishni tugatish uchun barmog'ingizni qo'ying","speak.label":"Xabarni ovoz chiqarib o'qing","speak.loading":"AI ovozini tayyorlash","speak.stop":"Ovozli o'qishni to'xtating","speak.error":"AI ovozi muvaffaqiyatsiz tugadi: {{message}}","tts.voice.label":"AI ovozi (Onlayn)","tts.voice.aria":"AI ovozini tanlang","tts.style.label":"O'qish ohangi (Onlayn)","tts.style.aria":"Ovoz ohangini tanlang","tts.rate.label":"O'qish tezligi (onlayn va oflayn)","tts.rate.aria":"Ovozli o'qish tezligi","tts.rate.normal":"1× — Oddiy","tts.rate.slow":"{{rate}}× — Sekin","tts.rate.fast":"{{rate}}× — Tez","tts.delivery.label":"Ovozli yetkazib berish","tts.delivery.normal":"Oddiy","tts.delivery.whisper":"Shivirlash","tts.delivery.breathy":"Nafasli","tts.delivery.clear":"Aniq artikulyatsiya","tts.delivery.soft":"Yumshoq ovoz","tts.delivery.projected":"Baland va aniq","tts.pitch.label":"Ovoz balandligi","tts.pitch.normal":"Tabiiy","tts.pitch.low":"Pastroq","tts.pitch.high":"Yuqori","tts.pitch.flat":"Yassi","tts.pitch.expressive":"Ekspressiv","tts.pace.label":"AI nutq tezligi","tts.pace.normal":"Tabiiy","tts.pace.slow":"Sekin","tts.pace.fast":"Tez","tts.pace.deliberate":"Pauzalar bilan","tts.style.auto":"Avtomatik","tts.style.calm":"Tinchlaning","tts.style.happy":"Quvnoq","tts.style.sad":"Achinarli","tts.style.excited":"hayajonlangan","tts.style.concerned":"Xavotirda","tts.style.friendly":"Do'stona","tts.style.professional":"Professional","tts.style.narrator":"Audio kitob","tts.style.documentary":"Hujjatli film","tts.style.news":"Yangiliklar","tts.style.storytelling":"Hikoyachi","tts.style.dramatic":"Dramatik","tts.style.mysterious":"Sirli","tts.style.serious":"Jiddiy","tts.style.confident":"Ishonchli","tts.style.gentle":"Yumshoq","tts.style.empathetic":"Empatik","tts.style.curious":"Qiziq","tts.style.surprised":"Hayron qoldim","tts.style.nervous":"Asabiy","tts.style.fearful":"Qo'rqinchli","tts.style.angry":"G'azablangan","tts.style.frustrated":"Xafa bo'lgan","tts.style.sarcastic":"Sarkastik","tts.style.ironic":"Kinoiy","tts.style.bored":"Zerikkan","tts.style.tired":"Charchagan","tts.style.whisper":"Shivirlash","tts.style.mutter":"G'o'ldiradi","tts.style.breathy":"Nafasli ovoz","tts.style.robotic":"Robot","tts.style.monotone":"Monoton","tts.style.playful":"O'ynoqi","tts.style.energetic":"Baquvvat","tts.style.thoughtful":"O'ychan","tts.style.persuasive":"Ishontiruvchi","tts.style.teacher":"O'qituvchi","tts.style.poetic":"Poetik","tts.style.slow":"Sekin nutq","tts.style.fast":"Tez nutq","tts.style.custom":"Men buni o'zim aniqlayman","tts.custom.label":"Maxsus ohang tavsifi (240 belgigacha)","tts.custom.placeholder":"Masalan: yumshoq pauza bilan iliq gapiring.","tts.tags.note":"Matndagi maxsus ovoz teglari: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. Bu teglar faqat yozilgan joyda amal qiladi; natija modelga bog'liq.","offline.module.uz-stt.name":"O‘zbek tilidagi nutqni aniqlash","offline.module.uz-stt.desc":"O‘zbek tilidagi nutqni tushunadi va aytilgan so‘zlarni matnga aylantiradi.","offline.module.uz-stt.sizeNote":"Model fayli: 591,6 MB · qo'shimcha fayllar alohida","offline.module.multilingual-stt.name":"Ko'p tilli nutqni aniqlash","offline.module.multilingual-stt.desc":"Turli tillardagi nutqni matnga aylantiradi. 99 ta til uchun sifat hali tasdiqlanmagan.","offline.module.multilingual-stt.sizeNote":"Model: 251,9 MB · qo'shimcha ish vaqti alohida","offline.module.offline-translate.name":"Oflayn tarjima","offline.module.offline-translate.desc":"Internetga ulanmasdan matnlarni boshqa tilga tarjima qilishga yordam beradi.","offline.module.offline-translate.sizeNote":"Yuklab olishning aniq hajmi hali aniqlanmagan","offline.module.offline-tts.name":"Matnni ovoz chiqarib o'qing","offline.module.offline-tts.desc":"Yozma matn va tarjimalarni internetsiz ovoz chiqarib o'qiydi.","offline.module.offline-tts.sizeNote":"Yuklab olishning aniq hajmi hali aniqlanmagan","offline.module.action.download":"{{name}} — yuklab olish","offline.module.action.ready":"Modul faol","offline.module.size":"Hajmi: {{size}}","offline.module.sizePending":"Hajmi: aniqlanmoqda","offline.state.not_installed":"Yuklanmagan","offline.state.downloading":"Yuklab olinmoqda…","offline.state.verifying":"Tekshirilmoqda…","offline.state.installed":"O‘rnatilgan va tekshirilgan · ishlatilganda yuklanadi","offline.state.ready":"Faol — nutqni tanishga tayyor","offline.state.ready.translate":"Faol — tarjimaga tayyor","offline.state.ready.tts":"Faol — ovozga tayyor","offline.state.enabled":"Faol — ishlatilganda xotiraga yuklanadi","offline.state.error":"Xato","offline.translate.notReady":"Offline tarjima moduli yuklab olinmagan.","offline.translate.initializing":"Offline tarjima moduli yuklanmoqda…","offline.translate.error":"Offline tarjima moduli xatosi","offline.translate.needPair":"Ikkala tilni tanlang: oflayn tarjima moduli tayyor bo‘lishi kerak.","offline.languages.title":"Oflayn tillar","offline.language.available":"Oflayn mavjud","offline.language.empty":"Til tanlanmagan","offline.progress.label":"Yuklab olish jarayoni","offline.notice.moduleMissing":"Yuklab olish moduli ochilmadi. Sahifani qayta yuklang.","offline.notice.starting":"Haqiqiy yuklab olish boshlandi. Internet uzilib qolsa, davom etish uchun yana bosing.","offline.notice.saved":"Fayllar saqlangan va SHA-256 tasdiqlangan. Sherpa-ONNX ish vaqti ulanmaguncha faol emas.","offline.notice.failed":"Yuklab olish toʻxtatildi: {{message}}. Qayta bosish saqlangan bo'laklardan davom etadi.","offline.notice.noSource":"{{name}}: yuklab olish manbasi hali ulanmagan. Yuklab olish boshlanmadi.","offline.status.verifiedInactive":"Yuklab olingan va tasdiqlangan · dvigatel ulanmagan","translation.selectOther":"Tarjima uchun boshqa tilni tanlang","translation.pending":"Tarjima qilinmoqda…","translation.error.pair":"Til juftligi hali serverda qo'llab-quvvatlanmaydi","translation.error.limit":"Tarjima chegarasiga yetdi","translation.error.server":"Tarjima serveri xatosi ({{status}})","translation.error.mismatch":"Tarjima javobidagi til kodlari mos kelmadi","translation.error.timeout":"Tarjima vaqti tugadi","translation.error.network":"Tarjima serveriga ulanib bo‘lmadi","stt.error.limit":"Soʻrov chegarasiga yetdi","stt.error.format":"Noto'g'ri audio yoki til formati","stt.error.unavailable":"Server vaqtincha ishlamayapti","stt.error.server":"Server xatosi: {{status}}","voice.hint.release":"Gapiring · tugatish uchun qo'yib yuboring","voice.hint.noSpeech":"Ushbu Chrome brauzerida nutqdan matnga funksiya mavjud emas","voice.hint.micPermission":"Mikrofon ruxsatini tekshiring","voice.hint.recognize":"Nutqni aniqlash: {{error}}","voice.hint.startFail":"Nutqni aniqlashni ishga tushirib boʻlmadi","onboarding.language.select":"Tilni tanlang","onboarding.language.pill":"Tilni tanlang","accessibility.download":"Yuklab olish","language.settings.title":"Interfeys tili","language.settings.aria":"Interfeys tilini tanlang","language.settings.note":"Interfeys tili boshqa tillarga tarjima qilingan; nutq modellari qayta yuklanmaydi.","tutorial.history.title":"Chatlar tarixi","tutorial.history.body":"Bu — tarjima suhbatlaringiz tarixi. AVNIVO bilan oldin yozishgan xabarlaringiz va tarjima chatlaringiz shu bo‘limda saqlanadi. Kerakli suhbatni topib, avvalgi xabarlarni qayta ko‘rishingiz, tarjimalarni tekshirishingiz yoki o‘sha suhbatni davom ettirishingiz mumkin. Yangi suhbat boshlash uchun ham tarix bo‘limidagi tegishli tugmadan foydalanasiz.","tutorial.settings.title":"Sozlamalar","tutorial.settings.body":"Sozlamalar bo‘limida tarjimonning ishlash usulini o‘zingizga moslashtirasiz. Online rejimda ovoz chiqarib o‘qish, mavjud ovozlar, o‘qish ohangi va uslubi kabi imkoniyatlarni boshqarish mumkin. Offline rejimda esa qurilmaga yuklanadigan ovoz tanish, tarjima va ovozli o‘qish modullarini hamda ularning holatini ko‘rishingiz mumkin. Ayrim imkoniyatlar tanlangan rejim va o‘rnatilgan modullarga bog‘liq.","tutorial.microphone.title":"Mikrofon","tutorial.microphone.body":"Mikrofon tugmasi orqali gapirib tarjima qilishni boshlaysiz. Avval kerakli tillarni tanlang, so‘ng mikrofonni bosing va odatdagidek gapiring. Ilova tanlangan rejim imkoniyatlariga qarab nutqni taniydi va tarjima qilishga yordam beradi. Mikrofon uchun brauzer ruxsati talab qilinishi mumkin.","tutorial.online.title":"Online rejim","tutorial.online.body":"Bu tugma internet orqali ishlaydigan tarjimon rejimini tanlaydi. Online rejimda mavjud bulutli ovoz tanish va tarjima xizmatlaridan foydalanish mumkin. Internet aloqasi va tegishli xizmatlarning mavjudligi zarur. Hozir ilova Online rejimida ochilgan.","tutorial.offline.title":"Offline rejim","tutorial.offline.body":"Bu tugma internetsiz ishlash uchun mo‘ljallangan rejimni tanlaydi. Offline imkoniyatlardan foydalanish uchun kerakli til va ovoz modullari qurilmaga oldindan yuklangan bo‘lishi lozim. Qo‘llab-quvvatlanadigan tillar va funksiyalar o‘rnatilgan modullarga bog‘liq. Tushunarli tugmasini bossangiz, tanishtirish yakunlanadi va ilova ishlashga tayyor bo‘ladi.","tutorial.next":"Tushunarli","offline.state.initializing":"Ishga tushmoqda…","offline.state.recording":"Ovoz yozilmoqda…","offline.state.transcribing":"Nutq matnga aylantirilmoqda…"},"en":{"_meta":{"code":"en","english":"English","machineTranslated":false,"reviewed":false,"generator":"i18n/generate.py","sourceLanguage":"en"},"app.name":"AVNIVO Translator","app.background":"AVNIVO background","mode.group":"Translator mode","mode.online":"Online mode","mode.offline":"Offline mode","history.toggle":"Open chat history","history.title":"Chat history","history.close":"Close history","history.new":"+ New chat","history.empty":"No saved chats yet. When you send a new message it will appear here with its date.","history.entry.title":"Uzbek = Russian","history.saved":"Saved: {{date}}","settings.toggle":"Open settings","settings.title":"Settings","settings.close":"Close settings","settings.description":"Settings section","offline.settings.title":"Offline settings","offline.settings.note":"Additional settings appear here, above the module list.","offline.modules.label":"Offline modules","offline.modules.title":"Offline modules","offline.modules.subtitle":"Download modules in advance and use them without internet. Some features may differ from Online mode.","brand.label":"AVNIVO Translator","messages.label":"Sent messages","languages.label":"Translation languages","languages.source":"Select Uzbek","languages.target":"Select Russian","online.languages.label":"Online languages","online.languages.title":"Online languages · {{count}}","online.languages.close":"Close","online.languages.search":"Search a language name or code","online.languages.searchLabel":"Search language","online.languages.help":"{{official}} confirmed · {{experimental}} experimental · {{retest}} need retest","online.status.official":"Confirmed","online.status.experimental":"Experimental","online.status.retest":"Needs retest","composer.placeholder":"Write text","mic.label.on":"Turn on microphone","mic.label.off":"Turn off microphone","mic.label.send":"Send text","mic.label.denied":"Microphone permission denied","mic.label.hold":"Release your finger to finish recording","speak.label":"Read the message aloud","speak.loading":"Preparing AI voice","speak.stop":"Stop reading aloud","speak.error":"AI voice failed: {{message}}","tts.voice.label":"AI voice (Online)","tts.voice.aria":"Choose an AI voice","tts.style.label":"Reading tone (Online)","tts.style.aria":"Choose a voice tone","tts.rate.label":"Reading speed (Online and Offline)","tts.rate.aria":"Read-aloud speed","tts.rate.normal":"1× — Normal","tts.rate.slow":"{{rate}}× — Slow","tts.rate.fast":"{{rate}}× — Fast","tts.delivery.label":"Voice delivery","tts.delivery.normal":"Normal","tts.delivery.whisper":"Whisper","tts.delivery.breathy":"Breathy","tts.delivery.clear":"Clear articulation","tts.delivery.soft":"Soft voice","tts.delivery.projected":"Loud and clear","tts.pitch.label":"Voice pitch","tts.pitch.normal":"Natural","tts.pitch.low":"Lower","tts.pitch.high":"Higher","tts.pitch.flat":"Flat","tts.pitch.expressive":"Expressive","tts.pace.label":"AI speech pace","tts.pace.normal":"Natural","tts.pace.slow":"Slow","tts.pace.fast":"Fast","tts.pace.deliberate":"With pauses","tts.style.auto":"Automatic","tts.style.calm":"Calm","tts.style.happy":"Cheerful","tts.style.sad":"Sad","tts.style.excited":"Excited","tts.style.concerned":"Concerned","tts.style.friendly":"Friendly","tts.style.professional":"Professional","tts.style.narrator":"Audiobook","tts.style.documentary":"Documentary","tts.style.news":"News","tts.style.storytelling":"Storyteller","tts.style.dramatic":"Dramatic","tts.style.mysterious":"Mysterious","tts.style.serious":"Serious","tts.style.confident":"Confident","tts.style.gentle":"Gentle","tts.style.empathetic":"Empathetic","tts.style.curious":"Curious","tts.style.surprised":"Surprised","tts.style.nervous":"Nervous","tts.style.fearful":"Fearful","tts.style.angry":"Angry","tts.style.frustrated":"Frustrated","tts.style.sarcastic":"Sarcastic","tts.style.ironic":"Ironic","tts.style.bored":"Bored","tts.style.tired":"Tired","tts.style.whisper":"Whispering","tts.style.mutter":"Muttering","tts.style.breathy":"Breathy voice","tts.style.robotic":"Robotic","tts.style.monotone":"Monotone","tts.style.playful":"Playful","tts.style.energetic":"Energetic","tts.style.thoughtful":"Thoughtful","tts.style.persuasive":"Persuasive","tts.style.teacher":"Teacher","tts.style.poetic":"Poetic","tts.style.slow":"Slow speech","tts.style.fast":"Fast speech","tts.style.custom":"I will define it myself","tts.custom.label":"Custom tone description (up to 240 characters)","tts.custom.placeholder":"For example: Speak warmly with gentle pauses.","tts.tags.note":"Special voice tags in text: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. These tags apply only where written; the result depends on the model.","offline.module.uz-stt.name":"Uzbek speech recognition","offline.module.uz-stt.desc":"Understands Uzbek speech and turns the spoken words into text.","offline.module.uz-stt.sizeNote":"Model file: 591.6 MB · extra files are separate","offline.module.multilingual-stt.name":"Multilingual speech recognition","offline.module.multilingual-stt.desc":"Turns speech in various languages into text. The quality for 99 languages is not yet confirmed.","offline.module.multilingual-stt.sizeNote":"Model: 251.9 MB · extra runtime is separate","offline.module.offline-translate.name":"Offline translation","offline.module.offline-translate.desc":"Helps translate texts into another language without an internet connection.","offline.module.offline-translate.sizeNote":"Exact download size not yet determined","offline.module.offline-tts.name":"Read text aloud","offline.module.offline-tts.desc":"Reads written text and translations aloud without internet.","offline.module.offline-tts.sizeNote":"Exact download size not yet determined","offline.module.action.download":"{{name}} — download","offline.module.action.ready":"Module active","offline.module.size":"Size: {{size}}","offline.module.sizePending":"Size: being determined","offline.state.not_installed":"Not downloaded","offline.state.downloading":"Downloading…","offline.state.verifying":"Verifying…","offline.state.installed":"Installed and verified · loads when used","offline.state.ready":"Active — ready to recognize speech","offline.state.ready.translate":"Active — ready to translate","offline.state.ready.tts":"Active — ready for speech","offline.state.enabled":"Active — loads into memory when used","offline.state.error":"Error","offline.translate.notReady":"The offline translation module is not downloaded.","offline.translate.initializing":"The offline translation module is loading…","offline.translate.error":"Offline translation module error","offline.translate.needPair":"Select both languages: the offline translation module must be ready.","offline.languages.title":"Offline languages","offline.language.available":"Available offline","offline.language.empty":"No language selected","offline.progress.label":"Download progress","offline.notice.moduleMissing":"The download module did not open. Reload the page.","offline.notice.starting":"Real download starting. If the internet drops, tap again to resume.","offline.notice.saved":"Files saved and SHA-256 verified. Not active until the Sherpa-ONNX runtime is connected.","offline.notice.failed":"Download stopped: {{message}}. Tapping again resumes from the saved chunks.","offline.notice.noSource":"{{name}}: the download source is not connected yet. The download did not start.","offline.status.verifiedInactive":"Downloaded and verified · engine not connected","translation.selectOther":"Choose another language for translation","translation.pending":"Translating…","translation.error.pair":"The language pair is not yet supported on the server","translation.error.limit":"Translation limit reached","translation.error.server":"Translation server error ({{status}})","translation.error.mismatch":"Language codes in the translation response did not match","translation.error.timeout":"Translation timed out","translation.error.network":"Could not connect to the translation server","stt.error.limit":"Request limit reached","stt.error.format":"Wrong audio or language format","stt.error.unavailable":"The server is temporarily unavailable","stt.error.server":"Server error: {{status}}","voice.hint.release":"Speak · release to finish","voice.hint.noSpeech":"Speech-to-text is not available in this Chrome","voice.hint.micPermission":"Check microphone permission","voice.hint.recognize":"Speech recognition: {{error}}","voice.hint.startFail":"Could not start speech recognition","onboarding.language.select":"Select language","onboarding.language.pill":"Select a language","accessibility.download":"Download","language.settings.title":"Interface language","language.settings.aria":"Select interface language","language.settings.note":"The interface language is translated into other languages; speech models are not reloaded.","tutorial.history.title":"Chat history","tutorial.history.body":"This is your translation chat history. Previous AVNIVO conversations and translations are saved here. You can reopen and review earlier conversations or start a new one.","tutorial.settings.title":"Settings","tutorial.settings.body":"Customize how the translator works here. Online settings include speech playback, voices, tones and styles. Offline settings show downloadable speech recognition, translation and speech playback modules and their status. Features depend on the selected mode and installed modules.","tutorial.microphone.title":"Microphone","tutorial.microphone.body":"Use the microphone to translate speech. Choose your languages, tap the microphone and speak normally. Speech recognition depends on the selected mode. Browser microphone permission may be required.","tutorial.online.title":"Online mode","tutorial.online.body":"This button selects internet-powered translation. Online mode can use available cloud speech recognition and translation services. An internet connection and access to the services are required. The app currently opens in Online mode.","tutorial.offline.title":"Offline mode","tutorial.offline.body":"This button selects the mode intended for use without internet. Download the required language and speech modules in advance. Available languages and features depend on installed modules. Tap Understood to finish the introduction and unlock the app.","tutorial.next":"Understood","offline.state.initializing":"Starting…","offline.state.recording":"Recording audio…","offline.state.transcribing":"Transcribing speech…"},"ru":{"_meta":{"code":"ru","english":"Russian","machineTranslated":true,"reviewed":false,"generator":"i18n/generate.py","sourceLanguage":"en"},"app.name":"AVNIVO Переводчик","app.background":"АВНИВО фон","mode.group":"Режим переводчика","mode.online":"Онлайн-режим","mode.offline":"Офлайн-режим","history.toggle":"Открыть историю чата","history.title":"История чата","history.close":"Закрыть историю","history.new":"+ Новый чат","history.empty":"Сохраненных чатов пока нет. Когда вы отправите новое сообщение, оно появится здесь с датой.","history.entry.title":"Узбекский = Русский","history.saved":"Сохранено: {{date}}","settings.toggle":"Открыть настройки","settings.title":"Настройки","settings.close":"Закрыть настройки","settings.description":"Раздел настроек","offline.settings.title":"Офлайн-настройки","offline.settings.note":"Дополнительные настройки появляются здесь, над списком модулей.","offline.modules.label":"Оффлайн модули","offline.modules.title":"Оффлайн модули","offline.modules.subtitle":"Загрузите модули заранее и используйте их без интернета. Некоторые функции могут отличаться от онлайн-режима.","brand.label":"AVNIVO Переводчик","messages.label":"Отправленные сообщения","languages.label":"Языки перевода","languages.source":"Выберите узбекский","languages.target":"Выберите русский","online.languages.label":"Онлайн языки","online.languages.title":"Онлайн-языки · {{count}}","online.languages.close":"Закрывать","online.languages.search":"Поиск по названию или коду языка","online.languages.searchLabel":"Язык поиска","online.languages.help":"{{official}} подтверждено · {{experimental}} экспериментально · {{retest}} требуется повторное тестирование","online.status.official":"Подтвержденный","online.status.experimental":"Экспериментальный","online.status.retest":"Требуется повторное тестирование","composer.placeholder":"Написать текст","mic.label.on":"Включить микрофон","mic.label.off":"Выключить микрофон","mic.label.send":"Отправить текст","mic.label.denied":"Разрешение на использование микрофона отклонено","mic.label.hold":"Отпустите палец, чтобы завершить запись.","speak.label":"Прочитайте сообщение вслух","speak.loading":"Подготовка голоса ИИ","speak.stop":"Хватит читать вслух","speak.error":"Голос AI не удался: {{message}}","tts.voice.label":"Голос AI (Онлайн)","tts.voice.aria":"Выберите голос ИИ","tts.style.label":"Тон чтения (Онлайн)","tts.style.aria":"Выберите тон голоса","tts.rate.label":"Скорость чтения (онлайн и оффлайн)","tts.rate.aria":"Скорость чтения вслух","tts.rate.normal":"1× — Нормальный","tts.rate.slow":"{{rate}}× — Медленно","tts.rate.fast":"{{rate}}× — Быстро","tts.delivery.label":"Голосовая доставка","tts.delivery.normal":"Нормальный","tts.delivery.whisper":"Шепот","tts.delivery.breathy":"Дышливый","tts.delivery.clear":"Четкая артикуляция","tts.delivery.soft":"Мягкий голос","tts.delivery.projected":"Громко и ясно","tts.pitch.label":"Высота голоса","tts.pitch.normal":"Естественный","tts.pitch.low":"Ниже","tts.pitch.high":"Выше","tts.pitch.flat":"Плоский","tts.pitch.expressive":"Выразительный","tts.pace.label":"Скорость речи ИИ","tts.pace.normal":"Естественный","tts.pace.slow":"Медленный","tts.pace.fast":"Быстрый","tts.pace.deliberate":"С паузами","tts.style.auto":"Автоматический","tts.style.calm":"Спокойствие","tts.style.happy":"Жизнерадостный","tts.style.sad":"Грустно","tts.style.excited":"Взволнованный","tts.style.concerned":"Обеспокоенный","tts.style.friendly":"Дружелюбно","tts.style.professional":"Профессиональный","tts.style.narrator":"Аудиокнига","tts.style.documentary":"Документальный фильм","tts.style.news":"Новости","tts.style.storytelling":"Рассказчик","tts.style.dramatic":"Драматический","tts.style.mysterious":"Таинственный","tts.style.serious":"Серьезный","tts.style.confident":"Уверенный","tts.style.gentle":"Нежный","tts.style.empathetic":"чуткий","tts.style.curious":"Любопытный","tts.style.surprised":"Удивлен","tts.style.nervous":"Нервный","tts.style.fearful":"Страшный","tts.style.angry":"Злой","tts.style.frustrated":"Расстроенный","tts.style.sarcastic":"Саркастический","tts.style.ironic":"Иронично","tts.style.bored":"Скучающий","tts.style.tired":"Усталый","tts.style.whisper":"Шепот","tts.style.mutter":"Бормотание","tts.style.breathy":"Хриплый голос","tts.style.robotic":"Роботизированный","tts.style.monotone":"монотонный","tts.style.playful":"Игривый","tts.style.energetic":"Энергичный","tts.style.thoughtful":"Вдумчивый","tts.style.persuasive":"Убедительный","tts.style.teacher":"Учитель","tts.style.poetic":"Поэтический","tts.style.slow":"Медленная речь","tts.style.fast":"Быстрая речь","tts.style.custom":"я определю это сам","tts.custom.label":"Описание пользовательского тона (до 240 символов)","tts.custom.placeholder":"Например: говорите тепло, делая легкие паузы.","tts.tags.note":"Специальные голосовые теги в тексте: <short pause>, <long pause>, <sigh>, <breath>, <gasp>, <cough>. Эти теги применяются только там, где они написаны; результат зависит от модели.","offline.module.uz-stt.name":"Распознавание узбекской речи","offline.module.uz-stt.desc":"Понимает узбекскую речь и превращает произнесенные слова в текст.","offline.module.uz-stt.sizeNote":"Файл модели: 591,6 МБ · дополнительные файлы отдельные","offline.module.multilingual-stt.name":"Многоязычное распознавание речи","offline.module.multilingual-stt.desc":"Превращает речь на разных языках в текст. Качество для 99 языков еще не подтверждено.","offline.module.multilingual-stt.sizeNote":"Модель: 251,9 МБ · дополнительное время работы оплачивается отдельно","offline.module.offline-translate.name":"Оффлайн перевод","offline.module.offline-translate.desc":"Помогает переводить тексты на другой язык без подключения к Интернету.","offline.module.offline-translate.sizeNote":"Точный размер загрузки еще не определен.","offline.module.offline-tts.name":"Чтение текста вслух","offline.module.offline-tts.desc":"Читает письменный текст и переводы вслух без Интернета.","offline.module.offline-tts.sizeNote":"Точный размер загрузки еще не определен.","offline.module.action.download":"{{name}} — скачать","offline.module.action.ready":"Модуль активен","offline.module.size":"Размер: {{size}}","offline.module.sizePending":"Размер: уточняется","offline.state.not_installed":"Не загружено","offline.state.downloading":"Загрузка…","offline.state.verifying":"Проверка…","offline.state.installed":"Установлено и проверено · загружается при использовании","offline.state.ready":"Активен — готов к распознаванию речи","offline.state.ready.translate":"Активен — готов к переводу","offline.state.ready.tts":"Активен — готов к озвучиванию","offline.state.enabled":"Активен — загружается в память при использовании","offline.state.error":"Ошибка","offline.translate.notReady":"Модуль офлайн-перевода не загружен.","offline.translate.initializing":"Модуль офлайн-перевода загружается…","offline.translate.error":"Ошибка модуля офлайн-перевода","offline.translate.needPair":"Выберите оба языка: модуль офлайн-перевода должен быть готов.","offline.languages.title":"Офлайн-языки","offline.language.available":"Доступно офлайн","offline.language.empty":"Язык не выбран","offline.progress.label":"Прогресс загрузки","offline.notice.moduleMissing":"Модуль загрузки не открылся. Перезагрузите страницу.","offline.notice.starting":"Начинается реальная загрузка. Если подключение к Интернету пропадает, нажмите еще раз, чтобы возобновить работу.","offline.notice.saved":"Файлы сохранены и проверен SHA-256. Неактивен до тех пор, пока не будет подключена среда выполнения Sherpa-ONNX.","offline.notice.failed":"Загрузка остановлена: {{message}}. Повторное нажатие возобновляется с сохраненных фрагментов.","offline.notice.noSource":"{{name}}: источник загрузки еще не подключен. Загрузка не началась.","offline.status.verifiedInactive":"Скачано и проверено · движок не подключен","translation.selectOther":"Выберите другой язык для перевода","translation.pending":"Перевод…","translation.error.pair":"Языковая пара пока не поддерживается на сервере.","translation.error.limit":"Достигнут лимит перевода","translation.error.server":"Ошибка сервера перевода ({{status}})","translation.error.mismatch":"Коды языков в ответе на перевод не совпали.","translation.error.timeout":"Время перевода истекло","translation.error.network":"Не удалось подключиться к серверу перевода","stt.error.limit":"Достигнут лимит запросов","stt.error.format":"Неправильный аудио или языковой формат","stt.error.unavailable":"Сервер временно недоступен","stt.error.server":"Ошибка сервера: {{status}}","voice.hint.release":"Говорить · отпустить до конца","voice.hint.noSpeech":"Преобразование речи в текст недоступно в этом Chrome.","voice.hint.micPermission":"Проверьте разрешение микрофона","voice.hint.recognize":"Распознавание речи: {{error}}","voice.hint.startFail":"Не удалось запустить распознавание речи","onboarding.language.select":"Выберите язык","onboarding.language.pill":"Выберите язык","accessibility.download":"Скачать","language.settings.title":"Язык интерфейса","language.settings.aria":"Выберите язык интерфейса","language.settings.note":"Язык интерфейса переведен на другие языки; речевые модели не перезагружаются.","tutorial.history.title":"История чата","tutorial.history.body":"Это ваша история чата переводов. Здесь сохраняются предыдущие беседы и переводы AVNIVO. Вы можете снова открыть и просмотреть предыдущие разговоры или начать новый.","tutorial.settings.title":"Настройки","tutorial.settings.body":"Здесь можно настроить работу переводчика. Онлайн-настройки включают воспроизведение речи, голоса, тона и стили. В автономных настройках отображаются загружаемые модули распознавания речи, перевода и воспроизведения речи, а также их статус. Возможности зависят от выбранного режима и установленных модулей.","tutorial.microphone.title":"Микрофон","tutorial.microphone.body":"Используйте микрофон для перевода речи. Выберите языки, коснитесь микрофона и говорите как обычно. Распознавание речи зависит от выбранного режима. Может потребоваться разрешение микрофона браузера.","tutorial.online.title":"Онлайн-режим","tutorial.online.body":"Эта кнопка выбирает перевод через Интернет. В онлайн-режиме можно использовать доступные облачные службы распознавания речи и перевода. Требуется подключение к Интернету и доступ к услугам. В настоящее время приложение открывается в онлайн-режиме.","tutorial.offline.title":"Офлайн-режим","tutorial.offline.body":"Эта кнопка выбирает режим, предназначенный для использования без интернета. Заранее скачайте необходимые языковые и речевые модули. Доступные языки и функции зависят от установленных модулей. Нажмите «Понятно», чтобы завершить введение и разблокировать приложение.","tutorial.next":"Понял","offline.state.initializing":"Запуск…","offline.state.recording":"Идёт запись…","offline.state.transcribing":"Распознавание речи…"}};
 </script>
 <script>
 /* AVNIVO interface localization engine.
@@ -787,8 +810,8 @@ function applyMode(mode){
  document.querySelector('meta[name="theme-color"]').content=chosen==='offline'?'#080f19':'#17120d';
  try{localStorage.setItem('avnivo.ui.mode.v1',chosen)}catch(e){}
 }
-modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'&&active)stopVoice();voiceHint.hidden=true;applyMode('online');updateOnlineLanguageLabels()});
-modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){requestToken++;cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}applyMode('offline');leftLanguage.querySelector('.language-name').textContent='O‘zbek tili';leftLanguage.querySelector('.language-code').textContent='UZ';rightLanguage.querySelector('.language-name').textContent='Русский язык';rightLanguage.querySelector('.language-code').textContent='РУ'});
+modeOnline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='offline'){if(active)stopVoice();try{window.AvnivoOfflineSTT&&window.AvnivoOfflineSTT.stop()}catch(e){}finishOfflineHold()}voiceHint.hidden=true;transferLanguageSelection('offline','online');applyMode('online');updateOnlineLanguageLabels();syncLanguageChips();syncUzbekSttCard()});
+modeOffline.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode==='online'){requestToken++;cancelOnlineRecording();if(active)stopVoice();closeOnlineLanguages()}else{try{window.AvnivoOfflineSTT&&window.AvnivoOfflineSTT.stop()}catch(e){}finishOfflineHold()}transferLanguageSelection('online','offline');applyMode('offline');syncLanguageChips();syncUzbekSttCard()});
 try{applyMode(localStorage.getItem('avnivo-first-launch-v1-complete')==='yes'?localStorage.getItem('avnivo.ui.mode.v1'):'online')}catch(e){applyMode('online')}
 const mic=shell.querySelector('.mic-icon');
 const trace=shell.querySelector('.voice-trace-glow');
@@ -856,6 +879,62 @@ function updateOnlineLanguageLabels(){
   button.setAttribute('aria-label',name+' ('+locale+')');
  }
 }
+/* Renders whichever pair the current mode owns. Online reads its own stored locales; offline reads
+   its own stored locales but only shows a chip whose code the loaded tokenizer actually carries, so
+   an unsupported or not-yet-installed language shows as empty instead of pretending. */
+function offlineDisplayName(code){
+ if(!code)return '';
+ const entry=offlineLanguageEntry(code);
+ if(entry)return entry.name;
+ const locale=ONLINE_LANGUAGES.find(x=>nllbCodeForLocale(x[0])===code);
+ return locale?onlineLanguageName(locale[0]):code;
+}
+function syncLanguageChips(){
+ const offline=document.documentElement.dataset.avnivoMode==='offline';
+ for(const [side,button] of [['left',leftLanguage],['right',rightLanguage]]){
+  if(!offline){
+   const locale=onlineChoice[side],name=onlineLanguageName(locale);
+   button.querySelector('.language-name').textContent=name;
+   button.querySelector('.language-code').textContent=locale.split('-')[0].toUpperCase();
+   button.setAttribute('aria-label',name+' ('+locale+')');
+   button.removeAttribute('data-unsupported');
+   continue;
+  }
+  /* The stored pair is always shown, even before the NLLB model is installed. Hiding it made the
+     chips look empty on every restart, which read as if the choice had been lost. The chip is only
+     marked unsupported when a loaded tokenizer proves it cannot be encoded; translation refuses
+     with a reason in that case, so the label never over-promises. */
+  const supported=offlineLanguagesReady();
+  const stored=offlineChoice[side];
+  const code=supported?supportedOfflineCode(stored,supported):stored;
+  const name=offlineDisplayName(code);
+  button.querySelector('.language-name').textContent=name;
+  button.querySelector('.language-code').textContent=code?code.split('_')[0].toUpperCase():'';
+  button.setAttribute('aria-label',name||avnivoUiText('offline.language.empty','Til tanlanmagan'));
+  const unusable=Boolean(stored)&&supported!==null&&!code;
+  if(unusable)button.setAttribute('data-unsupported','true');else button.removeAttribute('data-unsupported');
+ }
+}
+/* Carries a selection across a mode change when the other mode can honour it, and leaves the
+   target side empty when it cannot. Neither mode's stored pair is overwritten by this, so going
+   online -> offline -> online restores exactly what the user had online. */
+function transferLanguageSelection(fromMode,toMode){
+ const supported=offlineLanguagesReady();
+ for(const side of ['left','right']){
+  if(toMode==='offline'){
+   const code=offlineCodeFromLocale(onlineChoice[side],supported);
+   if(code)offlineChoice[side]=code;
+  }else{
+   /* Only transfer back when this side was actually filled offline and still maps to a locale the
+      online picker offers; otherwise keep the online pair the user already had. */
+   const code=offlineChoice[side];
+   if(!code)continue;
+   const locale=ONLINE_LANGUAGES.find(x=>nllbCodeForLocale(x[0])===code);
+   if(locale)onlineChoice[side]=locale[0];
+  }
+ }
+ persistOnlineLanguagePair();persistOfflineLanguagePair();
+}
 updateOnlineLanguageLabels();
 function renderOnlineLanguages(){
  const q=languageSearch.value.trim().toLocaleLowerCase();
@@ -879,21 +958,102 @@ function renderOnlineLanguages(){
 function openOnlineLanguages(side){
  if(document.documentElement.dataset.avnivoMode!=='online')return;
  longPressSide=side;longPressFired=true;languageSearch.value='';
+ languageSheet.dataset.mode='online';
+ languageSheet.querySelector('.online-language-head strong').textContent=
+  avnivoUiText('online.languages.title','Online tillar').replace('{{count}}',String(ONLINE_LANGUAGES.length));
  languageSheet.hidden=false;renderOnlineLanguages();syncBackNavigation();
 }
-function closeOnlineLanguages(){languageSheet.hidden=true;longPressSide=null;languageSearch.blur();syncBackNavigation()}
+function closeOnlineLanguages(){languageSheet.hidden=true;longPressSide=null;languageSheet.dataset.mode='';languageSearch.blur();syncBackNavigation()}
+/* Offline picker: same sheet, same search, same animation — only the source of the list differs.
+   It lists the audited NLLB tokenizer registry, so it is usable before the model is downloaded.
+   Translation remains gated separately until the loaded tokenizer is ready. */
+function offlineCodeLabel(code){
+ const entry=offlineLanguageEntry(code);
+ if(entry)return{name:entry.name,script:entry.script,locale:entry.locale||code,code};
+ const locale=ONLINE_LANGUAGES.find(x=>nllbCodeForLocale(x[0])===code);
+ return{name:locale?onlineLanguageName(locale[0]):code,script:'',locale:locale?locale[0]:code,code};
+}
+function offlineLanguagesForPicker(){
+ const registry=offlineLanguageRegistry();
+ if(registry.length)return registry.map(entry=>({
+  code:entry.code,name:entry.name,script:entry.script||'',locale:entry.locale||entry.code
+ }));
+ // Older native bridge fallback: the ready tokenizer's own list, still without any STT gate.
+ const ready=offlineLanguagesReady();
+ const state=ready&&ready.length?{languages:ready}:offlineTranslationState();
+ return (state.languages||[]).map(code=>{
+  const {name,script,locale}=offlineCodeLabel(code);
+  return{code,name,script,locale};
+ });
+}
+function renderOfflineLanguages(){
+ const languages=offlineLanguagesForPicker();
+ const ready=offlineLanguagesReady();
+ const q=languageSearch.value.trim().toLocaleLowerCase();
+ languageResults.replaceChildren();
+ for(const entry of languages){
+  const {code,name,script,locale}=entry;
+  if(q&&!((name+' '+script+' '+locale+' '+code).toLocaleLowerCase().includes(q)))continue;
+  const item=document.createElement('button');item.type='button';item.className='online-language-item';
+  const title=document.createElement('span');title.textContent=name+' · '+code;
+  const note=document.createElement('small');
+  const missing=ready&&!ready.includes(code);
+  note.textContent=(script?script+' · ':'')+(missing?avnivoUiText('offline.language.modelMissing','Modelda yo‘q'):avnivoUiText('offline.language.available','Oflayn mavjud'));
+  item.append(title,note);
+  item.setAttribute('aria-selected',String(offlineChoice[longPressSide]===code));
+  item.addEventListener('click',()=>{
+   offlineChoice[longPressSide]=code;
+   persistOfflineLanguagePair();syncLanguageChips();closeOnlineLanguages();
+  });
+  languageResults.append(item);
+ }
+}
+function openOfflineLanguages(side){
+ if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ const languages=offlineLanguagesForPicker();
+ if(languages.length===0)return;
+ longPressSide=side;longPressFired=true;languageSearch.value='';
+ languageSheet.dataset.mode='offline';
+ languageSheet.querySelector('.online-language-head strong').textContent=
+  avnivoUiText('offline.languages.title','Oflayn tillar')+' · '+languages.length;
+ languageSheet.hidden=false;renderOfflineLanguages();syncBackNavigation();
+}
 languageSheet.querySelector('.online-language-close').addEventListener('click',closeOnlineLanguages);
 languageSheet.addEventListener('click',e=>{if(e.target===languageSheet)closeOnlineLanguages()});
-languageSearch.addEventListener('input',renderOnlineLanguages);
+languageSearch.addEventListener('input',()=>{if(languageSheet.dataset.mode==='offline')renderOfflineLanguages();else renderOnlineLanguages()});
+/* Offline long press never opens a language list. It explains, in Uzbek, why the list is closed:
+   the module is missing, still downloading, failed, or merely not initialized yet. The 1.1 s
+   timing is unchanged, as is the online behaviour. */
+function offlinePickerBlockedMessage(state){
+ const status=state.status||{};
+ const code=status.state;
+ if(code==='downloading'||code==='verifying'||code==='initializing'){
+  return avnivoUiText('offline.translate.initializing','Offline tarjima moduli yuklanmoqda…');
+ }
+ if(code==='error'){
+  const reason=typeof status.reason==='string'&&status.reason?status.reason:'';
+  return avnivoUiText('offline.translate.error','Offline tarjima moduli xatosi')+(reason?': '+reason:'');
+ }
+ return avnivoUiText('offline.translate.notReady','Offline tarjima moduli yuklab olinmagan.');
+}
 for(const [side,chip] of [['left',leftLanguage],['right',rightLanguage]]){
  chip.addEventListener('pointerdown',e=>{
-  if(document.documentElement.dataset.avnivoMode!=='online'||e.button!==0)return;
+  if(e.button!==0)return;
+  const mode=document.documentElement.dataset.avnivoMode;
+  if(mode!=='online'&&mode!=='offline')return;
   longPressFired=false;clearTimeout(longPressTimer);
-  longPressTimer=setTimeout(()=>openOnlineLanguages(side),1100);
+  longPressTimer=setTimeout(()=>{
+   if(mode==='online'){openOnlineLanguages(side);return}
+   // Language selection is independent of the NLLB model and of every STT model. Translation
+   // itself is refused later by translateOfflineText until the model is ready.
+   openOfflineLanguages(side);
+   const state=offlineTranslationState();
+   if(!state.ready)hint(avnivoUiText('offline.translate.notReady','Offline tarjima moduli yuklab olinmagan.'));
+  },1100);
  });
  for(const name of ['pointerup','pointercancel','pointerleave'])chip.addEventListener(name,()=>clearTimeout(longPressTimer));
  chip.addEventListener('click',e=>{if(longPressFired){e.stopImmediatePropagation();longPressFired=false}},true);
- chip.addEventListener('contextmenu',e=>{if(document.documentElement.dataset.avnivoMode==='online')e.preventDefault()});
+ chip.addEventListener('contextmenu',e=>{if(document.documentElement.dataset.avnivoMode==='online'||document.documentElement.dataset.avnivoMode==='offline')e.preventDefault()});
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!languageSheet.hidden)closeOnlineLanguages()});
 
@@ -942,11 +1102,11 @@ function avnivoOfflineKey(module,field){
 /* Offline module UI: only installer-verified states may show success. */
 const offlineModuleCatalog=[
  {id:'uz-stt',serverModelId:'uzbek-stt',name:'O‘zbek tilini tanish modeli',desc:'O‘zbekcha nutqni matnga aylantiradi.',icon:'mic',bytes:591649160,sizeNote:'ONNX model: 591,6 MB; qo‘shimcha fayllar va ishchi dvigatel alohida'},
- {id:'multilingual-stt',installerId:'whisper-small-q8',name:'Ko‘p tillarni tanish — Whisper Small Q8',desc:'Ixcham ko‘p tilli ovoz tanish modeli.',icon:'mic',bytes:264646607,sizeNote:'Model taxminan 265 MB; qo‘shimcha fayllar alohida'},
- {id:'multilingual-stt-large',installerId:'whisper-large-v3-turbo',name:'Ko‘p tillarni tanish — Whisper Large V3 Turbo',desc:'Kattaroq ko‘p tilli model. Muhim: ko‘proq xotira talab qiladi va ayrim telefonlarni qiynashi mumkin.',icon:'mic',bytes:574000000,sizeNote:'Model taxminan 574 MB; aniq fayl hajmi va qurilma mosligi tekshiriladi'},
+ {id:'multilingual-stt',installerId:'whisper-small-q8',name:'Ko‘p tillarni tanish — Whisper Small Q8',desc:'Ixcham ko‘p tilli ovoz tanish modeli.',icon:'mic',bytes:264464607,sizeNote:'Model taxminan 265 MB; qo‘shimcha fayllar alohida'},
+ {id:'multilingual-stt-large',installerId:'whisper-large-v3-turbo',name:'Ko‘p tillarni tanish — Whisper Large V3 Turbo',desc:'Kattaroq ko‘p tilli model. Muhim: ko‘proq xotira talab qiladi va ayrim telefonlarni qiynashi mumkin.',icon:'mic',bytes:574041195,sizeNote:'Model taxminan 574 MB; aniq fayl hajmi va qurilma mosligi tekshiriladi'},
  {id:'offline-translate',installerId:'nllb-200-600m-int8',name:'Offline tarjima — NLLB-200 600M INT8',desc:'Standart ko‘p tilli tarjima modeli.',icon:'translate',bytes:916816094,sizeNote:'Encoder va decoder jami taxminan 916,8 MB; qo‘shimcha fayllar alohida'},
  {id:'offline-translate-large',name:'Offline tarjima — katta model (tanlanmagan)',desc:'Yuqoriroq sifat uchun rejalashtirilgan. Muhim: katta xotira talab qiladi, ayrim telefonlarni sekinlashtirishi mumkin.',icon:'translate',bytes:null,sizeNote:'Aniq model va hajm hali tasdiqlanmagan'},
- {id:'offline-tts-navoiy',installerId:'navoiy-tts',name:'O‘zbekcha ovozli o‘qish — Navoiy',desc:'O‘zbekcha matnni ovoz chiqarib o‘qish modeli.',icon:'speaker',bytes:202000000,sizeNote:'Model taxminan 202 MB; qo‘shimcha fayllar alohida'},
+ {id:'offline-tts-navoiy',installerId:'silero-tts',name:'O‘zbekcha ovozli o‘qish — Silero',desc:'O‘zbekcha matnni qurilmada, internetsiz ovozga aylantiradi.',icon:'speaker',bytes:91988758,sizeNote:'Model 92 MB (TorchScript Lite, MIT litsenziyasi)'},
  {id:'offline-tts',installerId:'mms-tts',name:'Ko‘p tilli ovozli o‘qish — MMS',desc:'Har bir til uchun alohida ovoz modeli; 60 til rejalashtirilgan.',icon:'speaker',bytes:null,sizeNote:'Tilga qarab hajmi farqlanadi; barcha tillar yuklangani tasdiqlanmagan'}
 ];
 const offlineModuleIcons={
@@ -955,7 +1115,8 @@ const offlineModuleIcons={
  translate:'<path d="M4 5h11M9 3v2m4 0c-.5 5-3 8-8 11M5 9c1 3 4 6 8 8M15 21l4-10 4 10m-7-4h6"/>',
  speaker:'<path d="M4 10h4l5-4v12l-5-4H4zM17 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/>',
  download:'<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
- check:'<path d="m5 12 4 4L19 6"/>'
+ check:'<path d="m5 12 4 4L19 6"/>',
+ trash:'<path d="M4 7h16M9 7V4h6v3m-8 0 1 14h8l1-14M10 11v6m4-6v6"/>'
 };
 const offlineSvg=name=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+offlineModuleIcons[name]+'</svg>';
 const offlineList=document.querySelector('.offline-modules-list');
@@ -966,9 +1127,13 @@ const offlineState=new Map();
 const offlineActiveSection=document.querySelector('.offline-active-section');
 const offlineActiveList=document.querySelector('.offline-active-list');
 const offlineEnabled=new Map();
+// Ready and its two live sub-states keep the module in the active list. Recording and decoding
+// are real engine states, not a reason to make the module disappear from the interface.
+const offlineActiveStates=new Set(['enabled','ready','recording','transcribing']);
+const isOfflineActive=state=>offlineActiveStates.has(state);
 function renderOfflineActiveList(){
  offlineActiveList.replaceChildren();
- const ready=offlineModuleCatalog.filter(m=>offlineState.get(m.id)==='ready');
+ const ready=offlineModuleCatalog.filter(m=>isOfflineActive(offlineState.get(m.id)));
  offlineActiveSection.hidden=!ready.length;
  for(const module of ready){
   const row=document.createElement('div');row.className='offline-active-item';
@@ -979,40 +1144,66 @@ function renderOfflineActiveList(){
   toggle.setAttribute('aria-pressed',String(enabled));
   toggle.setAttribute('aria-label',module.name+' — '+(enabled?'o‘chirish':'yoqish'));
   toggle.addEventListener('click',()=>{
-   if(offlineState.get(module.id)!=='ready')return;
-   const next=offlineEnabled.get(module.id)===false;
-   offlineEnabled.set(module.id,next);
-   try{localStorage.setItem('avnivo.offline.enabled.'+module.id,String(next))}catch(e){}
-   window.dispatchEvent(new CustomEvent('avnivo:offline-module-toggle',{detail:{id:module.id,enabled:next}}));
-   renderOfflineActiveList();
+   if(!isOfflineActive(offlineState.get(module.id)))return;
+   const bridge=module.serverModelId?window.AvnivoOfflineSTT:window.AvnivoOfflineModules;
+   const lifecycleId=module.installerId||module.serverModelId;
+   if(!lifecycleId||!bridge||typeof bridge.deactivate!=='function')return;
+   // Native deactivation is the only thing that changes the truth; the row disappears when the
+   // module reports INSTALLED, not because the page guessed.
+   toggle.disabled=true;toggle.textContent='O‘chirilmoqda…';
+   try{
+    if(module.serverModelId)bridge.deactivate();
+    else bridge.deactivate(lifecycleId);
+   }catch(e){
+    toggle.disabled=false;toggle.textContent='Yoqilgan';offlineNotice.textContent='O‘chirish xatosi: '+e.message;
+   }
   });
   row.append(name,toggle);offlineActiveList.append(row);
  }
 }
 const offlineMb=bytes=>(bytes/1e6).toFixed(1).replace('.',',')+' MB';
+const offlineStateKeys={not_installed:'offline.state.not_installed',downloading:'offline.state.downloading',verifying:'offline.state.verifying',downloaded:'offline.status.verifiedInactive',installed:'offline.state.installed',initializing:'offline.state.initializing',ready:'offline.state.ready',enabled:'offline.state.enabled',recording:'offline.state.recording',transcribing:'offline.state.transcribing',error:'offline.state.error'};
+// "Active" has to name the module's own job: a translator that reports it is ready to
+// recognize speech reads as a bug, which is exactly what the device report showed.
+const offlineReadyKey=module=>module.id.indexOf('offline-translate')===0?'offline.state.ready.translate':module.id.indexOf('offline-tts')===0?'offline.state.ready.tts':'offline.state.ready';
+const offlineReadyFallback=module=>module.id.indexOf('offline-translate')===0?'Faol — tarjimaga tayyor':module.id.indexOf('offline-tts')===0?'Faol — ovozga tayyor':'Faol — nutqni tanishga tayyor';
+const offlineStateFallbacks={not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',downloaded:'Yuklangan · faollashtirish kutilmoqda',installed:'O‘rnatilgan va tekshirilgan · ishlatilganda yuklanadi',initializing:'Ishga tushmoqda…',ready:'Faol — nutqni tanishga tayyor',enabled:'Faol — ishlatilganda xotiraga yuklanadi',recording:'Ovoz yozilmoqda…',transcribing:'Nutq matnga aylantirilmoqda…',error:'Xato'};
 function updateOfflineModule(id,state,progress){
  const module=offlineModuleCatalog.find(m=>m.id===id);
- if(!module||!['not_installed','downloading','verifying','downloaded','ready','error'].includes(state))return false;
+ if(!module||!Object.prototype.hasOwnProperty.call(offlineStateKeys,state))return false;
  const row=offlineList.querySelector('[data-module-id="'+id+'"]');if(!row)return false;
  offlineState.set(id,state);
  const btn=row.querySelector('.offline-module-action'),status=row.querySelector('.offline-module-state');
+ const del=row.querySelector('.offline-module-delete');
  const progressEl=row.querySelector('.offline-module-progress');
  const fill=row.querySelector('.offline-module-fill');
  const pct=row.querySelector('.offline-module-percent'),mb=row.querySelector('.offline-module-mb');
- const ready=state==='ready',downloaded=state==='downloaded';
- if(ready&&!offlineEnabled.has(id)){let saved=null;try{saved=localStorage.getItem('avnivo.offline.enabled.'+id)}catch(e){}offlineEnabled.set(id,saved!=='false')}
+ const ready=isOfflineActive(state),downloaded=state==='downloaded',installed=state==='installed',initializing=state==='initializing';
+ if(ready){offlineEnabled.set(id,true);try{localStorage.setItem('avnivo.offline.enabled.'+id,'true')}catch(e){}}
  btn.classList.toggle('is-ready',ready);
- btn.classList.toggle('is-verified',downloaded);
+ btn.classList.toggle('is-verified',downloaded||installed||initializing);
  btn.classList.toggle('is-downloading',state==='downloading'||state==='verifying');
- btn.disabled=state==='downloading'||state==='verifying';
- btn.innerHTML=offlineSvg(ready||downloaded?'check':'download');
- btn.setAttribute('aria-label',ready?'Modul faol':downloaded?'Model tekshirildi, dvigatel kutilmoqda':module.name+' — yuklab olish');
- status.textContent=avnivoUiText(({not_installed:'offline.state.not_installed',downloading:'offline.state.downloading',verifying:'offline.state.verifying',downloaded:'offline.status.verifiedInactive',ready:'offline.state.ready',error:'offline.state.error'})[state],({not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',downloaded:'Yuklangan · faollashtirish kutilmoqda',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'})[state]);
+ btn.disabled=state==='downloading'||state==='verifying'||initializing;
+ if(ready)btn.disabled=true;
+ btn.innerHTML=offlineSvg(ready||downloaded||installed||initializing?'check':'download');
+ btn.setAttribute('aria-label',ready?'Modul faol':downloaded||installed?'Model o‘rnatilgan — faollashtirish uchun bosing':initializing?'Modul ishga tushirilmoqda':state==='error'?'Qayta urinish':module.name+' — yuklab olish');
+ status.textContent=avnivoUiText(state==='ready'?offlineReadyKey(module):offlineStateKeys[state],state==='ready'?offlineReadyFallback(module):offlineStateFallbacks[state]);
+ if(del){
+  const removable=installed||ready||state==='recording'||state==='transcribing'||state==='error';
+  del.hidden=!removable;
+  del.disabled=state==='downloading'||state==='verifying'||initializing;
+  del.setAttribute('aria-label',module.name+' — modelni o‘chirish');
+ }
+ const reasonEl=row.querySelector('.offline-module-reason');
+ if(reasonEl&&state!=='error'){reasonEl.hidden=true;reasonEl.textContent=''}
  const hasProgress=progress&&Number.isFinite(progress.downloadedBytes)&&Number.isFinite(progress.totalBytes)&&progress.totalBytes>0&&progress.downloadedBytes>=0;
- progressEl.hidden=!(state==='downloading'||state==='verifying')||!hasProgress;
- if(hasProgress){
-  const done=Math.min(progress.downloadedBytes,progress.totalBytes),percent=Math.min(100,Math.floor(done/progress.totalBytes*100));
-  fill.style.width=percent+'%';pct.textContent=percent+'%';mb.textContent=offlineMb(done)+' / '+offlineMb(progress.totalBytes);
+ if(hasProgress)row.avnivoLastProgress={downloadedBytes:progress.downloadedBytes,totalBytes:progress.totalBytes};
+ else if(state==='not_installed'||installed||initializing||ready||state==='error')row.avnivoLastProgress=null;
+ const shownProgress=hasProgress?progress:row.avnivoLastProgress;
+ progressEl.hidden=!(state==='downloading'||state==='verifying')||!shownProgress;
+ if(shownProgress){
+  const done=Math.min(shownProgress.downloadedBytes,shownProgress.totalBytes),percent=Math.min(100,Math.floor(done/shownProgress.totalBytes*100));
+  fill.style.width=percent+'%';pct.textContent=percent+'%';mb.textContent=offlineMb(done)+' / '+offlineMb(shownProgress.totalBytes);
   btn.style.setProperty('--module-progress',percent+'%');
   if(state==='downloading'||state==='verifying')btn.innerHTML='<span class="module-percent">'+percent+'%</span>';
   progressEl.querySelector('[role="progressbar"]').setAttribute('aria-valuenow',String(percent));
@@ -1028,18 +1219,28 @@ for(const module of offlineModuleCatalog){
  const desc=document.createElement('p');desc.className='offline-module-desc';desc.textContent=avnivoUiText(avnivoOfflineKey(module,'desc')||'missing.desc',module.desc);
  const size=document.createElement('p');size.className='offline-module-size';size.textContent=module.bytes?avnivoUiText('offline.module.size','Hajmi: {{size}}',{size:offlineMb(module.bytes)}):avnivoUiText('offline.module.sizePending','Hajmi: aniqlanmoqda');size.title=module.sizeNote;
  const status=document.createElement('p');status.className='offline-module-state';status.textContent=avnivoUiText('offline.state.not_installed','Yuklanmagan');
- const meta=document.createElement('div');meta.className='offline-module-meta';meta.append(size,status);copy.append(name,desc,meta);
+ // Diagnosis line, hidden until the native side reports a concrete reason.
+ const reason=document.createElement('p');reason.className='offline-module-reason';reason.hidden=true;
+ const meta=document.createElement('div');meta.className='offline-module-meta';
+ const del=document.createElement('button');del.type='button';del.className='offline-module-delete';del.hidden=true;del.innerHTML=offlineSvg('trash');del.setAttribute('aria-label',module.name+' — modelni o‘chirish');
+ meta.append(size,status,del);copy.append(name,desc,meta,reason);
  const btn=document.createElement('button');btn.type='button';btn.className='offline-module-action';btn.innerHTML=offlineSvg('download');btn.setAttribute('aria-label',module.name+' — yuklab olish');
  const progress=document.createElement('div');progress.className='offline-module-progress';progress.hidden=true;
  progress.innerHTML='<div class="offline-module-progress-label"><span class="offline-module-percent">0%</span><span class="offline-module-mb">0 MB</span></div><div class="offline-module-track" role="progressbar" aria-label="Yuklash jarayoni" aria-valuemin="0" aria-valuemax="100"><div class="offline-module-fill"></div></div>';
  btn.addEventListener('click',()=>{
-  if(document.documentElement.dataset.avnivoMode!=='offline'||offlineState.get(module.id)==='ready')return;
+  if(document.documentElement.dataset.avnivoMode!=='offline'||isOfflineActive(offlineState.get(module.id)))return;
   btn.classList.remove('is-tapped');void btn.offsetWidth;btn.classList.add('is-tapped');
   if(module.serverModelId && window.AvnivoOfflineSTT){
    try{
-    offlineNotice.textContent='Android offline modeli yuklanmoqda. Internet kerak.';
-    updateOfflineModule(module.id,'downloading',{downloadedBytes:0,totalBytes:module.bytes});
-    window.AvnivoOfflineSTT.download();
+    if(offlineState.get(module.id)==='installed'&&typeof window.AvnivoOfflineSTT.activate==='function'){
+     offlineNotice.textContent='Model o‘rnatilgan. Dvigatel ishga tushirilmoqda…';
+     updateOfflineModule(module.id,'initializing');
+     window.AvnivoOfflineSTT.activate();
+    }else{
+     offlineNotice.textContent='Android offline modeli yuklanmoqda. Internet kerak.';
+     updateOfflineModule(module.id,'downloading',{downloadedBytes:0,totalBytes:module.bytes});
+     window.AvnivoOfflineSTT.download();
+    }
    }catch(e){updateOfflineModule(module.id,'error');offlineNotice.textContent=e.message}
    return;
   }
@@ -1057,6 +1258,18 @@ for(const module of offlineModuleCatalog){
    return;
   }
   if(module.installerId){
+   const bridge=window.AvnivoOfflineModules;
+   if(bridge&&typeof bridge.download==='function'){
+    const alreadyInstalled=offlineState.get(module.id)==='installed';
+    btn.disabled=true;
+    offlineNotice.textContent=alreadyInstalled?'Model o‘rnatilgan. Dvigatel yuklanmoqda…':'Model yuklash boshlanmoqda. Internet kerak.';
+    updateOfflineModule(module.id,alreadyInstalled?'initializing':'downloading',alreadyInstalled?null:{downloadedBytes:0,totalBytes:module.bytes});
+    try{
+     if(alreadyInstalled&&typeof bridge.activate==='function')bridge.activate(module.installerId);
+     else bridge.download(module.installerId);
+    }catch(e){updateOfflineModule(module.id,'error');offlineNotice.textContent=e.message}
+    return;
+   }
    const installer=window.avnivoSafeOfflineInstaller;
    if(!installer){offlineNotice.textContent='Xavfsiz yuklash dasturi ochilmadi';return}
    btn.disabled=true;
@@ -1072,10 +1285,27 @@ for(const module of offlineModuleCatalog){
   offlineNotice.textContent=module.name+': yuklash manbasi hali ulanmagan. Yuklash boshlanmadi.';
  });
  btn.addEventListener('animationend',()=>btn.classList.remove('is-tapped'));
+ del.addEventListener('click',()=>{
+  const current=offlineState.get(module.id);
+  if(!['installed','enabled','ready','recording','transcribing','error'].includes(current))return;
+  if(!window.confirm(module.name+': model fayllari butunlay o‘chiriladi. Davom etilsinmi?'))return;
+  del.disabled=true;
+  offlineNotice.textContent='O‘chirish tasdiqlandi. Faqat shu modul fayllari o‘chiriladi…';
+  if(module.serverModelId&&window.AvnivoOfflineSTT&&typeof window.AvnivoOfflineSTT.delete==='function'){
+   try{window.AvnivoOfflineSTT.delete()}catch(e){del.disabled=false;offlineNotice.textContent='O‘chirish xatosi: '+e.message}
+   return;
+  }
+  const bridge=window.AvnivoOfflineModules;
+  if(module.installerId&&bridge&&typeof bridge.delete==='function'){
+   try{bridge.delete(module.installerId)}catch(e){del.disabled=false;offlineNotice.textContent='O‘chirish xatosi: '+e.message}
+   return;
+  }
+  del.disabled=false;offlineNotice.textContent='Bu modul uchun o‘chirish mexanizmi mavjud emas.';
+ });
  row.append(mark,copy,btn,progress);offlineList.append(row);offlineState.set(module.id,'not_installed');
 }
 // The future verified installer must supply actual byte counts; no simulated progress.
-window.avnivoOfflineModuleUi={setVerifiedState:updateOfflineModule,isEnabled:id=>offlineState.get(id)==='ready'&&offlineEnabled.get(id)!==false};
+window.avnivoOfflineModuleUi={setVerifiedState:updateOfflineModule,isEnabled:id=>isOfflineActive(offlineState.get(id))&&offlineEnabled.get(id)!==false};
 window.AvnivoOfflineProgress=function(raw){
  const parts=String(raw||'').split('/');
  const done=Number(parts[0]),total=Number(parts[1]);
@@ -1084,35 +1314,209 @@ window.AvnivoOfflineProgress=function(raw){
   offlineNotice.textContent='O‘zbekcha model: '+offlineMb(done)+' / '+offlineMb(total);
  }
 };
-window.AvnivoOfflineStatus=function(message){
- offlineNotice.textContent=String(message||'');
- if(String(message||'').includes('Model yuklandi'))updateOfflineModule('uz-stt','ready');
- if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.status){
-  try{if(window.AvnivoOfflineSTT.status().includes('yuklangan'))updateOfflineModule('uz-stt','ready')}
-  catch(e){}
+// Native module bridge (Whisper, NLLB): installer id -> settings card id, native state -> card state.
+const offlineUiIdByInstaller={};
+for(const module of offlineModuleCatalog){if(module.installerId)offlineUiIdByInstaller[module.installerId]=module.id;if(module.serverModelId)offlineUiIdByInstaller[module.serverModelId]=module.id}
+const offlineStateByInstaller={not_installed:'not_installed',downloading:'downloading',verifying:'verifying',initializing:'initializing',installed:'installed',enabled:'enabled',ready:'ready',error:'error'};
+function syncOfflineModule(installerId,state,progress,enabled){
+ const uiId=offlineUiIdByInstaller[installerId];if(!uiId)return;
+ // Enabled is the user's intent, resident is only where the bytes are right now. A module that is
+ // switched on but was evicted for memory must still read as active, otherwise the card claims the
+ // user turned it off when they did not.
+ const cardState=(enabled===true&&state==='installed')?'enabled':(offlineStateByInstaller[state]||'not_installed');
+ updateOfflineModule(uiId,cardState,progress);
+}
+window.AvnivoOfflineModuleProgress=function(raw){
+ const parts=String(raw||'').split('|'),pair=String(parts[1]||'').split('/');
+ const done=Number(pair[0]),total=Number(pair[1]);
+ if(!Number.isFinite(done)||!Number.isFinite(total)||total<=0)return;
+ syncOfflineModule(parts[0],'downloading',{downloadedBytes:done,totalBytes:total});
+};
+window.AvnivoOfflineModuleStatus=function(installerId){
+ if(window.AvnivoOfflineModules&&typeof window.AvnivoOfflineModules.status==='function'){
+  try{
+   const info=JSON.parse(window.AvnivoOfflineModules.status(installerId));
+   syncOfflineModule(installerId,info.state,info.progress&&Number.isFinite(info.progress.downloadedBytes)&&Number.isFinite(info.progress.totalBytes)?info.progress:null,info.enabled===true);
+   // A module that cannot activate must say why on its own card; a bare spinner hides the cause.
+   if(info.reason&&(info.state==='installed'||info.state==='error')){
+    const uiId=offlineUiIdByInstaller[installerId],row=uiId&&offlineList.querySelector('[data-module-id="'+uiId+'"]');
+    const note=row&&row.querySelector('.offline-module-reason');
+    if(note){note.textContent=String(info.reason);note.hidden=false}
+   }
+  }catch(e){}
  }
 };
-window.AvnivoOfflineError=function(message){
+window.AvnivoOfflineModuleReady=function(installerId){
+ syncOfflineModule(installerId,'ready');
+ const uiId=offlineUiIdByInstaller[installerId],row=uiId&&offlineList.querySelector('[data-module-id="'+uiId+'"]');
+ const note=row&&row.querySelector('.offline-module-reason');if(note){note.hidden=true;note.textContent=''}
+ offlineNotice.textContent='Modul tayyor va faol: '+installerId;
+};
+window.AvnivoOfflineModuleError=function(raw){
+ const parts=String(raw||'').split('|');
+ syncOfflineModule(parts[0],'error');
+ const uiId=offlineUiIdByInstaller[parts[0]],row=uiId&&offlineList.querySelector('[data-module-id="'+uiId+'"]');
+ const note=row&&row.querySelector('.offline-module-reason');
+ if(note&&parts[1]){note.textContent=parts[1];note.hidden=false}
+ offlineNotice.textContent='Modul xatosi: '+(parts[1]||'noma’lum');
+};
+window.AvnivoOfflineModuleDeleted=function(installerId){
+ const uiId=offlineUiIdByInstaller[installerId];if(!uiId)return;
+ updateOfflineModule(uiId,'not_installed');
+ const row=offlineList.querySelector('[data-module-id="'+uiId+'"]');
+ const note=row&&row.querySelector('.offline-module-reason');if(note){note.textContent='';note.hidden=true}
+ offlineNotice.textContent='Model fayllari o‘chirildi. Qayta o‘rnatish uchun yuklash belgisini bosing.';
+};
+window.AvnivoOfflineModuleDeleteError=function(raw){
+ const parts=String(raw||'').split('|');
+ const uiId=offlineUiIdByInstaller[parts[0]],row=uiId&&offlineList.querySelector('[data-module-id="'+uiId+'"]');
+ const note=row&&row.querySelector('.offline-module-reason');
+ if(note&&parts[1]){note.textContent=parts[1];note.hidden=false}
+ const del=row&&row.querySelector('.offline-module-delete');if(del)del.disabled=false;
+ offlineNotice.textContent='O‘chirish xatosi: '+(parts[1]||'noma’lum');
+};
+// Reconcile the cards with the real native state on load (e.g. after an app restart).
+function syncInstalledModules(){
+ const bridge=window.AvnivoOfflineModules;
+ if(!bridge||typeof bridge.statusAll!=='function')return;
+ try{
+  for(const info of JSON.parse(bridge.statusAll()||'[]')){
+   const progress=info.progress&&Number.isFinite(info.progress.downloadedBytes)&&Number.isFinite(info.progress.totalBytes)?info.progress:null;
+   // A module the user switched on keeps reading as active after a restart even when its engine
+   // is not resident yet: dropping the flag here made every enabled module look switched off.
+   syncOfflineModule(info.id,info.state,progress,info.enabled===true);
+  }
+ }catch(e){}
+}
+syncInstalledModules();
+window.AvnivoOfflineSpeech=function(raw){
+ let info=null;try{info=JSON.parse(raw)}catch(e){return}
+ if(info&&info.error){offlineNotice.textContent='Ovoz xatosi: '+info.error}
+ // Ignore a late result from a playback the user already cancelled or replaced, so it cannot
+ // clear the button state of the utterance that is playing now.
+ if(!info||info.requestId!==String(ttsGeneration))return;
+ stopSpeaking();
+};
+window.AvnivoOfflineLevel=function(value,session){
+ // Real microphone amplitude from the native recorder drives the existing waveform.
+ if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ // A late level from a previous press must not move the current waveform.
+ if(session!==undefined&&Number(session)!==offlineSession)return;
+ const parsed=Number(value);
+ offlineLevel=Number.isFinite(parsed)?Math.max(0,Math.min(1,parsed)):0;
+};
+window.AvnivoOfflineHint=function(message){
+ hint(String(message||''));
+};
+// Native answers for the online capture path: a denied grant must be visible, not silent.
+window.AvnivoOnlineMicError=function(message){
+ shell.classList.remove('hold-voice');
+ onlineState('error');
+ hint(String(message||'Mikrofon ruxsati berilmadi'));
+};
+window.AvnivoOnlineMicGranted=function(){
+ // The grant only unblocks getUserMedia; the page re-runs capture on the next press.
+ hint('');
+};
+/* The finger is up and the native recorder has the audio. Show processing immediately, before any
+   decoding happens, so the indicator reflects the real stage instead of waiting for the text. */
+window.AvnivoOfflineProcessing=function(message,session){
+ if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ if(session!==undefined&&Number(session)!==offlineSession)return;
+ offlineProcessingSession=offlineSession;
+ stopOfflineWave();
+ shell.classList.remove('hold-voice');
+ offlineStateName('loading');
+ offlineNotice.textContent=String(message||'Matnga aylantirilmoqda…');
+};
+window.AvnivoOfflineStatus=function(message,session){
+ if(session!==undefined&&Number(session)!==offlineSession)return;
+ // Informational only. The press lifecycle ends on an explicit state, result, error or rejection
+ // callback, never by guessing from the wording of a progress message.
+ offlineNotice.textContent=String(message||'');
+};
+/* The native module state is the single source of truth for the settings card and the indicator.
+   A card is never promoted to "Faol" by a status string or by a completed download. */
+const offlineSttStateNames={not_installed:'not_installed',downloading:'downloading',verifying:'verifying',installed:'installed',initializing:'initializing',ready:'ready',recording:'recording',transcribing:'transcribing',error:'error'};
+function showUzbekSttReason(reason){
+ const row=offlineList.querySelector('[data-module-id="uz-stt"]');
+ const note=row&&row.querySelector('.offline-module-reason');
+ if(!note)return;
+ if(reason){note.textContent=String(reason);note.hidden=false;note.title=String(reason)}
+ else{note.textContent='';note.hidden=true;note.removeAttribute('title')}
+}
+window.AvnivoOfflineState=function(raw,session){
+ let info=null;try{info=JSON.parse(raw)}catch(e){return}
+ if(!info)return;
+ if(info.id&&info.id!=='uzbek-stt'&&info.id!=='uz-stt')return;
+ const state=offlineSttStateNames[info.state]||'error';
+ updateOfflineModule('uz-stt',state);
+ showUzbekSttReason(info.reason);
+ if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ const current=session===undefined||Number(session)===0||Number(session)===offlineSession||Number(session)===offlineProcessingSession;
+ if(!current)return;
+ if(state==='recording')offlineStateName('recording');
+ else if(state==='transcribing'){offlineProcessingSession=offlineSession;offlineStateName('loading')}
+ else if(state==='ready'){
+  // Only a decode that belongs to the press in progress may end that press. A READY that arrives
+  // from startup verification must never cut a live recording short.
+  if(info.readyForSpeech&&offlineSession!==0&&offlineProcessingSession===offlineSession){offlineProcessingSession=0;offlineStateName('done');finishOfflineHold()}
+ }
+ else if(state==='error'){offlineProcessingSession=0;offlineStateName('error');finishOfflineHold()}
+ else if(state==='installed'||state==='not_installed'){finishOfflineHold()}
+};
+window.AvnivoOfflineRejected=function(message,session){
+ if(session!==undefined&&Number(session)!==0&&Number(session)!==offlineSession)return;
+ // Native refused the press (permission, missing model, another capture). Restore the composer.
+ offlineNotice.textContent=String(message||'');
+ offlineProcessingSession=0;
+ offlineStateName('error');
+ finishOfflineHold();
+ hint(String(message||''));
+};
+window.AvnivoOfflineEngineReady=function(message){
+ // Compatibility callback: the verified state itself arrives through AvnivoOfflineState.
+ offlineNotice.textContent=String(message||'');
+ syncUzbekSttCard();
+};
+window.AvnivoOfflineError=function(message,session){
+ if(session!==undefined&&Number(session)!==offlineSession)return;
  const error=String(message||'Noma’lum xatolik');
  offlineNotice.textContent='Offline STT: '+error;
- updateOfflineModule('uz-stt','error');
- const row=offlineList.querySelector('[data-module-id="uz-stt"]');
- if(row){
-  const status=row.querySelector('.offline-module-state');
-  if(status){status.textContent='Yuklash xatosi: '+error;status.title=error}
- }
+ // Native session ended (or failed): restore the composer visual state and report via diagnostics.
+ finishOfflineHold();
+ offlineProcessingSession=0;
+ offlineStateName('error');
+ hint('Offline STT: '+error);
+ syncUzbekSttCard();
+ showUzbekSttReason(error);
 };
-window.AvnivoOfflineResult=function(text){
+window.AvnivoOfflineResult=function(text,session){
  if(document.documentElement.dataset.avnivoMode!=='offline')return;
+ // The guard that makes the first recording win: a result is only accepted for the press that is
+ // still current, so an earlier recording can never overwrite a newer one.
+ if(session!==undefined&&Number(session)!==offlineSession)return;
+ finishOfflineHold();
+ offlineProcessingSession=0;
  const spoken=String(text||'').trim();
- if(!spoken){hint('Nutq aniqlanmadi');return}
+ if(!spoken){offlineStateName('error');hint('Nutq aniqlanmadi');syncUzbekSttCard();return}
+ // Only real recognized speech is inserted into the composer; no lifecycle text is added.
  input.value=appendTranscript(input.value,spoken);
- persistDraft();resize();syncComposerMode();hint('Ovoz matnga aylantirildi');
+ persistDraft();resize();syncComposerMode();
+ offlineStateName('done');
+ syncUzbekSttCard();
 };
-if(window.AvnivoOfflineSTT && window.AvnivoOfflineSTT.status){
- try{if(window.AvnivoOfflineSTT.status().includes('yuklangan'))updateOfflineModule('uz-stt','ready')}
- catch(e){}
+/* Read the real native state. Called on load, on a mode switch, after unlock/resume and after every
+   terminal event, so the card is never stale and never disappears from the settings section. */
+function syncUzbekSttCard(){
+ if(!window.AvnivoOfflineSTT||typeof window.AvnivoOfflineSTT.moduleStatus!=='function')return;
+ try{
+  const raw=window.AvnivoOfflineSTT.moduleStatus();
+  const info=typeof raw==='string'?JSON.parse(raw):raw;
+  if(info)window.AvnivoOfflineState(JSON.stringify(info),info.session||0);
+ }catch(e){}
 }
+window.avnivoSyncUzbekSttCard=syncUzbekSttCard;
 
 const historyStorageKey='avnivo.preview.chat-history.v1';
 const activeHistoryKey='avnivo.preview.active-chat.v1';
@@ -1145,7 +1549,7 @@ window.AVNIVO_I18N?.onChange(function(){
   if(name)name.textContent=avnivoUiText(avnivoOfflineKey(module,'name')||'missing.name',module.name);
   if(desc)desc.textContent=avnivoUiText(avnivoOfflineKey(module,'desc')||'missing.desc',module.desc);
   if(size)size.textContent=module.bytes?avnivoUiText('offline.module.size','Hajmi: {{size}}',{size:offlineMb(module.bytes)}):avnivoUiText('offline.module.sizePending','Hajmi: aniqlanmoqda');
-  if(status){const state=offlineState.get(module.id)||'not_installed';const keys={not_installed:'offline.state.not_installed',downloading:'offline.state.downloading',verifying:'offline.state.verifying',downloaded:'offline.status.verifiedInactive',ready:'offline.state.ready',error:'offline.state.error'};const fallback={not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',downloaded:'Yuklangan · faollashtirish kutilmoqda',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'};status.textContent=avnivoUiText(keys[state],fallback[state]||'');}
+  if(status){const state=offlineState.get(module.id)||'not_installed';const keys={not_installed:'offline.state.not_installed',downloading:'offline.state.downloading',verifying:'offline.state.verifying',downloaded:'offline.status.verifiedInactive',installed:'offline.state.installed',ready:'offline.state.ready',error:'offline.state.error'};const fallback={not_installed:'Yuklanmagan',downloading:'Yuklanmoqda…',verifying:'Tekshirilmoqda…',downloaded:'Yuklangan · faollashtirish kutilmoqda',installed:'O‘rnatilgan · ishlatilganda yuklanadi',ready:'O‘rnatilgan va faol',error:'O‘rnatishda xatolik'};status.textContent=avnivoUiText(keys[state],fallback[state]||'');}
  });
 });
 
@@ -1168,6 +1572,167 @@ function setHistoryOpen(open){
  syncBackNavigation();
 }
 const PREVIEW_TRANSLATION='Tarjima sinov so‘zi';
+/* Offline mode is no longer Uzbek <-> Russian only. NLLB-200 is a 200-language model and the real
+   list is read from the loaded tokenizer through the native bridge; a hardcoded pair would both
+   hide most of the model and claim support for codes this build may not carry. The placeholder
+   text is only used when that engine is not installed and READY, never as a fake success. */
+/* BCP-47 -> NLLB code. Every value below was checked against the shipped tokenizer vocabulary
+   (202 codes, 196 base languages); a locale absent from this table is simply unsupported offline
+   and its chip stays blank rather than silently borrowing another language. */
+const NLLB_BY_BASE={'af':'afr_Latn','am':'amh_Ethi','ar':'arb_Arab','az':'azj_Latn','be':'bel_Cyrl','bg':'bul_Cyrl','bn':'ben_Beng','bs':'bos_Latn','ca':'cat_Latn','cs':'ces_Latn','cy':'cym_Latn','da':'dan_Latn','de':'deu_Latn','el':'ell_Grek','en':'eng_Latn','es':'spa_Latn','et':'est_Latn','eu':'eus_Latn','fa':'pes_Arab','fi':'fin_Latn','fil':'tgl_Latn','fr':'fra_Latn','ga':'gle_Latn','gl':'glg_Latn','gu':'guj_Gujr','ha':'hau_Latn','hi':'hin_Deva','hr':'hrv_Latn','hu':'hun_Latn','hy':'hye_Armn','id':'ind_Latn','ig':'ibo_Latn','is':'isl_Latn','it':'ita_Latn','iw':'heb_Hebr','ja':'jpn_Jpan','ka':'kat_Geor','km':'khm_Khmr','kn':'kan_Knda','ko':'kor_Hang','ky':'kir_Cyrl','lb':'ltz_Latn','ln':'lin_Latn','lo':'lao_Laoo','lt':'lit_Latn','lv':'lvs_Latn','mk':'mkd_Cyrl','ml':'mal_Mlym','mn':'khk_Cyrl','mr':'mar_Deva','ms':'zsm_Latn','mt':'mlt_Latn','my':'mya_Mymr','ne':'npi_Deva','nl':'nld_Latn','no':'nob_Latn','or':'ory_Orya','pa':'pan_Guru','pl':'pol_Latn','pt':'por_Latn','ro':'ron_Latn','ru':'rus_Cyrl','si':'sin_Sinh','sk':'slk_Latn','sl':'slv_Latn','so':'som_Latn','sq':'als_Latn','sr':'srp_Cyrl','sv':'swe_Latn','sw':'swh_Latn','ta':'tam_Taml','te':'tel_Telu','tg':'tgk_Cyrl','th':'tha_Thai','tr':'tur_Latn','uk':'ukr_Cyrl','ur':'urd_Arab','uz':'uzn_Latn','vi':'vie_Latn','xh':'xho_Latn','yo':'yor_Latn','zu':'zul_Latn'};
+/* Script-bearing locales need an explicit choice: NLLB keeps the writing system in the code, so
+   Chinese must not collapse to one script and Serbian must not borrow Croatian. */
+const NLLB_BY_LOCALE={'cmn-Hans-CN':'zho_Hans','cmn-Hant-TW':'zho_Hant','sr-RS':'srp_Cyrl','pa-Guru-IN':'pan_Guru'};
+function nllbCodeForLocale(locale){
+ if(typeof locale!=='string')return null;
+ if(NLLB_BY_LOCALE[locale])return NLLB_BY_LOCALE[locale];
+ const base=locale.split('-')[0];
+ return NLLB_BY_BASE[base]||null;
+}
+/* NLLB occasionally emits its language token as literal text. The native decoder no longer returns
+   it, but a stray marker must never reach the bubble or the speaker, so strip any language-code
+   shaped word from the translated string. */
+const NLLB_LANGUAGE_MARKER=/\b[a-z]{3}_[A-Za-z]{4}\b/g;
+function stripLanguageMarkers(text){
+ return String(text==null?'':text)
+  .replace(NLLB_LANGUAGE_MARKER,' ')
+  .replace(/^[ \t]+|[ \t]+$/g,'')
+  .replace(/[ \t]{2,}/g,' ');
+}
+/* NLLB code -> the locale a speech engine expects. Derived from the same tables the picker uses,
+   so every code the UI can show maps back to a voice language. */
+const SPEECH_LOCALE_BY_NLLB=(()=>{
+ const map={};
+ for(const entry of (typeof offlineLanguageRegistry==='function'?offlineLanguageRegistry():[]))if(entry&&entry.code&&entry.locale)map[entry.code]=entry.locale;
+ for(const [base,code] of Object.entries(NLLB_BY_BASE))if(!map[code])map[code]=base;
+ for(const [locale,code] of Object.entries(NLLB_BY_LOCALE))map[code]=locale;
+ return map;
+})();
+function speechLocaleForNllb(code){
+ if(typeof code!=='string'||!code)return null;
+ const entry=typeof offlineLanguageEntry==='function'?offlineLanguageEntry(code):null;
+ if(entry&&entry.locale)return entry.locale;
+ return SPEECH_LOCALE_BY_NLLB[code]||code.split('_')[0]||null;
+}
+/* The bundled Silero voice speaks Uzbek only. Routing any other language to it is what made a
+   Russian message come out in an Uzbek voice. */
+function isUzbekNllb(code){return code==='uzn_Latn'||speechLocaleForNllb(code)==='uz'}
+/* undefined: the engine has not listed voices yet, so `lang` is the only signal. null: the engine
+   listed its voices and none matches, so speaking would use a wrong-language voice. */
+function speechVoiceForLocale(locale){
+ if(!locale||!('speechSynthesis' in window)||typeof window.speechSynthesis.getVoices!=='function')return undefined;
+ let voices=[];
+ try{voices=window.speechSynthesis.getVoices()||[]}catch(e){voices=[]}
+ if(!voices.length)return undefined;
+ const tag=String(locale).toLowerCase(),base=tag.split('-')[0];
+ return voices.find(voice=>String(voice.lang||'').toLowerCase()===tag)
+     ||voices.find(voice=>String(voice.lang||'').toLowerCase().split('-')[0]===base)
+     ||null;
+}
+/* Full audited NLLB-200 tokenizer registry from the native side. It exists before the model is
+   downloaded and never depends on which STT model is installed. */
+var offlineRegistryCache=null;
+function offlineLanguageRegistry(){
+ if(offlineRegistryCache)return offlineRegistryCache;
+ const bridge=window.AvnivoOfflineModules;
+ if(!bridge||typeof bridge.offlineLanguageRegistry!=='function')return [];
+ try{
+  const raw=bridge.offlineLanguageRegistry();
+  const parsed=typeof raw==='string'?JSON.parse(raw):raw;
+  const list=parsed&&Array.isArray(parsed.languages)?parsed.languages:[];
+  if(list.length)offlineRegistryCache=list;
+  return list;
+ }catch(e){return []}
+}
+function offlineLanguageEntry(code){
+ if(!code||typeof offlineLanguageRegistry!=='function')return null;
+ return offlineLanguageRegistry().find(entry=>entry&&entry.code===code)||null;
+}
+/* The picker's truth comes from the native side: `ready` is only true after download, SHA-256,
+   native init and a smoke inference, and `languages` is that tokenizer's own vocabulary. */
+function offlineTranslationState(){
+ const bridge=window.AvnivoOfflineModules;
+ if(!bridge||typeof bridge.offlineTranslationState!=='function')return{ready:false,languages:[],status:{}};
+ try{
+  const raw=bridge.offlineTranslationState();
+  const parsed=typeof raw==='string'?JSON.parse(raw):raw;
+  return{ready:parsed&&parsed.ready===true,languages:Array.isArray(parsed?.languages)?parsed.languages:[],status:parsed?.status&&typeof parsed.status==='object'?parsed.status:{}};
+ }catch(e){return{ready:false,languages:[],status:{}}}
+}
+function offlineLanguagesReady(){
+ const state=offlineTranslationState();
+ return state.ready&&state.languages.length>0?state.languages:null;
+}
+/* Offline pair is tracked separately from the online pair so switching modes never destroys the
+   other mode's choice. A side is null when the stored locale has no NLLB equivalent. */
+const offlineLanguageStorageKey='avnivo.offline.language-pair.v1';
+const offlineChoice={left:null,right:null};
+try{
+ const saved=JSON.parse(localStorage.getItem(offlineLanguageStorageKey)||'null');
+ if(saved&&typeof saved==='object'){
+  for(const side of ['left','right']){
+   if(typeof saved[side]==='string')offlineChoice[side]=saved[side];
+  }
+ }
+}catch(e){console.warn('Saved offline languages unavailable',e)}
+function persistOfflineLanguagePair(){
+ try{localStorage.setItem(offlineLanguageStorageKey,JSON.stringify(offlineChoice))}catch(e){console.warn('Cannot save offline language pair',e)}
+}
+/* Only keep a selection the loaded tokenizer can actually encode. `offlineChoice` holds NLLB codes
+   already, so this validates rather than re-maps; mapping happens once, when a locale is imported. */
+function supportedOfflineCode(code,supported){
+ return code&&supported&&supported.includes(code)?code:null;
+}
+/* Imports an online locale into the offline pair, or null when NLLB has no code for it. */
+function offlineCodeFromLocale(locale,supported){
+ const code=nllbCodeForLocale(locale);
+ if(!code)return null;
+ const registry=typeof offlineLanguageRegistry==='function'?offlineLanguageRegistry():[];
+ if(registry.length&&!registry.some(entry=>entry.code===code))return null;
+ if(supported)return supported.includes(code)?code:null;
+ return code;
+}
+/* Paint the chips for the restored mode once every piece above exists. */
+syncLanguageChips();
+const offlineTranslations=new Map();
+/* The pair comes from the offline selection, which is only ever filled with codes the loaded
+   tokenizer carries, so this cannot quietly translate Uzbek->Russian when the user picked another
+   language. Both sides must resolve, otherwise the send is refused with a reason, never faked. */
+function translateOfflineText(text,language,bubble,entry){
+ const bridge=window.AvnivoOfflineModules;
+ const supported=offlineLanguagesReady();
+ const source=supportedOfflineCode(offlineChoice[language],supported);
+ const target=supportedOfflineCode(offlineChoice[oppositeLanguage(language)],supported);
+ const unavailable=()=>{
+  bubble.classList.remove('typing');
+  bubble.textContent=avnivoUiText('offline.translate.notReady','Offline tarjima moduli yuklab olinmagan.');
+ };
+ if(!bridge||typeof bridge.translate!=='function'||!source||!target){unavailable();return}
+ let ok=false;
+ try{ok=bridge.supportsTranslation(source,target)===true}catch(e){ok=false}
+ if(!ok){unavailable();return}
+ const requestId=String(++offlineTranslationSeq);
+ bubble.textContent=avnivoUiText('translation.pending','Tarjima qilinmoqda…');
+ offlineTranslations.set(requestId,{bubble,entry,historyId:currentHistoryId});
+ bridge.translate(text,source,target,requestId);
+}
+let offlineTranslationSeq=0;
+window.AvnivoOfflineTranslation=function(raw){
+ let payload;
+ try{payload=JSON.parse(raw)}catch(e){return}
+ const pending=offlineTranslations.get(String(payload.requestId));
+ if(!pending)return;
+ offlineTranslations.delete(String(payload.requestId));
+ const {bubble,entry}=pending;
+ const clean=stripLanguageMarkers(payload.text);
+ if(payload.error||typeof payload.text!=='string'||!clean){
+  if(bubble.isConnected){bubble.textContent='Oflayn tarjima bajarilmadi: '+(payload.error||'bo‘sh javob');bubble.classList.remove('typing')}
+  return;
+ }
+ if(entry){entry.translation=clean;persistHistory()}
+ if(!bubble.isConnected)return;
+ typeTranslation(bubble,clean,()=>autoReadTranslation(bubble,'offline',pending.historyId));
+};
 let translationTimers=new Set();
 function clearTranslationTimers(){for(const timer of translationTimers)clearTimeout(timer);translationTimers.clear()}
 function previewTranslation(entry){return entry&&typeof entry==='object'&&entry.translation===PREVIEW_TRANSLATION}
@@ -1254,6 +1819,7 @@ function stopSpeaking(){
  if(ttsAudio){ttsAudio.pause();ttsAudio.removeAttribute('src');ttsAudio.load();ttsAudio=null}
  if(ttsAudioUrl){URL.revokeObjectURL(ttsAudioUrl);ttsAudioUrl=null}
  if(window.speechSynthesis)window.speechSynthesis.cancel();
+ if(window.AvnivoOfflineModules&&typeof window.AvnivoOfflineModules.stopSpeech==='function'){try{window.AvnivoOfflineModules.stopSpeech()}catch(e){}}
  if(speakingButton){speakingButton.classList.remove('is-speaking');speakingButton.removeAttribute('data-loading');speakingButton.setAttribute('aria-pressed','false');speakingButton=null}
 }
 function ttsChunks(text){
@@ -1281,9 +1847,26 @@ async function playMessage(button,bubble,language){
  speakingButton=button;button.classList.add('is-speaking');button.setAttribute('aria-pressed','true');
  const finish=()=>{if(generation===ttsGeneration)stopSpeaking()};
  if(document.documentElement.dataset.avnivoMode!=='online'){
-  if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){finish();return}
+  // Route by the bubble's own language, not by its side. The left/right sides hold whatever the
+  // user picked, so "left means Uzbek, right means Russian" is wrong for every other pair. The
+  // bundled Silero engine speaks Uzbek only; every other language must use a voice of its own.
+  const code=button.dataset.code||offlineChoice[language]||null;
+  if(isUzbekNllb(code)&&window.AvnivoOfflineModules&&typeof window.AvnivoOfflineModules.isSpeechReady==='function'){
+   let nativeReady=false;
+   try{nativeReady=window.AvnivoOfflineModules.isSpeechReady()===true}catch(e){nativeReady=false}
+   if(nativeReady){try{window.AvnivoOfflineModules.speak(text,String(generation));return}catch(e){}}
+  }
+  const speechLocale=speechLocaleForNllb(code);
+  if(!speechLocale||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
+   button.title='Bu til uchun oflayn ovoz mavjud emas';finish();return;
+  }
   const utterance=new SpeechSynthesisUtterance(text);
-  utterance.lang=language==='right'?'ru-RU':'uz-UZ';utterance.rate=Number(ttsRateSelect.value);
+  utterance.lang=speechLocale;utterance.rate=Number(ttsRateSelect.value);
+  const speechVoice=speechVoiceForLocale(speechLocale);
+  // null means the engine listed its voices and none speaks this language. Speaking anyway would
+  // read, for example, Russian with whatever default voice is installed.
+  if(speechVoice===null){button.title='Bu til uchun ovoz o‘rnatilmagan: '+speechLocale;finish();return}
+  if(speechVoice)utterance.voice=speechVoice;
   utterance.onend=finish;utterance.onerror=finish;
   try{speechSynthesis.speak(utterance)}catch(e){finish()}
   return;
@@ -1346,12 +1929,37 @@ async function playMessage(button,bubble,language){
  }
 }
 ttsTestButton.addEventListener('click',()=>{if(document.documentElement.dataset.avnivoMode!=='online'){ttsOnlineStatus.textContent='Ovoz sinovi faqat online rejimda';return}const bubble=document.createElement('div');bubble.textContent='Salom! AVNIVO ovoz sinovi.';playMessage(ttsTestButton,bubble,'left')});
-function attachSpeaker(bubble,language){
+
+// Auto-read is opt-in, persisted separately for online/offline, and never sends messages.
+const autoReadStorageKey='avnivo.translator.auto-read.v1';
+let autoReadPrefs={online:false,offline:false};
+try{const saved=JSON.parse(localStorage.getItem(autoReadStorageKey)||'{}');if(saved&&typeof saved==='object'){autoReadPrefs.online=saved.online===true;autoReadPrefs.offline=saved.offline===true}}catch(e){}
+const autoReadRow=document.createElement('div');autoReadRow.className='avnivo-autoread';
+const autoReadCopy=document.createElement('div');autoReadCopy.className='avnivo-autoread-copy';
+const autoReadTitle=document.createElement('span');autoReadTitle.className='avnivo-autoread-title';autoReadTitle.textContent='Avto o‘qish';
+const autoReadNote=document.createElement('span');autoReadNote.className='avnivo-autoread-note';autoReadNote.textContent='Faqat tayyor tarjimani ovozda o‘qish';
+autoReadCopy.append(autoReadTitle,autoReadNote);
+const autoReadSwitch=document.createElement('button');autoReadSwitch.type='button';autoReadSwitch.className='avnivo-autoread-switch';autoReadSwitch.setAttribute('role','switch');autoReadSwitch.setAttribute('aria-label','Tarjimani avtomatik ovozda o‘qish');
+autoReadRow.append(autoReadCopy,autoReadSwitch);
+document.querySelector('.settings-drawer .settings-header')?.insertAdjacentElement('afterend',autoReadRow);
+function autoReadMode(){return document.documentElement.dataset.avnivoMode==='offline'?'offline':'online'}
+function syncAutoRead(){const enabled=autoReadPrefs[autoReadMode()]===true;autoReadSwitch.setAttribute('aria-checked',String(enabled));autoReadSwitch.setAttribute('aria-label','Tarjimani avtomatik ovozda o‘qish: '+(enabled?'yoqilgan':'o‘chirilgan'))}
+autoReadSwitch.addEventListener('click',()=>{const mode=autoReadMode();autoReadPrefs[mode]=!autoReadPrefs[mode];try{localStorage.setItem(autoReadStorageKey,JSON.stringify(autoReadPrefs))}catch(e){}syncAutoRead()});
+syncAutoRead();new MutationObserver(syncAutoRead).observe(document.documentElement,{attributes:true,attributeFilter:['data-avnivo-mode']});
+function autoReadTranslation(bubble,mode,sessionId){
+ if(autoReadPrefs[mode]!==true||autoReadMode()!==mode||!bubble.isConnected||currentHistoryId!==sessionId)return;
+ const text=bubble.textContent.trim();if(!text||text===PREVIEW_TRANSLATION)return;
+ const button=bubble.closest('.message-line')?.querySelector('.speak-message');
+ if(button)playMessage(button,bubble,button.dataset.language||'left');
+}
+function attachSpeaker(bubble,language,code){
  const isLeft=bubble.classList.contains('message-left');
  const line=document.createElement('div');
  line.className='message-line '+(isLeft?'line-left':'line-right');
  const button=document.createElement('button');
- button.type='button';button.className='speak-message';
+ button.type='button';button.className='speak-message';button.dataset.language=language;
+ // The code the message was written in, so a later language change cannot redirect its voice.
+ if(code)button.dataset.code=code;
  button.setAttribute('aria-label','Xabarni ovoz chiqarib o‘qish');
  button.setAttribute('aria-pressed','false');
  button.innerHTML='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="speaker-core" d="M5 12h5l6-5v18l-6-5H5z"/><path class="sound-bars" d="M20 11q5 5 0 10M23 7q9 9 0 18"/></svg>';
@@ -1373,23 +1981,23 @@ function restoreHistory(session){
  clearTranslationTimers();
  for(const entry of session.messages.slice(-30)){
   const source=renderChatBubble(entry,firstLanguage);
-  messages.append(attachSpeaker(source,messageData(entry,firstLanguage).language));
+  messages.append(attachSpeaker(source,messageData(entry,firstLanguage).language,entry.sourceCode));
   if(typeof entry.translation==='string'&&entry.translation.length>0){
    const language=entry.language==='right'?'right':'left';
    const translationBubble=renderChatBubble({text:entry.translation,language:oppositeLanguage(language)},firstLanguage);
    translationBubble.classList.add('translation-preview');
-   messages.append(attachSpeaker(translationBubble,oppositeLanguage(language)));
+   messages.append(attachSpeaker(translationBubble,oppositeLanguage(language),entry.targetCode));
   }
  }
  scrollChatToLatest();
  if(typeof updateBrandVisibility==='function')updateBrandVisibility();
  label.hidden=Boolean(input.value)||messages.children.length>0;
 }
-function saveChatMessage(message,language,translation){
+function saveChatMessage(message,language,translation,sourceCode,targetCode){
  let session=historySessions.find(x=>x.id===currentHistoryId);
  if(!session){session={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,8),title:'O‘zbek tili = русский язык',firstLanguage:language,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),messages:[]};historySessions.unshift(session);historyDrafts[session.id]=historyDrafts.new||'';delete historyDrafts.new;currentHistoryId=session.id;persistActiveChat()}
  if(!session.firstLanguage)session.firstLanguage=language;
- session.messages.push({text:message,language,translation});session.messages=session.messages.slice(-200);session.updatedAt=new Date().toISOString();
+ session.messages.push({text:message,language,translation,sourceCode:sourceCode||null,targetCode:targetCode||null});session.messages=session.messages.slice(-200);session.updatedAt=new Date().toISOString();
  historySessions.sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt));historySessions=historySessions.slice(0,100);persistHistory();
 }
 historyToggle.addEventListener('click',()=>setHistoryOpen(!historyOpen));
@@ -1485,7 +2093,10 @@ function syncComposerMode(){
  mic.setAttribute('aria-pressed',String(active));
  mic.disabled=typing&&!active&&!input.value.trim();
  updateBrandVisibility();
- label.hidden=typing||messages.children.length>0||active||shell.classList.contains('hold-voice');
+ // A press that is still being decoded is an active press: the greeting must not come back
+ // mid-transcription, which is what made the interface look idle while the engine was working.
+ const busyVoice=active||shell.classList.contains('hold-voice')||offlineProcessingSession===offlineSession&&offlineProcessingSession!==0;
+ label.hidden=typing||messages.children.length>0||busyVoice;
 }
 const ONLINE_TRANSLATION_ENDPOINT='https://avnivo-translation-test-792624108019.europe-west1.run.app/api/translate';
 async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,historyId){
@@ -1505,38 +2116,56 @@ async function translateOnlineText(text,sourceLocale,targetLocale,bubble,entry,h
   }
   const data=await response.json();
   if(data.model!=='general/translation-llm'||data.source!==source[1]||data.target!==target[1]||typeof data.text!=='string')throw Error('Tarjima javobida til kodlari mos kelmadi');
+  const translated=stripLanguageMarkers(data.text);
+  if(!translated)throw Error('Tarjima bo‘sh qaytdi');
   // Persist verified translation even if user closed the page or switched chats.
-  if(entry){entry.translation=data.text;persistHistory()}
+  if(entry){entry.translation=translated;persistHistory()}
   if(!bubble.isConnected)return;
-  typeTranslation(bubble,data.text);
+  typeTranslation(bubble,translated,()=>autoReadTranslation(bubble,'online',historyId));
  }catch(error){
   if(!bubble.isConnected)return;
   bubble.textContent=error.name==='AbortError'?'Tarjima vaqti tugadi':error instanceof TypeError?'Tarjima serveriga ulanib bo‘lmadi':error.message;
   bubble.classList.remove('typing');
  }finally{clearTimeout(timeoutId)}
 }
+/* Both selected languages must be usable before anything is sent. Offline this means the module is
+   ready and each chip resolved to a code the tokenizer carries; sending with a blank chip would
+   silently translate the wrong pair. */
+function offlinePairIncomplete(){
+ if(document.documentElement.dataset.avnivoMode!=='offline')return false;
+ const supported=offlineLanguagesReady();
+ return !supportedOfflineCode(offlineChoice.left,supported)||!supportedOfflineCode(offlineChoice.right,supported);
+}
 function sendMessage(){
  const message=input.value.trim();
  if(!message)return;
+ if(offlinePairIncomplete()){
+  hint(avnivoUiText('offline.translate.needPair','Ikkala tilni tanlang: oflayn tarjima moduli tayyor bo‘lishi kerak.'));
+  return;
+ }
  const language=languageRow.dataset.selected==='right'?'right':'left';
  let session=historySessions.find(x=>x.id===currentHistoryId);
  const firstLanguage=session?.firstLanguage||language;
- const sourceBubble=renderChatBubble({text:message,language},firstLanguage);
- messages.appendChild(attachSpeaker(sourceBubble,language));
  const online=document.documentElement.dataset.avnivoMode==='online';
+ // Pin each bubble to the language it is actually written in, so its voice never drifts when the
+ // picker changes later. Online uses its own locale; offline uses the NLLB code.
+ const sourceCode=online?null:(offlineChoice[language]||null);
+ const targetCode=online?null:(offlineChoice[oppositeLanguage(language)]||null);
+ const sourceBubble=renderChatBubble({text:message,language},firstLanguage);
+ messages.appendChild(attachSpeaker(sourceBubble,language,sourceCode));
  const sourceLocale=online?onlineChoice[language]:null;
  const targetLocale=online?onlineChoice[oppositeLanguage(language)]:null;
- saveChatMessage(message,language,online?'':PREVIEW_TRANSLATION);
+ saveChatMessage(message,language,online?'':PREVIEW_TRANSLATION,sourceCode,targetCode);
  const savedSession=historySessions.find(x=>x.id===currentHistoryId);
  const entry=savedSession?.messages[savedSession.messages.length-1];
  if(online&&entry){entry.sourceLocale=sourceLocale;entry.targetLocale=targetLocale;persistHistory()}
  const translationBubble=renderChatBubble({text:'',language:oppositeLanguage(language)},firstLanguage);
  translationBubble.classList.add('translation-preview');
- messages.appendChild(attachSpeaker(translationBubble,oppositeLanguage(language)));
+ messages.appendChild(attachSpeaker(translationBubble,oppositeLanguage(language),targetCode));
  if(online){
   translationBubble.textContent='Tarjima qilinmoqda…';
   translateOnlineText(message,sourceLocale,targetLocale,translationBubble,entry,currentHistoryId);
- }else typeTranslation(translationBubble,PREVIEW_TRANSLATION);
+ }else translateOfflineText(message,language,translationBubble,entry);
  while(messages.children.length>60)messages.firstElementChild.remove();
  scrollChatToLatest();
  input.value='';persistDraft();clearTimeout(timeout);timeout=0;resize();syncComposerMode();delay(300);
@@ -1583,20 +2212,40 @@ async function stopVoice(){
  analyser=null;samples=null;level=0;idleWave();
  if(!input.value){clearTimeout(timeout);timeout=0;delay(300)}
 }
+/**
+ * Releases the microphone and audio graph of a previous press. Called before opening a new stream
+ * so two capture sessions can never overlap; idempotent, so the error paths can call it too.
+ */
+async function releaseOnlineCapture(){
+ requestToken++;
+ if(onlineRecorder&&onlineRecorder.state!=='inactive'){try{onlineRecorder.stop()}catch(e){}}
+ onlineRecorder=null;
+ if(mediaStream){mediaStream.getTracks().forEach(track=>{try{track.stop()}catch(e){}});mediaStream=null}
+ if(audioContext){const context=audioContext;audioContext=null;try{await context.close()}catch(e){}}
+ analyser=null;samples=null;level=0;
+}
 async function startVoice(){
  if(document.documentElement.dataset.avnivoMode==='offline'){
   if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
-  try{window.AvnivoOfflineSTT.start();hint('Ovoz yozish boshlandi. Tugatish uchun mikrofonni qayta bosing.')}
-  catch(e){hint('Offline STT xatosi: '+e.message)}
+  // Native bridge reports real state (permission, model readiness, runtime errors) via AvnivoOffline*.
+  try{startOfflineStt(offlineSession)}
+  catch(e){hint('Offline STT xatosi: '+(e&&e.message||e))}
   return;
  }
- if(!navigator.mediaDevices?.getUserMedia){return}
+ if(!navigator.mediaDevices?.getUserMedia){hint('Bu qurilmada mikrofon API mavjud emas');return}
+ // A second capture while the first stream is still open is the main cause of NotReadableError on
+ // Samsung: the platform hands the microphone to one session only. Release everything first, then
+ // take the token, so this press is not invalidated by its own teardown.
+ await releaseOnlineCapture();
  const token=++requestToken;
  try{
-  const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  // Default processing is requested on purpose. Forcing echoCancellation/noiseSuppression/
+  // autoGainControl to false asks for a raw stream, which many devices cannot provide alongside
+  // another audio client and which then fails as NotReadableError before capture even starts.
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true});
   if(token!==requestToken){stream.getTracks().forEach(track=>track.stop());return}
   const Context=window.AudioContext||window.webkitAudioContext;
-  if(!Context){stream.getTracks().forEach(track=>track.stop());return}
+  if(!Context){stream.getTracks().forEach(track=>track.stop());hint('AudioContext mavjud emas: waveform ishlamaydi');return}
   const ctx=new Context();await ctx.resume();
   if(token!==requestToken){stream.getTracks().forEach(track=>track.stop());await ctx.close();return}
   const source=ctx.createMediaStreamSource(stream),a=ctx.createAnalyser();
@@ -1611,7 +2260,24 @@ async function startVoice(){
   shell.classList.add('voice-active');shell.classList.remove('text-mode');updateBrandVisibility();
   frame=requestAnimationFrame(draw);
   stream.getAudioTracks()[0]?.addEventListener('ended',()=>{if(active)stopVoice()},{once:true});
- }catch(error){if(token===requestToken){mic.setAttribute('aria-label','Mikrofonga ruxsat berilmadi');console.warn('Microphone unavailable',error)}}
+ }catch(error){
+  if(token!==requestToken)return;
+  // Name the real cause instead of failing silently: NotAllowedError is a permission refusal,
+  // NotFoundError means no capture device, and anything else is a genuine capture failure.
+  const name=error&&error.name||'';
+  const message=name==='NotAllowedError'?'Mikrofon ruxsati berilmadi. Ilova sozlamalaridan ruxsat bering'
+   :name==='NotFoundError'?'Mikrofon topilmadi'
+   :name==='NotReadableError'?'Mikrofon boshqa ilova tomonidan band'
+   :'Mikrofonni ochib bo‘lmadi: '+(error&&error.message||name||error);
+  mic.setAttribute('aria-label','Mikrofonga ruxsat berilmadi');
+  shell.classList.remove('hold-voice');
+  onlineState('error');
+  hint(message);
+  // A failed capture can still hold the device; release it so the next press is not blocked by
+  // this attempt, which is what produced a permanent NotReadableError after one bad start.
+  await releaseOnlineCapture();
+  console.warn('Microphone unavailable',name||error);
+ }
 }
 
 const voiceHint=document.querySelector('.voice-hint');
@@ -1684,7 +2350,10 @@ async function sendOnlineAudio(blob,locale,session){
   }else onlineState('error');
  }catch(e){
   if(session!==onlineSession||document.documentElement.dataset.avnivoMode!=='online')return;
-  console.warn('Chirp 2 recognition failed:',e);onlineState('error');
+  // A failed transcription must reach the user; a silent console line is not a report.
+  if(e&&e.name==='AbortError')hint('Ovozni matnga aylantirish bekor qilindi yoki vaqti tugadi');
+  else hint('Ovozni matnga aylantirish xatosi: '+(e&&e.message||e));
+  console.warn('Chirp 2 recognition failed:',e&&e.name||e);onlineState('error');
  }finally{clearTimeout(timer);if(onlineAbort===ctrl)onlineAbort=null}
 }
 function cancelOnlineRecording(){
@@ -1696,7 +2365,22 @@ function cancelOnlineRecording(){
 
 let holdTimer=0,holdStarted=false,holdPointer=null,holdSuppressClick=false,holdRecognizer=null,holdBase='',holdTranscript='',holdFinal='',holdSession=0,holdWaveStream=null,holdWaveContext=null,holdWaveFrame=0,holdWaveAnalyser=null;
 let avnivoPressStartedAt=0,avnivoRecordingAt=0,avnivoCancelHold=false,avnivoHoldFinalizing=false;
-function hint(message){if(document.documentElement.dataset.avnivoMode==='online'){voiceHint.hidden=true;return}voiceHint.textContent=message;voiceHint.hidden=!message}
+// Offline gesture state: the native recorder owns capture; JS only reflects its live amplitude.
+let offlineWaveFrame=0,offlineWaveActive=false,offlineLevel=0,avnivoOfflineCancel=false;
+/* Offline session tracking. The native bridge stamps every callback with the press it belongs to,
+   so a late result from an earlier recording can never be inserted into a later one. */
+let offlineSession=0,offlineProcessingSession=0;
+function offlineStateName(state){
+ // Drives the same left-hand indicator the online path uses: recording, processing, done, error.
+ onlineStatus.dataset.state=state;
+}
+let avnivoHintTimeout=0;
+function hint(message){
+ clearTimeout(avnivoHintTimeout);avnivoHintTimeout=0;
+ // Online mode used to swallow every hint, which hid microphone and Chirp 2 failures completely.
+ voiceHint.textContent=message;voiceHint.hidden=!message;
+ if(message)avnivoHintTimeout=setTimeout(()=>{voiceHint.textContent='';voiceHint.hidden=true;avnivoHintTimeout=0},3500);
+}
 function appendTranscript(base,transcript){
  const spoken=transcript.trim();
  if(!spoken)return base;
@@ -1734,6 +2418,33 @@ async function startHoldWave(session){
   animate();
  }catch(e){if(session===holdSession&&holdStarted)hint('Mikrofon ruxsatini tekshiring')}
 }
+// Drives the existing waveform from the native recorder's real microphone amplitude while the
+// user holds the microphone. Reuses the same appearance; only the amplitude source differs.
+function offlineWaveFrameStep(){
+ if(!offlineWaveActive)return;
+ const amp=Math.max(1.5,Math.min(13,offlineLevel*15));
+ const now=performance.now();
+ const path='M '+Array.from({length:61},(_,i)=>{
+  const x=i/60*100,env=Math.sin(Math.PI*i/60);
+  const y=16+Math.sin(i*.76+now*.014)*amp*env;
+  return x.toFixed(2)+','+y.toFixed(2);
+ }).join(' L ');
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 32" preserveAspectRatio="none"><path d="'+path+'" fill="none" stroke="#f6c776" stroke-width="1.8" vector-effect="non-scaling-stroke"/></svg>';
+ trace.style.backgroundImage='url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
+ trace.style.backgroundSize='100% 100%';
+ trace.style.filter='drop-shadow(0 0 '+Math.min(17,4+offlineLevel*14).toFixed(1)+'px #eeb552)';
+ offlineWaveFrame=requestAnimationFrame(offlineWaveFrameStep);
+}
+function stopOfflineWave(){
+ offlineWaveActive=false;cancelAnimationFrame(offlineWaveFrame);offlineLevel=0;
+ trace.style.backgroundImage='none';idleWave();
+}
+function finishOfflineHold(){
+ if(!offlineWaveActive&&!shell.classList.contains('hold-voice'))return;
+ stopOfflineWave();
+ shell.classList.remove('hold-voice');mic.setAttribute('aria-label','Mikrofonni yoqish');
+ syncComposerMode();
+}
 function finishHold(cancel=false){
  if(!holdStarted)return;
  avnivoCancelHold=cancel;avnivoHoldFinalizing=true;window.avnivoVoiceFinalizing=!cancel;
@@ -1746,9 +2457,36 @@ function finishHold(cancel=false){
  else {if(!cancel)input.value=appendTranscript(holdBase,holdFinal||holdTranscript);window.avnivoVoiceFinalizing=false;persistDraft();resize();syncComposerMode();hint('')}
  syncComposerMode();
 }
+function offlineSourceLanguage(){
+ const side=languageRow.dataset.selected==='right'?'right':'left';
+ return offlineChoice[side]||'';
+}
+function startOfflineStt(session){
+ const bridge=window.AvnivoOfflineSTT;
+ const source=offlineSourceLanguage();
+ if(bridge&&typeof bridge.startWithLanguage==='function')bridge.startWithLanguage(session,source);
+ else if(bridge)bridge.start(session);
+}
 function beginHold(){
- if(document.documentElement.dataset.avnivoMode==='offline' && window.AvnivoOfflineSTT){
-  try{window.AvnivoOfflineSTT.start();hint('Offline nutq tanilmoqda…')}catch(e){hint('Offline STT xatosi: '+e.message)}
+ if(document.documentElement.dataset.avnivoMode==='offline'){
+  if(!window.AvnivoOfflineSTT){hint('Offline STT Android moduli topilmadi');return}
+  // Every press is a new session. Native callbacks carry this number back, so this recording's
+  // result is accepted and any earlier one that is still in flight is discarded.
+  const session=++offlineSession;
+  offlineProcessingSession=0;
+  // The native bridge owns capture start/stop, permission prompts and error reporting. Reuse the
+  // existing recording appearance/animation; the waveform follows the native amplitude callback.
+  shell.classList.add('hold-voice');shell.classList.remove('text-mode');
+  mic.setAttribute('aria-pressed','true');mic.setAttribute('aria-label','Yozishni tugatish uchun bosing');
+  avnivoOfflineCancel=false;
+  clearTimeout(timeout);timeout=0;label.hidden=true;
+  offlineStateName('recording');
+  offlineLevel=0;offlineWaveActive=true;cancelAnimationFrame(offlineWaveFrame);offlineWaveFrame=requestAnimationFrame(offlineWaveFrameStep);
+  try{startOfflineStt(session)}
+  catch(e){
+   stopOfflineWave();shell.classList.remove('hold-voice');mic.setAttribute('aria-pressed','false');
+   offlineStateName('error');hint('Offline STT xatosi: '+(e&&e.message||e));
+  }
   return;
  }
  if(active||holdStarted)return;
@@ -1839,9 +2577,31 @@ mic.addEventListener('pointerdown',event=>{
 });
 function releaseHold(event){
  if(holdPointer===null||event.pointerId!==holdPointer)return;
- const wasHold=holdStarted||active||shell.classList.contains('hold-voice');
+ const offline=document.documentElement.dataset.avnivoMode==='offline';
+ const wasHold=offline?shell.classList.contains('hold-voice'):(holdStarted||active||shell.classList.contains('hold-voice'));
  const held=performance.now()-avnivoPressStartedAt;
  clearHoldTimer();holdPointer=null;
+ if(offline){
+  // Stop the native recording immediately when the finger is released; keep tap-to-send.
+  holdSuppressClick=true;
+  if(wasHold){
+   try{window.AvnivoOfflineSTT.stop(offlineSession)}catch(e){}
+   // The recording is over, so its waveform stops now, but the press is not finished: decoding is
+   // about to start. Showing the processing indicator here is what makes one press enough — the
+   // earlier code cleared every trace of the press and looked like nothing had happened.
+   stopOfflineWave();
+   shell.classList.remove('hold-voice');
+   mic.setAttribute('aria-pressed','false');
+   if(offlineProcessingSession!==offlineSession){
+    offlineProcessingSession=offlineSession;
+    offlineStateName('loading');
+    offlineNotice.textContent='Matnga aylantirilmoqda…';
+   }
+   syncComposerMode();
+  }
+  else if(held<1100&&input.value.trim())sendMessage();
+  return;
+ }
  if(wasHold){
    holdSuppressClick=true;
    const cancel=avnivoRecordingAt===0||performance.now()-avnivoRecordingAt<1000;
@@ -1856,8 +2616,13 @@ function releaseHold(event){
  }
 }
 mic.addEventListener('pointerup',releaseHold);
+// Android WebView may deliver the release to the document after capture is lost.
+// releaseHold is idempotent because it clears holdPointer on its first invocation.
+document.addEventListener('pointerup',releaseHold,true);
+window.addEventListener('blur',()=>{if(holdPointer!==null)cancelHeldPointer()});
 mic.addEventListener('mousedown',preserveKeyboardOnMicPress);
-mic.addEventListener('pointercancel',event=>{if(holdPointer!==event.pointerId)return;clearHoldTimer();holdPointer=null;holdSuppressClick=true;if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();stopVoice();shell.classList.remove('hold-voice')}else finishHold(true)});
+function cancelHeldPointer(){if(holdPointer===null)return;clearHoldTimer();holdPointer=null;holdSuppressClick=true;if(document.documentElement.dataset.avnivoMode==='offline'){const cancelled=offlineSession;try{const bridge=window.AvnivoOfflineSTT;if(bridge){if(typeof bridge.cancel==='function')bridge.cancel(cancelled);else bridge.stop(cancelled)}}catch(e){}offlineSession++;finishOfflineHold();offlineProcessingSession=0;offlineStateName('idle')}else if(document.documentElement.dataset.avnivoMode==='online'){cancelOnlineRecording();stopVoice();shell.classList.remove('hold-voice')}else finishHold(true)}
+mic.addEventListener('pointercancel',event=>{if(holdPointer===event.pointerId)cancelHeldPointer()});
 mic.addEventListener('lostpointercapture',event=>{if(holdPointer===event.pointerId)releaseHold(event)});
 mic.addEventListener('contextmenu',event=>{if(holdTimer||holdStarted||active)event.preventDefault()});
 mic.addEventListener('click',event=>{event.preventDefault();holdSuppressClick=false});
@@ -1881,14 +2646,29 @@ if(avnivoFirstRunDone&&!avnivoResumeFast){
 if(currentHistoryId){const current=historySessions.find(x=>x.id===currentHistoryId);if(current)restoreHistory(current)}
 loadDraft();renderHistory();
 window.avnivoReturningLaunch={fast:avnivoResumeFast,completed:avnivoFirstRunDone};
+// Reconcile the card with the real native state on load (e.g. after an app restart). Deferred to
+// here because the handler reads the session counters declared above.
+syncUzbekSttCard();
 function avnivoMarkHidden(){
  persistDraft();persistHistory();persistActiveChat();
+ // Backgrounding must not leave a native recording running. Only an open capture is cancelled;
+ // a decode that is already running is allowed to finish so its transcript is not lost.
+ if(document.documentElement.dataset.avnivoMode==='offline'&&shell.classList.contains('hold-voice')){
+  const cancelled=offlineSession;
+  try{const bridge=window.AvnivoOfflineSTT;if(bridge){if(typeof bridge.cancel==='function')bridge.cancel(cancelled);else bridge.stop(cancelled)}}catch(e){}
+  offlineSession++;
+  finishOfflineHold();
+ }
  try{localStorage.setItem(avnivoCloseKey,String(Date.now()))}catch(e){}
 }
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')avnivoMarkHidden()});
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='hidden')avnivoMarkHidden();
+ else {syncUzbekSttCard();syncInstalledModules();}
+});
+window.addEventListener('pageshow',()=>{syncUzbekSttCard();syncInstalledModules();});
 window.addEventListener('pagehide',avnivoMarkHidden);
 
-window.addEventListener('pagehide',()=>{stopSpeaking();cancelOnlineRecording();if(active)stopVoice()});
+window.addEventListener('pagehide',()=>{stopSpeaking();cancelOnlineRecording();if(document.documentElement.dataset.avnivoMode==='offline'&&shell.classList.contains('hold-voice')){try{const bridge=window.AvnivoOfflineSTT;if(bridge){if(typeof bridge.cancel==='function')bridge.cancel(offlineSession);else bridge.stop(offlineSession)}}catch(e){}}if(active)stopVoice()});
 
 })();
 </script>
